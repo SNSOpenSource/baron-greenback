@@ -25,12 +25,12 @@ public class Crawler {
     }
 
     public Sequence<Record> crawl(XmlSource webSource) throws Exception {
-        Records records = new Crawler().load(webSource.getUrl());
+        Records records = load(webSource.getUrl());
         records.define(webSource.getElement(), webSource.getFields());
         return records.get(webSource.getElement());
     }
 
-    public  Callable1<Record, Iterable<Record>> crawl(final Keyword<String> sourceUrl, final Keyword<Object> root, final Keyword<?>... fields) {
+    public Callable1<Record, Iterable<Record>> crawl(final Keyword<String> sourceUrl, final Keyword<Object> root, final Keyword<?>... fields) {
         return new Callable1<Record, Iterable<Record>>() {
             public Iterable<Record> call(Record record) throws Exception {
                 String url = record.get(sourceUrl);
