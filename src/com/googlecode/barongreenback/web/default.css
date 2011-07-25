@@ -93,3 +93,22 @@ img {
 .menu li:hover, .menu a:hover {
     background-color: #A5D642;
 }
+
+table.results {
+    border-collapse: collapse;
+    empty-cells: show;
+}
+
+table.results, table.results th, table.results td {
+    border: 1px solid #A5DDAD;
+}
+
+table.results th {
+    text-align: left;
+    background-color: #F2FFEE;
+}
+
+table.results th, table.results td {
+    padding: 0 10px;
+}
+

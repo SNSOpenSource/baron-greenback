@@ -9,7 +9,7 @@
 <p class="summary">A Lucene based web search tool</p>
 <div class="header">
     <ul class="menu">
-        <li class="item"><a href="index.html">home</a></li>
+        <li class="item"><a href="/">home</a></li>
         <li class="item"><a href="admin">admin</a></li>
     </ul>
 </div>
