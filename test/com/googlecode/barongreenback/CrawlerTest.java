@@ -3,6 +3,7 @@ package com.googlecode.barongreenback;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
+import com.googlecode.utterlyidle.Server;
 import com.googlecode.utterlyidle.io.Url;
 import org.junit.Test;
 
@@ -27,21 +28,31 @@ public class CrawlerTest {
 
     @Test
     public void shouldGetTheContentsOfAUrlAndExtractContent() throws Exception {
-        Url base = startServer();
-        final Url feed = base.replacePath(base.path().subDirectory("static").file("atom.xml"));
-        final Crawler crawler = new Crawler();
-        Sequence<Record> records = crawler.crawl(new XmlSource(feed.toURL(), ENTRIES, ID, LINK)).
-                sortBy(descending(UPDATED)).
-                flatMap(crawler.crawl(LINK, USER, USER_ID, FIRST_NAME));
+        Server server = startServer();
+        final Url feed = createFeed(server);
+        Sequence<Record> records = crawl(feed);
         Record entry = records.head();
 
         assertThat(entry.get(ID), is("urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1"));
         assertThat(entry.get(USER_ID), is(1234));
         assertThat(entry.get(FIRST_NAME), is("Dan"));
+        server.close();
+    }
+
+    public static Sequence<Record> crawl(Url feed) throws Exception {
+        final Crawler crawler = new Crawler();
+        return crawler.crawl(new XmlSource(feed.toURL(), ENTRIES, ID, LINK)).
+                sortBy(descending(UPDATED)).
+                flatMap(crawler.crawl(LINK, USER, USER_ID, FIRST_NAME));
+    }
+
+    public static Url createFeed(final Server server) {
+        Url base = server.getUrl();
+        return base.replacePath(base.path().subDirectory("static").file("atom.xml"));
     }
 
 
-    private Url startServer() {
+    public static Server startServer() {
         return application().content(packageUrl(CrawlerTest.class), "static").start(defaultConfiguration().port(10010));
     }
 
