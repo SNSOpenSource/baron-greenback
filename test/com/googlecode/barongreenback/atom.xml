@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed>
+  <title>A title</title>
+  <id>urn:uuid:d199d2c5-8975-f344-4bc8-a698158c6ef1</id>
+  <updated>2011-07-19T12:43:26Z</updated>
+  <entry>
+    <title>An entry title</title>
+    <link href="http://localhost:10010/static/custom.xml" />
+    <id>urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1</id>
+    <content type="text/xml">
+        <div>Foo</div>
+    </content>
+    <author>
+      <name>FTTC</name>
+    </author>
+    <updated>2011-07-19T12:43:26Z</updated>
+  </entry>
+</feed>
