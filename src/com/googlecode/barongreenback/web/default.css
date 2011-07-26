@@ -112,3 +112,7 @@ table.results th, table.results td {
     padding: 0 10px;
 }
 
+form.search {
+    margin-bottom: 20px;
+}
+

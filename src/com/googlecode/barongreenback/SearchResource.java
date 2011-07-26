@@ -1,27 +1,22 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static com.googlecode.barongreenback.Callables.asMap;
+import static com.googlecode.barongreenback.Callables.headers;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Callables.asString;
-import static com.googlecode.totallylazy.Callables.first;
 
 
 @Path("search")
@@ -36,20 +31,19 @@ public class SearchResource {
     }
 
     @GET
-    public Model find(@QueryParam("query") @DefaultValue("type:users") String query) throws ParseException {
-        Sequence<Record> results = records.query(parser.parse(query));
+    public Model find(@QueryParam("query") String query) throws ParseException {
+        Sequence<Record> results = records.query(parse(query));
         return model().
                 add("query", query).
-                add("headers", results.head().keywords().map(asString()).toList()).
+                add("headers", headers(results)).
                 add("results", results.map(asMap()).toList());
     }
 
-    public static Callable1<? super Record, Map<String, Object>> asMap() {
-        return new Callable1<Record, Map<String, Object>>() {
-            public Map<String, Object> call(Record record) throws Exception {
-                return record.fields().map(first(asString(Keyword.class))).
-                        fold(new HashMap<String, Object>(), Maps.<String, Object>asMap());
-            }
-        };
+    private Query parse(String query) throws ParseException {
+        if(query.isEmpty()){
+            return new MatchAllDocsQuery();
+        }
+        return parser.parse(query);
     }
+
 }

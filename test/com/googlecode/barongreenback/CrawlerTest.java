@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
@@ -21,6 +20,7 @@ public class CrawlerTest {
     private static final Keyword<String> ID = Keyword.keyword("id", String.class);
     private static final Keyword<String> LINK = Keyword.keyword("link/@href", String.class);
     private static final Keyword<Date> UPDATED = Keyword.keyword("updated", Date.class);
+    private static final Keyword<String> TITLE = Keyword.keyword("title", String.class);
 
     private static final Keyword<Object> USER = Keyword.keyword("/user");
     private static final Keyword<Integer> USER_ID = Keyword.keyword("summary/userId", Integer.class);
@@ -41,8 +41,7 @@ public class CrawlerTest {
 
     public static Sequence<Record> crawl(Url feed) throws Exception {
         final Crawler crawler = new Crawler();
-        return crawler.crawl(new XmlSource(feed.toURL(), ENTRIES, ID, LINK)).
-                sortBy(descending(UPDATED)).
+        return crawler.crawl(new XmlSource(feed.toURL(), ENTRIES, ID, LINK, UPDATED, TITLE)).
                 flatMap(crawler.crawl(LINK, USER, USER_ID, FIRST_NAME));
     }
 
