@@ -34,6 +34,7 @@ import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.rende
 public class SearchModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, ResponseHandlersModule {
     public Module addResources(Resources resources) throws ParseException {
         resources.add(annotatedClass(SearchResource.class));
+        resources.add(annotatedClass(CrawlerResource.class));
         resources.add(binding(get("").resource(method(on(SearchResource.class).find(definedParam("type:users"))))));
         return this;
     }
@@ -50,6 +51,7 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
         container.addActivator(Records.class, container.getActivator(LuceneRecords.class));
         container.add(Analyzer.class, StandardAnalyzer.class);
         container.addActivator(QueryParser.class, QueryParserActivator.class);
+        container.add(Crawler.class);
         return this;
     }
 
