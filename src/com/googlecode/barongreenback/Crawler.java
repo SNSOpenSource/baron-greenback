@@ -13,7 +13,7 @@ import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 
 import java.net.URL;
 
-import static com.googlecode.totallylazy.records.memory.MemoryRecords.updateValues;
+import static com.googlecode.totallylazy.records.RecordCallables.merge;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 
@@ -40,16 +40,4 @@ public class Crawler {
             }
         };
     }
-
-    public static Callable1<? super Record, Record> merge(final Record other) {
-        return new Callable1<Record, Record>() {
-            public Record call(Record record) throws Exception {
-                return other.fields().fold(record, updateValues());
-            }
-        };
-    }
-
-
-
-
 }
