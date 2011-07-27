@@ -12,7 +12,7 @@ import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.modules.ResponseHandlersModule;
 import com.googlecode.yadic.Container;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -43,13 +43,13 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
         container.addInstance(Version.class, Version.LUCENE_33);
         container.addActivator(Directory.class, DirectoryActivator.class);
         container.addActivator(IndexWriter.class, IndexWriterActivator.class);
+        container.add(Analyzer.class, KeywordAnalyzer.class);
         return this;
     }
 
     public Module addPerRequestObjects(Container container) {
         container.add(LuceneRecords.class);
         container.addActivator(Records.class, container.getActivator(LuceneRecords.class));
-        container.add(Analyzer.class, StandardAnalyzer.class);
         container.addActivator(QueryParser.class, QueryParserActivator.class);
         container.add(Crawler.class);
         return this;

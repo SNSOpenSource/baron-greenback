@@ -16,6 +16,10 @@ public class QueryParserActivator implements Callable<QueryParser>{
     }
 
     public QueryParser call() throws Exception {
-        return new QueryParser(version, "", analyzer);
+        QueryParser queryParser = new QueryParser(version, "", analyzer);
+        queryParser.setLowercaseExpandedTerms(false);
+        queryParser.setAllowLeadingWildcard(true);
+        queryParser.setDefaultOperator(QueryParser.Operator.AND);
+        return queryParser;
     }
 }
