@@ -4,15 +4,27 @@
   <id>urn:uuid:d199d2c5-8975-f344-4bc8-a698158c6ef1</id>
   <updated>2011-07-19T12:43:26Z</updated>
   <entry>
-    <title>An entry title</title>
-    <link href="http://localhost:10010/static/custom.xml" />
+    <title>Added user</title>
+    <link href="http://localhost:10010/static/entry1.xml" />
     <id>urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1</id>
     <content type="text/xml">
-        <div>Foo</div>
+        <div>Hello</div>
     </content>
     <author>
-      <name>FTTC</name>
+      <name>Dan</name>
     </author>
     <updated>2011-07-19T12:43:26Z</updated>
+  </entry>
+  <entry>
+    <title>Deleted user</title>
+    <link href="http://localhost:10010/static/entry2.xml" />
+    <id>urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef2</id>
+    <content type="text/xml">
+        <div>Byte</div>
+    </content>
+    <author>
+      <name>Bob</name>
+    </author>
+    <updated>2011-07-19T12:43:25Z</updated>
   </entry>
 </feed>

@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
+import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
@@ -42,6 +43,7 @@ public class CrawlerTest {
     public static Sequence<Record> crawl(Url feed) throws Exception {
         final Crawler crawler = new Crawler();
         return crawler.crawl(new XmlSource(feed.toURL(), ENTRIES, ID, LINK, UPDATED, TITLE)).
+                sortBy(descending(UPDATED)).
                 flatMap(crawler.crawl(LINK, USER, USER_ID, FIRST_NAME));
     }
 

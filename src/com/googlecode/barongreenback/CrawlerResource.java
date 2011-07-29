@@ -17,7 +17,9 @@ import org.apache.lucene.queryParser.ParseException;
 
 import java.net.URL;
 
+import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
@@ -43,7 +45,7 @@ public class CrawlerResource {
     }
 
     private Keyword[] toKeyWords(Iterable<String> fields, Iterable<String> types) {
-        return sequence(fields).filter(not(empty())).zip(sequence(types)).map(asKeyword()).toArray(Keyword.class);
+        return sequence(fields).zip(sequence(types)).filter(where(first(String.class), not(empty()))).map(asKeyword()).toArray(Keyword.class);
     }
 
     private Callable1<? super Pair<String, String>, Keyword> asKeyword() {
