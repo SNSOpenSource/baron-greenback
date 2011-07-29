@@ -22,6 +22,7 @@ import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.empty;
+import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
 import static com.googlecode.utterlyidle.proxy.Resource.resource;
 
@@ -38,24 +39,23 @@ public class CrawlerResource {
 
     @POST
     @Path("crawl")
-    public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath, @FormParam("fields") Iterable<String> fields, @FormParam("types") Iterable<String> types) throws Exception {
-        XmlSource webSource = new XmlSource(url, Keyword.keyword(elementXPath), toKeyWords(fields, types));
+    public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath, @FormParam("fields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases, @FormParam("types") Iterable<String> types) throws Exception {
+        XmlSource webSource = new XmlSource(url, keyword(elementXPath), toKeyWords(fields, aliases, types));
         Sequence<Record> extractedValues = crawler.crawl(webSource);
-        return add(Keyword.keyword(recordName), extractedValues);
+        return add(keyword(recordName), extractedValues);
     }
 
-    private Keyword[] toKeyWords(Iterable<String> fields, Iterable<String> types) {
-        return sequence(fields).zip(sequence(types)).filter(where(first(String.class), not(empty()))).map(asKeyword()).toArray(Keyword.class);
+    private Keyword[] toKeyWords(Iterable<String> fields, Iterable<String> types, Iterable<String> aliases) {
+        return sequence(fields).zip(sequence(aliases).zip(sequence(types))).filter(where(first(String.class), not(empty()))).map(asKeyword()).toArray(Keyword.class);
     }
 
-    private Callable1<? super Pair<String, String>, Keyword> asKeyword() {
-        return new Callable1<Pair<String, String>, Keyword>() {
-            public Keyword call(Pair<String, String> pair) throws Exception {
-                return Keyword.keyword(pair.first(), Class.forName(pair.second()));
+    private Callable1<? super Pair<String, Pair<String, String>>, Keyword> asKeyword() {
+        return new Callable1<Pair<String, Pair<String, String>>, Keyword>() {
+            public Keyword call(Pair<String, Pair<String, String>> pair) throws Exception {
+                return keyword(pair.first(), pair.second().second(), Class.forName(pair.second().first()));
             }
         };
     }
-
 
     private Response add(final Keyword<Object> recordName, final Sequence<Record> recordsToAdd) throws ParseException {
         records.add(recordName, recordsToAdd);

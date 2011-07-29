@@ -3,7 +3,6 @@ package com.googlecode.barongreenback;
 import com.googlecode.barongreenback.web.WebApplication;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.Application;
@@ -15,6 +14,7 @@ import com.googlecode.yadic.Container;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Runnables.VOID;
+import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
@@ -38,7 +38,7 @@ public class SearchResourceTest {
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
                 LuceneRecords luceneRecords = container.get(LuceneRecords.class);
-                luceneRecords.add(Keyword.keyword("users"), recordSequence);
+                luceneRecords.add(keyword("users"), recordSequence);
                 return VOID;
             }
         });

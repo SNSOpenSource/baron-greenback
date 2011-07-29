@@ -11,21 +11,22 @@ import java.util.Date;
 
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.URLs.packageUrl;
+import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class CrawlerTest {
-    private static final Keyword<Object> ENTRIES = Keyword.keyword("/feed/entry");
-    private static final Keyword<String> ID = Keyword.keyword("id", String.class);
-    private static final Keyword<String> LINK = Keyword.keyword("link/@href", String.class);
-    private static final Keyword<Date> UPDATED = Keyword.keyword("updated", Date.class);
-    private static final Keyword<String> TITLE = Keyword.keyword("title", String.class);
+    private static final Keyword<Object> ENTRIES = keyword("/feed/entry");
+    private static final Keyword<String> ID = keyword("id", String.class);
+    private static final Keyword<String> LINK = keyword("link/@href", String.class);
+    private static final Keyword<Date> UPDATED = keyword("updated", Date.class);
+    private static final Keyword<String> TITLE = keyword("title", String.class);
 
-    private static final Keyword<Object> USER = Keyword.keyword("/user");
-    private static final Keyword<Integer> USER_ID = Keyword.keyword("summary/userId", Integer.class);
-    private static final Keyword<String> FIRST_NAME = Keyword.keyword("summary/firstName", String.class);
+    private static final Keyword<Object> USER = keyword("/user");
+    private static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class);
+    private static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class);
 
     @Test
     public void shouldGetTheContentsOfAUrlAndExtractContent() throws Exception {

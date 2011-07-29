@@ -2,6 +2,8 @@ package com.googlecode.barongreenback;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.MediaType;
@@ -32,7 +34,7 @@ public class SearchResource {
 
     @GET
     public Model find(@QueryParam("query") String query) throws ParseException {
-        Sequence<Record> results = records.query(parse(query));
+        Sequence<Record> results = records.query(parse(query), Sequences.<Keyword>empty());
         return model().
                 add("query", query).
                 add("headers", headers(results)).
