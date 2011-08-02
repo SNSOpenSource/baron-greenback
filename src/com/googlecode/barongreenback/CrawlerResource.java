@@ -52,7 +52,9 @@ public class CrawlerResource {
     private Callable1<? super Pair<String, Pair<String, String>>, Keyword> asKeyword() {
         return new Callable1<Pair<String, Pair<String, String>>, Keyword>() {
             public Keyword call(Pair<String, Pair<String, String>> pair) throws Exception {
-                return keyword(pair.first(), pair.second().second(), Class.forName(pair.second().first()));
+                Class aClass = Class.forName(pair.second().first());
+                Keyword<?> keyword = keyword(pair.second().second(), aClass);
+                return keyword(pair.first(), aClass).as(keyword);
             }
         };
     }

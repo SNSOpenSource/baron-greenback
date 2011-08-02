@@ -7,13 +7,16 @@ import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.totallylazy.records.xml.XmlRecords;
+import com.googlecode.totallylazy.records.xml.mappings.DateMapping;
+import com.googlecode.totallylazy.records.xml.mappings.Mappings;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 
 import java.net.URL;
+import java.util.Date;
 
-import static com.googlecode.totallylazy.records.RecordCallables.merge;
+import static com.googlecode.totallylazy.records.RecordMethods.merge;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 
@@ -21,7 +24,7 @@ public class Crawler {
     public Records load(URL url) throws Exception {
         HttpHandler httpHandler = new ClientHttpHandler();
         Response response = httpHandler.handle(get(url.toString()).build());
-        return new XmlRecords(Xml.load(new String(response.bytes())));
+        return new XmlRecords(Xml.load(new String(response.bytes())), new Mappings().add(Date.class, DateMapping.atomDateFormat()));
     }
 
     public Sequence<Record> crawl(XmlSource webSource) throws Exception {
