@@ -3,6 +3,7 @@ package com.googlecode.barongreenback;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
@@ -53,8 +54,12 @@ public class CrawlerResource {
         return new Callable1<Pair<String, Pair<String, String>>, Keyword>() {
             public Keyword call(Pair<String, Pair<String, String>> pair) throws Exception {
                 Class aClass = Class.forName(pair.second().first());
-                Keyword<?> keyword = keyword(pair.second().second(), aClass);
-                return keyword(pair.first(), aClass).as(keyword);
+                ImmutableKeyword source = keyword(pair.first(), aClass);
+                String alias = pair.second().second();
+                if(!alias.isEmpty()){
+                    return source.as(keyword(alias, aClass));
+                }
+                return source;
             }
         };
     }

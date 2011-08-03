@@ -24,7 +24,8 @@ public class Crawler {
     public Records load(URL url) throws Exception {
         HttpHandler httpHandler = new ClientHttpHandler();
         Response response = httpHandler.handle(get(url.toString()).build());
-        return new XmlRecords(Xml.load(new String(response.bytes())), new Mappings().add(Date.class, DateMapping.atomDateFormat()));
+        String xml = new String(response.bytes());
+        return new XmlRecords(Xml.load(xml), new Mappings().add(Date.class, DateMapping.atomDateFormat()));
     }
 
     public Sequence<Record> crawl(XmlSource webSource) throws Exception {

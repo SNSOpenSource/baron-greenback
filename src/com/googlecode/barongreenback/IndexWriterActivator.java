@@ -24,6 +24,7 @@ public class IndexWriterActivator implements Callable<IndexWriter>, Closeable {
 
     public IndexWriter call() throws Exception {
         indexWriter = new IndexWriter(directory, new IndexWriterConfig(version, analyzer));
+        indexWriter.commit();
         return indexWriter;
     }
 

@@ -47,6 +47,6 @@ public class SearchResourceTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new RestServer(addSomeData(new WebApplication()), defaultConfiguration().port(9000));
+        new RestServer(new WebApplication(), defaultConfiguration().port(9000));
     }
 }
