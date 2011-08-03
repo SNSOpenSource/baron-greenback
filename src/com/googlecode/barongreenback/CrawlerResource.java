@@ -1,8 +1,9 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Quadruple;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
@@ -21,7 +22,6 @@ import java.net.URL;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
@@ -40,29 +40,33 @@ public class CrawlerResource {
 
     @POST
     @Path("crawl")
-    public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath, @FormParam("fields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases, @FormParam("types") Iterable<String> types) throws Exception {
-        XmlSource webSource = new XmlSource(url, keyword(elementXPath), toKeyWords(fields, aliases, types));
+    public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath,
+                          @FormParam("fields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases,
+                          @FormParam("types") Iterable<String> types, @FormParam("keys") Iterable<String> keys) throws Exception {
+        XmlSource webSource = new XmlSource(url, keyword(elementXPath), toKeyWords(fields, aliases, types, keys));
         Sequence<Record> extractedValues = crawler.crawl(webSource);
         return add(keyword(recordName), extractedValues);
     }
 
-    private Keyword[] toKeyWords(Iterable<String> fields, Iterable<String> types, Iterable<String> aliases) {
-        return sequence(fields).zip(sequence(aliases).zip(sequence(types))).filter(where(first(String.class), not(empty()))).map(asKeyword()).toArray(Keyword.class);
+    private Sequence<Keyword> toKeyWords(Iterable<String> fields, Iterable<String> types, Iterable<String> aliases, Iterable<String> keys) {
+        return Sequences.zip(fields, aliases, types, keys).filter(where(first(String.class), not(empty()))).map(asKeyword());
     }
 
-    private Callable1<? super Pair<String, Pair<String, String>>, Keyword> asKeyword() {
-        return new Callable1<Pair<String, Pair<String, String>>, Keyword>() {
-            public Keyword call(Pair<String, Pair<String, String>> pair) throws Exception {
-                Class aClass = Class.forName(pair.second().first());
-                ImmutableKeyword source = keyword(pair.first(), aClass);
-                String alias = pair.second().second();
+    private Callable1<? super Quadruple<String, String, String, String>, Keyword> asKeyword() {
+        return new Callable1<Quadruple<String, String, String, String>, Keyword>() {
+            public Keyword call(Quadruple<String, String, String, String> quadruple) throws Exception {
+                Class aClass = Class.forName(quadruple.third());
+                ImmutableKeyword source = keyword(quadruple.first(), aClass);
+                String alias = quadruple.second();
                 if(!alias.isEmpty()){
                     return source.as(keyword(alias, aClass));
                 }
                 return source;
+
             }
         };
     }
+
 
     private Response add(final Keyword<Object> recordName, final Sequence<Record> recordsToAdd) throws ParseException {
         records.add(recordName, recordsToAdd);

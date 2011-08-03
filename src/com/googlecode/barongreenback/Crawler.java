@@ -30,7 +30,7 @@ public class Crawler {
 
     public Sequence<Record> crawl(XmlSource webSource) throws Exception {
         Records records = load(webSource.getUrl());
-        records.define(webSource.getElement(), webSource.getFields());
+        records.define(webSource.getElement(), webSource.getFields().toArray(Keyword.class));
         return records.get(webSource.getElement());
     }
 
