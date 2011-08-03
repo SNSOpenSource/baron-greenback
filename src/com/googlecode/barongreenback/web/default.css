@@ -116,3 +116,17 @@ form.search {
     margin-bottom: 20px;
 }
 
+form.search input.search {
+    width: 500px;
+}
+
+form.crawl input.url {
+    width: 500px;
+    clear: right;
+}
+
+
+input.text {
+    border: 1px solid #337E34;
+}
+

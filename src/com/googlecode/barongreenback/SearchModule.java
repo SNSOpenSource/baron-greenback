@@ -39,7 +39,7 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
     public Module addResources(Resources resources) throws ParseException {
         resources.add(annotatedClass(SearchResource.class));
         resources.add(annotatedClass(CrawlerResource.class));
-        resources.add(binding(get("").resource(method(on(SearchResource.class).find(definedParam("type:users"))))));
+        resources.add(binding(get("").resource(method(on(SearchResource.class).find(definedParam(""))))));
         return this;
     }
 

@@ -6,7 +6,8 @@
 <body>
 <div>
     <form class="search" method="get" action="search">
-        <label for="query">Search:</label><input type="text" id="query" name="query" value="$query$"/>
+        <input class="search text" type="text" id="query" name="query" value="$query$"/><input type="submit" value="Search"/>
+
     </form>
 
     $results()$

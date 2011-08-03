@@ -4,7 +4,6 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 
@@ -16,14 +15,13 @@ import static com.googlecode.totallylazy.Callables.asString;
 
 public class Callables {
     public static List<String> headers(Sequence<Record> results) {
-        return results.headOption().
-                map(keywords()).getOrElse(Sequences.<Keyword>empty()).
+        return results.flatMap(keywords()).toSetSequence().
                 map(asString()).
                 toList();
     }
 
-    public static Callable1<? super Record, Sequence<Keyword>> keywords() {
-        return new Callable1<Record, Sequence<Keyword>>() {
+    public static Callable1<? super Record, Iterable<Keyword>> keywords() {
+        return new Callable1<Record, Iterable<Keyword>>() {
             public Sequence<Keyword> call(Record record) throws Exception {
                 return record.keywords();
             }
