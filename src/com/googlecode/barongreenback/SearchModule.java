@@ -1,9 +1,13 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
+import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Resources;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ResponseHandlers;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
@@ -56,7 +60,18 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
     }
 
     public Module addResponseHandlers(ResponseHandlers handlers) {
+        handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("crawl"))), renderer(new ModelRenderer("crawl")));
         handlers.add(where(entity(), is(instanceOf(Model.class))), renderer(new ModelRenderer("search")));
         return this;
     }
+
+    public static Callable1<? super Pair<Request, Response>, String> file() {
+        return new Callable1<Pair<Request, Response>, String>() {
+            public String call(Pair<Request, Response> pair) throws Exception {
+                return pair.first().url().path().file();
+            }
+        };
+    }
+
+
 }
