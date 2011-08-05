@@ -15,13 +15,13 @@ import static com.googlecode.totallylazy.Callables.asString;
 
 public class Callables {
     public static List<String> headers(Sequence<Record> results) {
-        return results.flatMap(keywords()).toSetSequence().
+        return results.flatMap(keywords()).unique().
                 map(asString()).
                 toList();
     }
 
-    public static Callable1<? super Record, Iterable<Keyword>> keywords() {
-        return new Callable1<Record, Iterable<Keyword>>() {
+    public static Callable1<? super Record, Sequence<Keyword>> keywords() {
+        return new Callable1<Record, Sequence<Keyword>>() {
             public Sequence<Keyword> call(Record record) throws Exception {
                 return record.keywords();
             }
