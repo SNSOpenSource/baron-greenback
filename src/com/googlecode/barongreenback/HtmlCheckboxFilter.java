@@ -1,11 +1,10 @@
 package com.googlecode.barongreenback;
 
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.iterators.PeekingIterator;
 
-import java.util.ArrayList;
-import java.util.List;
+import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Sequences.splitOn;
 
 public class HtmlCheckboxFilter<T> {
     private final T negative;
@@ -15,17 +14,18 @@ public class HtmlCheckboxFilter<T> {
     }
 
     public Sequence<T> filter(Iterable<T> values) {
-        List<T> result = new ArrayList<T>();
-        for (PeekingIterator<T> iterator = new PeekingIterator<T>(values.iterator()); iterator.hasNext(); ) {
-            T value = iterator.next();
-            if(value.equals(negative)){
-                result.add(value);
+        Sequence<Sequence<T>> result = sequence(values).recursive(splitOn(negative));
+        return result.isEmpty() ? sequence(negative) : result.map(emptyTo(negative));
+    }
+
+    private Callable1<? super Sequence<T>, T> emptyTo(final T negative) {
+        return new Callable1<Sequence<T>, T>() {
+            public T call(Sequence<T> sequence) throws Exception {
+                if(sequence.isEmpty()){
+                    return negative;
+                }
+                return sequence.head();
             }
-            if (!value.equals(negative) && negative.equals(iterator.peek())) {
-                result.add(value);
-                iterator.next();
-            }
-        }
-        return Sequences.sequence(result);
+        };
     }
 }
