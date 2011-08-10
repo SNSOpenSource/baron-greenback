@@ -2,6 +2,7 @@ package com.googlecode.barongreenback;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.RAMDirectory;
 
 import java.io.Closeable;
 import java.io.File;
@@ -14,9 +15,9 @@ public class DirectoryActivator implements Callable<Directory>, Closeable{
     private Directory directory;
 
     public Directory call() throws Exception {
-        File path = temporaryDirectory();
-        System.out.println("Index located at: " + path);
-        directory = new NIOFSDirectory(path);
+//        File path = temporaryDirectory("baron-greenback");
+//        System.out.println("Index located at: " + path);
+        directory = new RAMDirectory();
         return directory;
     }
 

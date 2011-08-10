@@ -50,7 +50,7 @@ public class CrawlerResource {
 
     @POST
     public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath,
-                          @FormParam("fields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases,
+                          @FormParam("withFields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases,
                           @FormParam("types") Iterable<String> types, @FormParam("keys") Iterable<String> keys,
                           FormParameters form
     ) throws Exception {
@@ -79,7 +79,7 @@ public class CrawlerResource {
     }
 
     private Sequence<Triple<Boolean, Keyword, String>> extractKeywordsFrom(String prefix, FormParameters form) {
-        Iterable<String> fields = form.getValues(prefix + "fields");
+        Iterable<String> fields = form.getValues(prefix + "withFields");
         Iterable<String> aliases = form.getValues(prefix + "aliases");
         Iterable<String> types = form.getValues(prefix + "types");
         Iterable<String> keys = form.getValues(prefix + "keys");
