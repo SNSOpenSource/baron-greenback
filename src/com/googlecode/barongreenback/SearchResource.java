@@ -17,7 +17,7 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 import static com.googlecode.barongreenback.Callables.asMap;
-import static com.googlecode.barongreenback.Callables.headers;
+import static com.googlecode.barongreenback.Callables.headersAsString;
 import static com.googlecode.funclate.Model.model;
 
 
@@ -37,7 +37,7 @@ public class SearchResource {
         Sequence<Record> results = records.query(parse(query), Sequences.<Keyword>empty());
         return model().
                 add("query", query).
-                add("headers", headers(results)).
+                add("headers", headersAsString(results)).
                 add("results", results.map(asMap()).toList());
     }
 

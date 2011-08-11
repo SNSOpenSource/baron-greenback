@@ -1,8 +1,16 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Quadruple;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.Third;
+import com.googlecode.totallylazy.Triple;
 import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
@@ -20,6 +28,7 @@ import org.apache.lucene.queryParser.ParseException;
 
 import java.net.URL;
 
+import static com.googlecode.barongreenback.View.view;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -37,20 +46,22 @@ import static com.googlecode.utterlyidle.proxy.Resource.resource;
 public class CrawlerResource {
     private final Records records;
     private final Crawler crawler;
+    private final Views views;
 
-    public CrawlerResource(Records records, Crawler crawler) {
+    public CrawlerResource(Records records, Crawler crawler, Views views) {
         this.records = records;
         this.crawler = crawler;
+        this.views = views;
     }
 
     @GET
-    public Model get(){
+    public Model get() {
         return Model.model();
     }
 
     @POST
     public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath,
-                          @FormParam("withFields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases,
+                          @FormParam("fields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases,
                           @FormParam("types") Iterable<String> types, @FormParam("keys") Iterable<String> keys,
                           FormParameters form
     ) throws Exception {
@@ -128,7 +139,7 @@ public class CrawlerResource {
 
     private String extractSubFeed(String type) {
         String[] parts = type.split("#");
-        if(parts.length > 1){
+        if (parts.length > 1) {
             return parts[1];
         }
         return "";
@@ -139,7 +150,7 @@ public class CrawlerResource {
         Class aClass = classOf(className);
         ImmutableKeyword source = keyword(triple.first(), aClass);
         String alias = triple.second();
-        if(!alias.isEmpty()){
+        if (!alias.isEmpty()) {
             return source.as(keyword(alias, aClass));
         }
         return source;
@@ -151,6 +162,7 @@ public class CrawlerResource {
 
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> primaryKeys, final Sequence<Record> recordsToAdd) throws ParseException {
+        views.add(view(recordName).withFields(com.googlecode.barongreenback.Callables.headers(recordsToAdd)));
         records.put(recordName, update(using(primaryKeys), recordsToAdd));
         return redirect(resource(SearchResource.class).find(String.format("%s:%s", Lucene.RECORD_KEY, recordName)));
     }

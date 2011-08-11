@@ -14,10 +14,12 @@ import java.util.Map;
 import static com.googlecode.totallylazy.Callables.asString;
 
 public class Callables {
-    public static List<String> headers(Sequence<Record> results) {
-        return results.flatMap(keywords()).unique().
-                map(asString()).
-                toList();
+    public static List<String> headersAsString(Sequence<Record> results) {
+        return headers(results).map(asString()).toList();
+    }
+
+    public static Sequence<Keyword> headers(Sequence<Record> results) {
+        return results.flatMap(keywords()).unique();
     }
 
     public static Callable1<? super Record, Sequence<Keyword>> keywords() {

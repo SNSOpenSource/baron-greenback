@@ -61,7 +61,7 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
 
     public Module addResponseHandlers(ResponseHandlers handlers) {
         handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("crawl"))), renderer(new ModelRenderer("crawl")));
-        handlers.add(where(entity(), is(instanceOf(Model.class))), renderer(new ModelRenderer("search")));
+        handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("search"))), renderer(new ModelRenderer("search")));
         return this;
     }
 

@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.web;
 
 import com.googlecode.barongreenback.SearchModule;
+import com.googlecode.barongreenback.ViewsModule;
 import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 
@@ -18,6 +19,7 @@ import static com.googlecode.utterlyidle.sitemesh.TemplateName.templateName;
 public class WebApplication extends RestApplication {
     public WebApplication() {
         add(new SearchModule());
+        add(new ViewsModule());
         add(stringTemplateDecorators(packageUrl(WebApplication.class), staticRule(contentType(TEXT_HTML), templateName("default"))));
         add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path(""))));
     }
