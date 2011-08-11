@@ -90,7 +90,7 @@ public class CrawlerResource {
         };
     }
 
-    private Sequence<Triple<Boolean, Keyword, String>> extractKeywordsFrom(String prefix, FormParameters form) {
+    private Sequence<Triple<Boolean, Keyword, StrinextractKeywordsFrom(String prefix, FormParameters form) {
         Iterable<String> fields = form.getValues(prefix + "withFields");
         Iterable<String> aliases = form.getValues(prefix + "aliases");
         Iterable<String> types = form.getValues(prefix + "types");
