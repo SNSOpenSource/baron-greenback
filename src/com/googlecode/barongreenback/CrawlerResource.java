@@ -34,6 +34,7 @@ import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
@@ -164,6 +165,6 @@ public class CrawlerResource {
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> primaryKeys, final Sequence<Record> recordsToAdd) throws ParseException {
         views.add(view(recordName).withFields(com.googlecode.barongreenback.Callables.headers(recordsToAdd)));
         records.put(recordName, update(using(primaryKeys), recordsToAdd));
-        return redirect(resource(SearchResource.class).find(String.format("%s:%s", Lucene.RECORD_KEY, recordName)));
+        return redirect(resource(SearchResource.class).find(recordName.name(), EMPTY));
     }
 }

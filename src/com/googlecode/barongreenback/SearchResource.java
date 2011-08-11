@@ -5,10 +5,13 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
+import com.googlecode.totallylazy.records.lucene.Lucene;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.Path;
+import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
@@ -21,7 +24,6 @@ import static com.googlecode.barongreenback.Callables.headersAsString;
 import static com.googlecode.funclate.Model.model;
 
 
-@Path("search")
 @Produces(MediaType.TEXT_HTML)
 public class SearchResource {
     private final LuceneRecords records;
@@ -33,12 +35,21 @@ public class SearchResource {
     }
 
     @GET
-    public Model find(@QueryParam("query") String query) throws ParseException {
-        Sequence<Record> results = records.query(parse(query), Sequences.<Keyword>empty());
+    @Path("{view}/search")
+    public Model find(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
+        Sequence<Record> results = records.query(parse(prefix(view, query)), Sequences.<Keyword>empty());
         return model().
+                add("view", view).
                 add("query", query).
                 add("headers", headersAsString(results)).
                 add("results", results.map(asMap()).toList());
+    }
+
+    private String prefix(String view, String query) {
+        if(view.isEmpty()){
+            return query;
+        }
+        return String.format("+%s:%s %s", Lucene.RECORD_KEY, view, query);
     }
 
     private Query parse(String query) throws ParseException {

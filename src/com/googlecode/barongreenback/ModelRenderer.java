@@ -24,7 +24,6 @@ public class ModelRenderer implements Renderer<Model> {
     public String render(Model value) throws Exception {
         EnhancedStringTemplateGroup group = new EnhancedStringTemplateGroup(templates);
         group.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
-        group.registerRenderer(instanceOf(View.class), new ViewRenderer());
         StringTemplate template = group.getInstanceOf(name, value.toMap());
         return template.toString();
     }

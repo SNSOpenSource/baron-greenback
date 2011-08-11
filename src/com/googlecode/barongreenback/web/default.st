@@ -4,7 +4,7 @@
     <title>baron-greenback : $title$</title>
     <link type="text/css" rel="stylesheet" href="$base$default.css"/>
 </head>
-<body>
+<body class="$body.class$">
 <h1 class="title">baron-greenback : $title$</h1>
 <p class="summary">A Lucene based web search tool</p>
 <div class="header">
@@ -13,6 +13,9 @@
         <li class="item"><a href="$base$admin/crawl">admin</a></li>
     </ul>
 </div>
+
+$include.({/views/list?current=$body.class$}).body$
+
 <div class="content">
 $body$
 </div>

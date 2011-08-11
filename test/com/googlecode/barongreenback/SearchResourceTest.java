@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.is;
 public class SearchResourceTest {
     @Test
     public void canQuery() throws Exception {
-        Response response = application(addSomeData(new WebApplication())).handle(get("search").withQuery("query", "type:users"));
+        Response response = application(addSomeData(new WebApplication())).handle(get("users/search").withQuery("query", "type:users"));
         System.out.println("response = " + response);
         assertThat(response.status(), is(OK));
     }

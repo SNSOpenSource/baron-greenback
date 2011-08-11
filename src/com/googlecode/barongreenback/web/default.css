@@ -130,3 +130,36 @@ input.text {
     border: 1px solid #337E34;
 }
 
+
+
+
+
+ul.views {
+    background-color: #F2FFEE;
+    overflow: hidden;
+    width: 100%;
+    border-bottom: 1px solid #A5DDAD;
+}
+
+ul.views li.view {
+    list-style: none;
+    float: left;
+}
+
+ul.views li.current {
+    background-color: #fff;
+    border: 1px solid #A5DDAD;
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+}
+
+ul.views a, ul.views a:link, ul.views a:visited {
+    padding: 5px;
+    display: block;
+    color: #A5DDAD
+    text-decoration: none;
+}
+
+ul.views li:hover, ul.views a:hover {
+    background-color: #A5DDAD;
+}
