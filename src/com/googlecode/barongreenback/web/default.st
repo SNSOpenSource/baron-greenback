@@ -5,14 +5,13 @@
     <link type="text/css" rel="stylesheet" href="$base$default.css"/>
 </head>
 <body class="$body.class$">
-<h1 class="title">baron-greenback : $title$</h1>
-<p class="summary">A Lucene based web search tool</p>
 <div class="header">
     <ul class="menu">
-        <li class="item"><a href="$base$">home</a></li>
-        <li class="item"><a href="$base$admin/crawl">admin</a></li>
+        <li class="item"><a href="$base$admin/crawl">Admin</a></li>
     </ul>
 </div>
+<h1 class="title">baron-greenback : $title$</h1>
+<p class="summary">A Lucene based web search tool</p>
 
 $include.({/views/list?current=$body.class$}).body$
 

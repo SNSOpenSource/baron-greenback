@@ -19,15 +19,8 @@ html, body {
 }
 
 .header {
-    border-top: 0.6ex solid #666;
-    background-color: #337E34;
-    margin-bottom: 20px;
-}
-
-.header img, .header .menu {
-    margin: 0 0 0 1em;
-    border-left: 1px #fff solid;
-    padding: 0;
+    border-bottom: 1px solid #A5DDAD;
+    text-align: right;
 }
 
 h1, h2, h3 {
@@ -72,27 +65,25 @@ img {
 }
 
 .menu {
-    overflow: hidden;
-    width: 100%;
+    margin: 0;
+    padding: 3px;
+    font-size: 90%;
+    text-transform: capitalize;
 }
 
 .menu li {
+    padding: 2px 5px;
     list-style: none;
-    float: left;
-    border-right: 1px solid white;
+    display: inline;
 }
 
 .menu a, .menu a:link, .menu a:visited {
-    width: 10em;
-    padding: 1ex 0em 1.5em 1em;
-    display: block;
-    color: white;
-    text-decoration: none;
+    color: #337E34;
+    text-decoration: underline;
 }
 
-.menu li:hover, .menu a:hover {
-    background-color: #A5D642;
-}
+
+
 
 table.results {
     border-collapse: collapse;
@@ -135,31 +126,39 @@ input.text {
 
 
 ul.views {
+    padding-top: 5px;
     background-color: #F2FFEE;
-    overflow: hidden;
+    height: 30px;
     width: 100%;
     border-bottom: 1px solid #A5DDAD;
 }
 
 ul.views li.view {
+    margin: 0 3px;
+    padding: 0 5px;
+    border-top: 1px solid #F2FFEE;
     list-style: none;
     float: left;
+    text-transform: capitalize;
 }
 
 ul.views li.current {
     background-color: #fff;
     border: 1px solid #A5DDAD;
     border-bottom: 1px solid #fff;
-    margin-bottom: -1px;
+    position: relative;
+    bottom: -2px;
 }
 
 ul.views a, ul.views a:link, ul.views a:visited {
     padding: 5px;
     display: block;
-    color: #A5DDAD
-    text-decoration: none;
+    color: #337E34;
+    text-decoration: underline;
 }
 
-ul.views li:hover, ul.views a:hover {
-    background-color: #A5DDAD;
+ul.views li.current a {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
 }
