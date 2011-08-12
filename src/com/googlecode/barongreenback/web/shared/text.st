@@ -1,0 +1,1 @@
+$input(id=id, name=name, class=class, type="text", label=label)$

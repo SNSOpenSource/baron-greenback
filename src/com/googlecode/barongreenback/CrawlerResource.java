@@ -63,10 +63,10 @@ public class CrawlerResource {
     @POST
     public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath,
                           @FormParam("fields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases,
-                          @FormParam("types") Iterable<String> types, @FormParam("keys") Iterable<String> keys,
+                          @FormParam("types") Iterable<String> types, @FormParam("unique") Iterable<String> unique,
                           FormParameters form
     ) throws Exception {
-        Sequence<Triple<Boolean, Keyword, String>> pairs = toKeywords(fields, aliases, types, clean(keys));
+        Sequence<Triple<Boolean, Keyword, String>> pairs = toKeywords(fields, aliases, types, clean(unique));
         Sequence<Keyword> primaryKeys = primaryKeys(pairs);
         Sequence<Pair<Keyword, String>> subFeeds = pairs.filter(where(third(String.class), is(not(Strings.empty())))).map(asSubFeed());
         Sequence<Keyword> allKeys = pairs.map(second(Keyword.class));

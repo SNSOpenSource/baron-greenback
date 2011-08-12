@@ -11,6 +11,7 @@ import java.net.URL;
 
 import static com.googlecode.totallylazy.Predicates.instanceOf;
 import static com.googlecode.totallylazy.URLs.packageUrl;
+import static com.googlecode.totallylazy.URLs.url;
 
 public class ModelRenderer implements Renderer<Model> {
     private final String name;
@@ -22,10 +23,16 @@ public class ModelRenderer implements Renderer<Model> {
     }
 
     public String render(Model value) throws Exception {
+        EnhancedStringTemplateGroup shared = new EnhancedStringTemplateGroup(subDirectory(templates, "shared"));
         EnhancedStringTemplateGroup group = new EnhancedStringTemplateGroup(templates);
+        group.setSuperGroup(shared);
         group.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         StringTemplate template = group.getInstanceOf(name, value.toMap());
         return template.toString();
+    }
+
+    private URL subDirectory(URL base, String directory) {
+        return url(base.toString() + directory);
     }
 
 }

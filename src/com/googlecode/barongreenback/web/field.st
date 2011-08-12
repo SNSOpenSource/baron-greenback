@@ -1,8 +1,6 @@
-<label for="field$id$">XPath:</label>
-<input type="text" name="$name$fields" class="text field" id="field$id$" />
+$text(id="field" + id, name=name + "fields", class="field", label="XPath")$
 
-<label for="alias$id$">Alias:</label>
-<input type="text" name="$name$aliases" class="text alias" id="alias$id$" />
+$text(id="alias" + id, name=name + "aliases", class="alias", label="Alias")$
 
 <label for="type$id$">Type:</label>
 <select id="type$id$" name="$name$types">
@@ -14,6 +12,5 @@
 <option value="java.net.URI#subfeed1">SubFeed1</option>
 </select>
 
-<label for="key$id$">Key:</label>
-<input type="checkbox" name="$name$keys" class="keys" value="true" id="key$id$"/>
-<input type="hidden" name="$name$keys" class="keys" value="false"/>
+$checkbox(id="unique" + id, name=name + "unique", class="unique", label="Unique")$
+
