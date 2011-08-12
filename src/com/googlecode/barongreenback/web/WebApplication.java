@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.web;
 
+import com.googlecode.barongreenback.CrawlerModule;
 import com.googlecode.barongreenback.SearchModule;
 import com.googlecode.barongreenback.ViewsModule;
 import com.googlecode.totallylazy.Strings;
@@ -21,6 +22,7 @@ import static com.googlecode.utterlyidle.sitemesh.TemplateName.templateName;
 
 public class WebApplication extends RestApplication {
     public WebApplication() {
+        add(new CrawlerModule());
         add(new SearchModule());
         add(new ViewsModule());
         add(stringTemplateDecorators(packageUrl(WebApplication.class),

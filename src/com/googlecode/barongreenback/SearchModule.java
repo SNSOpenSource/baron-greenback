@@ -38,7 +38,6 @@ import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.rende
 public class SearchModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, ResponseHandlersModule {
     public Module addResources(Resources resources) throws ParseException {
         resources.add(annotatedClass(SearchResource.class));
-        resources.add(annotatedClass(CrawlerResource.class));
         resources.add(binding(get("").resource(method(on(SearchResource.class).find(definedParam(""), definedParam(""))))));
         return this;
     }
@@ -55,12 +54,10 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
         container.add(LuceneRecords.class);
         container.addActivator(Records.class, container.getActivator(LuceneRecords.class));
         container.addActivator(QueryParser.class, QueryParserActivator.class);
-        container.add(Crawler.class);
         return this;
     }
 
     public Module addResponseHandlers(ResponseHandlers handlers) {
-        handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("crawl"))), renderer(new ModelRenderer("crawl")));
         handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("search"))), renderer(new ModelRenderer("search")));
         return this;
     }

@@ -1,17 +1,7 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Quadruple;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.Third;
-import com.googlecode.totallylazy.Triple;
-import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
@@ -32,9 +22,7 @@ import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.EMPTY;
-import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
@@ -60,96 +48,15 @@ public class CrawlerResource {
     }
 
     @POST
-    public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath,
-                          FormParameters form
+    public Response crawl(@FormParam("from") URL from, @FormParam("update") String update, XmlDefinition xmlDefinition
     ) throws Exception {
-        Sequence<Triple<Boolean, Keyword, String>> pairs = extractKeywordsFrom("", form);
-        Sequence<Keyword> primaryKeys = primaryKeys(pairs);
-        Sequence<Pair<Keyword, String>> subFeeds = pairs.filter(where(third(String.class), is(not(Strings.empty())))).map(asSubFeed());
-        Sequence<Keyword> allKeys = pairs.map(second(Keyword.class));
-        XmlSource webSource = new XmlSource(url, keyword(elementXPath), allKeys);
-        Sequence<Record> extractedValues = crawler.crawl(webSource);
-        Sequence<Record> allData = subFeeds.fold(extractedValues, processSubFeed(form));
-        return put(keyword(recordName), primaryKeys, allData);
+        Sequence<Record> extractedValues = crawler.crawl(from, xmlDefinition);
+        return put(keyword(update), xmlDefinition.uniqueFields(), extractedValues);
     }
 
-    private Sequence<Keyword> primaryKeys(Sequence<Triple<Boolean, Keyword, String>> pairs) {
-        return pairs.filter(where(first(Boolean.class), is(true))).map(second(Keyword.class));
-    }
-
-    private Callable2<Sequence<Record>, Pair<Keyword, String>, Sequence<Record>> processSubFeed(final FormParameters form) {
-        return new Callable2<Sequence<Record>, Pair<Keyword, String>, Sequence<Record>>() {
-            public Sequence<Record> call(Sequence<Record> recordSequence, Pair<Keyword, String> pair) throws Exception {
-                Sequence<Triple<Boolean, Keyword, String>> tripleSequence = extractKeywordsFrom(pair.second(), form);
-                Sequence<Keyword> keys = tripleSequence.map(Callables.second(Keyword.class));
-                return recordSequence.flatMap(crawler.crawl(pair.first(), keyword("/"), keys.toArray(Keyword.class)));
-            }
-        };
-    }
-
-    private Sequence<Triple<Boolean, Keyword, String>> extractKeywordsFrom(String prefix, FormParameters form) {
-        Iterable<String> fields = form.getValues(prefix + "fields");
-        Iterable<String> aliases = form.getValues(prefix + "aliases");
-        Iterable<String> types = form.getValues(prefix + "types");
-        Iterable<String> keys = form.getValues(prefix + "unique");
-        return toKeywords(fields, aliases, types, new CheckboxValues(keys));
-    }
-
-    private Callable1<? super Triple<Boolean, Keyword, String>, Pair<Keyword, String>> asSubFeed() {
-        return new Callable1<Triple<Boolean, Keyword, String>, Pair<Keyword, String>>() {
-            public Pair<Keyword, String> call(Triple<Boolean, Keyword, String> triple) throws Exception {
-                return Pair.pair(triple.second(), triple.third());
-            }
-        };
-    }
-
-    public static <T> Callable1<? super Third<T>, T> third(Class<T> aClass) {
-        return new Callable1<Third<T>, T>() {
-            public T call(Third<T> third) throws Exception {
-                return third.third();
-            }
-        };
-    }
-
-    private Sequence<Triple<Boolean, Keyword, String>> toKeywords(Iterable<String> fields, Iterable<String> aliases, Iterable<String> types, Iterable<Boolean> keys) {
-        return Sequences.zip(fields, aliases, types, keys).filter(where(first(String.class), not(empty()))).map(asKeyword()).realise();
-    }
-
-    private Callable1<? super Quadruple<String, String, String, Boolean>, Triple<Boolean, Keyword, String>> asKeyword() {
-        return new Callable1<Quadruple<String, String, String, Boolean>, Triple<Boolean, Keyword, String>>() {
-            public Triple<Boolean, Keyword, String> call(Quadruple<String, String, String, Boolean> quadruple) throws Exception {
-                return Triple.triple(quadruple.fourth(), toKeyword(quadruple), extractSubFeed(quadruple.third()));
-            }
-        };
-    }
-
-    private String extractSubFeed(String type) {
-        String[] parts = type.split("#");
-        if (parts.length > 1) {
-            return parts[1];
-        }
-        return "";
-    }
-
-    private Keyword toKeyword(Triple<String, String, String> triple) throws ClassNotFoundException {
-        String className = triple.third();
-        Class aClass = classOf(className);
-        ImmutableKeyword source = keyword(triple.first(), aClass);
-        String alias = triple.second();
-        if (!alias.isEmpty()) {
-            return source.as(keyword(alias, aClass));
-        }
-        return source;
-    }
-
-    private Class<?> classOf(String className) throws ClassNotFoundException {
-        return Class.forName(className.split("#")[0]);
-    }
-
-
-    private Response put(final Keyword<Object> recordName, Sequence<Keyword> primaryKeys, final Sequence<Record> recordsToAdd) throws ParseException {
+    private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
         views.add(view(recordName).withFields(com.googlecode.barongreenback.Callables.headers(recordsToAdd)));
-        records.put(recordName, update(using(primaryKeys), recordsToAdd));
+        records.put(recordName, update(using(unique), recordsToAdd));
         return redirect(resource(SearchResource.class).find(recordName.name(), EMPTY));
     }
 }

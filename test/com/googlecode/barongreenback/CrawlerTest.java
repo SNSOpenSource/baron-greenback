@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.utterlyidle.Server;
@@ -43,7 +44,7 @@ public class CrawlerTest {
 
     public static Sequence<Record> crawl(Url feed) throws Exception {
         final Crawler crawler = new Crawler();
-        return crawler.crawl(new XmlSource(feed.toURL(), ENTRIES, ID, LINK, UPDATED, TITLE)).
+        return crawler.crawl(feed.toURL(), new XmlDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE), Sequences.<Keyword>sequence(ID))).
                 sortBy(descending(UPDATED)).
                 flatMap(crawler.crawl(LINK, USER, USER_ID, FIRST_NAME));
     }
