@@ -15,7 +15,6 @@ import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
-import com.googlecode.totallylazy.records.lucene.Lucene;
 import com.googlecode.utterlyidle.FormParameters;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
@@ -62,11 +61,9 @@ public class CrawlerResource {
 
     @POST
     public Response crawl(@FormParam("url") URL url, @FormParam("recordName") String recordName, @FormParam("elementXPath") String elementXPath,
-                          @FormParam("fields") Iterable<String> fields, @FormParam("aliases") Iterable<String> aliases,
-                          @FormParam("types") Iterable<String> types, @FormParam("unique") Iterable<String> unique,
                           FormParameters form
     ) throws Exception {
-        Sequence<Triple<Boolean, Keyword, String>> pairs = toKeywords(fields, aliases, types, clean(unique));
+        Sequence<Triple<Boolean, Keyword, String>> pairs = extractKeywordsFrom("", form);
         Sequence<Keyword> primaryKeys = primaryKeys(pairs);
         Sequence<Pair<Keyword, String>> subFeeds = pairs.filter(where(third(String.class), is(not(Strings.empty())))).map(asSubFeed());
         Sequence<Keyword> allKeys = pairs.map(second(Keyword.class));
@@ -91,11 +88,11 @@ public class CrawlerResource {
     }
 
     private Sequence<Triple<Boolean, Keyword, String>> extractKeywordsFrom(String prefix, FormParameters form) {
-        Iterable<String> fields = form.getValues(prefix + "withFields");
+        Iterable<String> fields = form.getValues(prefix + "fields");
         Iterable<String> aliases = form.getValues(prefix + "aliases");
         Iterable<String> types = form.getValues(prefix + "types");
-        Iterable<String> keys = form.getValues(prefix + "keys");
-        return toKeywords(fields, aliases, types, clean(keys));
+        Iterable<String> keys = form.getValues(prefix + "unique");
+        return toKeywords(fields, aliases, types, new CheckboxValues(keys));
     }
 
     private Callable1<? super Triple<Boolean, Keyword, String>, Pair<Keyword, String>> asSubFeed() {
@@ -110,18 +107,6 @@ public class CrawlerResource {
         return new Callable1<Third<T>, T>() {
             public T call(Third<T> third) throws Exception {
                 return third.third();
-            }
-        };
-    }
-
-    private Iterable<Boolean> clean(Iterable<String> keys) {
-        return new HtmlCheckboxFilter<Boolean>(false).filter(Sequences.sequence(keys).map(asBoolean()));
-    }
-
-    public static Callable1<? super String, Boolean> asBoolean() {
-        return new Callable1<String, Boolean>() {
-            public Boolean call(String value) throws Exception {
-                return Boolean.parseBoolean(value);
             }
         };
     }
