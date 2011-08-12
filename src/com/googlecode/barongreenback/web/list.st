@@ -2,7 +2,8 @@
 <html>
 <head>
     <title>Crawler</title>
-    <meta name="decorator" content="none">
+    <meta name="decorator" content="none"/>
+    <link type="text/css" rel="stylesheet" href="$base$list.css"/>
 </head>
 <body>
 

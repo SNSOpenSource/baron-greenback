@@ -2,7 +2,9 @@
 <html>
 <head>
     <title>baron-greenback : $title$</title>
+    <link type="text/css" rel="stylesheet" href="$base$reset.css"/>
     <link type="text/css" rel="stylesheet" href="$base$default.css"/>
+    <link type="text/css" rel="stylesheet" href="$base$list.css"/>
 </head>
 <body class="$body.class$">
 <div class="header">

@@ -3,6 +3,8 @@ package com.googlecode.barongreenback;
 import com.googlecode.barongreenback.web.WebApplication;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.records.ImmutableKeyword;
+import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.Application;
@@ -33,12 +35,15 @@ public class SearchResourceTest {
     public static Application addSomeData(final WebApplication application) throws Exception {
         Server server = CrawlerTest.startServer();
         Url feed = CrawlerTest.createFeed(server);
-        final Sequence<Record> recordSequence = CrawlerTest.crawl(feed);
+        final Sequence<Record> recordSequence = CrawlerTest.crawl(feed).realise();
 
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
                 LuceneRecords luceneRecords = container.get(LuceneRecords.class);
-                luceneRecords.add(keyword("users"), recordSequence);
+                Keyword<Object> users = keyword("users");
+                luceneRecords.add(users, recordSequence);
+                Views views = container.get(Views.class);
+                views.add(View.view(users).withFields(Callables.headers(recordSequence)));
                 return VOID;
             }
         });
