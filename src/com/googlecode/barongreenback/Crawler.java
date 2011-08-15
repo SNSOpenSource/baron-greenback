@@ -40,7 +40,7 @@ public class Crawler {
         return new Callable1<Record, Iterable<Record>>() {
             public Iterable<Record> call(Record record) throws Exception {
                 String feed = record.get(sourceUrl);
-                XmlDefinition xmlDefinition = new XmlDefinition(root, Sequences.<Keyword>sequence(fields), Sequences.<Keyword>empty());
+                XmlDefinition xmlDefinition = new XmlDefinition(root, Sequences.<Keyword>sequence(fields));
                 Sequence<Record> records = crawl(url(feed), xmlDefinition);
                 return records.map(merge(record));
             }

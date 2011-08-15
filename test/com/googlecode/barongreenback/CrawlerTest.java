@@ -44,7 +44,7 @@ public class CrawlerTest {
 
     public static Sequence<Record> crawl(Url feed) throws Exception {
         final Crawler crawler = new Crawler();
-        return crawler.crawl(feed.toURL(), new XmlDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE), Sequences.<Keyword>sequence(ID))).
+        return crawler.crawl(feed.toURL(), new XmlDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE))).
                 sortBy(descending(UPDATED)).
                 flatMap(crawler.crawl(LINK, USER, USER_ID, FIRST_NAME));
     }
