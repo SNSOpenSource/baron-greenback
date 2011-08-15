@@ -2,7 +2,6 @@ package com.googlecode.barongreenback;
 
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
@@ -17,6 +16,7 @@ import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import java.net.URL;
 import java.util.Date;
 
+import static com.googlecode.barongreenback.XmlDefinition.XML_DEFINITION;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.records.RecordMethods.merge;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
@@ -36,12 +36,11 @@ public class Crawler {
         return records.get(xmlDefinition.rootXPath());
     }
 
-    public Callable1<Record, Iterable<Record>> crawl(final Keyword<String> sourceUrl, final Keyword<Object> root, final Keyword<?>... fields) {
+    public Callable1<Record, Iterable<Record>> crawl(final Keyword<String> sourceUrl) {
         return new Callable1<Record, Iterable<Record>>() {
             public Iterable<Record> call(Record record) throws Exception {
                 String feed = record.get(sourceUrl);
-                XmlDefinition xmlDefinition = new XmlDefinition(root, Sequences.<Keyword>sequence(fields));
-                Sequence<Record> records = crawl(url(feed), xmlDefinition);
+                Sequence<Record> records = crawl(url(feed), sourceUrl.metadata().get(XML_DEFINITION));
                 return records.map(merge(record));
             }
         };

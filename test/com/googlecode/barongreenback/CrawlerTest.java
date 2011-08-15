@@ -3,6 +3,7 @@ package com.googlecode.barongreenback;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
+import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.utterlyidle.Server;
 import com.googlecode.utterlyidle.io.Url;
@@ -10,7 +11,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static com.googlecode.totallylazy.Callables.descending;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
@@ -19,15 +20,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class CrawlerTest {
-    private static final Keyword<Object> ENTRIES = keyword("/feed/entry");
-    private static final Keyword<String> ID = keyword("id", String.class);
-    private static final Keyword<String> LINK = keyword("link/@href", String.class);
-    private static final Keyword<Date> UPDATED = keyword("updated", Date.class);
-    private static final Keyword<String> TITLE = keyword("title", String.class);
-
     private static final Keyword<Object> USER = keyword("/user");
     private static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class);
     private static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class);
+
+
+    private static final Keyword<Object> ENTRIES = keyword("/feed/entry");
+    private static final Keyword<String> ID = keyword("id", String.class);
+    private static final Keyword<String> LINK = keyword("link/@href", String.class).
+            metadata(MapRecord.record().set(XmlDefinition.XML_DEFINITION, new XmlDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
+    private static final Keyword<Date> UPDATED = keyword("updated", Date.class);
+    private static final Keyword<String> TITLE = keyword("title", String.class);
+
 
     @Test
     public void shouldGetTheContentsOfAUrlAndExtractContent() throws Exception {
@@ -44,9 +48,12 @@ public class CrawlerTest {
 
     public static Sequence<Record> crawl(Url feed) throws Exception {
         final Crawler crawler = new Crawler();
-        return crawler.crawl(feed.toURL(), new XmlDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE))).
-                sortBy(descending(UPDATED)).
-                flatMap(crawler.crawl(LINK, USER, USER_ID, FIRST_NAME));
+        return crawler.crawl(feed.toURL(), defintion()).
+                flatMap(crawler.crawl(LINK));
+    }
+
+    private static XmlDefinition defintion() {
+        return new XmlDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE));
     }
 
     public static Url createFeed(final Server server) {

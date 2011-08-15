@@ -22,7 +22,6 @@ public class XmlDefinitionExtractor {
     public static final String UNIQUE = "unique";
     public static final String ROOT_XPATH = "rootXPath";
     public static final String SUB_FEED_DELIMITER = "#";
-    public static final Keyword<XmlDefinition> XML_DEFINITION = keyword(XmlDefinition.class.getName(), XmlDefinition.class);
 
     private final FormParameters form;
 
@@ -78,7 +77,7 @@ public class XmlDefinitionExtractor {
 
         String prefix = extractSubFeed(type);
         if(!prefix.isEmpty()){
-            keyword.metadata().set(XML_DEFINITION, extractWith(prefix));
+            keyword.metadata().set(XmlDefinition.XML_DEFINITION, extractWith(prefix));
         }
     }
 

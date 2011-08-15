@@ -70,7 +70,7 @@ public class XmlDefinitionExtractorTest {
         assertThat(definition.allFields(), hasExactly(keyword("link", URI.class)));
 
         Keyword<Object> subRoot = keyword("/user/summary");
-        XmlDefinition subDefinition = definition.allFields().head().metadata().get(XmlDefinitionExtractor.XML_DEFINITION);
+        XmlDefinition subDefinition = definition.allFields().head().metadata().get(XmlDefinition.XML_DEFINITION);
         assertThat(subDefinition.rootXPath(), is(subRoot));
         assertThat(subDefinition.allFields(), hasExactly(keyword("id", Integer.class)));
         assertThat(subDefinition.uniqueFields(), hasExactly(keyword("id", Integer.class)));

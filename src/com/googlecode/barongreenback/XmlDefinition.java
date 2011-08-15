@@ -6,9 +6,11 @@ import com.googlecode.totallylazy.records.Keywords;
 
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 
 public class XmlDefinition {
+    public static final Keyword<XmlDefinition> XML_DEFINITION = keyword(XmlDefinition.class.getName(), XmlDefinition.class);
     private final Keyword<Object> rootXPath;
     private final Sequence<Keyword> allFields;
 
