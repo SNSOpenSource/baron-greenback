@@ -3,7 +3,6 @@ package com.googlecode.barongreenback;
 import com.googlecode.barongreenback.web.WebApplication;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
@@ -43,7 +42,7 @@ public class SearchResourceTest {
                 Keyword<Object> users = keyword("users");
                 luceneRecords.add(users, recordSequence);
                 Views views = container.get(Views.class);
-                views.add(View.view(users).withFields(Callables.headers(recordSequence)));
+                views.add(View.view(users).withFields(Callables.keywords(recordSequence)));
                 return VOID;
             }
         });

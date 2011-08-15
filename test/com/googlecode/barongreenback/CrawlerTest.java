@@ -3,6 +3,7 @@ package com.googlecode.barongreenback;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
+import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.utterlyidle.Server;
@@ -15,6 +16,7 @@ import java.util.Date;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,7 +24,7 @@ import static org.hamcrest.Matchers.is;
 
 public class CrawlerTest {
     private static final Keyword<Object> USER = keyword("/user");
-    private static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class);
+    private static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
     private static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class);
 
 

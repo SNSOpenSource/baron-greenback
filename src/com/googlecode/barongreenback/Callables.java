@@ -8,17 +8,12 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.totallylazy.Callables.asString;
 
 public class Callables {
-    public static List<String> headersAsString(Sequence<Record> results) {
-        return headers(results).map(asString()).toList();
-    }
-
-    public static Sequence<Keyword> headers(Sequence<Record> results) {
+    public static Sequence<Keyword> keywords(Sequence<Record> results) {
         return results.flatMap(keywords()).unique();
     }
 
@@ -33,9 +28,13 @@ public class Callables {
     public static Callable1<? super Record, Map> asMap() {
         return new Callable1<Record, Map>() {
             public Map call(Record record) throws Exception {
-                return record.fields().fold(new HashMap(), intoMap());
+                return toMap(record);
             }
         };
+    }
+
+    public static Map toMap(Record record) {
+        return record.fields().fold(new HashMap(), intoMap());
     }
 
     public static Callable2<? super Map, ? super Pair<Keyword, Object>, Map> intoMap() {
