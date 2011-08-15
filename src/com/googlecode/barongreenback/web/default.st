@@ -4,7 +4,7 @@
     <title>baron-greenback : $title$</title>
     <link type="text/css" rel="stylesheet" href="$base$reset.css"/>
     <link type="text/css" rel="stylesheet" href="$base$default.css"/>
-    <link type="text/css" rel="stylesheet" href="$base$list.css"/>
+    <link type="text/css" rel="stylesheet" href="$base$menu.css"/>
 </head>
 <body class="$body.class$">
 <div class="header">
@@ -15,7 +15,7 @@
 <h1 class="title">baron-greenback : $title$</h1>
 <p class="summary">A Lucene based web search tool</p>
 
-$include.({/views/list?current=$body.class$}).body$
+$include.({/menu?current=$body.class$}).body$
 
 <div class="content">
 $body$

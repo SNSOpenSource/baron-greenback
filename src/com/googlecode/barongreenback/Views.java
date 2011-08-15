@@ -90,4 +90,7 @@ public class Views {
     }
 
 
+    public boolean contains(Keyword<Object> recordName) {
+        return !get(recordName.name()).isEmpty();
+    }
 }

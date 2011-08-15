@@ -16,7 +16,7 @@ import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import java.net.URL;
 import java.util.Date;
 
-import static com.googlecode.barongreenback.XmlDefinition.XML_DEFINITION;
+import static com.googlecode.barongreenback.RecordDefinition.XML_DEFINITION;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -34,13 +34,13 @@ public class Crawler {
         return new XmlRecords(Xml.load(xml), new Mappings().add(Date.class, DateMapping.atomDateFormat()));
     }
 
-    public Sequence<Record> crawl(URL url, XmlDefinition xmlDefinition) throws Exception {
+    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition) throws Exception {
         XmlRecords xmlRecords = load(url);
-        Sequence<Keyword> allFields = xmlDefinition.fields();
+        Sequence<Keyword> allFields = recordDefinition.fields();
 
-        xmlRecords.define(xmlDefinition.rootXPath(), allFields.toArray(Keyword.class));
+        xmlRecords.define(recordDefinition.recordName(), allFields.toArray(Keyword.class));
 
-        Sequence<Record> result = xmlRecords.get(xmlDefinition.rootXPath());
+        Sequence<Record> result = xmlRecords.get(recordDefinition.recordName());
 
         return allFields.filter(where(metadata(XML_DEFINITION), is(notNullValue()))).
                 fold(result, crawlSubFeeds());
@@ -59,7 +59,7 @@ public class Crawler {
         return new Callable1<Record, Iterable<Record>>() {
             public Iterable<Record> call(Record currentRecord) throws Exception {
                 URL subFeed = url(currentRecord.get(sourceUrl).toString());
-                XmlDefinition subDefinitions = sourceUrl.metadata().get(XML_DEFINITION);
+                RecordDefinition subDefinitions = sourceUrl.metadata().get(XML_DEFINITION);
                 return crawl(subFeed, subDefinitions).
                         map(merge(currentRecord));
             }

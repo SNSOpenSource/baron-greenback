@@ -31,7 +31,7 @@ public class CrawlerTest {
     private static final Keyword<Object> ENTRIES = keyword("/feed/entry");
     private static final Keyword<String> ID = keyword("id", String.class);
     private static final Keyword<URI> LINK = keyword("link/@href", URI.class).
-            metadata(MapRecord.record().set(XmlDefinition.XML_DEFINITION, new XmlDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
+            metadata(MapRecord.record().set(RecordDefinition.XML_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
     private static final Keyword<Date> UPDATED = keyword("updated", Date.class);
     private static final Keyword<String> TITLE = keyword("title", String.class);
 
@@ -53,8 +53,8 @@ public class CrawlerTest {
         return new Crawler().crawl(feed.toURL(), defintion());
     }
 
-    private static XmlDefinition defintion() {
-        return new XmlDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE));
+    private static RecordDefinition defintion() {
+        return new RecordDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE));
     }
 
     public static Url createFeed(final Server server) {

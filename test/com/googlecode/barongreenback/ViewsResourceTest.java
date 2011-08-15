@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 public class ViewsResourceTest {
     @Test
     public void displaysAListOfViews() throws Exception {
-        Response response = application(new WebApplication()).handle(get("views/list"));
+        Response response = application(new WebApplication()).handle(get("menu"));
         System.out.println(response);
         assertThat(response.status(), is(Status.OK));
     }

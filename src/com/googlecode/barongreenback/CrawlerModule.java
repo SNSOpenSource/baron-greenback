@@ -25,7 +25,7 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Res
     }
 
     public Module addPerArgumentObjects(Container container) throws Exception {
-        container.addActivator(XmlDefinition.class, XmlDefinitionActivator.class);
+        container.addActivator(RecordDefinition.class, RecordDefinitionActivator.class);
         return this;
     }
 

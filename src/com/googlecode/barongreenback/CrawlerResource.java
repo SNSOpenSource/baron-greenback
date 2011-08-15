@@ -17,7 +17,7 @@ import org.apache.lucene.queryParser.ParseException;
 import java.net.URL;
 
 import static com.googlecode.barongreenback.View.view;
-import static com.googlecode.barongreenback.XmlDefinition.uniqueFields;
+import static com.googlecode.barongreenback.RecordDefinition.uniqueFields;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -49,14 +49,16 @@ public class CrawlerResource {
     }
 
     @POST
-    public Response crawl(@FormParam("from") URL from, @FormParam("update") String update, XmlDefinition xmlDefinition
+    public Response crawl(@FormParam("from") URL from, @FormParam("update") String update, RecordDefinition recordDefinition
     ) throws Exception {
-        Sequence<Record> extractedValues = crawler.crawl(from, xmlDefinition);
-        return put(keyword(update), uniqueFields(xmlDefinition), extractedValues);
+        Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
+        return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
-        views.add(view(recordName).withFields(com.googlecode.barongreenback.Callables.keywords(recordsToAdd)));
+        if(!views.contains(recordName)) {
+            views.add(view(recordName).withFields(com.googlecode.barongreenback.Callables.keywords(recordsToAdd)));
+        }
         records.put(recordName, update(using(unique), recordsToAdd));
         return redirect(resource(SearchResource.class).find(recordName.name(), EMPTY));
     }
