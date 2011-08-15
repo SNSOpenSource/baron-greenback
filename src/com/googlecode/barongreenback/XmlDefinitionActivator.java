@@ -12,6 +12,6 @@ public class XmlDefinitionActivator implements Callable<XmlDefinition>{
     }
 
     public XmlDefinition call() throws Exception {
-        return XmlDefinitionExtractor.extractFrom(form);
+        return new XmlDefinitionExtractor(form).extract();
     }
 }

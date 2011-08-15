@@ -19,22 +19,28 @@ import static com.googlecode.totallylazy.records.Keywords.keyword;
 
 public class XmlDefinitionExtractor {
 
-    public static XmlDefinition extractFrom(FormParameters form) {
-        return extractFrom(form, "");
+    private final FormParameters form;
+
+    public XmlDefinitionExtractor(FormParameters form) {
+        this.form = form;
     }
 
-    private static XmlDefinition extractFrom(FormParameters form, String prefix) {
-        Sequence<Triple<Boolean, Keyword, String>> pairs = extractKeywordsFrom(prefix, form);
+    public XmlDefinition extract() {
+        return extractWith("");
+    }
+
+    private XmlDefinition extractWith(String prefix) {
+        Sequence<Triple<Boolean, Keyword, String>> pairs = extractKeywordsWith(prefix);
         Sequence<Keyword> uniqueKeys = uniqueKeys(pairs);
         Sequence<Keyword> allKeys = pairs.map(second(Keyword.class));
         return new XmlDefinition(keyword(form.getValue(prefix + "rootXPath")), allKeys, uniqueKeys);
     }
 
-    private static Sequence<Keyword> uniqueKeys(Sequence<Triple<Boolean, Keyword, String>> pairs) {
+    private Sequence<Keyword> uniqueKeys(Sequence<Triple<Boolean, Keyword, String>> pairs) {
         return pairs.filter(where(first(Boolean.class), is(true))).map(second(Keyword.class));
     }
 
-    static Sequence<Triple<Boolean, Keyword, String>> extractKeywordsFrom(String prefix, FormParameters form) {
+    private Sequence<Triple<Boolean, Keyword, String>> extractKeywordsWith(String prefix) {
         Iterable<String> fields = form.getValues(prefix + "fields");
         Iterable<String> aliases = form.getValues(prefix + "aliases");
         Iterable<String> types = form.getValues(prefix + "types");
@@ -42,11 +48,11 @@ public class XmlDefinitionExtractor {
         return toKeywords(fields, aliases, types, new CheckboxValues(keys));
     }
 
-    static Sequence<Triple<Boolean, Keyword, String>> toKeywords(Iterable<String> fields, Iterable<String> aliases, Iterable<String> types, Iterable<Boolean> keys) {
+    private Sequence<Triple<Boolean, Keyword, String>> toKeywords(Iterable<String> fields, Iterable<String> aliases, Iterable<String> types, Iterable<Boolean> keys) {
         return Sequences.zip(fields, aliases, types, keys).filter(where(first(String.class), not(empty()))).map(asKeyword()).realise();
     }
 
-    static Callable1<? super Quadruple<String, String, String, Boolean>, Triple<Boolean, Keyword, String>> asKeyword() {
+    private Callable1<? super Quadruple<String, String, String, Boolean>, Triple<Boolean, Keyword, String>> asKeyword() {
         return new Callable1<Quadruple<String, String, String, Boolean>, Triple<Boolean, Keyword, String>>() {
             public Triple<Boolean, Keyword, String> call(Quadruple<String, String, String, Boolean> quadruple) throws Exception {
                 return Triple.triple(quadruple.fourth(), toKeyword(quadruple), extractSubFeed(quadruple.third()));
@@ -54,7 +60,7 @@ public class XmlDefinitionExtractor {
         };
     }
 
-    static String extractSubFeed(String type) {
+    private String extractSubFeed(String type) {
         String[] parts = type.split("#");
         if (parts.length > 1) {
             return parts[1];
@@ -62,7 +68,7 @@ public class XmlDefinitionExtractor {
         return "";
     }
 
-    static Keyword toKeyword(Triple<String, String, String> triple) throws ClassNotFoundException {
+    private Keyword toKeyword(Triple<String, String, String> triple) throws ClassNotFoundException {
         String className = triple.third();
         Class aClass = classOf(className);
         ImmutableKeyword source = keyword(triple.first(), aClass);
@@ -73,7 +79,7 @@ public class XmlDefinitionExtractor {
         return source;
     }
 
-    static Class<?> classOf(String className) throws ClassNotFoundException {
+    private Class<?> classOf(String className) throws ClassNotFoundException {
         return Class.forName(className.split("#")[0]);
     }
 
