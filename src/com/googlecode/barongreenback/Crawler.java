@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
@@ -17,7 +18,11 @@ import java.net.URL;
 import java.util.Date;
 
 import static com.googlecode.barongreenback.XmlDefinition.XML_DEFINITION;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.URLs.url;
+import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.RecordMethods.merge;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 
@@ -32,15 +37,25 @@ public class Crawler {
 
     public Sequence<Record> crawl(URL url, XmlDefinition xmlDefinition) throws Exception {
         Records records = load(url);
-        records.define(xmlDefinition.rootXPath(), xmlDefinition.allFields().toArray(Keyword.class));
-        return records.get(xmlDefinition.rootXPath());
+        Sequence<Keyword> allFields = xmlDefinition.allFields();
+
+        records.define(xmlDefinition.rootXPath(), allFields.toArray(Keyword.class));
+
+        Sequence<Record> result = records.get(xmlDefinition.rootXPath());
+
+        return allFields.filter(where(metadata(XML_DEFINITION), is(notNullValue()))).fold(result, new Callable2<Sequence<Record>, Keyword, Sequence<Record>>() {
+            public Sequence<Record> call(Sequence<Record> resultsSoFar, Keyword keyword) throws Exception {
+                return resultsSoFar.flatMap(crawl(keyword));
+            }
+        });
+
     }
 
-    public Callable1<Record, Iterable<Record>> crawl(final Keyword<String> sourceUrl) {
+    public Callable1<Record, Iterable<Record>> crawl(final Keyword sourceUrl) {
         return new Callable1<Record, Iterable<Record>>() {
             public Iterable<Record> call(Record record) throws Exception {
-                String feed = record.get(sourceUrl);
-                Sequence<Record> records = crawl(url(feed), sourceUrl.metadata().get(XML_DEFINITION));
+                Object feed = record.get(sourceUrl);
+                Sequence<Record> records = crawl(url(feed.toString()), sourceUrl.metadata().get(XML_DEFINITION));
                 return records.map(merge(record));
             }
         };
