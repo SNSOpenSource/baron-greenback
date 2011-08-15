@@ -1,11 +1,13 @@
 package com.googlecode.barongreenback;
 
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 
@@ -23,12 +25,33 @@ public class XmlDefinition {
         return rootXPath;
     }
 
-    public Sequence<Keyword> allFields() {
+    public Sequence<Keyword> fields() {
         return allFields;
     }
 
-    public Sequence<Keyword> uniqueFields() {
-        return allFields.filter(where(metadata(Keywords.UNIQUE), is(true)));
+
+
+
+
+    public static Sequence<Keyword> uniqueFields(XmlDefinition xmlDefinition) {
+        return allFields(xmlDefinition).filter(where(metadata(Keywords.UNIQUE), is(true)));
     }
+
+    public static Sequence<Keyword> allFields(XmlDefinition xmlDefinition) {
+        return xmlDefinition.fields().flatMap(allFields());
+    }
+
+    public static Callable1<? super Keyword, Sequence<Keyword>> allFields() {
+        return new Callable1<Keyword, Sequence<Keyword>>() {
+            public Sequence<Keyword> call(Keyword keyword) throws Exception {
+                XmlDefinition xmlDefinition = keyword.metadata().get(XmlDefinition.XML_DEFINITION);
+                if(xmlDefinition != null){
+                    return sequence(keyword).join(allFields(xmlDefinition));
+                }
+                return sequence(keyword);
+            }
+        };
+    }
+
 
 }

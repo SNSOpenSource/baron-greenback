@@ -47,7 +47,7 @@ public class SearchResourceTest {
                 return VOID;
             }
         });
-//        server.close();
+        server.close();
         return application;
     }
 

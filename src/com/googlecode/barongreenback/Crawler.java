@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.Records;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.totallylazy.records.xml.XmlRecords;
 import com.googlecode.totallylazy.records.xml.mappings.DateMapping;
@@ -28,7 +27,7 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 
 public class Crawler {
-    public Records load(URL url) throws Exception {
+    public XmlRecords load(URL url) throws Exception {
         HttpHandler httpHandler = new ClientHttpHandler();
         Response response = httpHandler.handle(get(url.toString()).build());
         String xml = new String(response.bytes());
@@ -36,27 +35,33 @@ public class Crawler {
     }
 
     public Sequence<Record> crawl(URL url, XmlDefinition xmlDefinition) throws Exception {
-        Records records = load(url);
-        Sequence<Keyword> allFields = xmlDefinition.allFields();
+        XmlRecords xmlRecords = load(url);
+        Sequence<Keyword> allFields = xmlDefinition.fields();
 
-        records.define(xmlDefinition.rootXPath(), allFields.toArray(Keyword.class));
+        xmlRecords.define(xmlDefinition.rootXPath(), allFields.toArray(Keyword.class));
 
-        Sequence<Record> result = records.get(xmlDefinition.rootXPath());
+        Sequence<Record> result = xmlRecords.get(xmlDefinition.rootXPath());
 
-        return allFields.filter(where(metadata(XML_DEFINITION), is(notNullValue()))).fold(result, new Callable2<Sequence<Record>, Keyword, Sequence<Record>>() {
-            public Sequence<Record> call(Sequence<Record> resultsSoFar, Keyword keyword) throws Exception {
-                return resultsSoFar.flatMap(crawl(keyword));
-            }
-        });
+        return allFields.filter(where(metadata(XML_DEFINITION), is(notNullValue()))).
+                fold(result, crawlSubFeeds());
 
     }
 
-    public Callable1<Record, Iterable<Record>> crawl(final Keyword sourceUrl) {
+    private Callable2<Sequence<Record>, Keyword, Sequence<Record>> crawlSubFeeds() {
+        return new Callable2<Sequence<Record>, Keyword, Sequence<Record>>() {
+            public Sequence<Record> call(Sequence<Record> records, Keyword keyword) throws Exception {
+                return records.flatMap(crawl(keyword));
+            }
+        };
+    }
+
+    private Callable1<Record, Iterable<Record>> crawl(final Keyword sourceUrl) {
         return new Callable1<Record, Iterable<Record>>() {
-            public Iterable<Record> call(Record record) throws Exception {
-                Object feed = record.get(sourceUrl);
-                Sequence<Record> records = crawl(url(feed.toString()), sourceUrl.metadata().get(XML_DEFINITION));
-                return records.map(merge(record));
+            public Iterable<Record> call(Record currentRecord) throws Exception {
+                URL subFeed = url(currentRecord.get(sourceUrl).toString());
+                XmlDefinition subDefinitions = sourceUrl.metadata().get(XML_DEFINITION);
+                return crawl(subFeed, subDefinitions).
+                        map(merge(currentRecord));
             }
         };
     }

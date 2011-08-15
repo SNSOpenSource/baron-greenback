@@ -1,11 +1,13 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
+import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
-import com.googlecode.utterlyidle.FormParameters;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.FormParam;
@@ -18,12 +20,16 @@ import org.apache.lucene.queryParser.ParseException;
 import java.net.URL;
 
 import static com.googlecode.barongreenback.View.view;
+import static com.googlecode.barongreenback.XmlDefinition.uniqueFields;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
@@ -51,7 +57,7 @@ public class CrawlerResource {
     public Response crawl(@FormParam("from") URL from, @FormParam("update") String update, XmlDefinition xmlDefinition
     ) throws Exception {
         Sequence<Record> extractedValues = crawler.crawl(from, xmlDefinition);
-        return put(keyword(update), xmlDefinition.uniqueFields(), extractedValues);
+        return put(keyword(update), uniqueFields(xmlDefinition), extractedValues);
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {

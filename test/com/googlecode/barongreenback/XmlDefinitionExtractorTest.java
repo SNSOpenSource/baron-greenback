@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.net.URI;
 
+import static com.googlecode.barongreenback.XmlDefinition.uniqueFields;
 import static com.googlecode.barongreenback.XmlDefinitionExtractor.ALIASES;
 import static com.googlecode.barongreenback.XmlDefinitionExtractor.FIELDS;
 import static com.googlecode.barongreenback.XmlDefinitionExtractor.ROOT_XPATH;
@@ -39,8 +40,8 @@ public class XmlDefinitionExtractorTest {
         XmlDefinition definition = extractor.extract();
         Keyword<Object> keyword = keyword("/feed/entry");
         assertThat(definition.rootXPath(), is(keyword));
-        assertThat(definition.allFields(), hasExactly(keyword("name", String.class), keyword("id", Integer.class)));
-        assertThat(definition.uniqueFields(), hasExactly(keyword("id", Integer.class)));
+        assertThat(definition.fields(), hasExactly(keyword("name", String.class), keyword("id", Integer.class)));
+        assertThat(uniqueFields(definition), hasExactly(keyword("id", Integer.class)));
     }
 
     @Test
@@ -67,13 +68,13 @@ public class XmlDefinitionExtractorTest {
         XmlDefinition definition = extractor.extract();
         Keyword<Object> keyword = keyword("/feed/entry");
         assertThat(definition.rootXPath(), is(keyword));
-        assertThat(definition.allFields(), hasExactly(keyword("link", URI.class)));
+        assertThat(definition.fields(), hasExactly(keyword("link", URI.class)));
 
         Keyword<Object> subRoot = keyword("/user/summary");
-        XmlDefinition subDefinition = definition.allFields().head().metadata().get(XmlDefinition.XML_DEFINITION);
+        XmlDefinition subDefinition = definition.fields().head().metadata().get(XmlDefinition.XML_DEFINITION);
         assertThat(subDefinition.rootXPath(), is(subRoot));
-        assertThat(subDefinition.allFields(), hasExactly(keyword("id", Integer.class)));
-        assertThat(subDefinition.uniqueFields(), hasExactly(keyword("id", Integer.class)));
+        assertThat(subDefinition.fields(), hasExactly(keyword("id", Integer.class)));
+        assertThat(uniqueFields(subDefinition), hasExactly(keyword("id", Integer.class)));
 
     }
 }
