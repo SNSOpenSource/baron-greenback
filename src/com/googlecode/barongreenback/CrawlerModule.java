@@ -18,7 +18,7 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 import static com.googlecode.utterlyidle.handlers.HandlerRule.entity;
 import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.renderer;
 
-public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, ResponseHandlersModule, RequestScopedModule {
+public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, RequestScopedModule {
     public Module addResources(Resources resources) throws Exception {
         resources.add(annotatedClass(CrawlerResource.class));
         return this;
@@ -29,14 +29,8 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Res
         return this;
     }
 
-    public Module addResponseHandlers(ResponseHandlers handlers) {
-        handlers.add(where(entity(), is(instanceOf(Model.class))), renderer(ModelRenderer.class));
-        return this;
-    }
-
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(Crawler.class);
-        container.addActivator(ModelRenderer.class, ModelRendererActivator.class);
         return this;
     }
 }

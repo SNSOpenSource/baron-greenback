@@ -35,7 +35,7 @@ import static com.googlecode.utterlyidle.dsl.DslBindings.binding;
 import static com.googlecode.utterlyidle.handlers.HandlerRule.entity;
 import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.renderer;
 
-public class SearchModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, ResponseHandlersModule {
+public class SearchModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule {
     public Module addResources(Resources resources) throws ParseException {
         resources.add(annotatedClass(SearchResource.class));
         resources.add(binding(get("").resource(method(on(SearchResource.class).find(definedParam(""), definedParam(""))))));
@@ -54,10 +54,6 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
         container.add(LuceneRecords.class);
         container.addActivator(Records.class, container.getActivator(LuceneRecords.class));
         container.addActivator(QueryParser.class, QueryParserActivator.class);
-        return this;
-    }
-
-    public Module addResponseHandlers(ResponseHandlers handlers) {
         return this;
     }
 
