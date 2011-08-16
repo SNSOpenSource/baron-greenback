@@ -25,9 +25,10 @@ public class ViewsTest {
         View view = view(keyword("users")).withFields(id, keyword("name", String.class));
         Views views = new Views(records).add(view);
 
-        assertThat(records.get(Views.RECORDS_NAME), hasExactly(
-                record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "id").set(Views.FIELD_TYPE, Integer.class.getName()).set(Views.UNIQUE, "true"),
-                record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "name").set(Views.FIELD_TYPE, String.class.getName()).set(Views.UNIQUE, "false")));
+        Sequence<Record> actual = records.get(Views.RECORDS_NAME).realise();
+        assertThat(actual, hasExactly(
+                record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "id").set(Views.FIELD_TYPE, Integer.class.getName()).set(Views.UNIQUE, true),
+                record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "name").set(Views.FIELD_TYPE, String.class.getName()).set(Views.UNIQUE, null)));
 
         View result = views.get().head();
         assertThat(result, is(view));
