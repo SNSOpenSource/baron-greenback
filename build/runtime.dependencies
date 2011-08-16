@@ -9,5 +9,5 @@ mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:450
 mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:367
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:129
-mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:17
+mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:18
 

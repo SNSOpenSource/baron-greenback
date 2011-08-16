@@ -67,16 +67,8 @@ public class SearchResource {
         return optionalView.map(fieldNames()).
                 getOrElse(keywords(results)).
                 map(asHeader()).
-                map(modelAsMap()).
+                map(Model.asMap()).
                 toList();
-    }
-
-    private Callable1<? super Model, Map<String, Object>> modelAsMap() {
-        return new Callable1<Model, Map<String, Object>>() {
-            public Map<String, Object> call(Model model) throws Exception {
-                return model.toMap();
-            }
-        };
     }
 
     private Callable1<? super Keyword, Model> asHeader() {
