@@ -8,6 +8,7 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
+import com.googlecode.totallylazy.records.RecordMethods;
 import com.googlecode.totallylazy.records.lucene.Lucene;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.MediaType;
@@ -24,10 +25,9 @@ import org.apache.lucene.search.Query;
 import java.util.List;
 import java.util.Map;
 
-import static com.googlecode.barongreenback.Callables.asMap;
-import static com.googlecode.barongreenback.Callables.keywords;
-import static com.googlecode.barongreenback.Callables.toMap;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.records.Keywords.keywords;
+import static com.googlecode.totallylazy.records.RecordMethods.toMap;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -51,7 +51,7 @@ public class SearchResource {
                 add("view", view).
                 add("query", query).
                 add("headers", headers(optionalView, results)).
-                add("results", results.map(asMap()).toList());
+                add("results", results.map(RecordMethods.asMap()).toList());
     }
 
     @GET

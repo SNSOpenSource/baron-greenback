@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
@@ -42,7 +43,7 @@ public class SearchResourceTest {
                 Keyword<Object> users = keyword("users");
                 luceneRecords.add(users, recordSequence);
                 Views views = container.get(Views.class);
-                views.add(View.view(users).withFields(Callables.keywords(recordSequence)));
+                views.add(View.view(users).withFields(keywords(recordSequence)));
                 return VOID;
             }
         });

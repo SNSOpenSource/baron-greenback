@@ -25,6 +25,7 @@ import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
@@ -57,7 +58,7 @@ public class CrawlerResource {
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
         if(!views.contains(recordName)) {
-            views.add(view(recordName).withFields(com.googlecode.barongreenback.Callables.keywords(recordsToAdd)));
+            views.add(view(recordName).withFields(keywords(recordsToAdd)));
         }
         records.put(recordName, update(using(unique), recordsToAdd));
         return redirect(resource(SearchResource.class).find(recordName.name(), EMPTY));
