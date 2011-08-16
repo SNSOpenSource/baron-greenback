@@ -6,23 +6,23 @@ import org.junit.Test;
 
 import java.net.URI;
 
-import static com.googlecode.barongreenback.XmlDefinition.uniqueFields;
-import static com.googlecode.barongreenback.XmlDefinitionExtractor.ALIASES;
-import static com.googlecode.barongreenback.XmlDefinitionExtractor.FIELDS;
-import static com.googlecode.barongreenback.XmlDefinitionExtractor.ROOT_XPATH;
-import static com.googlecode.barongreenback.XmlDefinitionExtractor.TYPES;
-import static com.googlecode.barongreenback.XmlDefinitionExtractor.UNIQUE;
+import static com.googlecode.barongreenback.RecordDefinition.uniqueFields;
+import static com.googlecode.barongreenback.RecordDefinitionExtractor.ALIASES;
+import static com.googlecode.barongreenback.RecordDefinitionExtractor.FIELDS;
+import static com.googlecode.barongreenback.RecordDefinitionExtractor.RECORD_NAME;
+import static com.googlecode.barongreenback.RecordDefinitionExtractor.TYPES;
+import static com.googlecode.barongreenback.RecordDefinitionExtractor.UNIQUE;
 import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.matchers.IterableMatcher.hasExactly;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class XmlDefinitionExtractorTest {
+public class RecordDefinitionExtractorTest {
 
     @Test
     public void correctlyExtractsFormParamters() throws Exception {
-        FormParameters form = FormParameters.formParameters(pair(ROOT_XPATH, "/feed/entry"),
+        FormParameters form = FormParameters.formParameters(pair(RECORD_NAME, "/feed/entry"),
                 pair(FIELDS, "name"),
                 pair(ALIASES, ""),
                 pair(TYPES, "java.lang.String"),
@@ -35,11 +35,11 @@ public class XmlDefinitionExtractorTest {
 
         );
 
-        XmlDefinitionExtractor extractor = new XmlDefinitionExtractor(form);
+        RecordDefinitionExtractor extractor = new RecordDefinitionExtractor(form);
 
-        XmlDefinition definition = extractor.extract();
+        RecordDefinition definition = extractor.extract();
         Keyword<Object> keyword = keyword("/feed/entry");
-        assertThat(definition.rootXPath(), is(keyword));
+        assertThat(definition.recordName(), is(keyword));
         assertThat(definition.fields(), hasExactly(keyword("name", String.class), keyword("id", Integer.class)));
         assertThat(uniqueFields(definition), hasExactly(keyword("id", Integer.class)));
     }
@@ -49,13 +49,13 @@ public class XmlDefinitionExtractorTest {
         String prefix = "subfeed1";
 
         FormParameters form = FormParameters.formParameters(
-                pair(ROOT_XPATH, "/feed/entry"),
+                pair(RECORD_NAME, "/feed/entry"),
                 pair(FIELDS, "link"),
                 pair(ALIASES, ""),
                 pair(TYPES, "java.net.URI#" + prefix),
                 pair(UNIQUE, "false"),
 
-                pair(prefix + ROOT_XPATH, "/user/summary"),
+                pair(prefix + RECORD_NAME, "/user/summary"),
                 pair(prefix + FIELDS, "ID"),
                 pair(prefix + ALIASES, ""),
                 pair(prefix + TYPES, "java.lang.Integer"),
@@ -63,16 +63,16 @@ public class XmlDefinitionExtractorTest {
 
         );
 
-        XmlDefinitionExtractor extractor = new XmlDefinitionExtractor(form);
+        RecordDefinitionExtractor extractor = new RecordDefinitionExtractor(form);
 
-        XmlDefinition definition = extractor.extract();
+        RecordDefinition definition = extractor.extract();
         Keyword<Object> keyword = keyword("/feed/entry");
-        assertThat(definition.rootXPath(), is(keyword));
+        assertThat(definition.recordName(), is(keyword));
         assertThat(definition.fields(), hasExactly(keyword("link", URI.class)));
 
         Keyword<Object> subRoot = keyword("/user/summary");
-        XmlDefinition subDefinition = definition.fields().head().metadata().get(XmlDefinition.XML_DEFINITION);
-        assertThat(subDefinition.rootXPath(), is(subRoot));
+        RecordDefinition subDefinition = definition.fields().head().metadata().get(RecordDefinition.XML_DEFINITION);
+        assertThat(subDefinition.recordName(), is(subRoot));
         assertThat(subDefinition.fields(), hasExactly(keyword("id", Integer.class)));
         assertThat(uniqueFields(subDefinition), hasExactly(keyword("id", Integer.class)));
 

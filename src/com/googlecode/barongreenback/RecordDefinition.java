@@ -11,18 +11,18 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 
-public class XmlDefinition {
-    public static final Keyword<XmlDefinition> XML_DEFINITION = keyword(XmlDefinition.class.getName(), XmlDefinition.class);
-    private final Keyword<Object> rootXPath;
+public class RecordDefinition {
+    public static final Keyword<RecordDefinition> XML_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
+    private final Keyword<Object> recordName;
     private final Sequence<Keyword> allFields;
 
-    public XmlDefinition(Keyword<Object> rootXPath, Sequence<Keyword> allFields) {
-        this.rootXPath = rootXPath;
+    public RecordDefinition(Keyword<Object> recordName, Sequence<Keyword> allFields) {
+        this.recordName = recordName;
         this.allFields = allFields;
     }
 
-    public Keyword<Object> rootXPath() {
-        return rootXPath;
+    public Keyword<Object> recordName() {
+        return recordName;
     }
 
     public Sequence<Keyword> fields() {
@@ -33,20 +33,20 @@ public class XmlDefinition {
 
 
 
-    public static Sequence<Keyword> uniqueFields(XmlDefinition xmlDefinition) {
-        return allFields(xmlDefinition).filter(where(metadata(Keywords.UNIQUE), is(true)));
+    public static Sequence<Keyword> uniqueFields(RecordDefinition recordDefinition) {
+        return allFields(recordDefinition).filter(where(metadata(Keywords.UNIQUE), is(true)));
     }
 
-    public static Sequence<Keyword> allFields(XmlDefinition xmlDefinition) {
-        return xmlDefinition.fields().flatMap(allFields());
+    public static Sequence<Keyword> allFields(RecordDefinition recordDefinition) {
+        return recordDefinition.fields().flatMap(allFields());
     }
 
     public static Callable1<? super Keyword, Sequence<Keyword>> allFields() {
         return new Callable1<Keyword, Sequence<Keyword>>() {
             public Sequence<Keyword> call(Keyword keyword) throws Exception {
-                XmlDefinition xmlDefinition = keyword.metadata().get(XmlDefinition.XML_DEFINITION);
-                if(xmlDefinition != null){
-                    return sequence(keyword).join(allFields(xmlDefinition));
+                RecordDefinition recordDefinition = keyword.metadata().get(RecordDefinition.XML_DEFINITION);
+                if(recordDefinition != null){
+                    return sequence(keyword).join(allFields(recordDefinition));
                 }
                 return sequence(keyword);
             }

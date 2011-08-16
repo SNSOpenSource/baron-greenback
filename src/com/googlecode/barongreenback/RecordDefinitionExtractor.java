@@ -15,27 +15,27 @@ import static com.googlecode.totallylazy.Sequences.zip;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 
-public class XmlDefinitionExtractor {
+public class RecordDefinitionExtractor {
     public static final String FIELDS = "fields";
     public static final String ALIASES = "aliases";
     public static final String TYPES = "types";
     public static final String UNIQUE = "unique";
-    public static final String ROOT_XPATH = "rootXPath";
+    public static final String RECORD_NAME = "recordName";
     public static final String SUB_FEED_DELIMITER = "#";
 
     private final FormParameters form;
 
-    public XmlDefinitionExtractor(FormParameters form) {
+    public RecordDefinitionExtractor(FormParameters form) {
         this.form = form;
     }
 
-    public XmlDefinition extract() {
+    public RecordDefinition extract() {
         return extractWith("");
     }
 
-    private XmlDefinition extractWith(String prefix) {
+    private RecordDefinition extractWith(String prefix) {
         Sequence<Keyword> keywords = extractKeywordsWith(prefix);
-        return new XmlDefinition(keyword(form.getValue(prefix + ROOT_XPATH)), keywords);
+        return new RecordDefinition(keyword(form.getValue(prefix + RECORD_NAME)), keywords);
     }
 
     private Sequence<Keyword> extractKeywordsWith(String prefix) {
@@ -77,7 +77,7 @@ public class XmlDefinitionExtractor {
 
         String prefix = extractSubFeed(type);
         if(!prefix.isEmpty()){
-            keyword.metadata().set(XmlDefinition.XML_DEFINITION, extractWith(prefix));
+            keyword.metadata().set(RecordDefinition.XML_DEFINITION, extractWith(prefix));
         }
     }
 
