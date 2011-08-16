@@ -25,9 +25,6 @@ public class ViewsModule implements ResourcesModule, RequestScopedModule, Respon
     }
 
     public Module addResponseHandlers(ResponseHandlers handlers) throws Exception {
-        handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("menu"))), renderer(new ModelRenderer("menu")));
-        handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("view"))), renderer(new ModelRenderer("view")));
-        handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("views"))), renderer(new ModelRenderer("views")));
         return this;
     }
 

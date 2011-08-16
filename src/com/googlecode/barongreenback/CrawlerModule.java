@@ -30,12 +30,13 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Res
     }
 
     public Module addResponseHandlers(ResponseHandlers handlers) {
-        handlers.add(where(entity(), is(instanceOf(Model.class))).and(where(file(), is("crawl"))), renderer(new ModelRenderer("crawl")));
+        handlers.add(where(entity(), is(instanceOf(Model.class))), renderer(ModelRenderer.class));
         return this;
     }
 
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(Crawler.class);
+        container.addActivator(ModelRenderer.class, ModelRendererActivator.class);
         return this;
     }
 }
