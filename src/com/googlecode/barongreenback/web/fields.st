@@ -1,14 +1,14 @@
 
 
-<fieldset class="fields $name$">
+<fieldset class="fields $prefix$">
     <legend>$title$</legend>
-    <label for="$name$recordName">Root XPath:</label><input id="$name$recordName" name="$name$recordName" value="" class="text $name$recordName" type="text"/>
+    $text(id={$prefix$recordName}, name={$prefix$recordName}, class={text $prefix$recordName}, label="Root XPath")$
     <ol>
-        <li>$field(id=1, name=name)$</li>
-        <li>$field(id=2, name=name)$</li>
-        <li>$field(id=3, name=name)$</li>
-        <li>$field(id=4, name=name)$</li>
-        <li>$field(id=5, name=name)$</li>
-        <li>$field(id=6, name=name)$</li>
+        <li>$field(id=1, name=prefix)$</li>
+        <li>$field(id=2, name=prefix)$</li>
+        <li>$field(id=3, name=prefix)$</li>
+        <li>$field(id=4, name=prefix)$</li>
+        <li>$field(id=5, name=prefix)$</li>
+        <li>$field(id=6, name=prefix)$</li>
     </ol>
 </fieldset>

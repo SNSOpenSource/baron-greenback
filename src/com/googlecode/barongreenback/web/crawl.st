@@ -8,16 +8,16 @@
 <form class="crawl" action="/admin/crawl" method="POST">
 
     <div>
-        <label for="update">Update:</label><input id="update" name="update" value="" class="text update" type="text"/>
+        $text(id="update", name="update", class="text update", label="Update")$
     </div>
 
     <div>
-        <label for="from">From:</label><input id="from" name="from" value="" class="text from" type="text"/>
+        $text(id="from", name="from", class="text from", label="From")$
     </div>
 
-    $fields(title="Fields", name="")$
+    $fields(title="Fields", prefix="")$
 
-    $fields(title="SubFeed1 Fields", name="subfeed1")$
+    $fields(title="SubFeed1 Fields", prefix="subfeed1")$
 
     <input type="submit" value="Crawl"/>
 </form>
