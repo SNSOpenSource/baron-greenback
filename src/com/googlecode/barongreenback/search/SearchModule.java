@@ -33,7 +33,6 @@ import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.rende
 public class SearchModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule {
     public Module addResources(Resources resources) throws ParseException {
         resources.add(annotatedClass(SearchResource.class));
-        resources.add(binding(get("").resource(method(on(SearchResource.class).find(definedParam(""), definedParam(""))))));
         return this;
     }
 
