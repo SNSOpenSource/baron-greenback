@@ -1,2 +1,2 @@
-<label for="$id$">$label$:</label>
-<input type="$type$" name="$name$" class="$type$ $class$" id="$id$" />
+$if(label)$<label for="$id; null=name$">$label$:</label>$endif$
+<input type='$type; null="text"$' name="$name$" class='$type; null="text"$ $class; null=name$' id="$id; null=name$" value="$value$"/>

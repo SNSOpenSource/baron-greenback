@@ -1,6 +1,6 @@
-$text(id="field" + id, name=name + "fields", class="field", label="XPath")$
+$input(id="field" + id, name=name + "fields", class="field", label="XPath")$
 
-$text(id="alias" + id, name=name + "aliases", class="alias", label="Alias")$
+$input(id="alias" + id, name=name + "aliases", class="alias", label="Alias")$
 
 <label for="type$id$">Type:</label>
 <select id="type$id$" name="$name$types">

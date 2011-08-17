@@ -122,7 +122,7 @@ form.search {
     margin-bottom: 20px;
 }
 
-form.search input.search {
+form.search input.query {
     width: 500px;
 }
 

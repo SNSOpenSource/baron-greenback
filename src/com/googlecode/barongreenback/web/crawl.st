@@ -8,11 +8,11 @@
 <form class="crawl" action="/admin/crawl" method="POST">
 
     <div>
-        $text(id="update", name="update", class="text update", label="Update")$
+        $input(name="update", label="Update")$
     </div>
 
     <div>
-        $text(id="from", name="from", class="text from", label="From")$
+        $input(name="from", label="From")$
     </div>
 
     $fields(title="Fields", prefix="")$
