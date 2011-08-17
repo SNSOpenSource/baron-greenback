@@ -15,9 +15,9 @@
         $input(name="from", label="From")$
     </div>
 
-    $fields(title="Fields", prefix="")$
+    $recordDefinition(title="Fields", prefix="")$
 
-    $fields(title="SubFeed1 Fields", prefix="subfeed1")$
+    $recordDefinition(title="SubFeed1 Fields", prefix="subfeed1")$
 
     <input type="submit" value="Crawl"/>
 </form>

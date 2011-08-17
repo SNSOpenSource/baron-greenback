@@ -14,11 +14,11 @@ import static com.googlecode.totallylazy.records.Keywords.metadata;
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> XML_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
     private final Keyword<Object> recordName;
-    private final Sequence<Keyword> allFields;
+    private final Sequence<Keyword> fields;
 
-    public RecordDefinition(Keyword<Object> recordName, Sequence<Keyword> allFields) {
+    public RecordDefinition(Keyword<Object> recordName, Sequence<Keyword> fields) {
         this.recordName = recordName;
-        this.allFields = allFields;
+        this.fields = fields;
     }
 
     public Keyword<Object> recordName() {
@@ -26,7 +26,7 @@ public class RecordDefinition {
     }
 
     public Sequence<Keyword> fields() {
-        return allFields;
+        return fields;
     }
 
 

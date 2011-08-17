@@ -34,7 +34,7 @@ import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
 import static com.googlecode.utterlyidle.proxy.Resource.resource;
 
-@Path("crawler/crawl")
+@Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
     private final Records records;
@@ -48,11 +48,13 @@ public class CrawlerResource {
     }
 
     @GET
+    @Path("new")
     public Model get() {
         return Model.model();
     }
 
     @POST
+    @Path("new")
     public Response crawl(@FormParam("from") URL from, @FormParam("update") String update, RecordDefinition recordDefinition
     ) throws Exception {
         Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);

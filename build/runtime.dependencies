@@ -6,7 +6,7 @@ mvn:org.sitemesh:sitemesh:jar:3.0-alpha-2
 mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
-mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:452
+mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:453
 mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:369
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:129
 mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:21

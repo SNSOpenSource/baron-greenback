@@ -9,7 +9,7 @@
 <body class="$body.class$">
 <div class="header">
     <ul class="menu">
-        <li class="item"><a href="$base$crawler/crawl">Admin</a></li>
+        <li class="item"><a href="$base$crawler/new">Admin</a></li>
     </ul>
 </div>
 <h1 class="title">baron-greenback : $title$</h1>

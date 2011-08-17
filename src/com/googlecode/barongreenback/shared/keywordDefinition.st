@@ -13,4 +13,5 @@ $input(id="alias" + id, name=name + "aliases", class="alias", label="Alias")$
 </select>
 
 $checkbox(id="unique" + id, name=name + "unique", class="unique", label="Unique")$
+$checkbox(id="visible" + id, name=name + "visible", class="visible", label="Visible", checked="true")$
 
