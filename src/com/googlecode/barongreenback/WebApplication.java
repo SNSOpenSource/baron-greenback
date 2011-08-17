@@ -25,9 +25,9 @@ public class WebApplication extends RestApplication {
         add(new CrawlerModule());
         add(new SearchModule());
         add(new ViewsModule());
-        add(stringTemplateDecorators(packageUrl(WebApplication.class),
+        add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
-                staticRule(contentType(TEXT_HTML), templateName("shared/default"))));
+                staticRule(contentType(TEXT_HTML), templateName("default"))));
         add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path(""))));
     }
 

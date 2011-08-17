@@ -39,12 +39,14 @@ public class SearchResourceTest {
         Response response = application(addSomeData(new WebApplication())).handle(get("users/search/list").withQuery("query", "type:users"));
         assertThat(response.status(), is(OK));
 
+        System.out.println("response = " + response);
+
         XmlRecords xmlRecords = new XmlRecords(Xml.load(new String(response.bytes())));
         Keyword results = keyword("//table[@class='results']/tbody/tr");
-        Keyword<String> title = keyword("td[@class='title']", String.class);
-        xmlRecords.define(results, title);
-        Sequence<String> result = xmlRecords.get(results).map(title);
-        assertThat(result, hasExactly("Added user", "Deleted user"));
+        Keyword<String> id = keyword("td[@class='id']", String.class);
+        xmlRecords.define(results, id);
+        Sequence<String> result = xmlRecords.get(results).map(id);
+        assertThat(result, hasExactly("urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1", "urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef2"));
     }
 
     public static Application addSomeData(final WebApplication application) throws Exception {

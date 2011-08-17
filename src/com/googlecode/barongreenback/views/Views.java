@@ -26,6 +26,7 @@ public class Views {
 
     public Views(Records records) {
         this.records = records;
+        records.define(RECORDS_NAME, VIEW_NAME, FIELD_NAME, FIELD_TYPE, UNIQUE);
     }
 
     public Views add(View view) {
