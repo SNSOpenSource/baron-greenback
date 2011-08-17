@@ -6,9 +6,13 @@ import com.googlecode.barongreenback.views.View;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
+import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
+import com.googlecode.totallylazy.records.xml.Xml;
+import com.googlecode.totallylazy.records.xml.XmlRecords;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Server;
@@ -18,6 +22,7 @@ import com.googlecode.yadic.Container;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Runnables.VOID;
+import static com.googlecode.totallylazy.matchers.IterableMatcher.hasExactly;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
@@ -25,14 +30,21 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 import static com.googlecode.utterlyidle.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 
 public class SearchResourceTest {
     @Test
     public void canQuery() throws Exception {
         Response response = application(addSomeData(new WebApplication())).handle(get("users/search/list").withQuery("query", "type:users"));
-        System.out.println("response = " + response);
         assertThat(response.status(), is(OK));
+
+        XmlRecords xmlRecords = new XmlRecords(Xml.load(new String(response.bytes())));
+        Keyword results = keyword("//table[@class='results']/tbody/tr");
+        Keyword<String> title = keyword("td[@class='title']", String.class);
+        xmlRecords.define(results, title);
+        Sequence<String> result = xmlRecords.get(results).map(title);
+        assertThat(result, hasExactly("Added user", "Deleted user"));
     }
 
     public static Application addSomeData(final WebApplication application) throws Exception {

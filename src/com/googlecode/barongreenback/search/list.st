@@ -10,7 +10,7 @@
         <input type="submit" value="Search"/>
     </form>
 
-    $search/results()$
+    $results()$
 </div>
 </body>
 </html>

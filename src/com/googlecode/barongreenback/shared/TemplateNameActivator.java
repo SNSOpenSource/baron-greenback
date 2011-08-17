@@ -17,10 +17,6 @@ public class TemplateNameActivator implements Callable<TemplateName> {
     }
 
     public TemplateName call() throws Exception {
-        String templateName = path.toString();
-        if(templateName.endsWith("search/list") || templateName.endsWith("search/unique")){
-            return templateName(format("search/%s", path.file()));
-        }
-        return templateName(templateName);
+        return templateName(path.file());
     }
 }
