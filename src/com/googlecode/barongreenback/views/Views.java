@@ -22,11 +22,10 @@ public class Views {
     public static final Keyword<String> VIEW_NAME = Keywords.keyword("name", String.class);
     public static final Keyword<String> FIELD_NAME = Keywords.keyword("fieldName", String.class);
     public static final Keyword<String> FIELD_TYPE = Keywords.keyword("fieldType", String.class);
-    public static final Keyword<Boolean> UNIQUE = Keywords.keyword("unique", Boolean.class);
 
     public Views(Records records) {
         this.records = records;
-        records.define(RECORDS_NAME, VIEW_NAME, FIELD_NAME, FIELD_TYPE, UNIQUE);
+        records.define(RECORDS_NAME, VIEW_NAME, FIELD_NAME, FIELD_TYPE, Keywords.UNIQUE);
     }
 
     public Views add(View view) {
@@ -35,7 +34,7 @@ public class Views {
     }
 
     private Sequence<Record> asRecords(View view) {
-        return view.getFields().map(asRecord(view.name()));
+        return view.fields().map(asRecord(view.name()));
     }
 
     private Callable1<? super Keyword, Record> asRecord(final Keyword view) {
@@ -44,7 +43,7 @@ public class Views {
                 return record().set(VIEW_NAME, view.name()).
                         set(FIELD_NAME, keyword.name()).
                         set(FIELD_TYPE, keyword.forClass().getName()).
-                        set(UNIQUE, keyword.metadata().get(Keywords.UNIQUE));
+                        set(Keywords.UNIQUE, keyword.metadata().get(Keywords.UNIQUE));
             }
         };
     }
@@ -78,7 +77,7 @@ public class Views {
     private Callable1<? super Record, Keyword> asField() {
         return new Callable1<Record, Keyword>() {
             public Keyword call(Record record) throws Exception {
-                return keyword(record.get(FIELD_NAME), Class.forName(record.get(FIELD_TYPE))).metadata(MapRecord.record().set(Keywords.UNIQUE, record.get(UNIQUE)));
+                return keyword(record.get(FIELD_NAME), Class.forName(record.get(FIELD_TYPE))).metadata(MapRecord.record().set(Keywords.UNIQUE, record.get(Keywords.UNIQUE)));
             }
         };
     }

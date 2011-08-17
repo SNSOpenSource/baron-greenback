@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.views;
 
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
@@ -16,6 +17,14 @@ public class View {
         return new View(name);
     }
 
+    public static Callable1<? super View,Sequence<Keyword>> asFields() {
+        return new Callable1<View, Sequence<Keyword>>() {
+            public Sequence<Keyword> call(View view) throws Exception {
+                return view.fields();
+            }
+        };
+    }
+
     public View withFields(Keyword<?>... keywords) {
         return withFields(Sequences.<Keyword>sequence(keywords));
     }
@@ -29,7 +38,7 @@ public class View {
         return name;
     }
 
-    public Sequence<Keyword> getFields() {
+    public Sequence<Keyword> fields() {
         return fields;
     }
 

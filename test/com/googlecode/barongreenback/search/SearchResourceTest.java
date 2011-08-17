@@ -39,8 +39,6 @@ public class SearchResourceTest {
         Response response = application(addSomeData(new WebApplication())).handle(get("users/search/list").withQuery("query", "type:users"));
         assertThat(response.status(), is(OK));
 
-        System.out.println("response = " + response);
-
         XmlRecords xmlRecords = new XmlRecords(Xml.load(new String(response.bytes())));
         Keyword results = keyword("//table[@class='results']/tbody/tr");
         Keyword<String> id = keyword("td[@class='id']", String.class);
@@ -58,6 +56,7 @@ public class SearchResourceTest {
             public Void call(Container container) throws Exception {
                 LuceneRecords luceneRecords = container.get(LuceneRecords.class);
                 Keyword<Object> users = keyword("users");
+                luceneRecords.define(users, keywords(recordSequence).toArray(Keyword.class));
                 luceneRecords.add(users, recordSequence);
                 Views views = container.get(Views.class);
                 views.add(View.view(users).withFields(keywords(recordSequence)));

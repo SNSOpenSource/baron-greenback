@@ -27,6 +27,7 @@ import org.apache.lucene.search.Query;
 import java.util.List;
 import java.util.Map;
 
+import static com.googlecode.barongreenback.views.View.asFields;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.RecordMethods.toMap;
@@ -49,7 +50,7 @@ public class SearchResource {
     @Path("list")
     public Model find(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
         Option<View> optionalView = views.get(view);
-        Sequence<Record> results = records.query(parse(prefix(view, query)), Sequences.<Keyword>empty());
+        Sequence<Record> results = records.query(parse(prefix(view, query)), optionalView.map(View.asFields()).getOrElse(Sequences.<Keyword>empty()));
         return model().
                 add("view", view).
                 add("query", query).
@@ -60,14 +61,15 @@ public class SearchResource {
     @GET
     @Path("unique")
     public Model unique(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
-        Record record = records.query(parse(prefix(view, query)), Sequences.<Keyword>empty()).head();
+        Option<View> optionalView = views.get(view);
+        Record record = records.query(parse(prefix(view, query)), optionalView.map(asFields()).getOrElse(Sequences.<Keyword>empty())).head();
         return model().
                 add("view", view).
                 add("record", toMap(record));
     }
 
     private List<Map<String, Object>> headers(Option<View> optionalView, Sequence<Record> results) {
-        return optionalView.map(fieldNames()).
+        return optionalView.map(asFields()).
                 getOrElse(keywords(results)).
                 map(asHeader()).
                 map(Model.asMap()).
@@ -80,14 +82,6 @@ public class SearchResource {
                 return model().
                         add("name", keyword.name()).
                         add("unique", keyword.metadata().get(Keywords.UNIQUE));
-            }
-        };
-    }
-
-    private Callable1<? super View,Sequence<Keyword>> fieldNames() {
-        return new Callable1<View, Sequence<Keyword>>() {
-            public Sequence<Keyword> call(View view) throws Exception {
-                return view.getFields();
             }
         };
     }

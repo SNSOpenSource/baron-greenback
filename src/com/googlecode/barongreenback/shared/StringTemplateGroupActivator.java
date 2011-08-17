@@ -26,10 +26,10 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
 
     public StringTemplateGroup call() throws Exception {
         EnhancedStringTemplateGroup shared = new EnhancedStringTemplateGroup(URLs.packageUrl(SharedModule.class));
+        shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
 
         EnhancedStringTemplateGroup group = new EnhancedStringTemplateGroup(append(packageUrl(WebApplication.class), packageName(path)));
         group.setSuperGroup(shared);
-        group.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         return group;
     }
 
