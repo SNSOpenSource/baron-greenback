@@ -10,11 +10,13 @@ import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
+import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
 
 import java.net.URL;
@@ -44,8 +46,8 @@ public class CrawlerResource {
 
     @GET
     @Path("new")
-    public Model get() {
-        return Model.model();
+    public Model get(@QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields) {
+        return Model.model().add("numberOfFields", new int[Math.min(numberOfFields, 100)]);
     }
 
     @POST

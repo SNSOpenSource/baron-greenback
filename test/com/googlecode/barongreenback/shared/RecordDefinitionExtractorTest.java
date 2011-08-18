@@ -1,9 +1,15 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.totallylazy.records.Keyword;
+import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.FormParameters;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.net.URI;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
@@ -20,7 +26,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class RecordDefinitionExtractorTest {
-
     @Test
     public void correctlyExtractsFormParamters() throws Exception {
         FormParameters form = FormParameters.formParameters(pair(RECORD_NAME, "/feed/entry"),
