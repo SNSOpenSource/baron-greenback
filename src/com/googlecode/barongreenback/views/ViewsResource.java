@@ -47,7 +47,7 @@ public class ViewsResource {
     @POST
     @Path("new")
     public Model create(RecordDefinition recordDefinition) {
-        views.add(View.view(recordDefinition.recordName()).withFields(recordDefinition.fields()));
+        views.put(View.view(recordDefinition.recordName()).withFields(recordDefinition.fields()));
         return model();
     }
 

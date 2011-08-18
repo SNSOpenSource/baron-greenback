@@ -33,11 +33,6 @@ public class Views {
         records.define(RECORDS_NAME, VIEW_NAME, FIELD_NAME, FIELD_TYPE, Keywords.UNIQUE, VISIBLE);
     }
 
-    public Views add(View view) {
-        records.add(RECORDS_NAME, asRecords(view));
-        return this;
-    }
-
     private Sequence<Record> asRecords(View view) {
         return view.fields().map(asRecord(view.name()));
     }
@@ -89,7 +84,6 @@ public class Views {
             }
         };
     }
-
 
     public boolean contains(Keyword<Object> recordName) {
         return !get(recordName.name()).isEmpty();

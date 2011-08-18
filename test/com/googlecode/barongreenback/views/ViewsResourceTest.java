@@ -29,7 +29,7 @@ public class ViewsResourceTest {
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
                 View view = view(keyword("users")).withFields(keyword("name", String.class));
-                container.get(Views.class).add(view);
+                container.get(Views.class).put(view);
                 return Runnables.VOID;
             }
         });

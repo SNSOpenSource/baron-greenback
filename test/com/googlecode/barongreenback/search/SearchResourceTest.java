@@ -59,7 +59,7 @@ public class SearchResourceTest {
                 luceneRecords.define(users, keywords(recordSequence).toArray(Keyword.class));
                 luceneRecords.add(users, recordSequence);
                 Views views = container.get(Views.class);
-                views.add(View.view(users).withFields(keywords(recordSequence)));
+                views.put(View.view(users).withFields(keywords(recordSequence)));
                 return VOID;
             }
         });
