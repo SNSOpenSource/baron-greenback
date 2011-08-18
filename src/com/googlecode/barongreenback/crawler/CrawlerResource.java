@@ -47,7 +47,7 @@ public class CrawlerResource {
     @GET
     @Path("new")
     public Model get(@QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields) {
-        return Model.model().add("numberOfFields", new int[Math.min(numberOfFields, 100)]);
+        return Model.model().add("numberOfFields", new int[Math.min(Math.max(numberOfFields,1), 100)]);
     }
 
     @POST
