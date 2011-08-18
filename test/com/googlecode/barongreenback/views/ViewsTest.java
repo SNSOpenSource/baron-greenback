@@ -26,19 +26,18 @@ public class ViewsTest {
     public void createAndRetrieveAView() throws Exception {
         RAMDirectory directory = new RAMDirectory();
         Records records = new LuceneRecords(directory, new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_33, new StandardAnalyzer(Version.LUCENE_33))));
-        Keyword<Integer> id = keyword("id", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
+        Keyword<Integer> id = keyword("id", Integer.class).metadata(record().set(Keywords.UNIQUE, true).set(Views.VISIBLE, true));
         View view = view(keyword("users")).withFields(id, keyword("name", String.class));
         Views views = new Views(records).add(view);
 
         Sequence<Record> actual = records.get(Views.RECORDS_NAME).realise();
         assertThat(actual, hasExactly(
-                record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "id").set(Views.FIELD_TYPE, Integer.class.getName()).set(Keywords.UNIQUE, true),
+                record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "id").set(Views.FIELD_TYPE, Integer.class.getName()).set(Keywords.UNIQUE, true).set(Views.VISIBLE, true),
                 record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "name").set(Views.FIELD_TYPE, String.class.getName())));
 
         View result = views.get().head();
         assertThat(result, is(view));
         Keyword idResult = result.fields().find(Predicates.<Keyword>is(id)).get();
         assertThat(idResult.metadata().get(Keywords.UNIQUE), is(true));
-
     }
 }

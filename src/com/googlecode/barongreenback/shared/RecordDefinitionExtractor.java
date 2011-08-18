@@ -1,8 +1,10 @@
 package com.googlecode.barongreenback.shared;
 
+import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Quadruple;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
@@ -11,6 +13,7 @@ import com.googlecode.utterlyidle.FormParameters;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.transpose;
 import static com.googlecode.totallylazy.Sequences.zip;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -20,6 +23,7 @@ public class RecordDefinitionExtractor {
     public static final String ALIASES = "aliases";
     public static final String TYPES = "types";
     public static final String UNIQUE = "unique";
+    public static final String VISIBLE = "visible";
     public static final String RECORD_NAME = "recordName";
     public static final String SUB_FEED_DELIMITER = "#";
 
@@ -43,28 +47,29 @@ public class RecordDefinitionExtractor {
         Iterable<String> aliases = form.getValues(prefix + ALIASES);
         Iterable<String> types = form.getValues(prefix + TYPES);
         Iterable<Boolean> unique = new CheckboxValues(form.getValues(prefix + UNIQUE));
-        return toKeywords(fields, aliases, types, unique);
+        Iterable<Boolean> visible = new CheckboxValues(form.getValues(prefix + VISIBLE));
+        return toKeywords(fields, aliases, types, unique, visible);
     }
 
-    private Sequence<Keyword> toKeywords(Iterable<String> fields, Iterable<String> aliases, Iterable<String> types, Iterable<Boolean> unique) {
-        return zip(fields, aliases, types, unique).
+    private Sequence<Keyword> toKeywords(Iterable fields, Iterable aliases, Iterable types, Iterable unique, Iterable visible) {
+        return Sequences.transpose(fields, aliases, types, unique, visible).
                 filter(where(first(String.class), not(empty()))).
                 map(asKeyword()).
                 realise();
     }
 
-    private Callable1<? super Quadruple<String, String, String, Boolean>, Keyword> asKeyword() {
-        return new Callable1<Quadruple<String, String, String, Boolean>, Keyword>() {
-            public Keyword call(Quadruple<String, String, String, Boolean> quadruple) throws Exception {
-                return toKeyword(quadruple.first(), quadruple.second(), quadruple.third(), quadruple.fourth());
+    private Callable1<? super Sequence, Keyword> asKeyword() {
+        return new Callable1<Sequence, Keyword>() {
+            public Keyword call(Sequence sequence) throws Exception {
+                return toKeyword((String) sequence.first(), (String) sequence.second(), (String) sequence.drop(2).head(), (Boolean) sequence.drop(3).head(), (Boolean) sequence.drop(4).head());
             }
         };
     }
 
-    private Keyword toKeyword(String name, String alias, String type, Boolean unique) throws ClassNotFoundException {
+    private Keyword toKeyword(String name, String alias, String type, Boolean unique, Boolean visible) throws ClassNotFoundException {
         ImmutableKeyword keyword = keyword(name, classOf(type));
 
-        setMetadata(keyword, type, unique);
+        setMetadata(keyword, type, unique, visible);
 
         if (!alias.isEmpty()) {
             return keyword.as(keyword(alias, classOf(type)));
@@ -72,8 +77,9 @@ public class RecordDefinitionExtractor {
         return keyword;
     }
 
-    private void setMetadata(ImmutableKeyword keyword, String type, Boolean unique) {
+    private void setMetadata(ImmutableKeyword keyword, String type, Boolean unique, Boolean visible) {
         keyword.metadata().set(Keywords.UNIQUE, unique);
+        keyword.metadata().set(Views.VISIBLE, visible);
 
         String prefix = extractSubFeed(type);
         if(!prefix.isEmpty()){
