@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
@@ -29,7 +30,11 @@ import java.util.Map;
 
 import static com.googlecode.barongreenback.views.View.asFields;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
+import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.RecordMethods.toMap;
 
 
@@ -49,29 +54,39 @@ public class SearchResource {
     @GET
     @Path("list")
     public Model find(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
-        Option<View> optionalView = views.get(view);
-        Sequence<Record> results = records.query(parse(prefix(view, query)), optionalView.map(View.asFields()).getOrElse(Sequences.<Keyword>empty()));
+        Sequence<Keyword> headers = headers(view);
+        Sequence<Record> results = records.query(parse(prefix(view, query)), headers);
         return model().
                 add("view", view).
                 add("query", query).
-                add("headers", headers(optionalView, results)).
+                add("headers", headers(headers, results)).
                 add("results", results.map(RecordMethods.asMap()).toList());
     }
 
     @GET
     @Path("unique")
     public Model unique(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
-        Option<View> optionalView = views.get(view);
-        Record record = records.query(parse(prefix(view, query)), optionalView.map(asFields()).getOrElse(Sequences.<Keyword>empty())).head();
+        Sequence<Keyword> headers = headers(view);
+        Record record = records.query(parse(prefix(view, query)), headers).head();
         return model().
                 add("view", view).
                 add("record", toMap(record));
     }
 
-    private List<Map<String, Object>> headers(Option<View> optionalView, Sequence<Record> results) {
-        return optionalView.map(asFields()).
-                getOrElse(keywords(results)).
-                map(asHeader()).
+    private Sequence<Keyword> headers(String view) {
+        Option<View> optionalView = views.get(view);
+        return optionalView.map(View.asFields()).getOrElse(Sequences.<Keyword>empty());
+    }
+
+    private List<Map<String, Object>> headers(Sequence<Keyword> headers, Sequence<Record> results) {
+        if(headers.isEmpty()){
+            return toModel(keywords(results));
+        }
+        return toModel(headers.filter(where(metadata(Views.VISIBLE), is(notNullValue(Boolean.class).and(is(true))))));
+    }
+
+    private List<Map<String, Object>> toModel(Sequence<Keyword> keywords) {
+        return keywords.map(asHeader()).
                 map(Model.asMap()).
                 toList();
     }
@@ -87,14 +102,14 @@ public class SearchResource {
     }
 
     private String prefix(String view, String query) {
-        if(view.isEmpty()){
+        if (view.isEmpty()) {
             return query;
         }
         return String.format("+%s:%s %s", Lucene.RECORD_KEY, view, query);
     }
 
     private Query parse(String query) throws ParseException {
-        if(query.isEmpty()){
+        if (query.isEmpty()) {
             return new MatchAllDocsQuery();
         }
         return parser.parse(query);

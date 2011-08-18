@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.search.SearchResource;
+import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Sequence;
@@ -19,13 +19,8 @@ import org.apache.lucene.queryParser.ParseException;
 
 import java.net.URL;
 
-import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
-import static com.googlecode.totallylazy.Callables.first;
-import static com.googlecode.totallylazy.Callables.second;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.not;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
@@ -62,9 +57,7 @@ public class CrawlerResource {
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
-        if(!views.contains(recordName)) {
-            views.add(view(recordName).withFields(keywords(recordsToAdd)));
-        }
+        views.put(view(recordName).withFields(keywords(recordsToAdd)));
         records.put(recordName, update(using(unique), recordsToAdd));
         return redirect(resource(SearchResource.class).find(recordName.name(), EMPTY));
     }

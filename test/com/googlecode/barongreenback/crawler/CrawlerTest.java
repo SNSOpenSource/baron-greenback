@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.Crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
@@ -31,7 +32,7 @@ public class CrawlerTest {
 
 
     private static final Keyword<Object> ENTRIES = keyword("/feed/entry");
-    private static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false));
+    private static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
     private static final Keyword<URI> LINK = keyword("link/@href", URI.class).
             metadata(MapRecord.record().set(RecordDefinition.XML_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
     private static final Keyword<Date> UPDATED = keyword("updated", Date.class);

@@ -3,8 +3,10 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Group;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.MapRecord;
@@ -15,6 +17,8 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
+import static com.googlecode.totallylazy.records.RecordMethods.update;
+import static com.googlecode.totallylazy.records.Using.using;
 
 public class Views {
     private final Records records;
@@ -89,5 +93,10 @@ public class Views {
 
     public boolean contains(Keyword<Object> recordName) {
         return !get(recordName.name()).isEmpty();
+    }
+
+    public Views put(View view) {
+        records.put(RECORDS_NAME, update(using(VIEW_NAME, FIELD_NAME), asRecords(view)));
+        return this;
     }
 }
