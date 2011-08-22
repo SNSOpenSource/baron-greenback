@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Quadruple;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.ImmutableKeyword;
@@ -85,7 +84,7 @@ public class RecordDefinitionExtractor {
 
         String prefix = extractSubFeed(type);
         if(!prefix.isEmpty()){
-            keyword.metadata().set(RecordDefinition.XML_DEFINITION, extractWith(prefix));
+            keyword.metadata().set(RecordDefinition.RECORD_DEFINITION, extractWith(prefix));
         }
     }
 

@@ -4,16 +4,17 @@ import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.records.AliasedKeyword;
 import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.MapRecord;
+import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
-import com.googlecode.utterlyidle.FormParameters;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.DefaultValue;
@@ -34,9 +35,12 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
+import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
@@ -45,9 +49,9 @@ import static com.googlecode.utterlyidle.proxy.Resource.resource;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
-    public static final ImmutableKeyword<Object> FORMS = keyword("forms");
-    public static final ImmutableKeyword<String> ID = keyword("id", String.class);
-    public static final ImmutableKeyword<String> FORM = keyword("form", String.class);
+    public static final Keyword<Object> MODELS = keyword("models");
+    public static final Keyword<String> ID = keyword("models_id", String.class);
+    public static final Keyword<String> MODEL = keyword("model", String.class);
     private final Records records;
     private final Crawler crawler;
     private final Views views;
@@ -56,7 +60,7 @@ public class CrawlerResource {
         this.records = records;
         this.crawler = crawler;
         this.views = views;
-        records.define(FORMS, ID, FORM);
+        records.define(MODELS, ID, MODEL);
     }
 
     @GET
@@ -68,14 +72,15 @@ public class CrawlerResource {
     @GET
     @Path("edit")
     public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields) {
-        return form("news", "http://feeds.bbci.co.uk/news/rss.xml",
-                recordDefinition("/rss/channel/item",
-                        keywordDefinition("title", "", "java.lang.String", false, true, false),
-                        keywordDefinition("link", "", "java.net.URI", false, false, true).
-                                add("definition", recordDefinition("",
-                                        keywordDefinition("status", "", "java.lang.String", false, true, false),
-                                        keywordDefinition("id", "", "java.lang.String", true, true, false))),
-                        keywordDefinition("guid", "", "java.lang.String", true, true, false)));
+        return records.get(MODELS).filter(where(ID, is(id))).map(MODEL).map(asModel()).head();
+    }
+
+    private Callable1<? super String, Model> asModel() {
+        return new Callable1<String, Model>() {
+            public Model call(String value) throws Exception {
+                return Model.parse(value);
+            }
+        };
     }
 
     private Model emptyForm(Integer numberOfFields) {
@@ -99,11 +104,7 @@ public class CrawlerResource {
     }
 
     private Model recordDefinition(String recordName, Model... fields) {
-        return Sequences.sequence(fields).fold(model().add("recordName", recordName), new Callable2<Model, Model, Model>() {
-            public Model call(Model model, Model field) throws Exception {
-                return model.add("fields", field);
-            }
-        });
+        return model().add("recordName", recordName).add("fields", Sequences.sequence(fields).toList());
     }
 
     private Model keywordDefinition(String name, String alias, String type, boolean unique, boolean visible, boolean subfeed) {
@@ -134,15 +135,62 @@ public class CrawlerResource {
     @POST
     @Path("new")
     public Response crawl(@QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields, @FormParam("action") String action,
-                          @FormParam("from") URL from, @FormParam("update") String update, RecordDefinition recordDefinition,
-                          FormParameters formParameters) throws Exception {
+                          @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition) throws Exception {
         if (action.equals("Save")) {
             String id = UUID.randomUUID().toString();
-            records.add(FORMS, MapRecord.record().set(ID, id).set(FORM, formParameters.toString()));
+            records.add(MODELS, record().set(ID, id).set(MODEL, toModel(update, from, recordDefinition).toString()));
             return redirect(resource(getClass()).edit(id, numberOfFields));
         }
         Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
+    }
+
+    private Model toModel(String update, URL from, RecordDefinition recordDefinition) {
+        return form(update, from.toString(), toModel(recordDefinition));
+
+    }
+
+    private Model toModel(RecordDefinition recordDefinition) {
+        return recordDefinition(recordDefinition.recordName().name(),
+                recordDefinition.fields().map(new Callable1<Keyword, Model>() {
+                    public Model call(Keyword keyword) throws Exception {
+                        return keywordDefinition(name(keyword), alias(keyword), type(keyword), unique(keyword), visible(keyword), subfeed(keyword));
+                    }
+                }).toArray(Model.class));
+    }
+
+    private boolean subfeed(Keyword keyword) {
+        return keyword.metadata().get(RecordDefinition.RECORD_DEFINITION) != null;
+    }
+
+    private boolean visible(Keyword keyword) {
+        return booleanValueOf(keyword, Views.VISIBLE);
+    }
+
+    private boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
+        return keyword.metadata().get(metaKeyword) == true;
+    }
+
+    private boolean unique(Keyword keyword) {
+        return booleanValueOf(keyword, Keywords.UNIQUE);
+    }
+
+    private String name(Keyword keyword) {
+        if (keyword instanceof AliasedKeyword) {
+            return ((AliasedKeyword) keyword).source().name();
+        }
+        return keyword.name();
+    }
+
+    private String alias(Keyword keyword) {
+        if (keyword instanceof AliasedKeyword) {
+            return keyword.name();
+        }
+        return "";
+    }
+
+    private String type(Keyword keyword) {
+        return keyword.forClass().getName();
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {

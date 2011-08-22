@@ -12,7 +12,7 @@ import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 
 public class RecordDefinition {
-    public static final Keyword<RecordDefinition> XML_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
+    public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
     private final Keyword<Object> recordName;
     private final Sequence<Keyword> fields;
 
@@ -44,7 +44,7 @@ public class RecordDefinition {
     public static Callable1<? super Keyword, Sequence<Keyword>> allFields() {
         return new Callable1<Keyword, Sequence<Keyword>>() {
             public Sequence<Keyword> call(Keyword keyword) throws Exception {
-                RecordDefinition recordDefinition = keyword.metadata().get(RecordDefinition.XML_DEFINITION);
+                RecordDefinition recordDefinition = keyword.metadata().get(RecordDefinition.RECORD_DEFINITION);
                 if(recordDefinition != null){
                     return sequence(keyword).join(allFields(recordDefinition));
                 }

@@ -17,7 +17,7 @@ import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import java.net.URL;
 import java.util.Date;
 
-import static com.googlecode.barongreenback.shared.RecordDefinition.XML_DEFINITION;
+import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -43,7 +43,7 @@ public class Crawler {
 
         Sequence<Record> result = xmlRecords.get(recordDefinition.recordName());
 
-        return allFields.filter(where(metadata(XML_DEFINITION), is(notNullValue()))).
+        return allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
                 fold(result, crawlSubFeeds());
 
     }
@@ -60,7 +60,7 @@ public class Crawler {
         return new Callable1<Record, Iterable<Record>>() {
             public Iterable<Record> call(Record currentRecord) throws Exception {
                 URL subFeed = url(currentRecord.get(sourceUrl).toString());
-                RecordDefinition subDefinitions = sourceUrl.metadata().get(XML_DEFINITION);
+                RecordDefinition subDefinitions = sourceUrl.metadata().get(RECORD_DEFINITION);
                 return crawl(subFeed, subDefinitions).
                         map(merge(currentRecord));
             }

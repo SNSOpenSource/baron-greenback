@@ -1,15 +1,9 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.FormParameters;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.net.URI;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
@@ -81,7 +75,7 @@ public class RecordDefinitionExtractorTest {
         assertThat(definition.fields(), hasExactly(keyword("link", URI.class)));
 
         Keyword<Object> subRoot = keyword("/user/summary");
-        RecordDefinition subDefinition = definition.fields().head().metadata().get(RecordDefinition.XML_DEFINITION);
+        RecordDefinition subDefinition = definition.fields().head().metadata().get(RecordDefinition.RECORD_DEFINITION);
         assertThat(subDefinition.recordName(), is(subRoot));
         assertThat(subDefinition.fields(), hasExactly(keyword("id", Integer.class)));
         assertThat(uniqueFields(subDefinition), hasExactly(keyword("id", Integer.class)));
