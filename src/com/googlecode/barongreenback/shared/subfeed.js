@@ -1,16 +1,37 @@
 $(document).ready(function() {
     $("input.subfeed").live('click', function() {
-        var kewordDefinition = $(this).parent("div.keywordDefinition");
+        var keywordDefinition = new KeywordDefinition($(this).parent("div.keywordDefinition"), "div.recordDefinitionTemplate", ".fields");
 
-        if(this.checked) {
-            if(kewordDefinition.find(".fields").length > 0) {
-                $(".fields", kewordDefinition).show();
-            } else {
-                var subfeed = $("div.recordDefinitionTemplate .fields").clone();
-                subfeed.appendTo(kewordDefinition);
-            }
+        if (this.checked) {
+            keywordDefinition.showOrAddSubfeed();
         } else {
-            $(".fields", kewordDefinition).hide();
+            keywordDefinition.hideSubfeed();
         }
     });
 });
+
+function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedSelector) {
+    this.content = keywordDefinition;
+    this.template = $([subfeedTemplateSelector, subfeedSelector].join(" "));
+    this.subfeedSelector = subfeedSelector;
+
+    this.hasSubfeed = function() {
+        return this.content.find(this.subfeedSelector).length > 0;
+    }
+
+    this.addSubfeed = function(subfeed) {
+        subfeed.appendTo(this.content);
+    }
+
+    this.hideSubfeed = function() {
+        $(this.subfeedSelector, this.content).hide();
+    }
+
+    this.showSubfeed = function() {
+        $(this.subfeedSelector, this.content).show();
+    }
+    
+    this.showOrAddSubfeed = function() {
+        this.hasSubfeed() ? this.showSubfeed() : this.addSubfeed(this.template.clone());
+    }
+}
