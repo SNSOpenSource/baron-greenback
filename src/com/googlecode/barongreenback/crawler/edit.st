@@ -21,6 +21,8 @@
     <input type="submit" value="Save" name="action"/>
 </form>
 
-
+<div class="recordDefinitionTemplate">
+        $recordDefinition(title="Fields", prefix="REPLACE_ME", definition=form.definition)$
+</div>
 </body>
 </html>

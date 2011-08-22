@@ -6,11 +6,11 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.AliasedKeyword;
-import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
@@ -35,6 +35,9 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Option.option;
+import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.EMPTY;
@@ -107,14 +110,15 @@ public class CrawlerResource {
         return model().add("recordName", recordName).add("fields", Sequences.sequence(fields).toList());
     }
 
-    private Model keywordDefinition(String name, String alias, String type, boolean unique, boolean visible, boolean subfeed) {
+    private Model keywordDefinition(String name, String alias, String type, boolean unique, boolean visible, Option<Model> recordDefinition) {
         return model().
                 add("name", name).
                 add("alias", alias).
                 add("type", type).
                 add("unique", unique).
                 add("visible", visible).
-                add("subfeed", subfeed);
+                add("subfeed", !recordDefinition.isEmpty()).
+                add("definition", recordDefinition.getOrNull());
     }
 
     private Callable2<? super HashMap<String, List<String>>, ? super Pair<String, String>, HashMap<String, List<String>>> asMultivaluedMap() {
@@ -154,13 +158,17 @@ public class CrawlerResource {
         return recordDefinition(recordDefinition.recordName().name(),
                 recordDefinition.fields().map(new Callable1<Keyword, Model>() {
                     public Model call(Keyword keyword) throws Exception {
-                        return keywordDefinition(name(keyword), alias(keyword), type(keyword), unique(keyword), visible(keyword), subfeed(keyword));
+                        return keywordDefinition(name(keyword), alias(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword));
                     }
                 }).toArray(Model.class));
     }
 
-    private boolean subfeed(Keyword keyword) {
-        return keyword.metadata().get(RecordDefinition.RECORD_DEFINITION) != null;
+    private Option<Model> recordDefinition(Keyword keyword) {
+        return option(keyword.metadata().get(RecordDefinition.RECORD_DEFINITION)).map(new Callable1<RecordDefinition, Model>() {
+            public Model call(RecordDefinition recordDefinition) throws Exception {
+                return toModel(recordDefinition);
+            }
+        });
     }
 
     private boolean visible(Keyword keyword) {

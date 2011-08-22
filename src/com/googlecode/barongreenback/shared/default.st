@@ -23,7 +23,7 @@ $body$
 <div class="footer">
     copyleft <a href="http://code.google.com/p/baron-greenback/">baron-greenback</a> - 2011
 </div>
-<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"/>
-<script type="text/javascript" src="$base$shared/subfeed.js"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="$base$shared/subfeed.js"></script>
 </body>
 </html>
