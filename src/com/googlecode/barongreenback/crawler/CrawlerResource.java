@@ -95,7 +95,7 @@ public class CrawlerResource {
     }
 
     private Model emptyDefinition(int number) {
-        return recordDefinition("", Sequences.repeat(model()).take(number).toArray(Model.class));
+        return recordDefinition("", Sequences.repeat(model().add("visible", true)).take(number).toArray(Model.class));
     }
 
     private Model form(String update, String from, Model definition) {
