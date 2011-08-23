@@ -1,5 +1,5 @@
 <div class="keywordDefinition">
-    $input(id=name + "field" + id, name=name + "fields", class="field", label="XPath", value=keyword.name)$
+    $input(id=name + "name" + id, name=name + "name", class="name", label="XPath", value=keyword.name)$
 
     $input(id=name + "alias" + id, name=name + "aliases", class="alias", label="Alias", value=keyword.alias)$
 

@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.shared;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
@@ -17,7 +16,7 @@ import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 
 public class RecordDefinitionExtractor {
-    public static final String FIELDS = "fields";
+    public static final String NAME = "name";
     public static final String ALIASES = "aliases";
     public static final String TYPES = "types";
     public static final String UNIQUE = "unique";
@@ -44,14 +43,14 @@ public class RecordDefinitionExtractor {
     }
 
     private Sequence<Keyword> extractKeywordsWith(String prefix) {
-        Iterable<String> fields = form.getValues(prefix + FIELDS);
+        Iterable<String> name = form.getValues(prefix + NAME);
         Iterable<String> aliases = form.getValues(prefix + ALIASES);
         Iterable<String> types = form.getValues(prefix + TYPES);
         Iterable<Boolean> unique = new CheckboxValues(form.getValues(prefix + UNIQUE));
         Iterable<Boolean> visible = new CheckboxValues(form.getValues(prefix + VISIBLE));
         Iterable<Boolean> subfeed = new CheckboxValues(form.getValues(prefix + SUBFEED));
         Iterable<String> subfeedPrefix = form.getValues(prefix + SUBFEED_PREFIX);
-        return toKeywords(fields, aliases, types, unique, visible, subfeed, subfeedPrefix);
+        return toKeywords(name, aliases, types, unique, visible, subfeed, subfeedPrefix);
     }
 
     private String generatePrefix(String prefix) {
@@ -59,8 +58,8 @@ public class RecordDefinitionExtractor {
         return prefix + SUBFEED_PREFIX_SEPARATOR ;
     }
 
-    private Sequence<Keyword> toKeywords(Iterable fields, Iterable aliases, Iterable types, Iterable unique, Iterable visible, Iterable subfeed, Iterable subfeedPrefix) {
-        return transpose(fields, aliases, types, unique, visible, subfeed, subfeedPrefix).
+    private Sequence<Keyword> toKeywords(Iterable name, Iterable aliases, Iterable types, Iterable unique, Iterable visible, Iterable subfeed, Iterable subfeedPrefix) {
+        return transpose(name, aliases, types, unique, visible, subfeed, subfeedPrefix).
                 filter(where(first(String.class), not(empty()))).
                 map(asKeyword()).
                 realise();
