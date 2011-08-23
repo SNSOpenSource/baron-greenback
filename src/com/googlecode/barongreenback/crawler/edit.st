@@ -7,8 +7,8 @@
 
 <form class="crawl form-stacked" action="" method="POST">
 
-    $input(name="update", label="Update", value=form.update)$
-    $input(name="from", label="From", value=form.from)$
+    $input(name="update", label="Update", value=form.update, placeholder="Name")$
+    $input(name="from", label="From", value=form.from, placeholder="http://www.example.com/feed/xml")$
 
     $recordDefinition(title="Fields", prefix="", record=form.record)$
 

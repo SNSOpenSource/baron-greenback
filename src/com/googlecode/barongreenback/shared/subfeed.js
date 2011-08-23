@@ -8,6 +8,14 @@ $(document).ready(function() {
             keywordDefinition.hideSubfeed();
         }
     });
+    $("input.more").live("click", function() {
+        var ol = $("ol", $(this).parent());
+        var template = $("li.keywordTemplate", ol);
+        var nextIndex = ol.children().length;
+        var html = "<li>" + template.html().replace(/REPLACE_ME/g, nextIndex) + "</li>";
+        var newKeyword = $(html).hide().insertBefore(template);
+        newKeyword.show("slow").css({display:'list-item'});
+    })
 });
 
 function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedPrefixSelector) {

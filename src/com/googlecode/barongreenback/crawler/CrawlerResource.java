@@ -55,7 +55,7 @@ import static com.googlecode.utterlyidle.proxy.Resource.resource;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
-    public static final String NUMBER_OF_FIELDS = "5";
+    public static final String NUMBER_OF_FIELDS = "3";
     private final Records records;
     private final Repository<UUID, Model> modelRepository;
     private final Crawler crawler;
