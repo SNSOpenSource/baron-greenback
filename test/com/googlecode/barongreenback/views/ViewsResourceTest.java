@@ -37,7 +37,7 @@ public class ViewsResourceTest {
         Response response = application(application).handle(get("views/menu"));
         assertThat(response.status(), is(Status.OK));
 
-        XmlRecords xmlRecords = new XmlRecords(Xml.load(new String(response.bytes())));
+        XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
         Keyword results = keyword("//ul[@class='views']/li");
         Keyword<String> link = keyword("a/@href", String.class);
         xmlRecords.define(results, link);

@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.xml.Xml;
@@ -32,7 +33,7 @@ public class Crawler {
         HttpHandler httpHandler = new ClientHttpHandler();
         Response response = httpHandler.handle(get(url.toString()).build());
         String xml = new String(response.bytes());
-        return new XmlRecords(Xml.load(xml), new Mappings().add(Date.class, DateMapping.atomDateFormat()));
+        return new XmlRecords(Xml.document(xml), new Mappings().add(Date.class, DateMapping.atomDateFormat()));
     }
 
     public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition) throws Exception {
@@ -59,10 +60,14 @@ public class Crawler {
     private Callable1<Record, Iterable<Record>> crawl(final Keyword sourceUrl) {
         return new Callable1<Record, Iterable<Record>>() {
             public Iterable<Record> call(Record currentRecord) throws Exception {
-                URL subFeed = url(currentRecord.get(sourceUrl).toString());
-                RecordDefinition subDefinitions = sourceUrl.metadata().get(RECORD_DEFINITION);
-                return crawl(subFeed, subDefinitions).
-                        map(merge(currentRecord));
+                try {
+                    URL subFeed = url(currentRecord.get(sourceUrl).toString());
+                    RecordDefinition subDefinitions = sourceUrl.metadata().get(RECORD_DEFINITION);
+                    return crawl(subFeed, subDefinitions).
+                            map(merge(currentRecord));
+                } catch (Exception e) {
+                    return Sequences.sequence(currentRecord);
+                }
             }
         };
     }

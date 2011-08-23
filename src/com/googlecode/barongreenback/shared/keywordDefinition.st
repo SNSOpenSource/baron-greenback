@@ -4,7 +4,7 @@
     $input(id=prefix + "alias" + id, name=prefix + "aliases", class="alias", label="Alias", value=keyword.alias)$
 
     <label for="prefix + type$id$">Type:</label>
-    <select id="prefix + type$id$" name="$name$types">
+    <select id="prefix + type$id$" name="$prefix$types">
     <option value="java.lang.String" selected="selected">String</option>
     <option value="java.lang.Integer">Integer</option>
     <option value="java.lang.Long">Long</option>

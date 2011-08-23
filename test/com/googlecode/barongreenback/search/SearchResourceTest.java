@@ -39,7 +39,7 @@ public class SearchResourceTest {
         Response response = application(addSomeData(new WebApplication())).handle(get("users/search/list").withQuery("query", "type:users"));
         assertThat(response.status(), is(OK));
 
-        XmlRecords xmlRecords = new XmlRecords(Xml.load(new String(response.bytes())));
+        XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
         Keyword results = keyword("//table[@class='results']/tbody/tr");
         Keyword<String> id = keyword("td[@class='id']", String.class);
         xmlRecords.define(results, id);

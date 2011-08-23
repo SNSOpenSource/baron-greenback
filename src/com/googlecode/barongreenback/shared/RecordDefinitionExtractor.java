@@ -59,7 +59,7 @@ public class RecordDefinitionExtractor {
     }
 
     private Sequence<Keyword> toKeywords(Iterable name, Iterable aliases, Iterable types, Iterable unique, Iterable visible, Iterable subfeed, Iterable subfeedPrefix) {
-        return transpose(name, aliases, types, unique, visible, subfeed, subfeedPrefix).
+       return transpose(name, aliases, types, unique, visible, subfeed, subfeedPrefix).
                 filter(where(first(String.class), not(empty()))).
                 map(asKeyword()).
                 realise();
