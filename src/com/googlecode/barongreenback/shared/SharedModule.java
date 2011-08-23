@@ -9,7 +9,10 @@ import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.modules.ResponseHandlersModule;
 import com.googlecode.utterlyidle.sitemesh.TemplateName;
 import com.googlecode.yadic.Container;
+import com.googlecode.yadic.generics.TypeFor;
 import org.antlr.stringtemplate.StringTemplateGroup;
+
+import java.util.UUID;
 
 import static com.googlecode.totallylazy.Predicates.instanceOf;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -27,6 +30,7 @@ public class SharedModule implements ResponseHandlersModule, RequestScopedModule
     public Module addPerRequestObjects(Container container) throws Exception {
         container.addActivator(TemplateName.class, TemplateNameActivator.class);
         container.addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class);
+        container.add(new TypeFor<Repository<UUID, Model>>(){}.get(), ModelRepository.class);
         return this;
     }
 

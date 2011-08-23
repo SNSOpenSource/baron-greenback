@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.RecordDefinitionExtractor;
+import com.googlecode.barongreenback.shared.Repository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
@@ -54,18 +55,16 @@ import static com.googlecode.utterlyidle.proxy.Resource.resource;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
-    public static final Keyword<Object> MODELS = keyword("models");
-    public static final Keyword<String> ID = keyword("models_id", String.class);
-    public static final Keyword<String> MODEL = keyword("model", String.class);
     private final Records records;
+    private final Repository<UUID, Model> modelRepository;
     private final Crawler crawler;
     private final Views views;
 
-    public CrawlerResource(Records records, Crawler crawler, Views views) {
+    public CrawlerResource(final Records records, final Repository<UUID, Model> modelRepository, Crawler crawler, Views views) {
         this.records = records;
+        this.modelRepository = modelRepository;
         this.crawler = crawler;
         this.views = views;
-        records.define(MODELS, ID, MODEL);
     }
 
     @GET
@@ -77,15 +76,7 @@ public class CrawlerResource {
     @GET
     @Path("edit")
     public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields) {
-        return records.get(MODELS).filter(where(ID, is(id))).map(MODEL).map(asModel()).head();
-    }
-
-    private Callable1<? super String, Model> asModel() {
-        return new Callable1<String, Model>() {
-            public Model call(String value) throws Exception {
-                return Model.parse(value);
-            }
-        };
+        return modelRepository.get(UUID.fromString(id));
     }
 
     private Model emptyForm(Integer numberOfFields) {
@@ -143,11 +134,9 @@ public class CrawlerResource {
     public Response crawl(@QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields, @FormParam("action") String action,
                           @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition) throws Exception {
         if (action.equals("Save")) {
-            String id = UUID.randomUUID().toString();
-            String json = toModel(update, from, recordDefinition).toString();
-            System.out.println("json = " + json);
-            records.add(MODELS, record().set(ID, id).set(MODEL, json));
-            return redirect(resource(getClass()).edit(id, numberOfFields));
+            UUID key = UUID.randomUUID();
+            modelRepository.set(key, toModel(update, from, recordDefinition));
+            return redirect(resource(getClass()).edit(key.toString(), numberOfFields));
         }
         Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
