@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $("input.subfeed").live('click', function() {
-        var keywordDefinition = new KeywordDefinition($(this).parent("div.keywordDefinition"), "div.recordDefinitionTemplate", ".fields");
+        var keywordDefinition = new KeywordDefinition($(this).parent("div.keywordDefinition"), "div.recordDefinitionTemplate", "input.subfeedPrefix");
 
         if (this.checked) {
             keywordDefinition.showOrAddSubfeed();
@@ -10,28 +10,32 @@ $(document).ready(function() {
     });
 });
 
-function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedSelector) {
+function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedPrefixSelector) {
     this.content = keywordDefinition;
-    this.template = $([subfeedTemplateSelector, subfeedSelector].join(" "));
-    this.subfeedSelector = subfeedSelector;
+    this.template = $(subfeedTemplateSelector);
+    this.subfeedPrefixSelector = subfeedPrefixSelector;
 
     this.hasSubfeed = function() {
-        return this.content.find(this.subfeedSelector).length > 0;
+        return $("div.subrecordDefinition", this.content).children().length > 0;
     }
 
-    this.addSubfeed = function(subfeed) {
-        subfeed.appendTo(this.content);
+    this.addSubfeed = function() {
+        var template = this.template.html();
+        var subfeedPrefix = $(this.subfeedPrefixSelector, this.content).attr("value");
+        template = template.replace(/REPLACE_ME/g, subfeedPrefix);
+
+        $("div.subrecordDefinition", this.content).html(template);
     }
 
     this.hideSubfeed = function() {
-        $(this.subfeedSelector, this.content).hide();
+        $("div.subrecordDefinition", this.content).hide();
     }
 
     this.showSubfeed = function() {
-        $(this.subfeedSelector, this.content).show();
+        $("div.subrecordDefinition", this.content).show();
     }
     
     this.showOrAddSubfeed = function() {
-        this.hasSubfeed() ? this.showSubfeed() : this.addSubfeed(this.template.clone());
+        this.hasSubfeed() ? this.showSubfeed() : this.addSubfeed();
     }
 }

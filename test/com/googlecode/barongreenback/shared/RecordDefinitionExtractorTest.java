@@ -9,7 +9,9 @@ import java.net.URI;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.ALIASES;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.FIELDS;
+import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.SUBFEED_PREFIX;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.RECORD_NAME;
+import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.SUBFEED;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.TYPES;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.UNIQUE;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.VISIBLE;
@@ -28,12 +30,16 @@ public class RecordDefinitionExtractorTest {
                 pair(TYPES, "java.lang.String"),
                 pair(UNIQUE, "false"),
                 pair(VISIBLE, "false"),
+                pair(SUBFEED, "false"),
+                pair(SUBFEED_PREFIX, "field1"),
 
                 pair(FIELDS, "id"),
                 pair(ALIASES, ""),
                 pair(TYPES, "java.lang.Integer"),
                 pair(UNIQUE, "true"), pair(UNIQUE, "false"),
-                pair(VISIBLE, "false")
+                pair(VISIBLE, "false"),
+                pair(SUBFEED, "false"),
+                pair(SUBFEED_PREFIX, "field2")
 
         );
 
@@ -48,22 +54,26 @@ public class RecordDefinitionExtractorTest {
 
     @Test
     public void supportsSubFeed() throws Exception {
-        String prefix = "subfeed1";
+        String prefix = "field1.";
 
         FormParameters form = FormParameters.formParameters(
                 pair(RECORD_NAME, "/feed/entry"),
                 pair(FIELDS, "link"),
                 pair(ALIASES, ""),
-                pair(TYPES, "java.net.URI#" + prefix),
+                pair(TYPES, "java.net.URI"),
                 pair(UNIQUE, "false"),
                 pair(VISIBLE, "false"),
+                pair(SUBFEED, "true"), pair(SUBFEED, "false"),
+                pair(SUBFEED_PREFIX, "field1"),
 
                 pair(prefix + RECORD_NAME, "/user/summary"),
                 pair(prefix + FIELDS, "ID"),
                 pair(prefix + ALIASES, ""),
                 pair(prefix + TYPES, "java.lang.Integer"),
                 pair(prefix + UNIQUE, "true"), pair(prefix + UNIQUE, "false"),
-                pair(prefix + VISIBLE, "false")
+                pair(prefix + VISIBLE, "false"),
+                pair(prefix + SUBFEED, "false"),
+                pair(prefix + SUBFEED_PREFIX, "field1.field1")
 
         );
 
