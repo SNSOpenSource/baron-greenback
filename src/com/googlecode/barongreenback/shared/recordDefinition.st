@@ -2,8 +2,8 @@
 
 <fieldset class="fields $prefix$">
     <legend>$title$</legend>
-    $input(name={$prefix$recordName}, label="Root XPath", value=definition.recordName)$
+    $input(name={$prefix$name}, label="Root XPath", value=record.name)$
     <ol>
-        $definition.fields:li(content={$keywordDefinition(id=i, name=prefix, keyword=it)$})$
+        $record.keywords:li(content={$keywordDefinition(id=i, name=prefix, keyword=it)$})$
     </ol>
 </fieldset>

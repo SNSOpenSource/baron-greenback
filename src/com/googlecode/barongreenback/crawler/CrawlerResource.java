@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.barongreenback.shared.RecordDefinitionExtractor;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
+import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.RECORD_NAME;
 import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Option.none;
@@ -103,11 +105,11 @@ public class CrawlerResource {
                 add("form", model().
                         add("update", update).
                         add("from", from).
-                        add("definition", definition));
+                        add("record", definition));
     }
 
     private Model recordDefinition(String recordName, Model... fields) {
-        return model().add("recordName", recordName).add("fields", Sequences.sequence(fields).toList());
+        return model().add(RECORD_NAME, recordName).add("keywords", Sequences.sequence(fields).toList());
     }
 
     private Model keywordDefinition(String name, String alias, String type, boolean unique, boolean visible, Option<Model> recordDefinition) {

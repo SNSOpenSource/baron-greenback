@@ -15,14 +15,14 @@
         $input(name="from", label="From", value=form.from)$
     </div>
 
-    $recordDefinition(title="Fields", prefix="", definition=form.definition)$
+    $recordDefinition(title="Fields", prefix="", record=form.record)$
 
     <input type="submit" value="Crawl" name="action"/>
     <input type="submit" value="Save" name="action"/>
 </form>
 
 <div class="recordDefinitionTemplate">
-        $recordDefinition(title="Fields", prefix="REPLACE_ME.", definition=form.definition)$
+        $recordDefinition(title="Fields", prefix="REPLACE_ME.", record=form.record)$
 </div>
 </body>
 </html>

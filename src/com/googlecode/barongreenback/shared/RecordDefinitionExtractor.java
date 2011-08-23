@@ -26,7 +26,7 @@ public class RecordDefinitionExtractor {
     public static final String SUBFEED_PREFIX = "subfeedPrefix";
     public static final String SUBFEED_PREFIX_SEPARATOR = ".";
 
-    public static final String RECORD_NAME = "recordName";
+    public static final String RECORD_NAME = "name";
     private final FormParameters form;
 
     public RecordDefinitionExtractor(FormParameters form) {
