@@ -16,7 +16,7 @@ import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 
 public class RecordDefinitionExtractor {
-    public static final String NAME = "name";
+    public static final String KEYWORD_NAME = "keywordName";
     public static final String ALIASES = "aliases";
     public static final String TYPES = "types";
     public static final String UNIQUE = "unique";
@@ -25,7 +25,7 @@ public class RecordDefinitionExtractor {
     public static final String SUBFEED_PREFIX = "subfeedPrefix";
     public static final String SUBFEED_PREFIX_SEPARATOR = ".";
 
-    public static final String RECORD_NAME = "name";
+    public static final String RECORD_NAME = "recordName";
     private final FormParameters form;
 
     public RecordDefinitionExtractor(FormParameters form) {
@@ -43,7 +43,7 @@ public class RecordDefinitionExtractor {
     }
 
     private Sequence<Keyword> extractKeywordsWith(String prefix) {
-        Iterable<String> name = form.getValues(prefix + NAME);
+        Iterable<String> name = form.getValues(prefix + KEYWORD_NAME);
         Iterable<String> aliases = form.getValues(prefix + ALIASES);
         Iterable<String> types = form.getValues(prefix + TYPES);
         Iterable<Boolean> unique = new CheckboxValues(form.getValues(prefix + UNIQUE));

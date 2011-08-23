@@ -1,6 +1,15 @@
+@light-color: #A5DDAD;
+@dark-color: #337E34;
+
+.light-border {
+    border: 1px solid @light-color;
+}
+
+.dark-border {
+    border: 1px solid @dark-color;
+}
+
 html, body {
-    margin: 0;
-    padding: 0;
     background-color: #fff;
     color: #333;
     font-family: Arial, Helvetica, Verdana, sans-serif;
@@ -9,7 +18,6 @@ html, body {
 
 .content, .footer {
     line-height: 1.35em;
-    margin: 0;
     padding: 0 1em 2em 1em;
     overflow: hidden;
 }
@@ -19,7 +27,7 @@ html, body {
 }
 
 .header {
-    border-bottom: 1px solid #A5DDAD;
+    border-bottom: 1px solid @light-color;
     text-align: right;
 }
 
@@ -43,7 +51,7 @@ h1.title {
 }
 
 fieldset {
-    border: 1px solid #337E34;
+    .dark-border;
     padding: 5px 10px 10px 10px;
     margin: 5px 0;
 }
@@ -74,20 +82,19 @@ img {
 }
 
 .menu {
-    margin: 0;
     padding: 3px;
     font-size: 90%;
     text-transform: capitalize;
-}
 
-.menu li {
-    padding: 2px 5px;
-    list-style: none;
-    display: inline;
+    li {
+        padding: 2px 5px;
+        list-style: none;
+        display: inline;
+    }
 }
 
 a, a:link, a:visited {
-    color: #337E34;
+    color: @dark-color;
     text-decoration: underline;
 }
 
@@ -100,7 +107,7 @@ table {
 }
 
 table, th, td {
-    border: 1px solid #A5DDAD;
+    .light-border;
 }
 
 th, dt {
@@ -133,12 +140,11 @@ form.crawl input.url {
 
 
 input.text {
-    border: 1px solid #337E34;
+    .dark-border;
 }
 
 .recordDefinitionTemplate {
-    position: absolute;
-    top: -9999px;
+    display: none;
 }
 
 

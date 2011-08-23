@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
 import com.googlecode.barongreenback.views.ViewsModule;
 import com.googlecode.utterlyidle.RestApplication;
+import com.googlecode.utterlyidle.dsl.StaticBindingBuilder;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 
 import static com.googlecode.totallylazy.URLs.packageUrl;
@@ -28,7 +29,7 @@ public class WebApplication extends RestApplication {
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
                 staticRule(contentType(TEXT_HTML), templateName("default"))));
-        add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path(""))));
+        add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("").set("less", "text/css"))));
     }
 
     public static void main(String[] args) throws Exception {

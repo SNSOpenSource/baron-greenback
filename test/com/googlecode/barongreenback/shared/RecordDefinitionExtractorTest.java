@@ -8,7 +8,7 @@ import java.net.URI;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.ALIASES;
-import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.NAME;
+import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.KEYWORD_NAME;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.SUBFEED_PREFIX;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.RECORD_NAME;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.SUBFEED;
@@ -25,7 +25,7 @@ public class RecordDefinitionExtractorTest {
     @Test
     public void correctlyExtractsFormParamters() throws Exception {
         FormParameters form = FormParameters.formParameters(pair(RECORD_NAME, "/feed/entry"),
-                pair(NAME, "name"),
+                pair(KEYWORD_NAME, "name"),
                 pair(ALIASES, ""),
                 pair(TYPES, "java.lang.String"),
                 pair(UNIQUE, "false"),
@@ -33,7 +33,7 @@ public class RecordDefinitionExtractorTest {
                 pair(SUBFEED, "false"),
                 pair(SUBFEED_PREFIX, "field1"),
 
-                pair(NAME, "id"),
+                pair(KEYWORD_NAME, "id"),
                 pair(ALIASES, ""),
                 pair(TYPES, "java.lang.Integer"),
                 pair(UNIQUE, "true"), pair(UNIQUE, "false"),
@@ -58,7 +58,7 @@ public class RecordDefinitionExtractorTest {
 
         FormParameters form = FormParameters.formParameters(
                 pair(RECORD_NAME, "/feed/entry"),
-                pair(NAME, "link"),
+                pair(KEYWORD_NAME, "link"),
                 pair(ALIASES, ""),
                 pair(TYPES, "java.net.URI"),
                 pair(UNIQUE, "false"),
@@ -67,7 +67,7 @@ public class RecordDefinitionExtractorTest {
                 pair(SUBFEED_PREFIX, "field1"),
 
                 pair(prefix + RECORD_NAME, "/user/summary"),
-                pair(prefix + NAME, "ID"),
+                pair(prefix + KEYWORD_NAME, "ID"),
                 pair(prefix + ALIASES, ""),
                 pair(prefix + TYPES, "java.lang.Integer"),
                 pair(prefix + UNIQUE, "true"), pair(prefix + UNIQUE, "false"),

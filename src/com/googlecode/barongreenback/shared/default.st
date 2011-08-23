@@ -3,8 +3,9 @@
 <head>
     <title>baron-greenback : $title$</title>
     <link type="text/css" rel="stylesheet" href="$base$shared/reset.css"/>
-    <link type="text/css" rel="stylesheet" href="$base$shared/default.css"/>
-    <link type="text/css" rel="stylesheet" href="$base$views/menu.css"/>
+    <link rel="stylesheet/less" type="text/css" href="$base$shared/default.less"/>
+    <link rel="stylesheet/less" type="text/css" href="$base$views/menu.less"/>
+    <script src="$base$shared/less-1.1.3.min.js" type="text/javascript"></script>
 </head>
 <body class="$body.class$">
 <div class="header">
