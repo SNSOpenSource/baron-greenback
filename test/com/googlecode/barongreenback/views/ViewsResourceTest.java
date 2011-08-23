@@ -38,7 +38,7 @@ public class ViewsResourceTest {
         assertThat(response.status(), is(Status.OK));
 
         XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
-        Keyword results = keyword("//ul[@class='views']/li");
+        Keyword results = keyword("//ul[@class='tabs']/li");
         Keyword<String> link = keyword("a/@href", String.class);
         xmlRecords.define(results, link);
         assertThat(xmlRecords.get(results).map(link), hasExactly("/users/search/list?query="));

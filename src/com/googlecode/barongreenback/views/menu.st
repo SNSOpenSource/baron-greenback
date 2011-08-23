@@ -6,8 +6,8 @@
 </head>
 <body>
 
-<ul class="views">
-    $views:{ view | <li class="view $view.name$ $if(view.current)$ current $endif$">
+<ul class="tabs">
+    $views:{ view | <li class="view $view.name$ $if(view.current)$ active $endif$">
         <a href="/$view.url$">$view.name$</a>
     </li>}$
 </ul>

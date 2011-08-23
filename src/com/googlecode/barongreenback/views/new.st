@@ -7,7 +7,7 @@
 
 <form class="view" action="" method="POST">
     $fields(title="Fields", prefix="")$
-    <input type="submit" value="Create"/>
+    <input type="submit" value="Create" class="create"/>
 </form>
 
 

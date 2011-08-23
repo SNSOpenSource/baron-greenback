@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $("input.subfeed").live('click', function() {
-        var keywordDefinition = new KeywordDefinition($(this).parent("div.keywordDefinition"), "div.recordDefinitionTemplate", "input.subfeedPrefix");
+        var keywordDefinition = new KeywordDefinition($(this).closest("div.keywordDefinition"), "div.recordDefinitionTemplate", "input.subfeedPrefix");
 
         if (this.checked) {
             keywordDefinition.showOrAddSubfeed();
@@ -24,15 +24,15 @@ function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedPr
         var subfeedPrefix = $(this.subfeedPrefixSelector, this.content).attr("value");
         template = template.replace(/REPLACE_ME/g, subfeedPrefix);
 
-        $("div.subrecordDefinition", this.content).html(template);
+        $("div.subrecordDefinition", this.content).hide().html(template).show("slow");
     }
 
     this.hideSubfeed = function() {
-        $("div.subrecordDefinition", this.content).hide();
+        $("div.subrecordDefinition", this.content).hide('slow');
     }
 
     this.showSubfeed = function() {
-        $("div.subrecordDefinition", this.content).show();
+        $("div.subrecordDefinition", this.content).show('slow');
     }
     
     this.showOrAddSubfeed = function() {

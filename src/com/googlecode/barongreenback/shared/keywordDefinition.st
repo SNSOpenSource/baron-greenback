@@ -3,14 +3,16 @@
 
     $input(id=prefix + "alias" + id, name=prefix + "aliases", class="alias", label="Alias", value=keyword.alias)$
 
-    <label for="prefix + type$id$">Type:</label>
-    <select id="prefix + type$id$" name="$prefix$types">
-    <option value="java.lang.String" selected="selected">String</option>
-    <option value="java.lang.Integer">Integer</option>
-    <option value="java.lang.Long">Long</option>
-    <option value="java.util.Date">Date</option>
-    <option value="java.net.URI">URI</option>
-    </select>
+    <div class="control">
+        <label for="prefix + type$id$">Type:</label>
+        <select id="prefix + type$id$" name="$prefix$types">
+        <option value="java.lang.String" selected="selected">String</option>
+        <option value="java.lang.Integer">Integer</option>
+        <option value="java.lang.Long">Long</option>
+        <option value="java.util.Date">Date</option>
+        <option value="java.net.URI">URI</option>
+        </select>
+    </div>
 
     $checkbox(id=prefix + "unique" + id, name=prefix + "unique", class="unique", label="Unique", checked=keyword.unique)$
     $checkbox(id=prefix + "visible" + id, name=prefix + "visible", class="visible", label="Visible", checked=keyword.visible)$

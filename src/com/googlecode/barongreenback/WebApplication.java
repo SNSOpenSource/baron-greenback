@@ -28,7 +28,7 @@ public class WebApplication extends RestApplication {
         add(new ViewsModule());
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
-                staticRule(contentType(TEXT_HTML), templateName("default"))));
+                staticRule(contentType(TEXT_HTML), templateName("twitter"))));
         add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("").set("less", "text/css"))));
     }
 

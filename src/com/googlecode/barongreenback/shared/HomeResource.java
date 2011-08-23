@@ -13,6 +13,6 @@ public class HomeResource {
     @GET
     @Path("")
     public Response homePage() {
-        return redirect(resource(CrawlerResource.class).get(10));
+        return redirect(resource(CrawlerResource.class).get(5));
     }
 }

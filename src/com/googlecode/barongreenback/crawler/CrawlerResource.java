@@ -55,6 +55,7 @@ import static com.googlecode.utterlyidle.proxy.Resource.resource;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
+    public static final String NUMBER_OF_FIELDS = "5";
     private final Records records;
     private final Repository<UUID, Model> modelRepository;
     private final Crawler crawler;
@@ -69,19 +70,19 @@ public class CrawlerResource {
 
     @GET
     @Path("new")
-    public Model get(@QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields) {
+    public Model get(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
         return emptyForm(numberOfFields);
     }
 
     @GET
     @Path("edit")
-    public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields) {
+    public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
         return modelRepository.get(UUID.fromString(id));
     }
 
     @POST
     @Path("new")
-    public Response crawl(@QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields, @FormParam("action") String action,
+    public Response crawl(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields, @FormParam("action") String action,
                           @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition) throws Exception {
         if (action.equals("Save")) {
             UUID key = UUID.randomUUID();

@@ -1,0 +1,65 @@
+@import "bootstrap.less";
+
+.large-input {
+    width: 270px;
+}
+
+.extra-large-input {
+    width: 530px;
+}
+
+.shadow (@shadow-color) {
+    @blur-radius: 3px;
+    @spread-radius: 1px;
+    -moz-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    -webkit-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+}
+
+input.crawl, input.search {
+    .btn;
+    .btn.primary;
+}
+
+input.save {
+    .btn;
+}
+
+div.control {
+    display: inline-block;
+    margin: 5px;
+}
+
+table.results {
+    .zebra-striped;
+}
+
+div.container, .container {
+    margin: 0 0 0 40px;
+    width: auto;
+}
+
+.content {
+    margin: 50px 20px;
+}
+
+form fieldset {
+    .shadow(lightgray);
+    margin: 5px;
+    padding: 5px;
+
+    legend {
+        background-color: white;
+        font-size: 110%;
+        font-weight: bold;
+        padding: 5px;
+    }
+}
+
+div.recordDefinitionTemplate{
+    display:none;
+}
+
+form input#from, form input#query {
+    .extra-large-input;
+}

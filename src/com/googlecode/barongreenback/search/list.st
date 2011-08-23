@@ -7,7 +7,7 @@
 <div>
     <form class="search" method="get" action="search">
         $input(name="query", value=query)$
-        <input type="submit" value="Search"/>
+        <input type="submit" value="Search" class="search"/>
     </form>
 
     $results()$
