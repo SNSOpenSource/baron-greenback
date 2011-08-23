@@ -19,11 +19,7 @@
 
     <div class="subrecordDefinition">
     $if(keyword.definition)$
-        $recordDefinition(title="SubFeed " + id, prefix="subfeed" + id, record=keyword.definition)$
+        $recordDefinition(title="SubFeed " + id, prefix="subfeed" + id, record=keyword.record)$
     $endif$
     </div>
 </div>
-
-
-
-

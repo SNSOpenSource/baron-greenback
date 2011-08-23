@@ -120,7 +120,7 @@ public class CrawlerResource {
                 add("unique", unique).
                 add("visible", visible).
                 add("subfeed", !recordDefinition.isEmpty()).
-                add("definition", recordDefinition.getOrNull());
+                add("record", recordDefinition.getOrNull());
     }
 
     private Callable2<? super HashMap<String, List<String>>, ? super Pair<String, String>, HashMap<String, List<String>>> asMultivaluedMap() {
@@ -144,7 +144,9 @@ public class CrawlerResource {
                           @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition) throws Exception {
         if (action.equals("Save")) {
             String id = UUID.randomUUID().toString();
-            records.add(MODELS, record().set(ID, id).set(MODEL, toModel(update, from, recordDefinition).toString()));
+            String json = toModel(update, from, recordDefinition).toString();
+            System.out.println("json = " + json);
+            records.add(MODELS, record().set(ID, id).set(MODEL, json));
             return redirect(resource(getClass()).edit(id, numberOfFields));
         }
         Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
