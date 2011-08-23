@@ -79,56 +79,6 @@ public class CrawlerResource {
         return modelRepository.get(UUID.fromString(id));
     }
 
-    private Model emptyForm(Integer numberOfFields) {
-        return form("", "", emptyDefinition(numberOfFields(numberOfFields)));
-    }
-
-    private int numberOfFields(Integer numberOfFields) {
-        return Math.min(Math.max(numberOfFields, 1), 100);
-    }
-
-    private Model emptyDefinition(int number) {
-        return recordDefinition("", Sequences.repeat(model().add("visible", true)).take(number).toArray(Model.class));
-    }
-
-    private Model form(String update, String from, Model definition) {
-        return model().
-                add("form", model().
-                        add("update", update).
-                        add("from", from).
-                        add("record", definition));
-    }
-
-    private Model recordDefinition(String recordName, Model... fields) {
-        return model().add(RECORD_NAME, recordName).add("keywords", Sequences.sequence(fields).toList());
-    }
-
-    private Model keywordDefinition(String name, String alias, String type, boolean unique, boolean visible, Option<Model> recordDefinition) {
-        return model().
-                add("name", name).
-                add("alias", alias).
-                add("type", type).
-                add("unique", unique).
-                add("visible", visible).
-                add("subfeed", !recordDefinition.isEmpty()).
-                add("record", recordDefinition.getOrNull());
-    }
-
-    private Callable2<? super HashMap<String, List<String>>, ? super Pair<String, String>, HashMap<String, List<String>>> asMultivaluedMap() {
-        return new Callable2<HashMap<String, List<String>>, Pair<String, String>, HashMap<String, List<String>>>() {
-            public HashMap<String, List<String>> call(HashMap<String, List<String>> map, Pair<String, String> pair) throws Exception {
-                if (map.containsKey(pair.first())) {
-                    map.get(pair.first()).add(pair.second());
-                } else {
-                    List<String> values = new ArrayList<String>();
-                    values.add(pair.second());
-                    map.put(pair.first(), values);
-                }
-                return map;
-            }
-        };
-    }
-
     @POST
     @Path("new")
     public Response crawl(@QueryParam("numberOfFields") @DefaultValue("10") Integer numberOfFields, @FormParam("action") String action,
@@ -142,56 +92,30 @@ public class CrawlerResource {
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
     }
 
+
+
+    private Model emptyForm(Integer numberOfFields) {
+        return form("", "", emptyDefinition(numberOfFields(numberOfFields)));
+    }
+
+    private int numberOfFields(Integer numberOfFields) {
+        return Math.min(Math.max(numberOfFields, 1), 100);
+    }
+
+    private Model emptyDefinition(int number) {
+        return RecordDefinition.recordDefinition("", Sequences.repeat(model().add("visible", true)).take(number).toArray(Model.class));
+    }
+
+    private Model form(String update, String from, Model definition) {
+        return model().
+                add("form", model().
+                        add("update", update).
+                        add("from", from).
+                        add("record", definition));
+    }
+
     private Model toModel(String update, URL from, RecordDefinition recordDefinition) {
-        return form(update, from.toString(), toModel(recordDefinition));
-
-    }
-
-    private Model toModel(RecordDefinition recordDefinition) {
-        return recordDefinition(recordDefinition.recordName().name(),
-                recordDefinition.fields().map(new Callable1<Keyword, Model>() {
-                    public Model call(Keyword keyword) throws Exception {
-                        return keywordDefinition(name(keyword), alias(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword));
-                    }
-                }).toArray(Model.class));
-    }
-
-    private Option<Model> recordDefinition(Keyword keyword) {
-        return option(keyword.metadata().get(RecordDefinition.RECORD_DEFINITION)).map(new Callable1<RecordDefinition, Model>() {
-            public Model call(RecordDefinition recordDefinition) throws Exception {
-                return toModel(recordDefinition);
-            }
-        });
-    }
-
-    private boolean visible(Keyword keyword) {
-        return booleanValueOf(keyword, Views.VISIBLE);
-    }
-
-    private boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
-        return keyword.metadata().get(metaKeyword) == true;
-    }
-
-    private boolean unique(Keyword keyword) {
-        return booleanValueOf(keyword, Keywords.UNIQUE);
-    }
-
-    private String name(Keyword keyword) {
-        if (keyword instanceof AliasedKeyword) {
-            return ((AliasedKeyword) keyword).source().name();
-        }
-        return keyword.name();
-    }
-
-    private String alias(Keyword keyword) {
-        if (keyword instanceof AliasedKeyword) {
-            return keyword.name();
-        }
-        return "";
-    }
-
-    private String type(Keyword keyword) {
-        return keyword.forClass().getName();
+        return form(update, from.toString(), recordDefinition.toModel());
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
