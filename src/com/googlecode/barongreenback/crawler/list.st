@@ -23,6 +23,7 @@
                 <input type="hidden" name="id" value="$item.id$"/>
                 <input type="submit" value="Crawl" class="crawl"/>
             </form>
+            <a href="edit?id=$item.id$" class="edit">Edit<a/>
             <a href="export?id=$item.id$" class="export">Export</a>
             <form action="delete" class="delete" method="post">
                 <input type="hidden" name="id" value="$item.id$"/>
