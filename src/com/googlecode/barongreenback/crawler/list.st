@@ -15,16 +15,21 @@
     </thead>
     <tbody>
     $items:{ item |
-        <tr>
-            <td><a href="edit?id=$item.id$">$item.model.form.update$</a></td>
-            <td><a href="$item.model.form.from$">$item.model.form.from$</a></td>
-            <td><a href="export?id=$item.id$" class="export">Export</a>
+    <tr>
+        <td><a href="edit?id=$item.id$">$item.model.form.update$</a></td>
+        <td><a href="$item.model.form.from$">$item.model.form.from$</a></td>
+        <td>
+            <form action="crawl" class="quickcrawl" method="post">
+                <input type="hidden" name="id" value="$item.id$"/>
+                <input type="submit" value="Crawl" class="crawl"/>
+            </form>
+            <a href="export?id=$item.id$" class="export">Export</a>
             <form action="delete" class="delete" method="post">
                 <input type="hidden" name="id" value="$item.id$"/>
                 <input type="submit" value="Delete" class="delete"/>
             </form>
-            </td>
-        </tr>
+        </td>
+    </tr>
     }$
     </tbody>
 </table>

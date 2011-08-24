@@ -10,7 +10,8 @@ import com.googlecode.totallylazy.records.AliasedKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 
-import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.RECORD_NAME;
+import java.util.List;
+
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -18,6 +19,7 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
+import static com.googlecode.totallylazy.records.MapRecord.record;
 
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
@@ -118,6 +120,29 @@ public class RecordDefinition {
                 add("visible", visible).
                 add("subfeed", !recordDefinition.isEmpty()).
                 add("record", recordDefinition.getOrNull());
+    }
+
+    public static RecordDefinition convert(Model model) {
+        if (model == null) {
+            return null;
+        }
+        return new RecordDefinition(keyword(model.get("name", String.class)), toKeywords(model.getValues("keywords", Model.class)));
+    }
+
+    private static Sequence<Keyword> toKeywords(List<Model> keywords) {
+        return sequence(keywords).map(new Callable1<Model, Keyword>() {
+            public Keyword call(Model model) throws Exception {
+                return keyword(
+                        model.get("name", String.class),
+                        Class.forName(model.get("type", String.class))).
+//                        as((Keyword) keyword(model.get("alias", String.class))).
+                        metadata(record().
+                                set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
+                                set(Views.VISIBLE, model.get("visible", Boolean.class)).
+                                set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class)))
+                        );
+            }
+        });
     }
 
 
