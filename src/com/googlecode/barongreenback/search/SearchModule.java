@@ -16,19 +16,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.proxy.Call.method;
-import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
-import static com.googlecode.utterlyidle.dsl.BindingBuilder.definedParam;
-import static com.googlecode.utterlyidle.dsl.BindingBuilder.get;
-import static com.googlecode.utterlyidle.dsl.DslBindings.binding;
-import static com.googlecode.utterlyidle.handlers.HandlerRule.entity;
-import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.renderer;
 
 public class SearchModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule {
     public Module addResources(Resources resources) throws ParseException {
@@ -47,7 +38,7 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
     public Module addPerRequestObjects(Container container) {
         container.add(LuceneRecords.class);
         container.addActivator(Records.class, container.getActivator(LuceneRecords.class));
-        container.addActivator(QueryParser.class, QueryParserActivator.class);
+        container.add(QueryParserActivator.class);
         return this;
     }
 

@@ -1,12 +1,11 @@
 package com.googlecode.barongreenback.search;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.util.Version;
 
-import java.util.concurrent.Callable;
-
-public class QueryParserActivator implements Callable<QueryParser>{
+public class QueryParserActivator{
     private final Version version;
     private final Analyzer analyzer;
 
@@ -15,8 +14,8 @@ public class QueryParserActivator implements Callable<QueryParser>{
         this.analyzer = analyzer;
     }
 
-    public QueryParser call() throws Exception {
-        QueryParser queryParser = new QueryParser(version, "", analyzer);
+    public MultiFieldQueryParser create(String... fields) {
+        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(version, fields, analyzer);
         queryParser.setLowercaseExpandedTerms(false);
         queryParser.setAllowLeadingWildcard(true);
         queryParser.setDefaultOperator(QueryParser.Operator.AND);

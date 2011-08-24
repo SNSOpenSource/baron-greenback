@@ -30,6 +30,7 @@ import java.util.Map;
 
 import static com.googlecode.barongreenback.views.View.asFields;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -42,10 +43,10 @@ import static com.googlecode.totallylazy.records.RecordMethods.toMap;
 @Path("{view}/search")
 public class SearchResource {
     private final LuceneRecords records;
-    private final QueryParser parser;
+    private final QueryParserActivator parser;
     private final Views views;
 
-    public SearchResource(final LuceneRecords records, final QueryParser parser, final Views views) {
+    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final Views views) {
         this.records = records;
         this.parser = parser;
         this.views = views;
@@ -55,7 +56,7 @@ public class SearchResource {
     @Path("list")
     public Model find(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
         Sequence<Keyword> headers = headers(view);
-        Sequence<Record> results = records.query(parse(prefix(view, query)), headers);
+        Sequence<Record> results = records.query(parse(prefix(view, query), headers), headers);
         return model().
                 add("view", view).
                 add("query", query).
@@ -67,7 +68,7 @@ public class SearchResource {
     @Path("unique")
     public Model unique(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
         Sequence<Keyword> headers = headers(view);
-        Record record = records.query(parse(prefix(view, query)), headers).head();
+        Record record = records.query(parse(prefix(view, query), headers), headers).head();
         return model().
                 add("view", view).
                 add("record", toMap(record));
@@ -108,11 +109,11 @@ public class SearchResource {
         return String.format("+%s:%s %s", Lucene.RECORD_KEY, view, query);
     }
 
-    private Query parse(String query) throws ParseException {
+    private Query parse(String query, Sequence<Keyword> keywords) throws ParseException {
         if (query.isEmpty()) {
             return new MatchAllDocsQuery();
         }
-        return parser.parse(query);
+        return parser.create(keywords.map(asString()).toArray(String.class)).parse(query);
     }
 
 }
