@@ -30,7 +30,7 @@ public class SharedModule implements ResponseHandlersModule, RequestScopedModule
     public Module addPerRequestObjects(Container container) throws Exception {
         container.addActivator(TemplateName.class, TemplateNameActivator.class);
         container.addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class);
-        container.add(new TypeFor<Repository<UUID, Model>>(){}.get(), ModelRepository.class);
+        container.add(ModelRepository.class, ModelRepository.class);
         return this;
     }
 

@@ -10,17 +10,10 @@
 <div class="topbar">
       <div class="fill">
         <div class="container">
-          <h3><a href="#">Baron Greenback: $title$</a></h3>
-          <ul>
-            <li class="active"><a href="/">Home</a></li>
-            <li class="active"><a href="/views/list">Views</a></li>
-          </ul>
-          <form action="">
-            <input type="text" placeholder="Search"/>
-          </form>
+          <h3><a href="/">Baron Greenback: $title$</a></h3>
           <ul class="nav secondary-nav">
             <li class="menu">
-                <li><a href="$base$crawler/new">Admin</a></li>
+                <li><a href="$base$crawler/list">Admin</a></li>
             </li>
           </ul>
         </div>

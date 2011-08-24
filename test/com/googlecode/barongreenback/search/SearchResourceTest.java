@@ -40,7 +40,7 @@ public class SearchResourceTest {
         assertThat(response.status(), is(OK));
 
         XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
-        Keyword results = keyword("//table[@class='results']/tbody/tr");
+        Keyword results = keyword("//table[contains(@class, 'results')]/tbody/tr");
         Keyword<String> id = keyword("td[@class='id']", String.class);
         xmlRecords.define(results, id);
         Sequence<String> result = xmlRecords.get(results).map(id);

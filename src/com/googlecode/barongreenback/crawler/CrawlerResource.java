@@ -1,11 +1,15 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.search.SearchResource;
+import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.Repository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
@@ -29,9 +33,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.shared.ModelRepository.ID;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
@@ -45,15 +54,31 @@ import static com.googlecode.utterlyidle.proxy.Resource.resource;
 public class CrawlerResource {
     public static final String NUMBER_OF_FIELDS = "3";
     private final Records records;
-    private final Repository<UUID, Model> modelRepository;
+    private final ModelRepository modelRepository;
     private final Crawler crawler;
     private final Views views;
 
-    public CrawlerResource(final Records records, final Repository<UUID, Model> modelRepository, Crawler crawler, Views views) {
+    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Views views) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.crawler = crawler;
         this.views = views;
+    }
+
+    @GET
+    @Path("list")
+    public Model list() {
+        return model().add("items", modelRepository.find(where(ID, is(notNullValue()))).map(asModelWithId()).toList());
+    }
+
+    private Callable1<? super Pair<UUID, Model>, Model> asModelWithId() {
+        return new Callable1<Pair<UUID, Model>, Model>() {
+            public Model call(Pair<UUID, Model> pair) throws Exception {
+                return model().
+                        add("id", pair.first().toString()).
+                        add("model", pair.second());
+            }
+        };
     }
 
     @GET
@@ -64,9 +89,9 @@ public class CrawlerResource {
 
     @POST
     @Path("edit")
-    public Response edit(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields, @FormParam("action") String action,
+    public Response edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields, @FormParam("action") String action,
                          @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition) throws Exception {
-        return crawl(numberOfFields, action, update, from, recordDefinition);
+        return crawl(numberOfFields, action, update, from, recordDefinition, some(id));
     }
 
     @GET
@@ -78,16 +103,23 @@ public class CrawlerResource {
     @POST
     @Path("new")
     public Response crawl(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields, @FormParam("action") String action,
-                          @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition) throws Exception {
+                          @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition, @QueryParam("id")Option<String> id) throws Exception {
+        UUID key = id.map(asUUID()).getOrElse(UUID.randomUUID());
+        modelRepository.set(key, toModel(update, from, recordDefinition));
         if (action.equals("Save")) {
-            UUID key = UUID.randomUUID();
-            modelRepository.set(key, toModel(update, from, recordDefinition));
-            return redirect(resource(getClass()).edit(key.toString(), numberOfFields));
+            return redirect(resource(getClass()).list());
         }
         Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
     }
 
+    private Callable1<? super String, UUID> asUUID() {
+        return new Callable1<String, UUID>() {
+            public UUID call(String value) throws Exception {
+                return UUID.fromString(value);
+            }
+        };
+    }
 
     private Model emptyForm(Integer numberOfFields) {
         return addTemplates(form("", "", emptyDefinition(numberOfFields(numberOfFields))));
