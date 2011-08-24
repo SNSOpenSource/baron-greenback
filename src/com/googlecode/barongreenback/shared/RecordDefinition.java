@@ -61,15 +61,19 @@ public class RecordDefinition {
     }
 
     public Model toModel() {
-        return recordDefinition(recordName().name(),
-                fields().map(new Callable1<Keyword, Model>() {
+        return toModel(recordName(), fields());
+    }
+
+    public static Model toModel(final Keyword<Object> keyword, final Sequence<Keyword> fields) {
+        return recordDefinition(keyword.name(),
+                fields.map(new Callable1<Keyword, Model>() {
                     public Model call(Keyword keyword) throws Exception {
                         return keywordDefinition(name(keyword), alias(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword));
                     }
                 }).toArray(Model.class));
     }
 
-    private Option<Model> recordDefinition(Keyword keyword) {
+    public static Option<Model> recordDefinition(Keyword keyword) {
         return option(keyword.metadata().get(RecordDefinition.RECORD_DEFINITION)).map(new Callable1<RecordDefinition, Model>() {
             public Model call(RecordDefinition recordDefinition) throws Exception {
                 return recordDefinition.toModel();
@@ -77,33 +81,33 @@ public class RecordDefinition {
         });
     }
 
-    private boolean visible(Keyword keyword) {
+    private static boolean visible(Keyword keyword) {
         return booleanValueOf(keyword, Views.VISIBLE);
     }
 
-    private boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
+    private static boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
         return keyword.metadata().get(metaKeyword) == true;
     }
 
-    private boolean unique(Keyword keyword) {
+    private static boolean unique(Keyword keyword) {
         return booleanValueOf(keyword, Keywords.UNIQUE);
     }
 
-    private String name(Keyword keyword) {
+    private static String name(Keyword keyword) {
         if (keyword instanceof AliasedKeyword) {
             return ((AliasedKeyword) keyword).source().name();
         }
         return keyword.name();
     }
 
-    private String alias(Keyword keyword) {
+    private static String alias(Keyword keyword) {
         if (keyword instanceof AliasedKeyword) {
             return keyword.name();
         }
         return "";
     }
 
-    private String type(Keyword keyword) {
+    private static String type(Keyword keyword) {
         return keyword.forClass().getName();
     }
 

@@ -16,6 +16,10 @@
     box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
 }
 
+.btn {
+    text-transform: capitalize;
+}
+
 input.crawl, input.search, a.new, input.import {
     .btn;
     .btn.primary;
@@ -69,7 +73,7 @@ form.import textarea.model {
     height: 300px;
 }
 
-html body form.delete, html body form.quickcrawl {
+html body form.delete, html body.list form.crawl {
     margin: 0;
     padding: 0;
     display: inline-block;

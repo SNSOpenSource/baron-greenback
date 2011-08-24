@@ -3,13 +3,31 @@
 <head>
     <title>Views</title>
 </head>
-<body>
+<body class="list">
 
-<ul>
-    $views:{ view | <li>
-        <a href="/$view.url$">$view.name$</a>
-    </li>}$
-</ul>
+<table class="results zebra-striped">
+    <thead>
+    <tr>
+        $th(class="blue", header="Name")$
+        $th(class="orange", header="action")$
+    </tr>
+    </thead>
+    <tbody>
+    $views:{ item |
+    <tr>
+        <td><a href="edit?id=$item.name$">$item.name$</a></td>
+        <td>
+            $get(name="edit", id=item.name)$
+            $post(name="delete", id=item.name)$
+        </td>
+    </tr>
+    }$
+    </tbody>
+</table>
+
+<div class="actions">
+    <a href="new" class="new">New</a>
+</div>
 
 </body>
 </html>

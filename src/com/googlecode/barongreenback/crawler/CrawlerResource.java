@@ -90,7 +90,6 @@ public class CrawlerResource {
         return redirectToList();
     }
 
-
     @POST
     @Path("crawl")
     public Response crawl(@FormParam("id") String id) throws Exception {

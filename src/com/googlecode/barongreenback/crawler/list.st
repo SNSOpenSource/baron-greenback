@@ -3,7 +3,7 @@
 <head>
     <title>Crawlers</title>
 </head>
-<body>
+<body class="list">
 
 <table class="results zebra-striped">
     <thead>
@@ -19,16 +19,10 @@
         <td><a href="edit?id=$item.id$">$item.model.form.update$</a></td>
         <td><a href="$item.model.form.from$">$item.model.form.from$</a></td>
         <td>
-            <form action="crawl" class="quickcrawl" method="post">
-                <input type="hidden" name="id" value="$item.id$"/>
-                <input type="submit" value="Crawl" class="crawl"/>
-            </form>
-            <a href="edit?id=$item.id$" class="edit">Edit<a/>
-            <a href="export?id=$item.id$" class="export">Export</a>
-            <form action="delete" class="delete" method="post">
-                <input type="hidden" name="id" value="$item.id$"/>
-                <input type="submit" value="Delete" class="delete"/>
-            </form>
+            $post(name="crawl", id=item.id)$
+            $get(name="edit", id=item.id)$
+            $get(name="export", id=item.id)$
+            $post(name="delete", id=item.id)$
         </td>
     </tr>
     }$
