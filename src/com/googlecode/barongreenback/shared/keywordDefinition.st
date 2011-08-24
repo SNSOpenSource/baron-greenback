@@ -6,11 +6,7 @@
     <div class="control">
         <label for="prefix + type$id$">Type:</label>
         <select id="prefix + type$id$" name="$prefix$types">
-        <option value="java.lang.String" selected="selected">String</option>
-        <option value="java.lang.Integer">Integer</option>
-        <option value="java.lang.Long">Long</option>
-        <option value="java.util.Date">Date</option>
-        <option value="java.net.URI">URI</option>
+            $types:{<option value="$it.value$" $if(it.(keyword.type))$ selected="selected" $endif$>$it.name$</option>}$
         </select>
     </div>
 

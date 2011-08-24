@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.Repository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
@@ -21,7 +22,11 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
 
+import java.io.Serializable;
+import java.net.URI;
 import java.net.URL;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
@@ -89,7 +94,19 @@ public class CrawlerResource {
     }
 
     private Model addTemplates(Model model) {
-        return model.add("emptyKeyword", emptyKeyword());
+        return model.add("emptyKeyword", emptyKeyword()).
+                add("types", types(String.class, Date.class, URI.class));
+    }
+
+    private List<Model> types(Class... classes) {
+        return Sequences.sequence(classes).map(new Callable1<Class, Model>() {
+            public Model call(Class aClass) throws Exception {
+                return model().
+                        add("name", aClass.getSimpleName()).
+                        add("value", aClass.getName()).
+                        add(aClass.getName(), true); // enable selected
+            }
+        }).toList();
     }
 
     private int numberOfFields(Integer numberOfFields) {

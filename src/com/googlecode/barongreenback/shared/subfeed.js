@@ -18,7 +18,8 @@ $(document).ready(function() {
         var html = "<li>" + $(template).html().replace(/KEYWORD_ID_REPLACE_ME/g, nextIndex) + "</li>";
         var newKeyword = $(html).hide().insertBefore(template);
         newKeyword.show(speed).css({display:'list-item'});
-    })
+    });
+    $("table.results").tablesorter({ sortList: [[0,0]] });
 });
 
 function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedPrefixSelector) {

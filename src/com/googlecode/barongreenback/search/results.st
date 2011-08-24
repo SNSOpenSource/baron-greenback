@@ -1,7 +1,7 @@
-<table class="results">
+<table class="results zebra-striped">
     <thead>
     <tr>
-        $headers:{ header | <th class="$header.name$">$header.name$</th>}$
+        $headers:th(class="blue", header=it.name),th(class="green", header=it.name),th(class="orange", header=it.name),th(class="purple", header=it.name)$
     </tr>
     </thead>
     <tbody>

@@ -1,0 +1,1 @@
+ <th class="$class$ header $header$">$header$</th>
