@@ -1,4 +1,7 @@
 $(document).ready(function() {
+
+    speed = "normal";
+
     $("input.subfeed").live('click', function() {
         var keywordDefinition = new KeywordDefinition($(this).closest("div.keywordDefinition"), "div.recordDefinitionTemplate", "input.subfeedPrefix");
 
@@ -9,12 +12,12 @@ $(document).ready(function() {
         }
     });
     $("input.more").live("click", function() {
-        var ol = $("ol", $(this).parent());
-        var template = $("li.keywordTemplate", ol);
-        var nextIndex = ol.children().length;
-        var html = "<li>" + template.html().replace(/REPLACE_ME/g, nextIndex) + "</li>";
+        var ol = $(this).parent().children("ol")[0];
+        var template = $(ol).children("li.keywordTemplate")[0];
+        var nextIndex = $(ol).children().length;
+        var html = "<li>" + $(template).html().replace(/REPLACE_ME/g, nextIndex) + "</li>";
         var newKeyword = $(html).hide().insertBefore(template);
-        newKeyword.show("slow").css({display:'list-item'});
+        newKeyword.show(speed).css({display:'list-item'});
     })
 });
 
@@ -32,15 +35,15 @@ function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedPr
         var subfeedPrefix = $(this.subfeedPrefixSelector, this.content).attr("value");
         template = template.replace(/REPLACE_ME/g, subfeedPrefix);
 
-        $("div.subrecordDefinition", this.content).hide().html(template).show("slow");
+        $("div.subrecordDefinition", this.content).hide().html(template).show(speed);
     }
 
     this.hideSubfeed = function() {
-        $("div.subrecordDefinition", this.content).hide('slow');
+        $("div.subrecordDefinition", this.content).hide(speed);
     }
 
     this.showSubfeed = function() {
-        $("div.subrecordDefinition", this.content).show('slow');
+        $("div.subrecordDefinition", this.content).show(speed);
     }
     
     this.showOrAddSubfeed = function() {

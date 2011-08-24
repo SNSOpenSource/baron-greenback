@@ -20,7 +20,7 @@
           </form>
           <ul class="nav secondary-nav">
             <li class="menu">
-                <li><a href="$base$crawler/new?numberOfFields=10">Admin</a></li>
+                <li><a href="$base$crawler/new">Admin</a></li>
             </li>
           </ul>
         </div>
