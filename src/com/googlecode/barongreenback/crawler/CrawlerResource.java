@@ -3,13 +3,11 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
-import com.googlecode.barongreenback.shared.Repository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
@@ -26,7 +24,6 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
@@ -74,13 +71,26 @@ public class CrawlerResource {
     @GET
     @Path("export")
     @Produces("application/json")
-    public String export(@QueryParam("id") String id){
+    public String export(@QueryParam("id") String id) {
         return modelFor(id).toString();
+    }
+
+    @GET
+    @Path("import")
+    public Model importForm() {
+        return model();
+    }
+
+    @POST
+    @Path("import")
+    public Response importJson(@FormParam("model") String model) {
+        modelRepository.set(UUID.randomUUID(), Model.parse(model));
+        return redirectToList();
     }
 
     @POST
     @Path("delete")
-    public Response delete(@FormParam("id") String id){
+    public Response delete(@FormParam("id") String id) {
         modelRepository.remove(UUID.fromString(id));
         return redirectToList();
     }
@@ -121,9 +131,10 @@ public class CrawlerResource {
     @POST
     @Path("new")
     public Response crawl(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields, @FormParam("action") String action,
-                          @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition, @QueryParam("id")Option<String> id) throws Exception {
+                          @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition, @QueryParam("id") Option<String> id) throws Exception {
         UUID key = id.map(asUUID()).getOrElse(UUID.randomUUID());
-        modelRepository.set(key, toModel(update, from, recordDefinition));
+        Model value = toModel(update, from, recordDefinition);
+        modelRepository.set(key, value);
         if (action.equals("Save")) {
             return redirectToList();
         }

@@ -31,6 +31,7 @@
 
 <div class="actions">
     <a href="new" class="new">New</a>
+    <a href="import" class="import">Import</a>
 </div>
 
 </body>

@@ -16,12 +16,12 @@
     box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
 }
 
-input.crawl, input.search, a.new {
+input.crawl, input.search, a.new, input.import {
     .btn;
     .btn.primary;
 }
 
-input.save, input.more, a.export, input.delete {
+input.save, input.more, a.export, input.delete, a.import {
     .btn;
 }
 
@@ -61,8 +61,12 @@ div.recordDefinitionTemplate, li.keywordTemplate {
     display:none;
 }
 
-form input#from, form input#query {
+form input#from, form input#query, form.import textarea.model {
     .extra-large-input;
+}
+
+form.import textarea.model {
+    height: 300px;
 }
 
 html body form.delete {
@@ -82,4 +86,6 @@ body {
 .actions {
     padding-left: 20px;
 }
+
+
 
