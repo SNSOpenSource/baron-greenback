@@ -54,7 +54,7 @@ public class CrawlerResource {
     @GET
     @Path("edit")
     public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
-        return modelRepository.get(UUID.fromString(id));
+        return addTemplates(modelRepository.get(UUID.fromString(id)));
     }
 
     @POST
@@ -85,7 +85,11 @@ public class CrawlerResource {
 
 
     private Model emptyForm(Integer numberOfFields) {
-        return form("", "", emptyDefinition(numberOfFields(numberOfFields)));
+        return addTemplates(form("", "", emptyDefinition(numberOfFields(numberOfFields))));
+    }
+
+    private Model addTemplates(Model model) {
+        return model.add("emptyKeyword", emptyKeyword());
     }
 
     private int numberOfFields(Integer numberOfFields) {
@@ -93,7 +97,11 @@ public class CrawlerResource {
     }
 
     private Model emptyDefinition(int number) {
-        return RecordDefinition.recordDefinition("", Sequences.repeat(model().add("visible", true)).take(number).toArray(Model.class));
+        return RecordDefinition.recordDefinition("", Sequences.repeat(emptyKeyword()).take(number).toArray(Model.class));
+    }
+
+    private Model emptyKeyword() {
+        return model().add("visible", true);
     }
 
     private Model form(String update, String from, Model definition) {
