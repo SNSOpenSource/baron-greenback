@@ -71,6 +71,20 @@ public class CrawlerResource {
         return model().add("items", modelRepository.find(where(ID, is(notNullValue()))).map(asModelWithId()).toList());
     }
 
+    @GET
+    @Path("export")
+    @Produces("application/json")
+    public String export(@QueryParam("id") String id){
+        return modelFor(id).toString();
+    }
+
+    @POST
+    @Path("delete")
+    public Response delete(@FormParam("id") String id){
+        modelRepository.remove(UUID.fromString(id));
+        return redirectToList();
+    }
+
     private Callable1<? super Pair<UUID, Model>, Model> asModelWithId() {
         return new Callable1<Pair<UUID, Model>, Model>() {
             public Model call(Pair<UUID, Model> pair) throws Exception {
@@ -84,7 +98,11 @@ public class CrawlerResource {
     @GET
     @Path("edit")
     public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
-        return addTemplates(modelRepository.get(UUID.fromString(id)));
+        return addTemplates(modelFor(id));
+    }
+
+    private Model modelFor(String id) {
+        return modelRepository.get(UUID.fromString(id));
     }
 
     @POST
@@ -107,10 +125,14 @@ public class CrawlerResource {
         UUID key = id.map(asUUID()).getOrElse(UUID.randomUUID());
         modelRepository.set(key, toModel(update, from, recordDefinition));
         if (action.equals("Save")) {
-            return redirect(resource(getClass()).list());
+            return redirectToList();
         }
         Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
+    }
+
+    private Response redirectToList() {
+        return redirect(resource(getClass()).list());
     }
 
     private Callable1<? super String, UUID> asUUID() {

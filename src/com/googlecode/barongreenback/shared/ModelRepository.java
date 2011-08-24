@@ -46,4 +46,8 @@ public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUI
     public void set(UUID key, Model value) {
         records.put(MODELS, update(using(ID), record().set(ID, key.toString()).set(MODEL, value.toString())));
     }
+
+    public void remove(UUID key) {
+        records.remove(MODELS, where(ID, is(key.toString())));
+    }
 }
