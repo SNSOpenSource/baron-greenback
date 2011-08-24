@@ -19,7 +19,7 @@
 </form>
 
 <div class="recordDefinitionTemplate">
-    $recordDefinition(title="Fields", prefix="REPLACE_ME.", record=form.record)$
+    $recordDefinition(title="Fields", prefix="RECORD_PREFIX_REPLACE_ME")$
 </div>
 </body>
 </html>

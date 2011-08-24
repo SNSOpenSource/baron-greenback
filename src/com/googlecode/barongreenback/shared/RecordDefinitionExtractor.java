@@ -23,7 +23,6 @@ public class RecordDefinitionExtractor {
     public static final String VISIBLE = "visible";
     public static final String SUBFEED = "subfeed";
     public static final String SUBFEED_PREFIX = "subfeedPrefix";
-    public static final String SUBFEED_PREFIX_SEPARATOR = ".";
 
     public static final String RECORD_NAME = "recordName";
     private final FormParameters form;
@@ -36,8 +35,7 @@ public class RecordDefinitionExtractor {
         return extractWith("");
     }
 
-    private RecordDefinition extractWith(String pre) {
-        String prefix = generatePrefix(pre);
+    private RecordDefinition extractWith(String prefix) {
         Sequence<Keyword> keywords = extractKeywordsWith(prefix);
         return new RecordDefinition(keyword(form.getValue(prefix + RECORD_NAME)), keywords);
     }
@@ -51,11 +49,6 @@ public class RecordDefinitionExtractor {
         Iterable<Boolean> subfeed = new CheckboxValues(form.getValues(prefix + SUBFEED));
         Iterable<String> subfeedPrefix = form.getValues(prefix + SUBFEED_PREFIX);
         return toKeywords(name, aliases, types, unique, visible, subfeed, subfeedPrefix);
-    }
-
-    private String generatePrefix(String prefix) {
-        if("".equals(prefix)) return "";
-        return prefix + SUBFEED_PREFIX_SEPARATOR ;
     }
 
     private Sequence<Keyword> toKeywords(Iterable name, Iterable aliases, Iterable types, Iterable unique, Iterable visible, Iterable subfeed, Iterable subfeedPrefix) {

@@ -106,7 +106,7 @@ public class RecordDefinition {
     }
 
     public static Model recordDefinition(String recordName, Model... fields) {
-        return model().add(RECORD_NAME, recordName).add("keywords", Sequences.sequence(fields).toList());
+        return model().add("name", recordName).add("keywords", Sequences.sequence(fields).toList());
     }
 
     public static Model keywordDefinition(String name, String alias, String type, boolean unique, boolean visible, Option<Model> recordDefinition) {

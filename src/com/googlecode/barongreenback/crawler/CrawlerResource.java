@@ -2,19 +2,12 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.RecordDefinition;
-import com.googlecode.barongreenback.shared.RecordDefinitionExtractor;
 import com.googlecode.barongreenback.shared.Repository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.records.AliasedKeyword;
 import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.utterlyidle.MediaType;
@@ -29,24 +22,14 @@ import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
-import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.RECORD_NAME;
 import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Option.option;
-import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
-import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
@@ -69,15 +52,22 @@ public class CrawlerResource {
     }
 
     @GET
-    @Path("new")
-    public Model get(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
-        return emptyForm(numberOfFields);
-    }
-
-    @GET
     @Path("edit")
     public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
         return modelRepository.get(UUID.fromString(id));
+    }
+
+    @POST
+    @Path("edit")
+    public Response edit(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields, @FormParam("action") String action,
+                         @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition) throws Exception {
+        return crawl(numberOfFields, action, update, from, recordDefinition);
+    }
+
+    @GET
+    @Path("new")
+    public Model get(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
+        return emptyForm(numberOfFields);
     }
 
     @POST
@@ -92,7 +82,6 @@ public class CrawlerResource {
         Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
     }
-
 
 
     private Model emptyForm(Integer numberOfFields) {

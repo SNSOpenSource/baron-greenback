@@ -15,7 +15,7 @@ $(document).ready(function() {
         var ol = $(this).parent().children("ol")[0];
         var template = $(ol).children("li.keywordTemplate")[0];
         var nextIndex = $(ol).children().length;
-        var html = "<li>" + $(template).html().replace(/REPLACE_ME/g, nextIndex) + "</li>";
+        var html = "<li>" + $(template).html().replace(/KEYWORD_ID_REPLACE_ME/g, nextIndex) + "</li>";
         var newKeyword = $(html).hide().insertBefore(template);
         newKeyword.show(speed).css({display:'list-item'});
     })
@@ -33,7 +33,7 @@ function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedPr
     this.addSubfeed = function() {
         var template = this.template.html();
         var subfeedPrefix = $(this.subfeedPrefixSelector, this.content).attr("value");
-        template = template.replace(/REPLACE_ME/g, subfeedPrefix);
+        template = template.replace(/RECORD_PREFIX_REPLACE_ME/g, subfeedPrefix);
 
         $("div.subrecordDefinition", this.content).hide().html(template).show(speed);
     }

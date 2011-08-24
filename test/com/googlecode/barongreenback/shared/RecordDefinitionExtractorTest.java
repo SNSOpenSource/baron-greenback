@@ -64,7 +64,7 @@ public class RecordDefinitionExtractorTest {
                 pair(UNIQUE, "false"),
                 pair(VISIBLE, "false"),
                 pair(SUBFEED, "true"), pair(SUBFEED, "false"),
-                pair(SUBFEED_PREFIX, "field1"),
+                pair(SUBFEED_PREFIX, prefix),
 
                 pair(prefix + RECORD_NAME, "/user/summary"),
                 pair(prefix + KEYWORD_NAME, "ID"),
@@ -73,7 +73,7 @@ public class RecordDefinitionExtractorTest {
                 pair(prefix + UNIQUE, "true"), pair(prefix + UNIQUE, "false"),
                 pair(prefix + VISIBLE, "false"),
                 pair(prefix + SUBFEED, "false"),
-                pair(prefix + SUBFEED_PREFIX, "field1.field1")
+                pair(prefix + SUBFEED_PREFIX, prefix + "field1.")
 
         );
 
