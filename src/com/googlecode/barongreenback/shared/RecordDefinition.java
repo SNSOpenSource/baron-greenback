@@ -148,8 +148,8 @@ public class RecordDefinition {
         metadata(record().
         set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
         set(Views.VISIBLE, model.get("visible", Boolean.class)).
-        set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class)))
-);
+        set(Views.GROUP, model.get("group", String.class)).
+        set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
             }
         });
     }
