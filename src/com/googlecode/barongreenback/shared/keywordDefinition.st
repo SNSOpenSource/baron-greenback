@@ -2,6 +2,7 @@
     $input(id=prefix + "keywordName" + id, name=prefix + "keywordName", class="keywordName", label="XPath", value=keyword.name)$
 
     $input(id=prefix + "alias" + id, name=prefix + "aliases", class="alias", label="Alias", value=keyword.alias)$
+    $input(id=prefix + "group" + id, name=prefix + "group", class="group", label="Group", value=keyword.group)$
 
     <div class="control">
         <label for="prefix + type$id$">Type:</label>

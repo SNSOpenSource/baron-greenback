@@ -110,24 +110,10 @@ public class CrawlerResource {
         return redirectToList();
     }
 
-    private Callable1<? super Pair<UUID, Model>, Model> asModelWithId() {
-        return new Callable1<Pair<UUID, Model>, Model>() {
-            public Model call(Pair<UUID, Model> pair) throws Exception {
-                return model().
-                        add("id", pair.first().toString()).
-                        add("model", pair.second());
-            }
-        };
-    }
-
     @GET
     @Path("edit")
     public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
         return addTemplates(modelFor(id));
-    }
-
-    private Model modelFor(String id) {
-        return modelRepository.get(UUID.fromString(id));
     }
 
     @POST
@@ -150,7 +136,7 @@ public class CrawlerResource {
                           @FormParam("update") String update,
                           @FormParam("from") URL from,
                           RecordDefinition recordDefinition
-                          ) throws Exception {
+    ) throws Exception {
         UUID key = id.map(asUUID()).getOrElse(UUID.randomUUID());
         Model value = toModel(update, from, recordDefinition);
         modelRepository.set(key, value);
@@ -159,6 +145,20 @@ public class CrawlerResource {
         }
         Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
+    }
+
+    private Model modelFor(String id) {
+        return modelRepository.get(UUID.fromString(id));
+    }
+
+    private Callable1<? super Pair<UUID, Model>, Model> asModelWithId() {
+        return new Callable1<Pair<UUID, Model>, Model>() {
+            public Model call(Pair<UUID, Model> pair) throws Exception {
+                return model().
+                        add("id", pair.first().toString()).
+                        add("model", pair.second());
+            }
+        };
     }
 
     private Response redirectToList() {

@@ -21,7 +21,7 @@
     </div>
 
 <div class="content">
-$include.({$base$views/menu?current=$body.class$}).body$
+$include.({$base$views/menu?current=$meta.view$}).body$
 $body$
 </div>
 <div class="footer">

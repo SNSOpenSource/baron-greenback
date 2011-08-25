@@ -8,6 +8,7 @@ import java.net.URI;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.ALIASES;
+import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.GROUP;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.KEYWORD_NAME;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.SUBFEED_PREFIX;
 import static com.googlecode.barongreenback.shared.RecordDefinitionExtractor.RECORD_NAME;
@@ -27,6 +28,7 @@ public class RecordDefinitionExtractorTest {
         FormParameters form = FormParameters.formParameters(pair(RECORD_NAME, "/feed/entry"),
                 pair(KEYWORD_NAME, "name"),
                 pair(ALIASES, ""),
+                pair(GROUP, "group1"),
                 pair(TYPES, "java.lang.String"),
                 pair(UNIQUE, "false"),
                 pair(VISIBLE, "false"),
@@ -35,6 +37,7 @@ public class RecordDefinitionExtractorTest {
 
                 pair(KEYWORD_NAME, "id"),
                 pair(ALIASES, ""),
+                pair(GROUP, ""),
                 pair(TYPES, "java.lang.Integer"),
                 pair(UNIQUE, "true"), pair(UNIQUE, "false"),
                 pair(VISIBLE, "false"),
@@ -60,6 +63,7 @@ public class RecordDefinitionExtractorTest {
                 pair(RECORD_NAME, "/feed/entry"),
                 pair(KEYWORD_NAME, "link"),
                 pair(ALIASES, ""),
+                pair(GROUP, ""),
                 pair(TYPES, "java.net.URI"),
                 pair(UNIQUE, "false"),
                 pair(VISIBLE, "false"),
@@ -69,6 +73,7 @@ public class RecordDefinitionExtractorTest {
                 pair(prefix + RECORD_NAME, "/user/summary"),
                 pair(prefix + KEYWORD_NAME, "ID"),
                 pair(prefix + ALIASES, ""),
+                pair(prefix + GROUP, ""),
                 pair(prefix + TYPES, "java.lang.Integer"),
                 pair(prefix + UNIQUE, "true"), pair(prefix + UNIQUE, "false"),
                 pair(prefix + VISIBLE, "false"),

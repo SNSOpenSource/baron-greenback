@@ -321,6 +321,18 @@ form {
   }
 }
 
+.label {
+    display: block;
+    float: none;
+    width: auto;
+    font-weight: bold;
+    text-align: left;
+    line-height: 20px;
+    padding-top: 0;
+    color: @grayDark;
+    text-transform: capitalize;
+}
+
 // Stacked forms
 form.form-stacked {
   padding-left: 20px;
@@ -331,13 +343,7 @@ form.form-stacked {
     margin-left: 0;
   }
   label {
-    display: block;
-    float: none;
-    width: auto;
-    font-weight: bold;
-    text-align: left;
-    line-height: 20px;
-    padding-top: 0;
+    .label;
   }
   .clearfix {
     margin-bottom: @baseline / 2;

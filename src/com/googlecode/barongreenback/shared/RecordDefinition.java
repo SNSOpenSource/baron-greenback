@@ -68,7 +68,7 @@ public class RecordDefinition {
         return recordDefinition(keyword.name(),
                 fields.map(new Callable1<Keyword, Model>() {
                     public Model call(Keyword keyword) throws Exception {
-                        return keywordDefinition(name(keyword), alias(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword));
+                        return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword));
                     }
                 }).toArray(Model.class));
     }
@@ -107,6 +107,10 @@ public class RecordDefinition {
         return "";
     }
 
+    private static String group(Keyword keyword) {
+        return keyword.metadata().get(Views.GROUP);
+    }
+
     private static String type(Keyword keyword) {
         return keyword.forClass().getName();
     }
@@ -115,10 +119,11 @@ public class RecordDefinition {
         return model().add("name", recordName).add("keywords", Sequences.sequence(fields).toList());
     }
 
-    public static Model keywordDefinition(String name, String alias, String type, boolean unique, boolean visible, Option<Model> recordDefinition) {
+    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, Option<Model> recordDefinition) {
         return model().
                 add("name", name).
                 add("alias", alias).
+                add("group", group).
                 add("type", type).
                 add("unique", unique).
                 add("visible", visible).
@@ -140,11 +145,11 @@ public class RecordDefinition {
                         model.get("name", String.class),
                         Class.forName(model.get("type", String.class))).
 //                        as((Keyword) keyword(model.get("alias", String.class))).
-                        metadata(record().
-                                set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
-                                set(Views.VISIBLE, model.get("visible", Boolean.class)).
-                                set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class)))
-                        );
+        metadata(record().
+        set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
+        set(Views.VISIBLE, model.get("visible", Boolean.class)).
+        set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class)))
+);
             }
         });
     }

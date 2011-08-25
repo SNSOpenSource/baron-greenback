@@ -2,17 +2,23 @@
 <html>
 <head>
     <title>home</title>
+    <meta name="view" content="$view$"/>
 </head>
 <body class="$view$">
 <div>
+    $record.keys:{ groupName |
+    <fieldset>
+        <legend>$groupName$</legend>
 
-<dl>
-    $record.keys:{ key |
-        <dt>$key$</dt>
-        <dd>$record.(key)$</dd>
+        $record.(groupName).keys:{ name |
+
+        <div class="control">
+            <span class="label">$name$</span>
+            <span>$record.(groupName).(name)$</span>
+        </div>
+        }$
+    </fieldset>
     }$
-</dl>
-
 </div>
 </body>
 </html>

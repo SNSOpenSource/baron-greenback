@@ -4,8 +4,9 @@ import com.googlecode.barongreenback.views.View;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
@@ -21,14 +22,13 @@ import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.googlecode.barongreenback.views.View.asFields;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -36,7 +36,6 @@ import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
-import static com.googlecode.totallylazy.records.RecordMethods.toMap;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -69,9 +68,26 @@ public class SearchResource {
     public Model unique(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
         Sequence<Keyword> headers = headers(view);
         Record record = records.query(parse(prefix(view, query), headers), headers).head();
+        Map<String, Map<String, Object>> fold = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return model().
                 add("view", view).
-                add("record", toMap(record));
+                add("record", fold);
+    }
+
+    public static Callable2<Map<String, Map<String, Object>>, Pair<Keyword, Object>, Map<String, Map<String, Object>>> groupBy(final Keyword<String> lookupKeyword) {
+        return new Callable2<Map<String, Map<String, Object>>, Pair<Keyword, Object>, Map<String, Map<String, Object>>>() {
+            public Map<String, Map<String, Object>> call(Map<String, Map<String, Object>> map, Pair<Keyword, Object> pair) throws Exception {
+                Keyword keyword = pair.first();
+                Object value = pair.second();
+                String key = keyword.metadata().get(lookupKeyword);
+                if(key.isEmpty()) key = "Other";
+                if(!map.containsKey(key)){
+                    map.put(key, new LinkedHashMap<String, Object>());
+                }
+                map.get(key).put(keyword.name(), value);
+                return map;
+            }
+        };
     }
 
     private Sequence<Keyword> headers(String view) {

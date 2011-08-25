@@ -27,6 +27,7 @@ public class Views {
     public static final Keyword<String> FIELD_NAME = Keywords.keyword("fieldName", String.class);
     public static final Keyword<String> FIELD_TYPE = Keywords.keyword("fieldType", String.class);
     public static final Keyword<Boolean> VISIBLE = Keywords.keyword("visible", Boolean.class);
+    public static final Keyword<String> GROUP = Keywords.keyword("group", String.class);
 
     public Views(Records records) {
         this.records = records;
@@ -44,7 +45,8 @@ public class Views {
                         set(FIELD_NAME, keyword.name()).
                         set(FIELD_TYPE, keyword.forClass().getName()).
                         set(Keywords.UNIQUE, keyword.metadata().get(Keywords.UNIQUE)).
-                        set(VISIBLE, keyword.metadata().get(VISIBLE));
+                        set(VISIBLE, keyword.metadata().get(VISIBLE)).
+                        set(GROUP, keyword.metadata().get(GROUP));
             }
         };
     }
@@ -80,7 +82,8 @@ public class Views {
             public Keyword call(Record record) throws Exception {
                 return keyword(record.get(FIELD_NAME), Class.forName(record.get(FIELD_TYPE))).metadata(MapRecord.record().
                         set(Keywords.UNIQUE, record.get(Keywords.UNIQUE)).
-                        set(VISIBLE, record.get(VISIBLE)));
+                        set(VISIBLE, record.get(VISIBLE)).
+                        set(GROUP, record.get(GROUP)));
             }
         };
     }

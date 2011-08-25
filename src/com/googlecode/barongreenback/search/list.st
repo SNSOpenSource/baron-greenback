@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>home</title>
+    <meta name="view" content="$view$" />
 </head>
 <body class="$view$">
 <div>
