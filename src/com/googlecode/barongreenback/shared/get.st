@@ -1,1 +1,1 @@
-<a href="$name$?id=$id$" class="$name$">$name$<a/>
+<a href="$name$?id=$id$" class="$name$">$name$</a>
