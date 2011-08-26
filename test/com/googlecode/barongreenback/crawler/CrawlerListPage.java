@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.html.Html;
 import com.googlecode.utterlyidle.HttpHandler;
+import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 
 import static com.googlecode.utterlyidle.RequestBuilder.get;
@@ -26,5 +27,10 @@ public class CrawlerListPage {
 
     public boolean contains(String value) {
         return html.selectContent("//a[contains(@class, 'update')]/text()").equals(value);
+    }
+
+    public CrawlerPage edit(String value) throws Exception {
+        Request request = html.link("//a[contains(@class, 'update') and text() = '" + value + "']").click();
+        return new CrawlerPage(httpHandler, httpHandler.handle(request));
     }
 }

@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.html;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.Response;
 import org.w3c.dom.Document;
+import org.w3c.dom.html.HTMLInputElement;
 
 public class Html {
     private final Document document;
@@ -28,7 +29,15 @@ public class Html {
         return new Input(Xml.selectNodes(document, xpath).head());
     }
 
+    public Select select(String xpath) {
+        return new Select(Xml.selectNodes(document, xpath).head());
+    }
+
     public String selectContent(String xpath) {
         return Xml.selectContents(document, xpath);
+    }
+
+    public Link link(String xpath) {
+        return new Link(Xml.selectNodes(document, xpath).head());
     }
 }

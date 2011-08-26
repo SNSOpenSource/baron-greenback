@@ -1,0 +1,26 @@
+package com.googlecode.barongreenback.html;
+
+import com.googlecode.totallylazy.records.xml.Xml;
+import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.RequestBuilder;
+import org.w3c.dom.Node;
+
+public class Link implements NameValue{
+    private final Node link;
+
+    public Link(Node link) {
+        this.link = link;
+    }
+
+    public Request click() {
+        return RequestBuilder.get(value()).build();
+    }
+
+    public String value() {
+        return Xml.selectContents(link, "@href");
+    }
+
+    public String name() {
+        return link.getNodeValue();
+    }
+}

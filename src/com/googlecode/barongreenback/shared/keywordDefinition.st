@@ -5,8 +5,8 @@
     $input(id=prefix + "group" + id, name=prefix + "group", class="group", label="Group", value=keyword.group)$
 
     <div class="control">
-        <label for="prefix + type$id$">Type:</label>
-        <select id="prefix + type$id$" name="$prefix$types">
+        <label for="$prefix$type$id$">Type:</label>
+        <select id="$prefix$type$id$" name="$prefix$types">
             $types:{<option value="$it.value$" $if(it.(keyword.type))$ selected="selected" $endif$>$it.name$</option>}$
         </select>
     </div>

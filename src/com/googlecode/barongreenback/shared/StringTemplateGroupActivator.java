@@ -18,17 +18,21 @@ import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.totallylazy.URLs.url;
 
 public class StringTemplateGroupActivator implements Callable<StringTemplateGroup> {
-    private final HierarchicalPath path;
+    private final URL baseUrl;
 
     public StringTemplateGroupActivator(final Request request) {
-        this.path = request.url().path();
+        baseUrl = append(packageUrl(WebApplication.class), packageName(request.url().path()));
+    }
+
+    public StringTemplateGroupActivator(URL baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public StringTemplateGroup call() throws Exception {
         EnhancedStringTemplateGroup shared = new EnhancedStringTemplateGroup(URLs.packageUrl(SharedModule.class));
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
 
-        EnhancedStringTemplateGroup group = new EnhancedStringTemplateGroup(append(packageUrl(WebApplication.class), packageName(path)));
+        EnhancedStringTemplateGroup group = new EnhancedStringTemplateGroup(baseUrl);
         group.setSuperGroup(shared);
         return group;
     }
