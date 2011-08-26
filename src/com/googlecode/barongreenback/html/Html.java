@@ -22,15 +22,15 @@ public class Html {
     }
 
     public Form form(String xpath) {
-        return new Form(Xml.selectNodes(document, xpath).head());
+        return new Form(Xml.selectElement(document, xpath));
     }
 
     public Input input(String xpath) {
-        return new Input(Xml.selectNodes(document, xpath).head());
+        return new Input(Xml.selectElement(document, xpath));
     }
 
     public Select select(String xpath) {
-        return new Select(Xml.selectNodes(document, xpath).head());
+        return new Select(Xml.selectElement(document, xpath));
     }
 
     public String selectContent(String xpath) {
@@ -38,6 +38,6 @@ public class Html {
     }
 
     public Link link(String xpath) {
-        return new Link(Xml.selectNodes(document, xpath).head());
+        return new Link(Xml.selectElement(document, xpath));
     }
 }

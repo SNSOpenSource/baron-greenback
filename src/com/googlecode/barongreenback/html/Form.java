@@ -7,12 +7,13 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class Form {
-    private final Node form;
+    private final Element form;
 
-    public Form(Node form) {
+    public Form(Element form) {
         this.form = form;
     }
 
@@ -24,34 +25,34 @@ public class Form {
     }
 
     private Sequence<NameValue> nameValuePairs(String xpath) {
-        return Xml.selectNodes(form, xpath).flatMap(toNameAndValue());
+        return Xml.selectElements(form, xpath).flatMap(toNameAndValue());
     }
 
-    private Callable1<? super Node, Sequence<NameValue>> toNameAndValue() {
-        return new Callable1<Node, Sequence<NameValue>>() {
-            public Sequence<NameValue> call(Node node) throws Exception {
-                String type = type(node);
+    private Callable1<? super Element, Sequence<NameValue>> toNameAndValue() {
+        return new Callable1<Element, Sequence<NameValue>>() {
+            public Sequence<NameValue> call(Element element) throws Exception {
+                String type = type(element);
                 if (type.equals("select")) {
-                    return Sequences.<NameValue>sequence(new Select(node));
+                    return Sequences.<NameValue>sequence(new Select(element));
                 }
                 if (type.equals("checkbox")) {
-                    Checkbox checkbox = new Checkbox(node);
+                    Checkbox checkbox = new Checkbox(element);
                     if (checkbox.checked()) {
                         return Sequences.<NameValue>sequence(checkbox);
                     }
                     return Sequences.empty();
                 }
-                return Sequences.<NameValue>sequence(new Input(node));
+                return Sequences.<NameValue>sequence(new Input(element));
             }
         };
     }
 
-    private String type(Node node) {
-        String nodeName = node.getNodeName();
-        if (nodeName.equals("input")) {
-            return Xml.selectContents(node, "@type");
+    private String type(Element element) {
+        String tagName = element.getTagName();
+        if (tagName.equals("input")) {
+            return Xml.selectContents(element, "@type");
         }
-        return nodeName;
+        return tagName;
     }
 
     private Callable2<RequestBuilder, NameValue, RequestBuilder> addFormParams() {

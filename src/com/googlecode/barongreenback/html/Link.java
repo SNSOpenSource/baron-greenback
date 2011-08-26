@@ -3,12 +3,13 @@ package com.googlecode.barongreenback.html;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class Link implements NameValue{
-    private final Node link;
+    private final Element link;
 
-    public Link(Node link) {
+    public Link(Element link) {
         this.link = link;
     }
 
@@ -21,6 +22,6 @@ public class Link implements NameValue{
     }
 
     public String name() {
-        return link.getNodeValue();
+        return link.getTextContent();
     }
 }

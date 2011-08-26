@@ -1,31 +1,30 @@
 package com.googlecode.barongreenback.html;
 
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.records.xml.Xml;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
-import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
+import static com.googlecode.totallylazy.Runnables.VOID;
+import static com.googlecode.totallylazy.records.xml.Xml.*;
 
 public class Select implements NameValue {
     public static final String SELECTED = "selected";
+    public static final String SELECTED_OPTION = "option[@selected='selected']";
     private final Element select;
 
-    public Select(Node select) {
-        this.select = (Element) select;
+    public Select(Element select) {
+        this.select = select;
     }
 
     public String value() {
-        String selected = selectContents(select, "option[@selected='selected']/@value");
+        String selected = selectContents(select, SELECTED_OPTION + "/@value");
         return selected.equals(Strings.EMPTY) ? selectContents(select, "option[1]/@value") : selected;
     }
 
     public Select value(String value){
-        for (Element element : Xml.selectNodes(select, "option").safeCast(Element.class)) {
-            element.removeAttribute(SELECTED);
-        }
-        Element element = Xml.selectNodes(select, "option[@value='" + value + "']").safeCast(Element.class).head();
-        element.setAttribute(SELECTED, SELECTED);
+        selectElements(select, SELECTED_OPTION).each(removeAttribute(SELECTED));
+        selectElement(select, "option[@value='" + value + "']").setAttribute(SELECTED, SELECTED);
         return this;
     }
 
