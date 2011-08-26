@@ -5,11 +5,23 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class Checkbox extends Input{
+    public static final String CHECKED = "checked";
+
     public Checkbox(Element input) {
         super(input);
     }
 
     public boolean checked() {
-        return Xml.selectContents(input, "@checked").equals("checked");
+        return Xml.selectContents(input, "@checked").equals(CHECKED);
+    }
+
+    public Checkbox check() {
+        input.setAttribute(CHECKED, CHECKED);
+        return this;
+    }
+
+    public Checkbox uncheck() {
+        input.removeAttribute(CHECKED);
+        return this;
     }
 }

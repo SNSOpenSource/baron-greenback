@@ -19,6 +19,9 @@ public class CrawlerResourceTest {
         newPage.alias(1).value("foo");
         newPage.group(1).value("foo");
         newPage.type(1).value(String.class.getName());
+        newPage.unique(1).check();
+        newPage.visible(1).uncheck();
+        newPage.subfeed(1).uncheck();
         CrawlerListPage list =  newPage.save();
 
         CrawlerPage edit = list.edit("news");
@@ -29,5 +32,8 @@ public class CrawlerResourceTest {
         assertThat(edit.alias(1).value(), is("foo"));
         assertThat(edit.group(1).value(), is("foo"));
         assertThat(edit.type(1).value(), is(String.class.getName()));
+        assertThat(edit.unique(1).checked(), is(true));
+        assertThat(edit.visible(1).checked(), is(false));
+        assertThat(edit.subfeed(1).checked(), is(false));
     }
 }

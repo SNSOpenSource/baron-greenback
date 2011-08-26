@@ -33,6 +33,10 @@ public class Html {
         return new Select(Xml.selectElement(document, xpath));
     }
 
+    public Checkbox checkbox(String xpath) {
+        return new Checkbox(Xml.selectElement(document, xpath));
+    }
+
     public String selectContent(String xpath) {
         return Xml.selectContents(document, xpath);
     }

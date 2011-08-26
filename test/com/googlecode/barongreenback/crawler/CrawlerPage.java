@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.html.Checkbox;
 import com.googlecode.barongreenback.html.Html;
 import com.googlecode.barongreenback.html.Input;
 import com.googlecode.barongreenback.html.Select;
@@ -21,6 +22,9 @@ public class CrawlerPage {
     public static final String ALIAS = "//input[@id='alias%s']";
     public static final String GROUP = "//input[@id='group%s']";
     public static final String TYPE = "//select[@id='type%s']";
+    public static final String UNIQUE = "//input[@id='unique%s']";
+    public static final String VISIBLE = "//input[@id='visible%s']";
+    public static final String SUBFEED = "//input[@id='subfeed%s']";
     private final HttpHandler httpHandler;
     private final Html html;
 
@@ -66,5 +70,17 @@ public class CrawlerPage {
 
     public Select type(int index) {
         return html.select(String.format(TYPE, index));
+    }
+
+    public Checkbox unique(int index) {
+        return html.checkbox(String.format(UNIQUE, index));
+    }
+
+    public Checkbox visible(int index) {
+        return html.checkbox(String.format(VISIBLE, index));
+    }
+
+    public Checkbox subfeed(int index) {
+        return html.checkbox(String.format(SUBFEED, index));
     }
 }
