@@ -1,1 +1,1 @@
-$edit()$
+$edit(action="New")$

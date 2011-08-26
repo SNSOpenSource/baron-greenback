@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create View</title>
+    <title>$action; null="Edit"$ View</title>
 </head>
 <body>
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Crawler</title>
+    <title>$action; null="Edit"$ Crawler</title>
 </head>
 <body>
 
