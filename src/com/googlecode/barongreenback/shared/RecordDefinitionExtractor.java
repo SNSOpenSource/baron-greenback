@@ -94,7 +94,4 @@ public class RecordDefinitionExtractor {
     private Class<?> classOf(String className) throws ClassNotFoundException {
         return Class.forName(className);
     }
-
-
-
 }

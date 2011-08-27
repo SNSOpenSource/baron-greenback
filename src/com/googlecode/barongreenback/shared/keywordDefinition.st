@@ -14,11 +14,11 @@
     $checkbox(id=prefix + "unique" + id, name=prefix + "unique", class="unique", label="Unique", checked=keyword.unique)$
     $checkbox(id=prefix + "visible" + id, name=prefix + "visible", class="visible", label="Visible", checked=keyword.visible)$
     $checkbox(id=prefix + "subfeed" + id, name=prefix + "subfeed", class="subfeed", label="Subfeed", checked=keyword.subfeed)$
-    $input(id=prefix + "subfeedPrefix" + id, name=prefix + "subfeedPrefix", class="subfeedPrefix", value=prefix + "field" + id + ".", type="hidden")$
+    $input(id=prefix + "subfeedPrefix" + id, name=prefix + "subfeedPrefix", class="subfeedPrefix", value=prefix + id + ".", type="hidden")$
 
     <div class="subrecordDefinition">
     $if(keyword.record)$
-        $recordDefinition(title="Fields", prefix=prefix + "field" + id + ".", record=keyword.record)$
+        $recordDefinition(title="Fields", prefix=prefix + id + ".", record=keyword.record)$
     $endif$
     </div>
 </div>
