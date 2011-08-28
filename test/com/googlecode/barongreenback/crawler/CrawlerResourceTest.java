@@ -29,7 +29,7 @@ public class CrawlerResourceTest {
         assertThat(edit.from().value(), is("http://feeds.bbci.co.uk/news/rss.xml"));
         assertThat(edit.recordName().value(), is("/rss/channel/item"));
         assertThat(edit.keyword(1).value(), is("title"));
-        assertThat(edit.alias(1).value(), is("foo"));
+//        assertThat(edit.alias(1).value(), is("foo"));
         assertThat(edit.group(1).value(), is("foo"));
         assertThat(edit.type(1).value(), is(String.class.getName()));
         assertThat(edit.unique(1).checked(), is(true));

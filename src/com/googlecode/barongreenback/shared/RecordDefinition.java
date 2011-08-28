@@ -86,7 +86,11 @@ public class RecordDefinition {
     }
 
     private static boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
-        return keyword.metadata().get(metaKeyword) == true;
+        try {
+            return true == keyword.metadata().get(metaKeyword);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private static boolean unique(Keyword keyword) {

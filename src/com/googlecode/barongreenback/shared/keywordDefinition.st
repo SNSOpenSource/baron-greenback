@@ -1,24 +1,24 @@
 <div class="keywordDefinition">
-    $input(id=prefix + "keywordName" + id, name=prefix + "keywordName", class="keywordName", label="XPath", value=keyword.name)$
+    $input(id=prefix + "name", name=prefix + "name", class="keywordName", label="XPath", value=keyword.name)$
 
-    $input(id=prefix + "alias" + id, name=prefix + "aliases", class="alias", label="Alias", value=keyword.alias)$
-    $input(id=prefix + "group" + id, name=prefix + "group", class="group", label="Group", value=keyword.group)$
+    $input(id=prefix + "alias", name=prefix + "alias", class="alias", label="Alias", value=keyword.alias)$
+    $input(id=prefix + "group", name=prefix + "group", class="group", label="Group", value=keyword.group)$
 
     <div class="control">
-        <label for="$prefix$type$id$">Type:</label>
-        <select id="$prefix$type$id$" name="$prefix$types">
+        <label for="$prefix$type">Type:</label>
+        <select id="$prefix$type" name="$prefix$type">
             $types:{<option value="$it.value$" $if(it.(keyword.type))$ selected="selected" $endif$>$it.name$</option>}$
         </select>
     </div>
 
-    $checkbox(id=prefix + "unique" + id, name=prefix + "unique", class="unique", label="Unique", checked=keyword.unique)$
-    $checkbox(id=prefix + "visible" + id, name=prefix + "visible", class="visible", label="Visible", checked=keyword.visible)$
-    $checkbox(id=prefix + "subfeed" + id, name=prefix + "subfeed", class="subfeed", label="Subfeed", checked=keyword.subfeed)$
-    $input(id=prefix + "subfeedPrefix" + id, name=prefix + "subfeedPrefix", class="subfeedPrefix", value=prefix + id + ".", type="hidden")$
+    $checkbox(id=prefix + "unique", name=prefix + "unique", class="unique", label="Unique", checked=keyword.unique)$
+    $checkbox(id=prefix + "visible", name=prefix + "visible", class="visible", label="Visible", checked=keyword.visible)$
+    $checkbox(id=prefix + "subfeed", name=prefix + "subfeed", class="subfeed", label="Subfeed", checked=keyword.subfeed)$
+    $input(id=prefix + "subfeedPrefix", name=prefix + "subfeedPrefix", class="subfeedPrefix", value=prefix + "record.", type="hidden")$
 
     <div class="subrecordDefinition">
     $if(keyword.record)$
-        $recordDefinition(title="Fields", prefix=prefix + id + ".", record=keyword.record)$
+        $recordDefinition(title="Fields", prefix=prefix + "record.", record=keyword.record)$
     $endif$
     </div>
 </div>

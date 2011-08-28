@@ -17,14 +17,14 @@ import static org.hamcrest.Matchers.containsString;
 public class CrawlerPage {
     public static final String UPDATE = "//input[@name='update']";
     public static final String FROM = "//input[@name='from']";
-    public static final String RECORD_NAME = "//input[@name='recordName']";
-    public static final String KEYWORD_NAME = "//input[@id='keywordName%s']";
-    public static final String ALIAS = "//input[@id='alias%s']";
-    public static final String GROUP = "//input[@id='group%s']";
-    public static final String TYPE = "//select[@id='type%s']";
-    public static final String UNIQUE = "//input[@id='unique%s']";
-    public static final String VISIBLE = "//input[@id='visible%s']";
-    public static final String SUBFEED = "//input[@id='subfeed%s']";
+    public static final String RECORD_NAME = "//input[@id='record.name']";
+    public static final String KEYWORD_NAME = "//input[@id='record.keywords[%s].name']";
+    public static final String ALIAS = "//input[@id='record.keywords[%s].alias']";
+    public static final String GROUP = "//input[@id='record.keywords[%s].group']";
+    public static final String TYPE = "//select[@id='record.keywords[%s].type']";
+    public static final String UNIQUE = "//input[@id='record.keywords[%s].unique']";
+    public static final String VISIBLE = "//input[@id='record.keywords[%s].visible']";
+    public static final String SUBFEED = "//input[@id='record.keywords[%s].subfeed']";
     private final HttpHandler httpHandler;
     private final Html html;
 

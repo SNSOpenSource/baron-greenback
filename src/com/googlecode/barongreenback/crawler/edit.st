@@ -7,10 +7,10 @@
 
 <form class="crawl form-stacked" action="" method="POST">
 
-    $input(name="update", label="Update", value=form.update, placeholder="Name")$
-    $input(name="from", label="From", value=form.from, placeholder="http://www.example.com/feed/xml")$
+    $input(name="update", label="Update", class="update", value=form.update, placeholder="Name")$
+    $input(name="from", label="From", class="from", value=form.from, placeholder="http://www.example.com/feed/xml")$
 
-    $recordDefinition(title="Fields", prefix="", record=form.record)$
+    $recordDefinition(title="Fields", prefix="record.", record=form.record)$
 
     <div class="actions">
         <input type="submit" value="Crawl" name="action" class="crawl"/>
