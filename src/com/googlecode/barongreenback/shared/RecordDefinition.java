@@ -7,6 +7,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.AliasedKeyword;
+import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 
@@ -145,15 +146,18 @@ public class RecordDefinition {
     private static Sequence<Keyword> toKeywords(List<Model> keywords) {
         return sequence(keywords).map(new Callable1<Model, Keyword>() {
             public Keyword call(Model model) throws Exception {
-                return keyword(
-                        model.get("name", String.class),
-                        Class.forName(model.get("type", String.class))).
-//                        as((Keyword) keyword(model.get("alias", String.class))).
-        metadata(record().
-        set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
-        set(Views.VISIBLE, model.get("visible", Boolean.class)).
-        set(Views.GROUP, model.get("group", String.class)).
-        set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
+                Keyword<?> keyword = keyword(model.get("name", String.class),
+                        Class.forName(model.get("type", String.class)));
+
+                String alias = model.get("alias", String.class);
+                if (!alias.isEmpty()) {
+                    keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
+                }
+                return keyword.metadata(record().
+                        set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
+                        set(Views.VISIBLE, model.get("visible", Boolean.class)).
+                        set(Views.GROUP, model.get("group", String.class)).
+                        set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
             }
         });
     }
