@@ -15,16 +15,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class CrawlerPage {
-    public static final String UPDATE = "//input[@name='update']";
-    public static final String FROM = "//input[@name='from']";
-    public static final String RECORD_NAME = "//input[@id='record.name']";
-    public static final String KEYWORD_NAME = "//input[@id='record.keywords[%s].name']";
-    public static final String ALIAS = "//input[@id='record.keywords[%s].alias']";
-    public static final String GROUP = "//input[@id='record.keywords[%s].group']";
-    public static final String TYPE = "//select[@id='record.keywords[%s].type']";
-    public static final String UNIQUE = "//input[@id='record.keywords[%s].unique']";
-    public static final String VISIBLE = "//input[@id='record.keywords[%s].visible']";
-    public static final String SUBFEED = "//input[@id='record.keywords[%s].subfeed']";
+    public static final String UPDATE = "//input[@name='form.update']";
+    public static final String FROM = "//input[@name='form.from']";
+    public static final String RECORD_NAME = "//input[@id='form.record.name']";
+    public static final String KEYWORD_NAME = "//input[@id='form.record.keywords[%s].name']";
+    public static final String ALIAS = "//input[@id='form.record.keywords[%s].alias']";
+    public static final String GROUP = "//input[@id='form.record.keywords[%s].group']";
+    public static final String TYPE = "//select[@id='form.record.keywords[%s].type']";
+    public static final String UNIQUE = "//input[@id='form.record.keywords[%s].unique']";
+    public static final String VISIBLE = "//input[@id='form.record.keywords[%s].visible']";
+    public static final String SUBFEED = "//input[@id='form.record.keywords[%s].subfeed']";
     private final HttpHandler httpHandler;
     private final Html html;
 
@@ -35,7 +35,7 @@ public class CrawlerPage {
     }
 
     public CrawlerPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get(urlOf(resource(CrawlerResource.class).get(3))).build()));
+        this(httpHandler, httpHandler.handle(get(urlOf(resource(CrawlerResource.class).newForm())).build()));
     }
 
     public CrawlerListPage save() throws Exception {

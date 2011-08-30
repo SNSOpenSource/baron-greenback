@@ -10,7 +10,7 @@ import java.util.regex.MatchResult;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 
-public class FormToModelConverter {
+public class ParametersToModel {
     public static Model modelOf(Iterable<Pair<String, String>> parameters) {
         return sequence(parameters).fold(Model.model(), new Callable2<Model, Pair<String, String>, Model>() {
             public Model call(Model model, Pair<String, String> pair) throws Exception {
@@ -41,7 +41,7 @@ public class FormToModelConverter {
     private static Model parentOf(final Model startingModel, final Sequence<String> parents) {
         return parents.fold(startingModel, new Callable2<Model, String, Model>() {
             public Model call(Model model, String parent) throws Exception {
-                if(list.matches(parent)){
+                if (list.matches(parent)) {
                     MatchResult match = list.findMatches(parent).head();
                     return getModel(model, match.group(1), Integer.valueOf(match.group(2)) - 1);
                 }

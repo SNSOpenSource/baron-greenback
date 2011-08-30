@@ -35,10 +35,7 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
-import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -51,7 +48,7 @@ import static com.googlecode.utterlyidle.proxy.Resource.resource;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
-    public static final String NUMBER_OF_FIELDS = "3";
+    public static final Integer NUMBER_OF_FIELDS = 3;
     private final Records records;
     private final ModelRepository modelRepository;
     private final Crawler crawler;
@@ -73,7 +70,7 @@ public class CrawlerResource {
     @GET
     @Path("export")
     @Produces("application/json")
-    public String export(@QueryParam("id") String id) {
+    public String export(@QueryParam("id") UUID id) {
         return modelFor(id).toString();
     }
 
@@ -91,9 +88,50 @@ public class CrawlerResource {
     }
 
     @POST
+    @Path("delete")
+    public Response delete(@FormParam("id") UUID id) {
+        modelRepository.remove(id);
+        return redirectToList();
+    }
+
+    @GET
+    @Path("new")
+    public Model newForm() {
+        return emptyForm(NUMBER_OF_FIELDS);
+    }
+
+    @POST
+    @Path("new")
+    public Response newCrawler(@FormParam("action") String action, Model model) throws Exception {
+        return edit(UUID.randomUUID(), action, model);
+    }
+
+    @GET
+    @Path("edit")
+    public Model edit(@QueryParam("id") UUID id) {
+        return addTemplates(modelFor(id));
+    }
+
+    @POST
+    @Path("edit")
+    public Response edit(@QueryParam("id") UUID id, @FormParam("action") String action, final Model root) throws Exception {
+        Model form = root.get("form", Model.class);
+        String from = form.get("from", String.class);
+        String update = form.get("update", String.class);
+        Model record = form.get("record", Model.class);
+        RecordDefinition recordDefinition = convert(record);
+        modelRepository.set(id, form(update, from, recordDefinition.toModel()));
+        if (action.equals("Save")) {
+            return redirectToList();
+        }
+        Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition);
+        return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
+    }
+
+    @POST
     @Path("crawl")
-    public Response crawl(@FormParam("id") String id) throws Exception {
-        Model model = modelRepository.get(UUID.fromString(id));
+    public Response crawl(@FormParam("id") UUID id) throws Exception {
+        Model model = modelRepository.get(id);
         Model form = model.get("form", Model.class);
         String from = form.get("from", String.class);
         String update = form.get("update", String.class);
@@ -103,52 +141,8 @@ public class CrawlerResource {
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
     }
 
-    @POST
-    @Path("delete")
-    public Response delete(@FormParam("id") String id) {
-        modelRepository.remove(UUID.fromString(id));
-        return redirectToList();
-    }
-
-    @GET
-    @Path("edit")
-    public Model edit(@QueryParam("id") String id, @QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
-        return addTemplates(modelFor(id));
-    }
-
-    @POST
-    @Path("edit")
-    public Response edit(@QueryParam("id") String id, @FormParam("action") String action,
-                         @FormParam("update") String update, @FormParam("from") URL from, RecordDefinition recordDefinition) throws Exception {
-        return crawl(some(id), action, update, from, recordDefinition);
-    }
-
-    @GET
-    @Path("new")
-    public Model get(@QueryParam("numberOfFields") @DefaultValue(NUMBER_OF_FIELDS) Integer numberOfFields) {
-        return emptyForm(numberOfFields);
-    }
-
-    @POST
-    @Path("new")
-    public Response crawl(@QueryParam("id") Option<String> id,
-                          @FormParam("action") String action,
-                          @FormParam("update") String update,
-                          @FormParam("from") URL from,
-                          RecordDefinition recordDefinition
-    ) throws Exception {
-        UUID key = id.map(asUUID()).getOrElse(UUID.randomUUID());
-        Model value = toModel(update, from, recordDefinition);
-        modelRepository.set(key, value);
-        if (action.equals("Save")) {
-            return redirectToList();
-        }
-        Sequence<Record> extractedValues = crawler.crawl(from, recordDefinition);
-        return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
-    }
-
-    private Model modelFor(String id) {
-        return modelRepository.get(UUID.fromString(id));
+    private Model modelFor(UUID id) {
+        return modelRepository.get(id);
     }
 
     private Callable1<? super Pair<UUID, Model>, Model> asModelWithId() {
@@ -211,10 +205,6 @@ public class CrawlerResource {
                         add("update", update).
                         add("from", from).
                         add("record", definition));
-    }
-
-    private Model toModel(String update, URL from, RecordDefinition recordDefinition) {
-        return form(update, from.toString(), recordDefinition.toModel());
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {

@@ -45,7 +45,7 @@ public class Crawler {
         Sequence<Record> result = xmlRecords.get(recordDefinition.recordName());
 
         return allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
-                fold(result, crawlSubFeeds());
+                fold(result, crawlSubFeeds()).realise();
 
     }
 

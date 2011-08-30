@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.AliasedKeyword;
@@ -16,6 +17,7 @@ import java.util.List;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -42,7 +44,8 @@ public class RecordDefinition {
 
 
     public static Sequence<Keyword> uniqueFields(RecordDefinition recordDefinition) {
-        return allFields(recordDefinition).filter(where(metadata(Keywords.UNIQUE), is(true)));
+        return allFields(recordDefinition).filter(where(metadata(Keywords.UNIQUE), is(notNullValue())).
+                and(where(metadata(Keywords.UNIQUE), is(true))));
     }
 
     public static Sequence<Keyword> allFields(RecordDefinition recordDefinition) {
@@ -67,11 +70,15 @@ public class RecordDefinition {
 
     public static Model toModel(final Keyword<Object> keyword, final Sequence<Keyword> fields) {
         return recordDefinition(keyword.name(),
-                fields.map(new Callable1<Keyword, Model>() {
-                    public Model call(Keyword keyword) throws Exception {
-                        return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword));
-                    }
-                }).toArray(Model.class));
+                fields.map(asKeywordDefinition()).toArray(Model.class));
+    }
+
+    private static Callable1<Keyword, Model> asKeywordDefinition() {
+        return new Callable1<Keyword, Model>() {
+            public Model call(Keyword keyword) throws Exception {
+                return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword));
+            }
+        };
     }
 
     public static Option<Model> recordDefinition(Keyword keyword) {
