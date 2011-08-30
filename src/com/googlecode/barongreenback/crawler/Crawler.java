@@ -29,8 +29,14 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 
 public class Crawler {
+
+    private final HttpHandler httpHandler;
+
+    public Crawler() {
+        httpHandler = new ClientHttpHandler();
+    }
+
     public XmlRecords load(URL url) throws Exception {
-        HttpHandler httpHandler = new ClientHttpHandler();
         Response response = httpHandler.handle(get(url.toString()).build());
         String xml = new String(response.bytes());
         return new XmlRecords(Xml.document(xml), new Mappings().add(Date.class, DateMapping.atomDateFormat()));

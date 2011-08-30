@@ -21,7 +21,7 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
     private final URL baseUrl;
 
     public StringTemplateGroupActivator(final Request request) {
-        baseUrl = append(packageUrl(WebApplication.class), packageName(request.url().path()));
+        baseUrl = append(packageUrl(WebApplication.class), packageName(HierarchicalPath.hierarchicalPath(request.uri().path())));
     }
 
     public StringTemplateGroupActivator(URL baseUrl) {
@@ -42,7 +42,7 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
     }
 
     private static String packageName(HierarchicalPath path) {
-        return path.segments().reverse().second();
+        return path.segments().init().last();
     }
 
 }

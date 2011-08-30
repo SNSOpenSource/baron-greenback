@@ -1,14 +1,13 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.crawler.CrawlerTest;
 import com.googlecode.barongreenback.WebApplication;
+import com.googlecode.barongreenback.crawler.CrawlerTest;
 import com.googlecode.barongreenback.views.View;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.ImmutableKeyword;
+import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.totallylazy.records.xml.Xml;
@@ -17,7 +16,6 @@ import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Server;
 import com.googlecode.utterlyidle.httpserver.RestServer;
-import com.googlecode.utterlyidle.io.Url;
 import com.googlecode.yadic.Container;
 import org.junit.Test;
 
@@ -30,7 +28,6 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 import static com.googlecode.utterlyidle.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 
 public class SearchResourceTest {
@@ -49,7 +46,7 @@ public class SearchResourceTest {
 
     public static Application addSomeData(final WebApplication application) throws Exception {
         Server server = CrawlerTest.startServer();
-        Url feed = CrawlerTest.createFeed(server);
+        Uri feed = CrawlerTest.createFeed(server);
         final Sequence<Record> recordSequence = CrawlerTest.crawl(feed).realise();
 
         application.usingRequestScope(new Callable1<Container, Void>() {

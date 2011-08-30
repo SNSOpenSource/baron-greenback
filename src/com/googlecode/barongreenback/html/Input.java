@@ -1,12 +1,8 @@
 package com.googlecode.barongreenback.html;
 
-import com.googlecode.totallylazy.Value;
-import com.googlecode.totallylazy.records.xml.Xml;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
-import static com.googlecode.totallylazy.records.xml.Xml.selectElement;
 import static com.googlecode.totallylazy.records.xml.Xml.selectNode;
 
 public class Input implements NameValue{

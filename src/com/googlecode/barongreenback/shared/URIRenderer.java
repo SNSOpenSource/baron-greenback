@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.funclate.Renderer;
-import com.googlecode.totallylazy.Callable1;
 
 import java.net.URI;
 

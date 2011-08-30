@@ -4,7 +4,6 @@ import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class Link implements NameValue{
     private final Element link;

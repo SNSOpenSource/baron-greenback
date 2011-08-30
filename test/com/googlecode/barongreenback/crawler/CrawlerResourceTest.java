@@ -1,8 +1,8 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.html.RedirectFollowingHandler;
 import com.googlecode.barongreenback.html.RelativeUrlHandler;
+import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 public class CrawlerResourceTest {
     @Test
     public void canSaveAndLoadACrawler() throws Exception {
-        CrawlerPage newPage = new CrawlerPage(new RedirectFollowingHandler(new RelativeUrlHandler(new WebApplication())));
+        CrawlerPage newPage = new CrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication())));
         newPage.update().value("news");
         newPage.from().value("http://feeds.bbci.co.uk/news/rss.xml");
         newPage.recordName().value("/rss/channel/item");

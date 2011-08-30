@@ -1,12 +1,12 @@
 package com.googlecode.barongreenback.html;
 
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Strings;
 import org.w3c.dom.Element;
 
-import static com.googlecode.totallylazy.Runnables.VOID;
-import static com.googlecode.totallylazy.records.xml.Xml.*;
+import static com.googlecode.totallylazy.records.xml.Xml.removeAttribute;
+import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
+import static com.googlecode.totallylazy.records.xml.Xml.selectElement;
+import static com.googlecode.totallylazy.records.xml.Xml.selectElements;
 
 public class Select implements NameValue {
     public static final String SELECTED = "selected";

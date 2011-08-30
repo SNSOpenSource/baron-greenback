@@ -4,18 +4,17 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.utterlyidle.Server;
-import com.googlecode.utterlyidle.io.Url;
 import org.junit.Test;
 
 import java.net.URI;
 import java.util.Date;
 
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
@@ -41,7 +40,7 @@ public class CrawlerTest {
     @Test
     public void shouldGetTheContentsOfAUrlAndExtractContent() throws Exception {
         Server server = startServer();
-        final Url feed = createFeed(server);
+        final Uri feed = createFeed(server);
         Sequence<Record> records = crawl(feed);
         Record entry = records.head();
 
@@ -51,7 +50,7 @@ public class CrawlerTest {
         server.close();
     }
 
-    public static Sequence<Record> crawl(Url feed) throws Exception {
+    public static Sequence<Record> crawl(Uri feed) throws Exception {
         return new Crawler().crawl(feed.toURL(), defintion());
     }
 
@@ -59,9 +58,8 @@ public class CrawlerTest {
         return new RecordDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE));
     }
 
-    public static Url createFeed(final Server server) {
-        Url base = server.getUrl();
-        return base.replacePath(base.path().subDirectory("static").file("atom.xml"));
+    public static Uri createFeed(final Server server) {
+        return server.uri().path("static/atom.xml");
     }
 
 
