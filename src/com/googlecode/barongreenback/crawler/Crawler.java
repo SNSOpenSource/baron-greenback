@@ -14,6 +14,7 @@ import com.googlecode.totallylazy.records.xml.mappings.Mappings;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
+import com.googlecode.utterlyidle.handlers.HttpClient;
 
 import java.net.URL;
 import java.util.Date;
@@ -29,15 +30,18 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 
 public class Crawler {
-
-    private final HttpHandler httpHandler;
+    private final HttpClient httpClient;
 
     public Crawler() {
-        httpHandler = new ClientHttpHandler();
+        httpClient = new ClientHttpHandler();
+    }
+
+    public Crawler(HttpClient httpClient) {
+        this.httpClient = httpClient;
     }
 
     public XmlRecords load(URL url) throws Exception {
-        Response response = httpHandler.handle(get(url.toString()).build());
+        Response response = httpClient.handle(get(url.toString()).build());
         String xml = new String(response.bytes());
         return new XmlRecords(Xml.document(xml), new Mappings().add(Date.class, DateMapping.atomDateFormat()));
     }

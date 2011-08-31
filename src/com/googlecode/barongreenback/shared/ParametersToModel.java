@@ -42,7 +42,7 @@ public class ParametersToModel {
         return parents.fold(startingModel, new Callable2<Model, String, Model>() {
             public Model call(Model model, String parent) throws Exception {
                 if (list.matches(parent)) {
-                    MatchResult match = list.findMatches(parent).head();
+                    MatchResult match = list.match(parent);
                     return getModel(model, match.group(1), Integer.valueOf(match.group(2)) - 1);
                 }
                 return getModel(model, parent, 0);

@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
@@ -151,7 +152,19 @@ public class RecordDefinition {
     }
 
     private static Sequence<Keyword> toKeywords(List<Model> keywords) {
-        return sequence(keywords).map(new Callable1<Model, Keyword>() {
+        return sequence(keywords).filter(nameNotEmpty()).map(asKeyword());
+    }
+
+    private static Predicate<? super Model> nameNotEmpty() {
+        return new Predicate<Model>() {
+            public boolean matches(Model model) {
+                return !model.get("name", String.class).isEmpty();
+            }
+        };
+    }
+
+    private static Callable1<Model, Keyword> asKeyword() {
+        return new Callable1<Model, Keyword>() {
             public Keyword call(Model model) throws Exception {
                 Keyword<?> keyword = keyword(model.get("name", String.class),
                         Class.forName(model.get("type", String.class)));
@@ -166,7 +179,7 @@ public class RecordDefinition {
                         set(Views.GROUP, model.get("group", String.class)).
                         set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
             }
-        });
+        };
     }
 
 
