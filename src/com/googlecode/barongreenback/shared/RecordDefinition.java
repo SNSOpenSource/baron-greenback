@@ -8,6 +8,8 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.totallylazy.records.AliasedKeyword;
 import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
@@ -16,11 +18,14 @@ import com.googlecode.totallylazy.records.Keywords;
 import java.util.List;
 
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.value;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.MapRecord.record;
@@ -152,15 +157,7 @@ public class RecordDefinition {
     }
 
     private static Sequence<Keyword> toKeywords(List<Model> keywords) {
-        return sequence(keywords).filter(nameNotEmpty()).map(asKeyword());
-    }
-
-    private static Predicate<? super Model> nameNotEmpty() {
-        return new Predicate<Model>() {
-            public boolean matches(Model model) {
-                return !model.get("name", String.class).isEmpty();
-            }
-        };
+        return sequence(keywords).filter(where(value("name", String.class), is(not(empty())))).map(asKeyword());
     }
 
     private static Callable1<Model, Keyword> asKeyword() {
