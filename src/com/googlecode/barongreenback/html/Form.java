@@ -19,9 +19,8 @@ public class Form {
     public Request submit(String submitXpath) {
         String action = Xml.selectContents(form, "@action");
         String method = Xml.selectContents(form, "@method");
-        Sequence<NameValue> inputs = nameValuePairs("//input[not(@type='submit')]|//select|" + submitXpath );
-        Sequence<NameValue> textAreas = nameValuePairs("//textarea");
-        return inputs.join(textAreas).fold(new RequestBuilder(method, action), addFormParams()).build();
+        Sequence<NameValue> inputs = nameValuePairs("//input[not(@type='submit')]|//textarea|//select|" + submitXpath );
+        return inputs.fold(new RequestBuilder(method, action), addFormParams()).build();
     }
 
     private Sequence<NameValue> nameValuePairs(String xpath) {
