@@ -1,21 +1,19 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.search.SearchResource;
+import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
@@ -24,10 +22,6 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.ID;
@@ -48,7 +42,6 @@ import static com.googlecode.utterlyidle.proxy.Resource.resource;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
-    public static final Integer NUMBER_OF_FIELDS = 3;
     private final Records records;
     private final ModelRepository modelRepository;
     private final Crawler crawler;
@@ -97,7 +90,7 @@ public class CrawlerResource {
     @GET
     @Path("new")
     public Model newForm() {
-        return emptyForm(NUMBER_OF_FIELDS);
+        return Forms.emptyForm(Forms.NUMBER_OF_FIELDS);
     }
 
     @POST
@@ -109,7 +102,7 @@ public class CrawlerResource {
     @GET
     @Path("edit")
     public Model edit(@QueryParam("id") UUID id) {
-        return addTemplates(modelFor(id));
+        return Forms.addTemplates(modelFor(id));
     }
 
     @POST
@@ -120,7 +113,7 @@ public class CrawlerResource {
         String update = form.get("update", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        modelRepository.set(id, form(update, from, recordDefinition.toModel()));
+        modelRepository.set(id, Forms.form(update, from, recordDefinition.toModel()));
         if (action.equals("Save")) {
             return redirectToList();
         }
@@ -165,46 +158,6 @@ public class CrawlerResource {
                 return UUID.fromString(value);
             }
         };
-    }
-
-    private Model emptyForm(Integer numberOfFields) {
-        return addTemplates(form("", "", emptyDefinition(numberOfFields(numberOfFields))));
-    }
-
-    private Model addTemplates(Model model) {
-        return model.add("emptyKeyword", emptyKeyword()).
-                add("types", types(String.class, Date.class, URI.class));
-    }
-
-    private List<Model> types(Class... classes) {
-        return Sequences.sequence(classes).map(new Callable1<Class, Model>() {
-            public Model call(Class aClass) throws Exception {
-                return model().
-                        add("name", aClass.getSimpleName()).
-                        add("value", aClass.getName()).
-                        add(aClass.getName(), true); // enable selected
-            }
-        }).toList();
-    }
-
-    private int numberOfFields(Integer numberOfFields) {
-        return Math.min(Math.max(numberOfFields, 1), 100);
-    }
-
-    private Model emptyDefinition(int number) {
-        return RecordDefinition.recordDefinition("", Sequences.repeat(emptyKeyword()).take(number).toArray(Model.class));
-    }
-
-    private Model emptyKeyword() {
-        return model().add("visible", true);
-    }
-
-    private Model form(String update, String from, Model definition) {
-        return model().
-                add("form", model().
-                        add("update", update).
-                        add("from", from).
-                        add("record", definition));
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {

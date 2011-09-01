@@ -13,6 +13,8 @@ import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 
+import java.util.UUID;
+
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -95,5 +97,9 @@ public class Views {
     public Views put(View view) {
         records.put(RECORDS_NAME, update(using(VIEW_NAME, FIELD_NAME), asRecords(view)));
         return this;
+    }
+
+    public void remove(String viewName) {
+        records.remove(RECORDS_NAME, where(VIEW_NAME, is(viewName)));
     }
 }
