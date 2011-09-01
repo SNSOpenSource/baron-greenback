@@ -13,7 +13,10 @@
             <h3><a href="/" class="home">Baron Greenback: $title$</a></h3>
             <ul class="nav secondary-nav">
                 <li class="menu">
-                    <a href="$base$crawler/list">Admin</a>
+                    <a href="$base$views/list">Views Admin</a>
+                </li>
+                <li class="menu">
+                    <a href="$base$crawler/list">Crawler Admin</a>
                 </li>
             </ul>
         </div>
