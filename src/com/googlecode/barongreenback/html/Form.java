@@ -20,7 +20,8 @@ public class Form {
         String action = Xml.selectContents(form, "@action");
         String method = Xml.selectContents(form, "@method");
         Sequence<NameValue> inputs = nameValuePairs("//input[not(@type='submit')]|//select|" + submitXpath );
-        return inputs.fold(new RequestBuilder(method, action), addFormParams()).build();
+        Sequence<NameValue> textAreas = nameValuePairs("//textarea");
+        return inputs.join(textAreas).fold(new RequestBuilder(method, action), addFormParams()).build();
     }
 
     private Sequence<NameValue> nameValuePairs(String xpath) {
@@ -40,6 +41,9 @@ public class Form {
                         return Sequences.<NameValue>sequence(checkbox);
                     }
                     return Sequences.empty();
+                }
+                if(type.equals("textarea")) {
+                    return Sequences.<NameValue>sequence(new TextArea(element));
                 }
                 return Sequences.<NameValue>sequence(new Input(element));
             }

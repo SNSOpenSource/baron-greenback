@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.html.RelativeUrlHandler;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
 import org.junit.Test;
 
@@ -35,5 +36,13 @@ public class CrawlerResourceTest {
         assertThat(edit.unique(1).checked(), is(true));
         assertThat(edit.visible(1).checked(), is(false));
         assertThat(edit.subfeed(1).checked(), is(false));
+    }
+
+    @Test
+    public void canImportCrawlerInJsonFormat() throws Exception {
+        ImportCrawlerPage importPage = new ImportCrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication())));
+        importPage.model().value(Strings.toString(getClass().getResourceAsStream("crawler.json")));
+        CrawlerListPage listPage = importPage.importModel();
+        assertThat(listPage.contains("news"), is(true));
     }
 }

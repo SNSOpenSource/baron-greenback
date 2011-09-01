@@ -32,6 +32,10 @@ public class Html {
         return new Input(selectElement(document, xpath));
     }
 
+    public TextArea textarea(String xpath) {
+        return new TextArea(selectElement(document, xpath));
+    }
+
     public Select select(String xpath) {
         return new Select(selectElement(document, xpath));
     }

@@ -26,4 +26,8 @@ public class RelativeUrlHandler implements HttpHandler {
         currentUri = request.uri();
         return httpHandler.handle(request);
     }
+
+    public Uri getCurrentUri() {
+        return currentUri;
+    }
 }

@@ -64,7 +64,7 @@ public class CrawlerTest {
 
 
     public static Server startServer() {
-        return application().content(packageUrl(CrawlerTest.class), "static").start(defaultConfiguration().port(10010));
+        return application().content(packageUrl(CrawlerTest.class), "/static").start(defaultConfiguration().port(10010));
     }
 
 }

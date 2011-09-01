@@ -34,7 +34,7 @@ public class ViewsResourceTest {
             }
         });
 
-        Response response = application(application).handle(get("views/menu"));
+        Response response = application(application).handle(get("/views/menu"));
         assertThat(response.status(), is(Status.OK));
 
         XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Crawlers</title>
+    <title>Import Crawler</title>
 </head>
 <body>
 
 
-<form class="import form-stacked" action="import" method="post">
+<form class="import form-stacked" action="import" method="POST">
     <fieldset>
         <legend>Import</legend>
         <div class="control">
@@ -16,7 +16,7 @@
         </div>
     </fieldset>
     <div class="actions">
-        <input type="submit" value="Import" class="import"/>
+        <input type="submit" name="action" value="Import" class="import"/>
     </div>
 </form>
 
