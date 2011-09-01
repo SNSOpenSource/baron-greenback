@@ -111,13 +111,14 @@ public class CrawlerResource {
         Model form = root.get("form", Model.class);
         String from = form.get("from", String.class);
         String update = form.get("update", String.class);
+        String more = form.get("more", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
         modelRepository.set(id, Forms.form(update, from, recordDefinition.toModel()));
         if (action.equals("Save")) {
             return redirectToList();
         }
-        Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition);
+        Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition, more);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
     }
 
@@ -128,9 +129,10 @@ public class CrawlerResource {
         Model form = model.get("form", Model.class);
         String from = form.get("from", String.class);
         String update = form.get("update", String.class);
+        String more = form.get("more", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition);
+        Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition, more);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
     }
 

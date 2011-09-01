@@ -5,16 +5,18 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.URLs;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.totallylazy.records.xml.XmlRecords;
 import com.googlecode.totallylazy.records.xml.mappings.DateMapping;
 import com.googlecode.totallylazy.records.xml.mappings.Mappings;
-import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
+import org.w3c.dom.Document;
 
 import java.net.URL;
 import java.util.Date;
@@ -40,14 +42,36 @@ public class Crawler {
         this.httpClient = httpClient;
     }
 
-    public XmlRecords load(URL url) throws Exception {
+    public XmlRecords records(Document document) throws Exception {
+        return new XmlRecords(document, new Mappings().add(Date.class, DateMapping.atomDateFormat()));
+    }
+
+    private Document document(URL url) throws Exception {
         Response response = httpClient.handle(get(url.toString()).build());
         String xml = new String(response.bytes());
-        return new XmlRecords(Xml.document(xml), new Mappings().add(Date.class, DateMapping.atomDateFormat()));
+        return Xml.document(xml);
+    }
+
+    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, String more) throws Exception {
+        Document document = document(url);
+        Sequence<Record> recordsSoFar = crawl(document, recordDefinition);
+        if (!Strings.isEmpty(more)) {
+            String next = Xml.selectContents(document, more);
+            if (!Strings.isEmpty(next)) {
+                URL nextUrl = URLs.url(next);
+                return recordsSoFar.join(crawl(nextUrl, recordDefinition, more));
+            }
+        }
+        return recordsSoFar;
     }
 
     public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition) throws Exception {
-        XmlRecords xmlRecords = load(url);
+        Document document = document(url);
+        return crawl(document, recordDefinition);
+    }
+
+    public Sequence<Record> crawl(Document document, RecordDefinition recordDefinition) throws Exception {
+        XmlRecords xmlRecords = records(document);
         Sequence<Keyword> allFields = recordDefinition.fields();
 
         xmlRecords.define(recordDefinition.recordName(), allFields.toArray(Keyword.class));
@@ -81,4 +105,5 @@ public class Crawler {
             }
         };
     }
+
 }
