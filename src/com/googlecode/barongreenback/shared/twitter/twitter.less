@@ -1,0 +1,114 @@
+@import "bootstrap.less";
+
+.large-input {
+    width: 270px;
+}
+
+.extra-large-input {
+    width: 530px;
+}
+
+.shadow (@shadow-color) {
+    @blur-radius: 3px;
+    @spread-radius: 1px;
+    -moz-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    -webkit-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+}
+
+h1, h2, h3, h4, h5, h6, .btn, a.update {
+    text-transform: capitalize;
+}
+
+input.crawl, input.search, a.new, input.import {
+    .btn;
+    .btn.primary;
+}
+
+input.save, input.more, a.export, input.delete, a.import, a.edit {
+    .btn;
+}
+
+input.delete {
+    .btn;
+    .btn.danger;
+}
+
+div.control {
+    display: inline-block;
+    margin: 5px;
+}
+
+th, ul.tabs li {
+    text-transform: capitalize;
+}
+
+div.container, .container {
+    margin: 0 0 0 40px;
+    width: auto;
+}
+
+.content {
+    margin: 50px 20px;
+}
+
+fieldset {
+    .shadow(lightgray);
+    margin: 5px;
+    padding: 5px;
+
+    legend {
+        background-color: white;
+        font-size: 110%;
+        font-weight: bold;
+        padding: 5px;
+        margin-bottom: 0;
+        color: @grayDark;
+        text-transform: capitalize;
+    }
+}
+
+div.recordDefinitionTemplate, li.keywordTemplate {
+    display:none;
+}
+
+form input.from, form input#query, form.import textarea.model {
+    .extra-large-input;
+}
+
+form.import textarea.model {
+    height: 300px;
+}
+
+form.view {
+    div.rootXPath, div.alias, div.subfeed {
+        display: none;
+    }
+}
+
+
+html body form.delete, html body.list form.crawl {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+body {
+    form {
+        input[type=text], input[type=password], textarea, select {
+            color: #333;
+        }
+    }
+}
+
+.actions {
+    padding-left: 20px;
+}
+
+.topbar {
+    a.home {
+        background: left no-repeat url(../small-logo.png);
+        padding-left: 40px;
+    }
+}
+
