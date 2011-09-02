@@ -7,6 +7,7 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
+import com.googlecode.utterlyidle.annotations.HttpMethod;
 import org.w3c.dom.Element;
 
 public class Form {
@@ -19,9 +20,10 @@ public class Form {
     public Request submit(String submitXpath) {
         String action = Xml.selectContents(form, "@action");
         String method = Xml.selectContents(form, "@method");
-        Sequence<NameValue> inputs = nameValuePairs("//input[not(@type='submit')]|//select|" + submitXpath );
-        Sequence<NameValue> textAreas = nameValuePairs("//textarea");
-        return inputs.join(textAreas).fold(new RequestBuilder(method, action), addFormParams()).build();
+        Sequence<NameValue> inputs = nameValuePairs("//input[not(@type='submit')]|//textarea|//select|" + submitXpath );
+        return inputs.fold(new RequestBuilder(method, action),
+                method.equalsIgnoreCase(HttpMethod.POST) ? addFormParams() : addQueryParams()).
+                build();
     }
 
     private Sequence<NameValue> nameValuePairs(String xpath) {
@@ -58,6 +60,14 @@ public class Form {
         return tagName;
     }
 
+    private Callable2<RequestBuilder, NameValue, RequestBuilder> addQueryParams() {
+        return new Callable2<RequestBuilder, NameValue, RequestBuilder>() {
+            public RequestBuilder call(RequestBuilder requestBuilder, NameValue nameValue) throws Exception {
+                return requestBuilder.withQuery(nameValue.name(), nameValue.value());
+            }
+        };
+    }
+
     private Callable2<RequestBuilder, NameValue, RequestBuilder> addFormParams() {
         return new Callable2<RequestBuilder, NameValue, RequestBuilder>() {
             public RequestBuilder call(RequestBuilder requestBuilder, NameValue nameValue) throws Exception {
@@ -65,5 +75,4 @@ public class Form {
             }
         };
     }
-
 }
