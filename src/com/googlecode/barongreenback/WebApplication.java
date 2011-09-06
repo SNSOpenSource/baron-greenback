@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.barongreenback.crawler.CrawlerModule;
+import com.googlecode.barongreenback.jobs.JobsModule;
 import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
 import com.googlecode.barongreenback.views.ViewsModule;
@@ -26,6 +27,7 @@ public class WebApplication extends RestApplication {
         add(new CrawlerModule());
         add(new SearchModule());
         add(new ViewsModule());
+        add(new JobsModule());
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
                 staticRule(contentType(TEXT_HTML), templateName("twitter"))));

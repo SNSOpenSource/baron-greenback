@@ -18,6 +18,7 @@ import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
+import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
@@ -134,6 +135,12 @@ public class CrawlerResource {
         RecordDefinition recordDefinition = convert(record);
         Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition, more);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
+    }
+
+    @POST
+    @Path("crawl/{id}")
+    public Response crawl2(@PathParam("id") UUID id) throws Exception {
+        return crawl(id);
     }
 
     private Model modelFor(UUID id) {
