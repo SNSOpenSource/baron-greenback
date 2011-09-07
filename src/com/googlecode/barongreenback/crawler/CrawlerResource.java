@@ -18,7 +18,6 @@ import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
@@ -30,7 +29,9 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Predicates.*;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -115,12 +116,8 @@ public class CrawlerResource {
         String more = form.get("more", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        modelRepository.set(id, Forms.form(update, from, recordDefinition.toModel()));
-        if (action.equals("Save")) {
-            return redirectToList();
-        }
-        Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition, more);
-        return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
+        modelRepository.set(id, Forms.form(update, from, more, recordDefinition.toModel()));
+        return redirectToList();
     }
 
     @POST
@@ -135,12 +132,6 @@ public class CrawlerResource {
         RecordDefinition recordDefinition = convert(record);
         Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition, more);
         return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
-    }
-
-    @POST
-    @Path("crawl/{id}")
-    public Response crawl2(@PathParam("id") UUID id) throws Exception {
-        return crawl(id);
     }
 
     private Model modelFor(UUID id) {

@@ -13,16 +13,17 @@ import static com.googlecode.funclate.Model.model;
 public class Forms {
     public static final Integer NUMBER_OF_FIELDS = 3;
 
-    public static Model form(String update, String from, Model definition) {
+    public static Model form(String update, String from, String more, Model definition) {
         return model().
                 add("form", model().
                         add("update", update).
                         add("from", from).
+                        add("more", more).
                         add("record", definition));
     }
 
     public static Model emptyForm(Integer numberOfFields) {
-        return addTemplates(form("", "", emptyDefinition(numberOfFields(numberOfFields))));
+        return addTemplates(form("", "", "", emptyDefinition(numberOfFields(numberOfFields))));
     }
 
     public static Model emptyKeyword() {

@@ -14,8 +14,8 @@
     $recordDefinition(title="Fields", prefix="form.record.", record=form.record)$
 
     <div class="actions">
-        <input type="submit" value="Crawl" name="action" class="crawl"/>
         <input type="submit" value="Save" name="action" class="save"/>
+        <a href="list" class="cancel">Cancel</a>
     </div>
 </form>
 

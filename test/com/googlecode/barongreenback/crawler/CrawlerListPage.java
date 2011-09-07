@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.html.Html;
+import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
@@ -30,7 +31,17 @@ public class CrawlerListPage {
     }
 
     public CrawlerPage edit(String value) throws Exception {
-        Request request = html.link("//a[contains(@class, 'update') and text() = '" + value + "']").click();
+        Request request = html.link(linkTo(value)).click();
         return new CrawlerPage(httpHandler, httpHandler.handle(request));
+    }
+
+    private String linkTo(String value) {
+        return "//a[contains(@class, 'update') and text() = '" + value + "']";
+    }
+
+    public ViewSearchPage crawl(String value) throws Exception {
+        Request request = html.form("//tr[" + linkTo(value) + "]//form[contains(@class, 'crawl')]").submit("//input[@type='submit' and @class='crawl']");
+        Response response = httpHandler.handle(request);
+        return new ViewSearchPage(httpHandler, response);
     }
 }

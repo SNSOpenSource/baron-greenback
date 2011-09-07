@@ -7,6 +7,7 @@ import com.googlecode.totallylazy.records.RecordMethods;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.totallylazy.records.Using;
 import com.googlecode.totallylazy.records.memory.MemoryRecords;
+import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
@@ -33,9 +34,11 @@ public class HttpScheduler {
     private final Map<Request, ScheduledFuture<?>> scheduledFutures = new HashMap<Request, ScheduledFuture<?>>();
 
     private final ScheduledExecutorService executorService;
+    private final Application application;
 
-    public HttpScheduler(ScheduledExecutorService executorService) {
+    public HttpScheduler(final ScheduledExecutorService executorService, final Application application) {
         this.executorService = executorService;
+        this.application = application;
         records.define(SCHEDULED_REQUESTS, REQUEST, INITIAL_DELAY, DELAY, TIME_UNIT);
     }
 
@@ -49,11 +52,11 @@ public class HttpScheduler {
         scheduledFutures.put(request, scheduledFuture);
     }
 
-    private Runnable httpTask(final Request request) {
+    public Runnable httpTask(final Request request) {
         return new Runnable() {
             public void run() {
                 try {
-                    new ClientHttpHandler().handle(request);
+                    application.handle(request);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

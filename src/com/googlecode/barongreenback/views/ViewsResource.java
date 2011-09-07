@@ -63,7 +63,7 @@ public class ViewsResource {
     @Path("edit")
     public Model editForm(@QueryParam("id") String name) {
         View view = views.get(name).get();
-        return addTemplates(Forms.form(name, "", toModel(Keywords.keyword(""), view.fields())));
+        return addTemplates(Forms.form(name, "", "", toModel(Keywords.keyword(""), view.fields())));
     }
 
     @POST

@@ -46,12 +46,6 @@ public class CrawlerPage {
         return new CrawlerListPage(httpHandler, response);
     }
 
-    public ViewSearchPage crawl() throws Exception {
-        Request request = html.form("//form[contains(@class, 'crawl')]").submit("//input[@type='submit' and @class='crawl']");
-        Response response = httpHandler.handle(request);
-        return new ViewSearchPage(httpHandler, response);
-    }
-
     public Input update() {
         return html.input(UPDATE);
     }

@@ -23,6 +23,7 @@ public class CrawlerResourceTest {
         CrawlerPage newPage = new CrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication())));
         newPage.update().value("news");
         newPage.from().value("http://feeds.bbci.co.uk/news/rss.xml");
+        newPage.more().value("//link[@rel='prev-archive']/@href");
         newPage.recordName().value("/rss/channel/item");
         newPage.keyword(1).value("title");
         newPage.alias(1).value("foo");
@@ -31,11 +32,12 @@ public class CrawlerResourceTest {
         newPage.unique(1).check();
         newPage.visible(1).uncheck();
         newPage.subfeed(1).uncheck();
-        CrawlerListPage list =  newPage.save();
+        CrawlerListPage list = newPage.save();
 
         CrawlerPage edit = list.edit("news");
         assertThat(edit.update().value(), is("news"));
         assertThat(edit.from().value(), is("http://feeds.bbci.co.uk/news/rss.xml"));
+        assertThat(edit.more().value(), is("//link[@rel='prev-archive']/@href"));
         assertThat(edit.recordName().value(), is("/rss/channel/item"));
         assertThat(edit.keyword(1).value(), is("title"));
         assertThat(edit.alias(1).value(), is("foo"));
@@ -53,7 +55,7 @@ public class CrawlerResourceTest {
         CrawlerListPage listPage = importPage.importModel();
         assertThat(listPage.contains("news"), is(true));
     }
-    
+
     @Test
     public void canCrawlFeedsWithPagination() throws Exception {
         setupServerWithDataFeed();
@@ -70,18 +72,19 @@ public class CrawlerResourceTest {
         newPage.unique(1).check();
         newPage.visible(1).check();
         newPage.subfeed(1).uncheck();
-        ViewSearchPage pageWithFeedData =  newPage.crawl();
+        CrawlerListPage list = newPage.save();
+        ViewSearchPage pageWithFeedData = list.crawl("news");
 
-        assertThat(pageWithFeedData.containsCell("Added user", "title"), is (true));
-        assertThat(pageWithFeedData.containsCell("Deleted user", "title"), is (true));
-        assertThat(pageWithFeedData.containsCell("Updated user", "title"), is (true));
+        assertThat(pageWithFeedData.containsCell("Added user", "title"), is(true));
+        assertThat(pageWithFeedData.containsCell("Deleted user", "title"), is(true));
+        assertThat(pageWithFeedData.containsCell("Updated user", "title"), is(true));
     }
 
     private void setupServerWithDataFeed() throws Exception {
         RestServer dataSourceServer = new RestServer(new Restaurant(), defaultConfiguration().port(9001));
         ClientHttpHandler restClient = new ClientHttpHandler();
-        restClient.handle(put(dataSourceServer.uri()+"data").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom.xml").getBytes()).build());
-        restClient.handle(put(dataSourceServer.uri()+"data/prev").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom-prev.xml").getBytes()).build());
+        restClient.handle(put(dataSourceServer.uri() + "data").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom.xml").getBytes()).build());
+        restClient.handle(put(dataSourceServer.uri() + "data/prev").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom-prev.xml").getBytes()).build());
     }
 
     private String fileContent(String name) {
