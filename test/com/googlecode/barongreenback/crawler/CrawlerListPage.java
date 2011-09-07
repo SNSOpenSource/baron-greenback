@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.html.Html;
+import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
@@ -39,9 +40,9 @@ public class CrawlerListPage {
         return "//a[contains(@class, 'update') and text() = '" + value + "']";
     }
 
-    public ViewSearchPage crawl(String value) throws Exception {
-        Request request = html.form("//tr[" + linkTo(value) + "]//form[contains(@class, 'crawl')]").submit("//input[@type='submit' and @class='crawl']");
+    public JobsListPage crawl(String value) throws Exception {
+        Request request = html.form("//tr[" + linkTo(value) + "]/descendant::form[contains(@class, 'crawl')]").submit("descendant::input[@type='submit' and @class='crawl']");
         Response response = httpHandler.handle(request);
-        return new ViewSearchPage(httpHandler, response);
+        return new JobsListPage(httpHandler, response);
     }
 }

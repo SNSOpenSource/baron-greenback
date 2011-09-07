@@ -20,7 +20,7 @@ public class Form {
     public Request submit(String submitXpath) {
         String action = Xml.selectContents(form, "@action");
         String method = Xml.selectContents(form, "@method");
-        Sequence<NameValue> inputs = nameValuePairs("//input[not(@type='submit')]|//textarea|//select|" + submitXpath );
+        Sequence<NameValue> inputs = nameValuePairs("descendant::input[not(@type='submit')]|descendant::textarea|descendant::select|" + submitXpath );
         return inputs.fold(new RequestBuilder(method, action),
                 method.equalsIgnoreCase(HttpMethod.POST) ? addFormParams() : addQueryParams()).
                 build();

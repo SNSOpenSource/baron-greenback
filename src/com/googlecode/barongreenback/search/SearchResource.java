@@ -54,7 +54,7 @@ public class SearchResource {
 
     @GET
     @Path("list")
-    public Model find(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
+    public Model list(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
         Sequence<Keyword> headers = headers(view);
         Sequence<Record> results = records.query(parse(prefix(view, query), headers), headers);
         return model().

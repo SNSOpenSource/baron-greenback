@@ -163,6 +163,6 @@ public class CrawlerResource {
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
         views.put(view(recordName).withFields(keywords(recordsToAdd)));
         records.put(recordName, update(using(unique), recordsToAdd));
-        return redirect(resource(SearchResource.class).find(recordName.name(), EMPTY));
+        return redirect(resource(SearchResource.class).list(recordName.name(), EMPTY));
     }
 }

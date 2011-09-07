@@ -32,7 +32,7 @@ public class ImportCrawlerPage {
     }
 
     public CrawlerListPage importModel() throws Exception {
-        Request request = html.form("//form[contains(@class, 'import')]").submit("//input[@type='submit' and @class='import']");
+        Request request = html.form("//form[contains(@class, 'import')]").submit("descendant::input[@type='submit' and @class='import']");
         Response response = httpHandler.handle(request);
         return new CrawlerListPage(httpHandler, response);
     }

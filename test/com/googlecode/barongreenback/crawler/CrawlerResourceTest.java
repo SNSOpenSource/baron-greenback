@@ -2,8 +2,10 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.html.RelativeUrlHandler;
+import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
 import com.googlecode.utterlyidle.httpserver.RestServer;
@@ -60,7 +62,8 @@ public class CrawlerResourceTest {
     public void canCrawlFeedsWithPagination() throws Exception {
         setupServerWithDataFeed();
 
-        CrawlerPage newPage = new CrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication())));
+        HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication()));
+        CrawlerPage newPage = new CrawlerPage(handler);
         newPage.update().value("news");
         newPage.from().value("http://localhost:9001/data");
         newPage.more().value("//link[@rel='prev-archive']/@href");
@@ -73,11 +76,15 @@ public class CrawlerResourceTest {
         newPage.visible(1).check();
         newPage.subfeed(1).uncheck();
         CrawlerListPage list = newPage.save();
-        ViewSearchPage pageWithFeedData = list.crawl("news");
+        list.crawl("news");
 
-        assertThat(pageWithFeedData.containsCell("Added user", "title"), is(true));
-        assertThat(pageWithFeedData.containsCell("Deleted user", "title"), is(true));
-        assertThat(pageWithFeedData.containsCell("Updated user", "title"), is(true));
+        Thread.sleep(100);
+
+        ViewSearchPage viewSearchPage = new ViewSearchPage(handler, "news", "");
+
+        assertThat(viewSearchPage.containsCell("Added user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Deleted user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Updated user", "title"), is(true));
     }
 
     private void setupServerWithDataFeed() throws Exception {

@@ -41,7 +41,7 @@ public class CrawlerPage {
     }
 
     public CrawlerListPage save() throws Exception {
-        Request request = html.form("//form[contains(@class, 'crawl')]").submit("//input[@type='submit' and @class='save']");
+        Request request = html.form("//form[contains(@class, 'crawl')]").submit("descendant::input[@type='submit' and @class='save']");
         Response response = httpHandler.handle(request);
         return new CrawlerListPage(httpHandler, response);
     }

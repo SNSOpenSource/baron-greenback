@@ -96,7 +96,7 @@ public class ViewsResource {
                 return model().
                         add("current", keyword.name().equalsIgnoreCase(current)).
                         add("name", keyword.name()).
-                        add("url", urlOf(resource(SearchResource.class).find(keyword.name(), "")));
+                        add("url", urlOf(resource(SearchResource.class).list(keyword.name(), "")));
             }
         };
     }

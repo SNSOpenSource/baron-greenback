@@ -33,6 +33,8 @@ import static com.googlecode.barongreenback.jobs.HttpScheduler.TIME_UNIT;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.utterlyidle.AbsoluteLocationHandler.toAbsoluteUri;
+import static com.googlecode.utterlyidle.proxy.Resource.redirect;
+import static com.googlecode.utterlyidle.proxy.Resource.resource;
 
 @Path("jobs")
 public class JobsResource {
@@ -54,7 +56,11 @@ public class JobsResource {
 
         scheduler.schedule(scheduledRequest, record().set(INITIAL_DELAY, 0L).set(DELAY, interval).set(TIME_UNIT, TimeUnit.SECONDS));
 
-        return Responses.response(Status.OK).entity("scheduled");
+        return redirectToList();
+    }
+
+    private Response redirectToList() {
+        return redirect(resource(getClass()).list());
     }
 
     @GET
