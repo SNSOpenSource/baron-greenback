@@ -97,8 +97,8 @@ public class CrawlerResource {
 
     @POST
     @Path("new")
-    public Response newCrawler(@FormParam("action") String action, Model model) throws Exception {
-        return edit(UUID.randomUUID(), action, model);
+    public Response newCrawler(Model model) throws Exception {
+        return edit(UUID.randomUUID(), model);
     }
 
     @GET
@@ -109,14 +109,15 @@ public class CrawlerResource {
 
     @POST
     @Path("edit")
-    public Response edit(@QueryParam("id") UUID id, @FormParam("action") String action, final Model root) throws Exception {
+    public Response edit(@QueryParam("id") UUID id, final Model root) throws Exception {
         Model form = root.get("form", Model.class);
         String from = form.get("from", String.class);
         String update = form.get("update", String.class);
         String more = form.get("more", String.class);
+        String checkpoint = form.get("checkpoint", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        modelRepository.set(id, Forms.form(update, from, more, recordDefinition.toModel()));
+        modelRepository.set(id, Forms.form(update, from, more, checkpoint, recordDefinition.toModel()));
         return redirectToList();
     }
 
@@ -128,10 +129,12 @@ public class CrawlerResource {
         String from = form.get("from", String.class);
         String update = form.get("update", String.class);
         String more = form.get("more", String.class);
+        String checkpoint = form.get("checkpoint", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        Sequence<Record> extractedValues = crawler.crawl(url(from), recordDefinition, more);
-        return put(keyword(update), uniqueFields(recordDefinition), extractedValues);
+        Pair<String, Sequence<Record>> newCheckpointAndRecords = crawler.crawlAndReturnNewCheckpoint(url(from), recordDefinition, more, checkpoint);
+        modelRepository.set(id, Forms.form(update, from, more, newCheckpointAndRecords.first(), recordDefinition.toModel()));
+        return put(keyword(update), uniqueFields(recordDefinition), newCheckpointAndRecords.second());
     }
 
     private Model modelFor(UUID id) {

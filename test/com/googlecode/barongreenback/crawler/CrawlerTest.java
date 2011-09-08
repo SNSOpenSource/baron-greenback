@@ -51,7 +51,7 @@ public class CrawlerTest {
     }
 
     public static Sequence<Record> crawl(Uri feed) throws Exception {
-        return new Crawler().crawl(feed.toURL(), defintion());
+        return new Crawler().crawl(feed.toURL(), defintion(), "", "");
     }
 
     private static RecordDefinition defintion() {

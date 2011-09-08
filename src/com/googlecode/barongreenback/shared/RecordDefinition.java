@@ -32,6 +32,7 @@ import static com.googlecode.totallylazy.records.MapRecord.record;
 
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
+    public static final ImmutableKeyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
     private final Keyword<Object> recordName;
     private final Sequence<Keyword> fields;
 
@@ -82,7 +83,7 @@ public class RecordDefinition {
     private static Callable1<Keyword, Model> asKeywordDefinition() {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {
-                return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword));
+                return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword), checkpoint(keyword));
             }
         };
     }
@@ -97,6 +98,10 @@ public class RecordDefinition {
 
     private static boolean visible(Keyword keyword) {
         return booleanValueOf(keyword, Views.VISIBLE);
+    }
+
+    private static boolean checkpoint(Keyword keyword) {
+        return booleanValueOf(keyword, CHECKPOINT);
     }
 
     private static boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
@@ -137,7 +142,7 @@ public class RecordDefinition {
         return model().add("name", recordName).add("keywords", Sequences.sequence(fields).toList());
     }
 
-    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, Option<Model> recordDefinition) {
+    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, Option<Model> recordDefinition, boolean checkpoint) {
         return model().
                 add("name", name).
                 add("alias", alias).
@@ -146,7 +151,8 @@ public class RecordDefinition {
                 add("unique", unique).
                 add("visible", visible).
                 add("subfeed", !recordDefinition.isEmpty()).
-                add("record", recordDefinition.getOrNull());
+                add("record", recordDefinition.getOrNull()).
+                add("checkpoint", checkpoint);
     }
 
     public static RecordDefinition convert(Model model) {
@@ -174,6 +180,7 @@ public class RecordDefinition {
                         set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
                         set(Views.VISIBLE, model.get("visible", Boolean.class)).
                         set(Views.GROUP, model.get("group", String.class)).
+                        set(CHECKPOINT, model.get("checkpoint", Boolean.class)).
                         set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
             }
         };

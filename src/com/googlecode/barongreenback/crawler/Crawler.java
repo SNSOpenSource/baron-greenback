@@ -3,6 +3,9 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
@@ -22,9 +25,11 @@ import java.util.Date;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.URLs.url;
+import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.RecordMethods.merge;
 import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
@@ -52,13 +57,33 @@ public class Crawler {
         return Xml.document(xml);
     }
 
-    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, String moreSelector) throws Exception {
+    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, String moreSelector, String checkpoint) throws Exception {
         Document document = document(url);
-        Sequence<Record> recordsSoFar = crawl(document, recordDefinition);
+        Sequence<Record> recordsSoFar = crawl(document, recordDefinition, checkpoint);
+
         if (moreResults(moreSelector, document)) {
-            return recordsSoFar.join(crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector));
+            return recordsSoFar.join(crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector, checkpoint));
         }
+       
         return recordsSoFar;
+    }
+
+    public Pair<String, Sequence<Record>> crawlAndReturnNewCheckpoint(URL url, RecordDefinition recordDefinition, String moreSelector, String checkpoint) throws Exception {
+        Document document = document(url);
+        Sequence<Record> recordsSoFar = crawl(document, recordDefinition, checkpoint);
+
+        String newCheckpoint = evaluateNewCheckpoint(recordsSoFar, checkpoint);
+
+        if (moreResults(moreSelector, document)) {
+            return Pair.pair(newCheckpoint, recordsSoFar.join(crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector, checkpoint)));
+        }
+
+        return Pair.pair(newCheckpoint, recordsSoFar);
+    }
+
+    private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, String oldCheckpoint) {
+        if(recordsSoFar.isEmpty()) return oldCheckpoint;
+        return recordsSoFar.first().get(keyword("title", String.class));
     }
 
     private String moreLink(String moreSelector, Document document) {
@@ -69,22 +94,48 @@ public class Crawler {
         return !Strings.isEmpty(more) && !Strings.isEmpty(moreLink(more, document));
     }
 
-    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition) throws Exception {
+    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, String checkpoint) throws Exception {
         Document document = document(url);
-        return crawl(document, recordDefinition);
+        return crawl(document, recordDefinition, checkpoint);
     }
 
-    public Sequence<Record> crawl(Document document, RecordDefinition recordDefinition) throws Exception {
+    public Sequence<Record> crawl(Document document, RecordDefinition recordDefinition, String checkpoint) throws Exception {
         XmlRecords xmlRecords = records(document);
         Sequence<Keyword> allFields = recordDefinition.fields();
 
         xmlRecords.define(recordDefinition.recordName(), allFields.toArray(Keyword.class));
 
-        Sequence<Record> result = xmlRecords.get(recordDefinition.recordName());
+        Sequence<Record> results = xmlRecords.get(recordDefinition.recordName());
+        Sequence<Record> resultsAfterCheckpoint  = results.takeWhile(not(checkpointReached(checkpoint)));
 
         return allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
-                fold(result, crawlSubFeeds()).realise();
+                fold(resultsAfterCheckpoint, crawlSubFeeds()).realise();
 
+    }
+
+    private Predicate<? super Record> checkpointReached(final String checkpointValue) {
+        return new Predicate<Record>() {
+            public boolean matches(Record record) {
+                Sequence<Keyword> checkpoints = record.keywords().filter(checkpoint());
+                return checkpoints.exists(checkpointValue(record, checkpointValue));
+            }
+        };
+    }
+
+    private Predicate<? super Keyword> checkpointValue(final Record record, final String checkpoint) {
+        return new Predicate<Keyword>() {
+            public boolean matches(Keyword keyword) {
+                return record.get(keyword).equals(checkpoint);
+            }
+        };
+    }
+
+    private Predicate<? super Keyword> checkpoint() {
+        return new Predicate<Keyword>() {
+            public boolean matches(Keyword keyword) {
+                return keyword.metadata().get(RecordDefinition.CHECKPOINT) != null;
+            }
+        };
     }
 
     private Callable2<Sequence<Record>, Keyword, Sequence<Record>> crawlSubFeeds() {
@@ -101,7 +152,7 @@ public class Crawler {
                 try {
                     URL subFeed = url(currentRecord.get(sourceUrl).toString());
                     RecordDefinition subDefinitions = sourceUrl.metadata().get(RECORD_DEFINITION);
-                    return crawl(subFeed, subDefinitions).
+                    return crawl(subFeed, subDefinitions, "").
                             map(merge(currentRecord));
                 } catch (Exception e) {
                     return Sequences.sequence(currentRecord);
