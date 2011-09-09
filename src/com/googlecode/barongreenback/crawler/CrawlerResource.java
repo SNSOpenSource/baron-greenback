@@ -164,7 +164,9 @@ public class CrawlerResource {
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
-        views.put(view(recordName).withFields(keywords(recordsToAdd)));
+        Sequence<Keyword> keywords = keywords(recordsToAdd);
+        views.put(view(recordName).withFields(keywords));
+        records.define(recordName, keywords.toArray(Keyword.class));
         records.put(recordName, update(using(unique), recordsToAdd));
         return redirect(resource(SearchResource.class).list(recordName.name(), EMPTY));
     }

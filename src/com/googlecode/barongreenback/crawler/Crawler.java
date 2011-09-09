@@ -52,7 +52,7 @@ public class Crawler {
     }
 
     public XmlRecords records(Document document) throws Exception {
-        return new XmlRecords(document, new Mappings().add(Date.class, DateMapping.atomDateFormat()));
+        return new XmlRecords(document);
     }
 
     private Document document(URL url) throws Exception {
