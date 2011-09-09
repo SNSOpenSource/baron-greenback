@@ -29,6 +29,7 @@ import static com.googlecode.totallylazy.records.MapRecord.record;
 
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
+    public static final Keyword<Boolean> SUBFEED = keyword("subfeed", Boolean.class);
     private final Keyword<Object> recordName;
     private final Sequence<Keyword> fields;
 
@@ -79,7 +80,7 @@ public class RecordDefinition {
     private static Callable1<Keyword, Model> asKeywordDefinition() {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {
-                return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword), visible(keyword), recordDefinition(keyword), checkpoint(keyword));
+                return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword), visible(keyword), subfeed(keyword), recordDefinition(keyword), checkpoint(keyword));
             }
         };
     }
@@ -94,6 +95,10 @@ public class RecordDefinition {
 
     private static boolean visible(Keyword keyword) {
         return booleanValueOf(keyword, Views.VISIBLE);
+    }
+
+    private static boolean subfeed(Keyword keyword) {
+        return booleanValueOf(keyword, RecordDefinition.SUBFEED);
     }
 
     private static boolean checkpoint(Keyword keyword) {
@@ -138,7 +143,7 @@ public class RecordDefinition {
         return model().add("name", recordName).add("keywords", Sequences.sequence(fields).toList());
     }
 
-    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, Option<Model> recordDefinition, boolean checkpoint) {
+    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, boolean subfeed, Option<Model> recordDefinition, boolean checkpoint) {
         return model().
                 add("name", name).
                 add("alias", alias).
@@ -146,8 +151,8 @@ public class RecordDefinition {
                 add("type", type).
                 add("unique", unique).
                 add("visible", visible).
-                add("subfeed", !recordDefinition.isEmpty()).
-                add("record", recordDefinition.getOrNull()).
+                add("subfeed", subfeed).
+                add("record", subfeed ? recordDefinition.getOrNull() : null).
                 add("checkpoint", checkpoint);
     }
 
@@ -177,6 +182,7 @@ public class RecordDefinition {
                         set(Views.VISIBLE, model.get("visible", Boolean.class)).
                         set(Views.GROUP, model.get("group", String.class)).
                         set(Crawler.CHECKPOINT, model.get("checkpoint", Boolean.class)).
+                        set(RecordDefinition.SUBFEED, model.get("subfeed", Boolean.class)).
                         set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
             }
         };
