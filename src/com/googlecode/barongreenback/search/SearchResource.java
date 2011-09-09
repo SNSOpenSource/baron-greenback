@@ -55,12 +55,13 @@ public class SearchResource {
     @GET
     @Path("list")
     public Model list(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
-        Sequence<Keyword> headers = headers(view);
-        Sequence<Record> results = records.query(parse(prefix(view, query), headers), headers);
+        Sequence<Keyword> allHeaders = headers(view);
+        Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
+        Sequence<Record> results = records.query(parse(prefix(view, query), visibleHeaders), allHeaders);
         return model().
                 add("view", view).
                 add("query", query).
-                add("headers", headers(headers, results)).
+                add("headers", headers(visibleHeaders, results)).
                 add("results", results.map(RecordMethods.asMap()).toList());
     }
 
@@ -100,7 +101,11 @@ public class SearchResource {
         if(headers.isEmpty()){
             return toModel(keywords(results));
         }
-        return toModel(headers.filter(where(metadata(Views.VISIBLE), is(notNullValue(Boolean.class).and(is(true))))));
+        return toModel(headers);
+    }
+
+    private Sequence<Keyword> visibleHeaders(Sequence<Keyword> headers) {
+        return headers.filter(where(metadata(Views.VISIBLE), is(notNullValue(Boolean.class).and(is(true)))));
     }
 
     private List<Map<String, Object>> toModel(Sequence<Keyword> keywords) {

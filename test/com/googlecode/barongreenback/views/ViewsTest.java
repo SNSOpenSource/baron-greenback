@@ -37,8 +37,8 @@ public class ViewsTest {
 
                 Sequence<Record> actual = records.get(Views.RECORDS_NAME).realise();
                 assertThat(actual, hasExactly(
-                        record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "id").set(Views.FIELD_TYPE, Integer.class.getName()).set(Keywords.UNIQUE, true).set(Views.VISIBLE, true),
-                        record().set(Views.VIEW_NAME, "users").set(Views.FIELD_NAME, "name").set(Views.FIELD_TYPE, String.class.getName())));
+                        record().set(Views.VIEW_NAME, "users").set(Views.FIELD_ORDER, 0).set(Views.FIELD_NAME, "id").set(Views.FIELD_TYPE, Integer.class.getName()).set(Keywords.UNIQUE, true).set(Views.VISIBLE, true),
+                        record().set(Views.VIEW_NAME, "users").set(Views.FIELD_ORDER, 1).set(Views.FIELD_NAME, "name").set(Views.FIELD_TYPE, String.class.getName())));
 
                 View result = views.get().head();
                 assertThat(result, is(view));

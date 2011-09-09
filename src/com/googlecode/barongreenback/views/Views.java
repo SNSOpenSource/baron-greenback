@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.comparators.Comparators.ascending;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
@@ -26,6 +27,7 @@ public class Views {
     private final Records records;
     public static final Keyword RECORDS_NAME = Keywords.keyword("views");
     public static final Keyword<String> VIEW_NAME = Keywords.keyword("name", String.class);
+    public static final Keyword<Integer> FIELD_ORDER = Keywords.keyword("fieldOrder", Integer.class);
     public static final Keyword<String> FIELD_NAME = Keywords.keyword("fieldName", String.class);
     public static final Keyword<String> FIELD_TYPE = Keywords.keyword("fieldType", String.class);
     public static final Keyword<Boolean> VISIBLE = Keywords.keyword("visible", Boolean.class);
@@ -33,17 +35,19 @@ public class Views {
 
     public Views(Records records) {
         this.records = records;
-        records.define(RECORDS_NAME, VIEW_NAME, FIELD_NAME, FIELD_TYPE, Keywords.UNIQUE, VISIBLE);
+        records.define(RECORDS_NAME, VIEW_NAME, FIELD_ORDER, FIELD_NAME, FIELD_TYPE, Keywords.UNIQUE, VISIBLE);
     }
 
     private Sequence<Record> asRecords(View view) {
-        return view.fields().map(asRecord(view.name()));
+        return view.fields().zipWithIndex().map(asRecord(view.name()));
     }
 
-    private Callable1<? super Keyword, Record> asRecord(final Keyword view) {
-        return new Callable1<Keyword, Record>() {
-            public Record call(Keyword keyword) throws Exception {
+    private Callable1<? super Pair<Number, Keyword>, Record> asRecord(final Keyword view) {
+        return new Callable1<Pair<Number, Keyword>, Record>() {
+            public Record call(Pair<Number, Keyword> pair) throws Exception {
+                Keyword keyword = pair.second();
                 return record().set(VIEW_NAME, view.name()).
+                        set(FIELD_ORDER, pair.first().intValue()).
                         set(FIELD_NAME, keyword.name()).
                         set(FIELD_TYPE, keyword.forClass().getName()).
                         set(Keywords.UNIQUE, keyword.metadata().get(Keywords.UNIQUE)).
@@ -62,6 +66,7 @@ public class Views {
     public Sequence<View> get(final Predicate<? super Record> predicate) {
         return records.get(RECORDS_NAME).
                 filter(predicate).
+                sortBy(FIELD_ORDER).
                 groupBy(VIEW_NAME).
                 map(asView());
     }
