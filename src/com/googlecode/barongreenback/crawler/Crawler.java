@@ -3,13 +3,15 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
+import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.totallylazy.records.xml.XmlRecords;
@@ -34,9 +36,11 @@ import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.RecordMethods.merge;
 import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
+import static java.lang.Boolean.TRUE;
 
 
 public class Crawler {
+    public static final ImmutableKeyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
     private final HttpClient httpClient;
 
     public Crawler() {
@@ -83,7 +87,9 @@ public class Crawler {
 
     private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, String oldCheckpoint) {
         if(recordsSoFar.isEmpty()) return oldCheckpoint;
-        return recordsSoFar.first().get(keyword("title", String.class));
+        Option<Keyword> checkpoint = recordsSoFar.first().keywords().find(checkpoint());
+        if(checkpoint.isEmpty()) return oldCheckpoint;
+        return recordsSoFar.first().get(checkpoint.get()).toString();
     }
 
     private String moreLink(String moreSelector, Document document) {
@@ -133,7 +139,7 @@ public class Crawler {
     private Predicate<? super Keyword> checkpoint() {
         return new Predicate<Keyword>() {
             public boolean matches(Keyword keyword) {
-                return keyword.metadata().get(RecordDefinition.CHECKPOINT) != null;
+                return TRUE.equals(keyword.metadata().get(CHECKPOINT));
             }
         };
     }

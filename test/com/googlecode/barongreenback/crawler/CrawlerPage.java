@@ -4,7 +4,6 @@ import com.googlecode.barongreenback.html.Checkbox;
 import com.googlecode.barongreenback.html.Html;
 import com.googlecode.barongreenback.html.Input;
 import com.googlecode.barongreenback.html.Select;
-import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
@@ -19,6 +18,7 @@ public class CrawlerPage {
     public static final String UPDATE = "//input[@name='form.update']";
     public static final String FROM = "//input[@name='form.from']";
     public static final String MORE = "//input[@name='form.more']";
+    public static final String CHECKPOINT_VALUE = "//input[@name='form.checkpoint']";
     public static final String RECORD_NAME = "//input[@id='form.record.name']";
     public static final String KEYWORD_NAME = "//input[@id='form.record.keywords[%s].name']";
     public static final String ALIAS = "//input[@id='form.record.keywords[%s].alias']";
@@ -27,6 +27,7 @@ public class CrawlerPage {
     public static final String UNIQUE = "//input[@id='form.record.keywords[%s].unique']";
     public static final String VISIBLE = "//input[@id='form.record.keywords[%s].visible']";
     public static final String SUBFEED = "//input[@id='form.record.keywords[%s].subfeed']";
+    public static final String CHECKPOINT = "//input[@id='form.record.keywords[%s].checkpoint']";
     private final HttpHandler httpHandler;
     private final Html html;
 
@@ -56,6 +57,10 @@ public class CrawlerPage {
 
     public Input more() {
         return html.input(MORE);
+    }
+
+    public Input checkpoint() {
+        return html.input(CHECKPOINT_VALUE);
     }
 
     public Input recordName() {
@@ -88,5 +93,9 @@ public class CrawlerPage {
 
     public Checkbox subfeed(int index) {
         return html.checkbox(String.format(SUBFEED, index));
+    }
+
+    public Checkbox checkpoint(int index) {
+        return html.checkbox(String.format(CHECKPOINT, index));
     }
 }

@@ -12,6 +12,8 @@ import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Restaurant;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
 import static com.googlecode.utterlyidle.MediaType.TEXT_XML;
 import static com.googlecode.utterlyidle.RequestBuilder.put;
@@ -59,7 +61,7 @@ public class CrawlerResourceTest {
     }
 
     @Test
-    public void canCrawlFeedsWithPagination() throws Exception {
+    public void canCrawlFeedsWithPaginationAndCheckpoint() throws Exception {
         setupServerWithDataFeed();
 
         HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication()));
@@ -67,6 +69,7 @@ public class CrawlerResourceTest {
         newPage.update().value("news");
         newPage.from().value("http://localhost:9001/data");
         newPage.more().value("//link[@rel='prev-archive']/@href");
+        newPage.checkpoint().value("2011-07-19T12:43:20Z");
         newPage.recordName().value("/feed/entry");
         newPage.keyword(1).value("title");
         newPage.alias(1).value("");
@@ -75,6 +78,16 @@ public class CrawlerResourceTest {
         newPage.unique(1).check();
         newPage.visible(1).check();
         newPage.subfeed(1).uncheck();
+        newPage.subfeed(1).uncheck();
+        newPage.checkpoint(1).uncheck();
+        newPage.keyword(2).value("updated");
+        newPage.alias(2).value("");
+        newPage.group(2).value("");
+        newPage.type(2).value(String.class.getName());
+        newPage.unique(2).uncheck();
+        newPage.visible(2).uncheck();
+        newPage.subfeed(2).uncheck();
+        newPage.checkpoint(2).check();
         CrawlerListPage list = newPage.save();
         list.crawl("news");
 
@@ -85,6 +98,7 @@ public class CrawlerResourceTest {
         assertThat(viewSearchPage.containsCell("Added user", "title"), is(true));
         assertThat(viewSearchPage.containsCell("Deleted user", "title"), is(true));
         assertThat(viewSearchPage.containsCell("Updated user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Created user", "title"), is(false));
     }
 
     private void setupServerWithDataFeed() throws Exception {

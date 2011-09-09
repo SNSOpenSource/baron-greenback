@@ -1,15 +1,12 @@
 package com.googlecode.barongreenback.shared;
 
+import com.googlecode.barongreenback.crawler.Crawler;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.totallylazy.records.AliasedKeyword;
 import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
@@ -32,7 +29,6 @@ import static com.googlecode.totallylazy.records.MapRecord.record;
 
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
-    public static final ImmutableKeyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
     private final Keyword<Object> recordName;
     private final Sequence<Keyword> fields;
 
@@ -101,7 +97,7 @@ public class RecordDefinition {
     }
 
     private static boolean checkpoint(Keyword keyword) {
-        return booleanValueOf(keyword, CHECKPOINT);
+        return booleanValueOf(keyword, Crawler.CHECKPOINT);
     }
 
     private static boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
@@ -180,7 +176,7 @@ public class RecordDefinition {
                         set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
                         set(Views.VISIBLE, model.get("visible", Boolean.class)).
                         set(Views.GROUP, model.get("group", String.class)).
-                        set(CHECKPOINT, model.get("checkpoint", Boolean.class)).
+                        set(Crawler.CHECKPOINT, model.get("checkpoint", Boolean.class)).
                         set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
             }
         };
