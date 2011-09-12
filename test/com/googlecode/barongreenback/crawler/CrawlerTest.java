@@ -4,13 +4,17 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
+import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.Server;
+import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.net.URI;
 import java.util.Date;
@@ -18,6 +22,7 @@ import java.util.Date;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
+import static com.googlecode.totallylazy.records.xml.Xml.document;
 import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,7 +38,7 @@ public class CrawlerTest {
     private static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
     private static final Keyword<URI> LINK = keyword("link/@href", URI.class).
             metadata(MapRecord.record().set(RecordDefinition.RECORD_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
-    private static final Keyword<Date> UPDATED = keyword("updated", Date.class);
+    private static final Keyword<Date> UPDATED = keyword("updated", Date.class).metadata(record().set(Crawler.CHECKPOINT, true));
     private static final Keyword<String> TITLE = keyword("title", String.class);
 
 
@@ -50,6 +55,13 @@ public class CrawlerTest {
         server.close();
     }
 
+    @Test
+    public void shouldNotGoPastTheCheckpoint() throws Exception {
+        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), "Tue Jul 19 13:43:25 BST 2011");
+
+        assertThat(records.size(), Matchers.<Number>is(1));
+    }
+
     public static Sequence<Record> crawl(Uri feed) throws Exception {
         return new Crawler().crawl(feed.toURL(), defintion(), "", "");
     }
@@ -62,6 +74,9 @@ public class CrawlerTest {
         return server.uri().path("static/atom.xml");
     }
 
+    private String fileContent(String name) {
+        return Strings.toString(getClass().getResourceAsStream(name));
+    }
 
     public static Server startServer() {
         return application().content(packageUrl(CrawlerTest.class), "/static").start(defaultConfiguration().port(10010));

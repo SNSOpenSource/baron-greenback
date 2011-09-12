@@ -133,6 +133,7 @@ public class CrawlerResource {
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
         Pair<String, Sequence<Record>> newCheckpointAndRecords = crawler.crawlAndReturnNewCheckpoint(url(from), recordDefinition, more, checkpoint);
+        System.out.println(String.format("Crawled %d new items", newCheckpointAndRecords.second().size()));
         modelRepository.set(id, Forms.form(update, from, more, newCheckpointAndRecords.first(), recordDefinition.toModel()));
         return put(keyword(update), uniqueFields(recordDefinition), newCheckpointAndRecords.second());
     }
@@ -153,14 +154,6 @@ public class CrawlerResource {
 
     private Response redirectToList() {
         return redirect(resource(getClass()).list());
-    }
-
-    private Callable1<? super String, UUID> asUUID() {
-        return new Callable1<String, UUID>() {
-            public UUID call(String value) throws Exception {
-                return UUID.fromString(value);
-            }
-        };
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {

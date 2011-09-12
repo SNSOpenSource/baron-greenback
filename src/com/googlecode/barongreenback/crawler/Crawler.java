@@ -40,7 +40,8 @@ import static java.lang.Boolean.TRUE;
 
 
 public class Crawler {
-    public static final ImmutableKeyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
+    public static final Keyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
+    public static final Keyword<String> CHECKPOINT_VALUE = Keywords.keyword("checkpointValue", String.class);
     private final HttpClient httpClient;
 
     public Crawler() {
@@ -131,7 +132,7 @@ public class Crawler {
     private Predicate<? super Keyword> checkpointValue(final Record record, final String checkpoint) {
         return new Predicate<Keyword>() {
             public boolean matches(Keyword keyword) {
-                return record.get(keyword).equals(checkpoint);
+                return record.get(keyword).toString().equals(checkpoint);
             }
         };
     }
