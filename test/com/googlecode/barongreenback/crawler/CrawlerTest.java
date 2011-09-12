@@ -57,13 +57,13 @@ public class CrawlerTest {
 
     @Test
     public void shouldNotGoPastTheCheckpoint() throws Exception {
-        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), "Tue Jul 19 13:43:25 BST 2011");
+        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword("Tue Jul 19 13:43:25 BST 2011", String.class));
 
         assertThat(records.size(), Matchers.<Number>is(1));
     }
 
     public static Sequence<Record> crawl(Uri feed) throws Exception {
-        return new Crawler().crawl(feed.toURL(), defintion(), "", "");
+        return new Crawler().crawl(feed.toURL(), defintion(), keyword("", String.class), keyword("", String.class));
     }
 
     private static RecordDefinition defintion() {

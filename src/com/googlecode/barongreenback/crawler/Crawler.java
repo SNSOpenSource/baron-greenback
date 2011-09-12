@@ -62,7 +62,7 @@ public class Crawler {
         return Xml.document(xml);
     }
 
-    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, String moreSelector, String checkpoint) throws Exception {
+    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<String> checkpoint) throws Exception {
         Document document = document(url);
         Sequence<Record> recordsSoFar = crawl(document, recordDefinition, checkpoint);
 
@@ -73,7 +73,7 @@ public class Crawler {
         return recordsSoFar;
     }
 
-    public Pair<String, Sequence<Record>> crawlAndReturnNewCheckpoint(URL url, RecordDefinition recordDefinition, String moreSelector, String checkpoint) throws Exception {
+    public Pair<String, Sequence<Record>> crawlAndReturnNewCheckpoint(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<String> checkpoint) throws Exception {
         Document document = document(url);
         Sequence<Record> recordsSoFar = crawl(document, recordDefinition, checkpoint);
 
@@ -86,27 +86,27 @@ public class Crawler {
         return Pair.pair(newCheckpoint, recordsSoFar);
     }
 
-    private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, String oldCheckpoint) {
-        if(recordsSoFar.isEmpty()) return oldCheckpoint;
+    private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Keyword<String> oldCheckpoint) {
+        if(recordsSoFar.isEmpty()) return oldCheckpoint.name();
         Option<Keyword> checkpoint = recordsSoFar.first().keywords().find(checkpoint());
-        if(checkpoint.isEmpty()) return oldCheckpoint;
+        if(checkpoint.isEmpty()) return oldCheckpoint.name();
         return recordsSoFar.first().get(checkpoint.get()).toString();
     }
 
-    private String moreLink(String moreSelector, Document document) {
-        return selectContents(document, moreSelector);
+    private String moreLink(Keyword<String> moreSelector, Document document) {
+        return selectContents(document, moreSelector.name());
     }
 
-    private boolean moreResults(String more, Document document) {
-        return !Strings.isEmpty(more) && !Strings.isEmpty(moreLink(more, document));
+    private boolean moreResults(Keyword<String> more, Document document) {
+        return !Strings.isEmpty(more.name()) && !Strings.isEmpty(moreLink(more, document));
     }
 
-    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, String checkpoint) throws Exception {
+    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
         Document document = document(url);
         return crawl(document, recordDefinition, checkpoint);
     }
 
-    public Sequence<Record> crawl(Document document, RecordDefinition recordDefinition, String checkpoint) throws Exception {
+    public Sequence<Record> crawl(Document document, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
         XmlRecords xmlRecords = records(document);
         Sequence<Keyword> allFields = recordDefinition.fields();
 
@@ -120,7 +120,7 @@ public class Crawler {
 
     }
 
-    private Predicate<? super Record> checkpointReached(final String checkpointValue) {
+    private Predicate<? super Record> checkpointReached(final Keyword<String> checkpointValue) {
         return new Predicate<Record>() {
             public boolean matches(Record record) {
                 Sequence<Keyword> checkpoints = record.keywords().filter(checkpoint());
@@ -129,10 +129,10 @@ public class Crawler {
         };
     }
 
-    private Predicate<? super Keyword> checkpointValue(final Record record, final String checkpoint) {
+    private Predicate<? super Keyword> checkpointValue(final Record record, final Keyword<String> checkpoint) {
         return new Predicate<Keyword>() {
             public boolean matches(Keyword keyword) {
-                return record.get(keyword).toString().equals(checkpoint);
+                return record.get(keyword).toString().equals(checkpoint.name());
             }
         };
     }
@@ -159,7 +159,7 @@ public class Crawler {
                 try {
                     URL subFeed = url(currentRecord.get(sourceUrl).toString());
                     RecordDefinition subDefinitions = sourceUrl.metadata().get(RECORD_DEFINITION);
-                    return crawl(subFeed, subDefinitions, "").
+                    return crawl(subFeed, subDefinitions, keyword("", String.class)).
                             map(merge(currentRecord));
                 } catch (Exception e) {
                     return Sequences.sequence(currentRecord);
