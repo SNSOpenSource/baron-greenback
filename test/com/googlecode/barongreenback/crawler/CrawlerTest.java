@@ -10,11 +10,9 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.utterlyidle.Server;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.net.URI;
 import java.util.Date;
@@ -57,13 +55,13 @@ public class CrawlerTest {
 
     @Test
     public void shouldNotGoPastTheCheckpoint() throws Exception {
-        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword("Tue Jul 19 13:43:25 BST 2011", String.class));
+        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword("Tue Jul 19 13:43:25 BST 2011", String.class)).first();
 
         assertThat(records.size(), Matchers.<Number>is(1));
     }
 
     public static Sequence<Record> crawl(Uri feed) throws Exception {
-        return new Crawler().crawl(feed.toURL(), defintion(), keyword("", String.class), keyword("", String.class));
+        return new Crawler().crawl(feed.toURL(), defintion(), keyword("", String.class), keyword("", String.class)).second();
     }
 
     private static RecordDefinition defintion() {

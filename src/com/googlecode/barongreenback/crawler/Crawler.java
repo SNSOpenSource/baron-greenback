@@ -9,21 +9,17 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.totallylazy.records.xml.XmlRecords;
-import com.googlecode.totallylazy.records.xml.mappings.DateMapping;
-import com.googlecode.totallylazy.records.xml.mappings.Mappings;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.w3c.dom.Document;
 
 import java.net.URL;
-import java.util.Date;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -41,7 +37,6 @@ import static java.lang.Boolean.TRUE;
 
 public class Crawler {
     public static final Keyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
-    public static final Keyword<String> CHECKPOINT_VALUE = Keywords.keyword("checkpointValue", String.class);
     private final HttpClient httpClient;
 
     public Crawler() {
@@ -62,28 +57,20 @@ public class Crawler {
         return Xml.document(xml);
     }
 
-    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<String> checkpoint) throws Exception {
+    public Pair<? extends Keyword<String>, Sequence<Record>> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<String> checkpoint) throws Exception {
         Document document = document(url);
-        Sequence<Record> recordsSoFar = crawl(document, recordDefinition, checkpoint);
+        Pair<Sequence<Record>, Boolean> newRecordsOnCurrentPageAndMoreIndicator = crawl(document, recordDefinition, checkpoint);
+        Sequence<Record> newRecordsOnCurrentPage = newRecordsOnCurrentPageAndMoreIndicator.first();
+        Boolean moreIndicator = newRecordsOnCurrentPageAndMoreIndicator.second();
 
-        if (moreResults(moreSelector, document)) {
-            return recordsSoFar.join(crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector, checkpoint));
-        }
-       
-        return recordsSoFar;
-    }
+        String newCheckpoint = evaluateNewCheckpoint(newRecordsOnCurrentPage, checkpoint);
 
-    public Pair<String, Sequence<Record>> crawlAndReturnNewCheckpoint(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<String> checkpoint) throws Exception {
-        Document document = document(url);
-        Sequence<Record> recordsSoFar = crawl(document, recordDefinition, checkpoint);
-
-        String newCheckpoint = evaluateNewCheckpoint(recordsSoFar, checkpoint);
-
-        if (moreResults(moreSelector, document)) {
-            return Pair.pair(newCheckpoint, recordsSoFar.join(crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector, checkpoint)));
+        if (moreIndicator && moreResultsLink(moreSelector, document)) {
+            Sequence<Record> newRecordsOnPreviousPages = crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector, checkpoint).second();
+            return Pair.pair(keyword(newCheckpoint, String.class), newRecordsOnCurrentPage.join(newRecordsOnPreviousPages));
         }
 
-        return Pair.pair(newCheckpoint, recordsSoFar);
+        return Pair.pair(keyword(newCheckpoint, String.class), newRecordsOnCurrentPage);
     }
 
     private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Keyword<String> oldCheckpoint) {
@@ -97,16 +84,16 @@ public class Crawler {
         return selectContents(document, moreSelector.name());
     }
 
-    private boolean moreResults(Keyword<String> more, Document document) {
+    private boolean moreResultsLink(Keyword<String> more, Document document) {
         return !Strings.isEmpty(more.name()) && !Strings.isEmpty(moreLink(more, document));
     }
 
-    public Sequence<Record> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
+    public Pair<Sequence<Record>, Boolean> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
         Document document = document(url);
         return crawl(document, recordDefinition, checkpoint);
     }
 
-    public Sequence<Record> crawl(Document document, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
+    public Pair<Sequence<Record>, Boolean> crawl(Document document, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
         XmlRecords xmlRecords = records(document);
         Sequence<Keyword> allFields = recordDefinition.fields();
 
@@ -115,8 +102,10 @@ public class Crawler {
         Sequence<Record> results = xmlRecords.get(recordDefinition.recordName());
         Sequence<Record> resultsAfterCheckpoint  = results.takeWhile(not(checkpointReached(checkpoint)));
 
-        return allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
+        Sequence<Record> records = allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
                 fold(resultsAfterCheckpoint, crawlSubFeeds()).realise();
+        boolean hasMore = results.equals(resultsAfterCheckpoint);
+        return Pair.pair(records, hasMore);
 
     }
 
@@ -159,7 +148,7 @@ public class Crawler {
                 try {
                     URL subFeed = url(currentRecord.get(sourceUrl).toString());
                     RecordDefinition subDefinitions = sourceUrl.metadata().get(RECORD_DEFINITION);
-                    return crawl(subFeed, subDefinitions, keyword("", String.class)).
+                    return crawl(subFeed, subDefinitions, keyword("", String.class)).first().
                             map(merge(currentRecord));
                 } catch (Exception e) {
                     return Sequences.sequence(currentRecord);
