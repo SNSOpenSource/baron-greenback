@@ -20,8 +20,10 @@ import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.w3c.dom.Document;
 
 import java.net.URL;
+import java.util.Date;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
+import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
@@ -75,17 +77,26 @@ public class Crawler {
         xmlRecords.define(recordDefinition.recordName(), allFields.toArray(Keyword.class));
 
         Sequence<Record> results = xmlRecords.get(recordDefinition.recordName());
-        Sequence<Record> resultsAfterCheckpoint  = results.takeWhile(not(checkpointReached(checkpoint)));
+        Sequence<Record> sortedResults = sortResults(allFields, results);
+        Sequence<Record> sortedResultsAfterCheckpoint = sortedResults.takeWhile(not(checkpointReached(checkpoint)));
 
         Sequence<Record> records = allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
-                fold(resultsAfterCheckpoint, crawlSubFeeds()).realise();
-        boolean hasMore = results.equals(resultsAfterCheckpoint);
+                fold(sortedResultsAfterCheckpoint, crawlSubFeeds()).realise();
+        boolean hasMore = results.equals(sortedResultsAfterCheckpoint);
         return Pair.pair(records, hasMore);
 
     }
 
     public XmlRecords records(Document document) throws Exception {
         return new XmlRecords(document);
+    }
+
+    private Sequence<Record> sortResults(Sequence<Keyword> headers, Sequence<Record> values) {
+        Option<Keyword> checkpointKeyword = headers.find(checkpoint());
+        if (!checkpointKeyword.isEmpty() && checkpointKeyword.get().forClass().equals(Date.class)) {
+            return values.sortBy(descending(checkpointKeyword.get()));
+        }
+        return values;
     }
 
     private Document document(URL url) throws Exception {
@@ -95,9 +106,9 @@ public class Crawler {
     }
 
     private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Keyword<String> oldCheckpoint) {
-        if(recordsSoFar.isEmpty()) return oldCheckpoint.name();
+        if (recordsSoFar.isEmpty()) return oldCheckpoint.name();
         Option<Keyword> checkpoint = recordsSoFar.first().keywords().find(checkpoint());
-        if(checkpoint.isEmpty()) return oldCheckpoint.name();
+        if (checkpoint.isEmpty()) return oldCheckpoint.name();
         return recordsSoFar.first().get(checkpoint.get()).toString();
     }
 
