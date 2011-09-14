@@ -47,16 +47,6 @@ public class Crawler {
         this.httpClient = httpClient;
     }
 
-    public XmlRecords records(Document document) throws Exception {
-        return new XmlRecords(document);
-    }
-
-    private Document document(URL url) throws Exception {
-        Response response = httpClient.handle(get(url.toString()).build());
-        String xml = new String(response.bytes());
-        return Xml.document(xml);
-    }
-
     public Pair<? extends Keyword<String>, Sequence<Record>> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<String> checkpoint) throws Exception {
         Document document = document(url);
         Pair<Sequence<Record>, Boolean> newRecordsOnCurrentPageAndMoreIndicator = crawl(document, recordDefinition, checkpoint);
@@ -71,21 +61,6 @@ public class Crawler {
         }
 
         return Pair.pair(keyword(newCheckpoint, String.class), newRecordsOnCurrentPage);
-    }
-
-    private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Keyword<String> oldCheckpoint) {
-        if(recordsSoFar.isEmpty()) return oldCheckpoint.name();
-        Option<Keyword> checkpoint = recordsSoFar.first().keywords().find(checkpoint());
-        if(checkpoint.isEmpty()) return oldCheckpoint.name();
-        return recordsSoFar.first().get(checkpoint.get()).toString();
-    }
-
-    private String moreLink(Keyword<String> moreSelector, Document document) {
-        return selectContents(document, moreSelector.name());
-    }
-
-    private boolean moreResultsLink(Keyword<String> more, Document document) {
-        return !Strings.isEmpty(more.name()) && !Strings.isEmpty(moreLink(more, document));
     }
 
     public Pair<Sequence<Record>, Boolean> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
@@ -107,6 +82,31 @@ public class Crawler {
         boolean hasMore = results.equals(resultsAfterCheckpoint);
         return Pair.pair(records, hasMore);
 
+    }
+
+    public XmlRecords records(Document document) throws Exception {
+        return new XmlRecords(document);
+    }
+
+    private Document document(URL url) throws Exception {
+        Response response = httpClient.handle(get(url.toString()).build());
+        String xml = new String(response.bytes());
+        return Xml.document(xml);
+    }
+
+    private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Keyword<String> oldCheckpoint) {
+        if(recordsSoFar.isEmpty()) return oldCheckpoint.name();
+        Option<Keyword> checkpoint = recordsSoFar.first().keywords().find(checkpoint());
+        if(checkpoint.isEmpty()) return oldCheckpoint.name();
+        return recordsSoFar.first().get(checkpoint.get()).toString();
+    }
+
+    private String moreLink(Keyword<String> moreSelector, Document document) {
+        return selectContents(document, moreSelector.name());
+    }
+
+    private boolean moreResultsLink(Keyword<String> more, Document document) {
+        return !Strings.isEmpty(more.name()) && !Strings.isEmpty(moreLink(more, document));
     }
 
     private Predicate<? super Record> checkpointReached(final Keyword<String> checkpointValue) {

@@ -23,6 +23,7 @@ import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
@@ -128,7 +129,7 @@ public class SearchResource {
         if (view.isEmpty()) {
             return query;
         }
-        return String.format("+%s:%s %s", Lucene.RECORD_KEY, view, query);
+        return String.format("+%s:\"%s\" %s", Lucene.RECORD_KEY, view, query);
     }
 
     private Query parse(String query, Sequence<Keyword> keywords) throws ParseException {

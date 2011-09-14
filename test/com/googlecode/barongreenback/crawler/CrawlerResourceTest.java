@@ -66,7 +66,7 @@ public class CrawlerResourceTest {
 
         HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication()));
         CrawlerPage newPage = new CrawlerPage(handler);
-        newPage.update().value("news");
+        newPage.update().value("news feed");
         newPage.from().value("http://localhost:9001/data");
         newPage.more().value("//link[@rel='prev-archive']/@href");
         newPage.checkpoint().value("2011-07-19T12:43:20Z");
@@ -89,11 +89,11 @@ public class CrawlerResourceTest {
         newPage.subfeed(2).uncheck();
         newPage.checkpoint(2).check();
         CrawlerListPage list = newPage.save();
-        list.crawl("news");
+        list.crawl("news feed");
 
         Thread.sleep(100);
 
-        ViewSearchPage viewSearchPage = new ViewSearchPage(handler, "news", "");
+        ViewSearchPage viewSearchPage = new ViewSearchPage(handler, "news feed", "");
 
         assertThat(viewSearchPage.containsCell("Added user", "title"), is(true));
         assertThat(viewSearchPage.containsCell("Deleted user", "title"), is(true));

@@ -7,6 +7,7 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Escaper;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
@@ -163,4 +164,5 @@ public class CrawlerResource {
         records.put(recordName, update(using(unique), recordsToAdd));
         return redirect(resource(SearchResource.class).list(recordName.name(), EMPTY));
     }
+
 }
