@@ -11,17 +11,13 @@
         $th(class="blue", header="method")$
         $th(class="green", header="uri")$
         $th(class="orange", header="interval")$
+        $th(class="purple", header="action")$
     </tr>
     </thead>
     <tbody>
     $jobs:item(item=it)$
     </tbody>
 </table>
-
-<!--<div class="actions">-->
-    <!--<a href="new" class="new">New</a>-->
-    <!--<a href="import" class="import">Import</a>-->
-<!--</div>-->
 
 </body>
 </html>
