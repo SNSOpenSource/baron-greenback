@@ -36,7 +36,7 @@ public class CrawlerTest {
     private static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
     private static final Keyword<URI> LINK = keyword("link/@href", URI.class).
             metadata(MapRecord.record().set(RecordDefinition.RECORD_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
-    private static final Keyword<Date> UPDATED = keyword("updated", Date.class).metadata(record().set(Crawler.CHECKPOINT, true));
+    private static final Keyword<String> UPDATED = keyword("updated", String.class).metadata(record().set(Crawler.CHECKPOINT, true));
     private static final Keyword<String> TITLE = keyword("title", String.class);
 
 
@@ -55,7 +55,7 @@ public class CrawlerTest {
 
     @Test
     public void shouldNotGoPastTheCheckpoint() throws Exception {
-        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword("Tue Jul 19 13:43:25 BST 2011", String.class)).first();
+        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword("2011-07-19T12:43:25Z", String.class)).first();
 
         assertThat(records.size(), Matchers.<Number>is(1));
     }
