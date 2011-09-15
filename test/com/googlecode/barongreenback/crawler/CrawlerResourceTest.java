@@ -69,7 +69,7 @@ public class CrawlerResourceTest {
         newPage.update().value("news feed");
         newPage.from().value("http://localhost:9001/data");
         newPage.more().value("//link[@rel='prev-archive']/@href");
-        newPage.checkpoint().value("Tue Jul 19 13:43:20 BST 2011"); // java.util.Date toString()
+        newPage.checkpoint().value("2011-07-19T12:43:20Z");
         newPage.recordName().value("/feed/entry");
         newPage.keyword(1).value("title");
         newPage.alias(1).value("");
@@ -83,7 +83,7 @@ public class CrawlerResourceTest {
         newPage.keyword(2).value("updated");
         newPage.alias(2).value("");
         newPage.group(2).value("");
-        newPage.type(2).value(Date.class.getName());
+        newPage.type(2).value(String.class.getName());
         newPage.unique(2).uncheck();
         newPage.visible(2).uncheck();
         newPage.subfeed(2).uncheck();
