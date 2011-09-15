@@ -55,14 +55,16 @@ public class CrawlerTest {
 
     @Test
     public void shouldNotGoPastTheCheckpoint_checkpointValueMatchesExactly() throws Exception {
-        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword("2011-07-19T12:43:25Z", Date.class)).first();
-
-        assertThat(records.size(), Matchers.<Number>is(1));
+        shouldNotGoPastTheCheckpoint("2011-07-19T12:43:25Z");
     }
 
     @Test
     public void shouldNotGoPastTheCheckpoint_checkpointValueDoesntMatchExactly() throws Exception {
-        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword("2011-07-19T12:43:26Z", Date.class)).first();
+        shouldNotGoPastTheCheckpoint("2011-07-19T12:43:26Z");
+    }
+
+    private void shouldNotGoPastTheCheckpoint(String date) throws Exception {
+        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword(date, Date.class)).first();
 
         assertThat(records.size(), Matchers.<Number>is(1));
     }
