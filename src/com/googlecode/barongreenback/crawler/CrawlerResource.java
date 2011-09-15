@@ -23,6 +23,7 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
 
+import java.util.Date;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.ID;
@@ -133,7 +134,7 @@ public class CrawlerResource {
         String checkpoint = form.get("checkpoint", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        Pair<? extends Keyword<String>, Sequence<Record>> newCheckpointAndRecords = crawler.crawl(url(from), recordDefinition, keyword(more, String.class), keyword(checkpoint, String.class));
+        Pair<? extends Keyword<Date>, Sequence<Record>> newCheckpointAndRecords = crawler.crawl(url(from), recordDefinition, keyword(more, String.class), keyword(checkpoint, recordDefinition.checkpointFieldType()));
         System.out.println(String.format("Crawled %d new items", newCheckpointAndRecords.second().size()));
         modelRepository.set(id, Forms.form(update, from, more, newCheckpointAndRecords.first().name(), recordDefinition.toModel()));
         return put(keyword(update), uniqueFields(recordDefinition), newCheckpointAndRecords.second());

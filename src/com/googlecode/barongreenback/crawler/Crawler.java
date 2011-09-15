@@ -3,6 +3,8 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.DateFormatConverter;
+import com.googlecode.totallylazy.Dates;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
@@ -28,6 +30,7 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
@@ -49,7 +52,7 @@ public class Crawler {
         this.httpClient = httpClient;
     }
 
-    public Pair<? extends Keyword<String>, Sequence<Record>> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<String> checkpoint) throws Exception {
+    public Pair<? extends Keyword<Date>, Sequence<Record>> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<Date> checkpoint) throws Exception {
         Document document = document(url);
         Pair<Sequence<Record>, Boolean> newRecordsOnCurrentPageAndMoreIndicator = crawl(document, recordDefinition, checkpoint);
         Sequence<Record> newRecordsOnCurrentPage = newRecordsOnCurrentPageAndMoreIndicator.first();
@@ -59,18 +62,18 @@ public class Crawler {
 
         if (moreIndicator && moreResultsLink(moreSelector, document)) {
             Sequence<Record> newRecordsOnPreviousPages = crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector, checkpoint).second();
-            return Pair.pair(keyword(newCheckpoint, String.class), newRecordsOnCurrentPage.join(newRecordsOnPreviousPages));
+            return Pair.pair(keyword(newCheckpoint, Date.class), newRecordsOnCurrentPage.join(newRecordsOnPreviousPages));
         }
 
-        return Pair.pair(keyword(newCheckpoint, String.class), newRecordsOnCurrentPage);
+        return Pair.pair(keyword(newCheckpoint, Date.class), newRecordsOnCurrentPage);
     }
 
-    public Pair<Sequence<Record>, Boolean> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
+    public Pair<Sequence<Record>, Boolean> crawl(URL url, RecordDefinition recordDefinition, Keyword<Date> checkpoint) throws Exception {
         Document document = document(url);
         return crawl(document, recordDefinition, checkpoint);
     }
 
-    public Pair<Sequence<Record>, Boolean> crawl(Document document, RecordDefinition recordDefinition, Keyword<String> checkpoint) throws Exception {
+    public Pair<Sequence<Record>, Boolean> crawl(Document document, RecordDefinition recordDefinition, Keyword<Date> checkpoint) throws Exception {
         XmlRecords xmlRecords = records(document);
         Sequence<Keyword> allFields = recordDefinition.fields();
 
@@ -105,7 +108,7 @@ public class Crawler {
         return Xml.document(xml);
     }
 
-    private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Keyword<String> oldCheckpoint) {
+    private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Keyword<Date> oldCheckpoint) {
         if (recordsSoFar.isEmpty()) return oldCheckpoint.name();
         Option<Keyword> checkpoint = recordsSoFar.first().keywords().find(checkpoint());
         if (checkpoint.isEmpty()) return oldCheckpoint.name();
@@ -120,27 +123,25 @@ public class Crawler {
         return !Strings.isEmpty(more.name()) && !Strings.isEmpty(moreLink(more, document));
     }
 
-    private Predicate<? super Record> checkpointReached(final Keyword<String> checkpointValue) {
+    private Predicate<? super Record> checkpointReached(final Keyword checkpointValue) {
         return new Predicate<Record>() {
             public boolean matches(Record record) {
-                Sequence<Keyword> checkpoints = record.keywords().filter(checkpoint());
-                return checkpoints.exists(checkpointValue(record, checkpointValue));
+                Option<Keyword> checkpoint = record.keywords().filter(checkpoint()).headOption();
+                if(!checkpoint.isEmpty() && !checkpointValue.name().isEmpty()) {
+                    DateFormatConverter converter = new DateFormatConverter(Dates.RFC3339(), Dates.RFC822(), Dates.javaToString());
+                    Date recordDate = (Date) record.get(checkpoint.get());
+                    Date checkpointDate = converter.toDate(checkpointValue.name());
+                    return recordDate.equals(checkpointDate) || recordDate.before(checkpointDate);
+                }
+                return false;
             }
         };
     }
 
-    private Predicate<? super Keyword> checkpointValue(final Record record, final Keyword<String> checkpoint) {
+    public static Predicate<? super Keyword> checkpoint() {
         return new Predicate<Keyword>() {
             public boolean matches(Keyword keyword) {
-                return record.get(keyword).toString().equals(checkpoint.name());
-            }
-        };
-    }
-
-    private Predicate<? super Keyword> checkpoint() {
-        return new Predicate<Keyword>() {
-            public boolean matches(Keyword keyword) {
-                return TRUE.equals(keyword.metadata().get(CHECKPOINT));
+                return keyword.forClass().equals(Date.class) && TRUE.equals(keyword.metadata().get(CHECKPOINT));
             }
         };
     }
@@ -159,7 +160,7 @@ public class Crawler {
                 try {
                     URL subFeed = url(currentRecord.get(sourceUrl).toString());
                     RecordDefinition subDefinitions = sourceUrl.metadata().get(RECORD_DEFINITION);
-                    return crawl(subFeed, subDefinitions, keyword("", String.class)).first().
+                    return crawl(subFeed, subDefinitions, keyword("", Date.class)).first().
                             map(merge(currentRecord));
                 } catch (Exception e) {
                     return Sequences.sequence(currentRecord);

@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.AliasedKeyword;
@@ -46,7 +47,6 @@ public class RecordDefinition {
         return fields;
     }
 
-
     public static Sequence<Keyword> uniqueFields(RecordDefinition recordDefinition) {
         return allFields(recordDefinition).filter(where(metadata(Keywords.UNIQUE), is(notNullValue())).
                 and(where(metadata(Keywords.UNIQUE), is(true))));
@@ -66,6 +66,10 @@ public class RecordDefinition {
                 return sequence(keyword);
             }
         };
+    }
+
+    public Class checkpointFieldType() {
+        return fields.find(Crawler.checkpoint()).getOrElse(keyword("type", Object.class)).forClass();
     }
 
     public Model toModel() {
