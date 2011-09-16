@@ -7,7 +7,8 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Escaper;
+import com.googlecode.totallylazy.DateFormatConverter;
+import com.googlecode.totallylazy.Dates;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
@@ -26,6 +27,9 @@ import org.apache.lucene.queryParser.ParseException;
 import java.util.Date;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.Crawler.CHECKPOINT_VALUE;
+import static com.googlecode.barongreenback.crawler.Crawler.MORE;
+import static com.googlecode.barongreenback.crawler.Crawler.URL;
 import static com.googlecode.barongreenback.shared.ModelRepository.ID;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
@@ -38,6 +42,7 @@ import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
+import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
@@ -134,10 +139,19 @@ public class CrawlerResource {
         String checkpoint = form.get("checkpoint", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        Pair<? extends Keyword<Date>, Sequence<Record>> newCheckpointAndRecords = crawler.crawl(url(from), recordDefinition, keyword(more, String.class), keyword(checkpoint, recordDefinition.checkpointFieldType()));
+        Pair<Date, Sequence<Record>> newCheckpointAndRecords = crawler.crawl(crawlingDefinition(from, more, checkpoint, recordDefinition));
         System.out.println(String.format("Crawled %d new items", newCheckpointAndRecords.second().size()));
-        modelRepository.set(id, Forms.form(update, from, more, newCheckpointAndRecords.first().name(), recordDefinition.toModel()));
+        modelRepository.set(id, Forms.form(update, from, more, newCheckpointAndRecords.first().toString(), recordDefinition.toModel()));
         return put(keyword(update), uniqueFields(recordDefinition), newCheckpointAndRecords.second());
+    }
+
+    private Record crawlingDefinition(String from, String more, String checkpoint, RecordDefinition recordDefinition) {
+        return record().set(URL, url(from)).set(RecordDefinition.RECORD_DEFINITION, recordDefinition).set(MORE, more).set(CHECKPOINT_VALUE, toDate(checkpoint));
+    }
+
+    private Date toDate(String checkpoint) {
+        if(checkpoint.isEmpty()) return null;
+        return new DateFormatConverter(Dates.RFC3339(), Dates.RFC822(), Dates.javaToString()).toDate(checkpoint);
     }
 
     private Model modelFor(UUID id) {

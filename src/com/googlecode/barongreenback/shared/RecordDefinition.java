@@ -68,10 +68,6 @@ public class RecordDefinition {
         };
     }
 
-    public Class checkpointFieldType() {
-        return fields.find(Crawler.checkpoint()).getOrElse(keyword("type", Object.class)).forClass();
-    }
-
     public Model toModel() {
         return toModel(recordName(), fields());
     }

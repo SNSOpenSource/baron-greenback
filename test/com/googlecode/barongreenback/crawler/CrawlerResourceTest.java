@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.html.RelativeUrlHandler;
-import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.HttpHandler;
@@ -62,14 +61,33 @@ public class CrawlerResourceTest {
 
     @Test
     public void canCrawlFeedsWithPaginationAndCheckpoint() throws Exception {
-        setupServerWithDataFeed();
+        ViewSearchPage viewSearchPage = crawlFeedsWithPaginationAndCheckpoint("2011-07-19T12:43:20Z");
+
+        assertThat(viewSearchPage.containsCell("Added user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Deleted user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Updated user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Created user", "title"), is(false));
+    }
+
+    @Test
+    public void canCrawlFeedsWithPaginationAndWithoutCheckpoint() throws Exception {
+        ViewSearchPage viewSearchPage = crawlFeedsWithPaginationAndCheckpoint("");
+
+        assertThat(viewSearchPage.containsCell("Added user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Deleted user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Updated user", "title"), is(true));
+        assertThat(viewSearchPage.containsCell("Created user", "title"), is(true));
+    }
+
+    private ViewSearchPage crawlFeedsWithPaginationAndCheckpoint(String checkpointValue) throws Exception {
+        RestServer restServer = setupServerWithDataFeed();
 
         HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication()));
         CrawlerPage newPage = new CrawlerPage(handler);
         newPage.update().value("news feed");
         newPage.from().value("http://localhost:9001/data");
         newPage.more().value("//link[@rel='prev-archive']/@href");
-        newPage.checkpoint().value("2011-07-19T12:43:20Z");
+        newPage.checkpoint().value(checkpointValue);
         newPage.recordName().value("/feed/entry");
         newPage.keyword(1).value("title");
         newPage.alias(1).value("");
@@ -93,19 +111,17 @@ public class CrawlerResourceTest {
 
         Thread.sleep(100);
 
-        ViewSearchPage viewSearchPage = new ViewSearchPage(handler, "news feed", "");
+        restServer.close();
 
-        assertThat(viewSearchPage.containsCell("Added user", "title"), is(true));
-        assertThat(viewSearchPage.containsCell("Deleted user", "title"), is(true));
-        assertThat(viewSearchPage.containsCell("Updated user", "title"), is(true));
-        assertThat(viewSearchPage.containsCell("Created user", "title"), is(false));
+        return new ViewSearchPage(handler, "news feed", "");
     }
 
-    private void setupServerWithDataFeed() throws Exception {
+    private RestServer setupServerWithDataFeed() throws Exception {
         RestServer dataSourceServer = new RestServer(new Restaurant(), defaultConfiguration().port(9001));
         ClientHttpHandler restClient = new ClientHttpHandler();
         restClient.handle(put(dataSourceServer.uri() + "data").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom.xml").getBytes()).build());
         restClient.handle(put(dataSourceServer.uri() + "data/prev").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom-prev.xml").getBytes()).build());
+        return dataSourceServer;
     }
 
     private String fileContent(String name) {

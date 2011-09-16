@@ -2,6 +2,8 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
+import com.googlecode.totallylazy.DateFormatConverter;
+import com.googlecode.totallylazy.Dates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
@@ -17,6 +19,11 @@ import org.junit.Test;
 import java.net.URI;
 import java.util.Date;
 
+import static com.googlecode.barongreenback.crawler.Crawler.CHECKPOINT_VALUE;
+import static com.googlecode.barongreenback.crawler.Crawler.DOCUMENT;
+import static com.googlecode.barongreenback.crawler.Crawler.MORE;
+import static com.googlecode.barongreenback.crawler.Crawler.URL;
+import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
@@ -35,7 +42,7 @@ public class CrawlerTest {
     private static final Keyword<Object> ENTRIES = keyword("/feed/entry");
     private static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
     private static final Keyword<URI> LINK = keyword("link/@href", URI.class).
-            metadata(MapRecord.record().set(RecordDefinition.RECORD_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
+            metadata(MapRecord.record().set(RECORD_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
     private static final Keyword<Date> UPDATED = keyword("updated", Date.class).metadata(record().set(Crawler.CHECKPOINT, true));
     private static final Keyword<String> TITLE = keyword("title", String.class);
 
@@ -55,22 +62,27 @@ public class CrawlerTest {
 
     @Test
     public void shouldNotGoPastTheCheckpoint_checkpointValueMatchesExactly() throws Exception {
-        shouldNotGoPastTheCheckpoint("2011-07-19T12:43:25Z");
+        shouldNotGoPastTheCheckpoint(toDate("2011-07-19T12:43:25Z"));
     }
 
     @Test
     public void shouldNotGoPastTheCheckpoint_checkpointValueDoesntMatchExactly() throws Exception {
-        shouldNotGoPastTheCheckpoint("2011-07-19T12:43:26Z");
+        shouldNotGoPastTheCheckpoint(toDate("2011-07-19T12:43:26Z"));
     }
 
-    private void shouldNotGoPastTheCheckpoint(String date) throws Exception {
-        Sequence<Record> records = new Crawler().crawl(document(fileContent("atom.xml")), defintion(), keyword(date, Date.class)).first();
+    private Date toDate(String s) {
+        return new DateFormatConverter(Dates.RFC3339()).toDate(s);
+    }
+
+    private void shouldNotGoPastTheCheckpoint(Date date) throws Exception {
+        Record documentCrawlingDefinition = record().set(DOCUMENT, document(fileContent("atom.xml"))).set(RECORD_DEFINITION, defintion()).set(CHECKPOINT_VALUE, date);
+        Sequence<Record> records = new Crawler().crawlDocument(documentCrawlingDefinition).first();
 
         assertThat(records.size(), Matchers.<Number>is(1));
     }
 
     public static Sequence<Record> crawl(Uri feed) throws Exception {
-        return new Crawler().crawl(feed.toURL(), defintion(), keyword("", String.class), keyword("", Date.class)).second();
+        return new Crawler().crawl(record().set(URL, feed.toURL()).set(RECORD_DEFINITION, defintion())).second();
     }
 
     private static RecordDefinition defintion() {

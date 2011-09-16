@@ -3,8 +3,6 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.DateFormatConverter;
-import com.googlecode.totallylazy.Dates;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
@@ -30,10 +28,10 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
+import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.merge;
 import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
@@ -41,7 +39,12 @@ import static java.lang.Boolean.TRUE;
 
 
 public class Crawler {
+    public static final Keyword<URL> URL = keyword("url", URL.class);
+    public static final Keyword<Document> DOCUMENT = keyword("document", Document.class);
+    public static final Keyword<String> MORE = keyword("more", String.class);
     public static final Keyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
+    public static final Keyword<Date> CHECKPOINT_VALUE = keyword("checkpointValue", Date.class);
+
     private final HttpClient httpClient;
 
     public Crawler() {
@@ -52,36 +55,36 @@ public class Crawler {
         this.httpClient = httpClient;
     }
 
-    public Pair<? extends Keyword<Date>, Sequence<Record>> crawl(URL url, RecordDefinition recordDefinition, Keyword<String> moreSelector, Keyword<Date> checkpoint) throws Exception {
-        Document document = document(url);
-        Pair<Sequence<Record>, Boolean> newRecordsOnCurrentPageAndMoreIndicator = crawl(document, recordDefinition, checkpoint);
+    public Pair<Date, Sequence<Record>> crawl(Record crawlingDefinition) throws Exception {
+        Document document = document(crawlingDefinition.get(URL));
+        Pair<Sequence<Record>, Boolean> newRecordsOnCurrentPageAndMoreIndicator = crawlDocument(crawlingDefinition.set(DOCUMENT, document));
         Sequence<Record> newRecordsOnCurrentPage = newRecordsOnCurrentPageAndMoreIndicator.first();
         Boolean moreIndicator = newRecordsOnCurrentPageAndMoreIndicator.second();
 
-        String newCheckpoint = evaluateNewCheckpoint(newRecordsOnCurrentPage, checkpoint);
+        Date newCheckpoint = evaluateNewCheckpoint(newRecordsOnCurrentPage, crawlingDefinition.get(CHECKPOINT_VALUE));
 
-        if (moreIndicator && moreResultsLink(moreSelector, document)) {
-            Sequence<Record> newRecordsOnPreviousPages = crawl(url(moreLink(moreSelector, document)), recordDefinition, moreSelector, checkpoint).second();
-            return Pair.pair(keyword(newCheckpoint, Date.class), newRecordsOnCurrentPage.join(newRecordsOnPreviousPages));
+        if (moreIndicator && moreResultsLink(crawlingDefinition.get(MORE), document)) {
+            Sequence<Record> newRecordsOnPreviousPages = crawl(crawlingDefinition.set(URL, url(moreLink(crawlingDefinition.get(MORE), document)))).second();
+            return Pair.pair(newCheckpoint, newRecordsOnCurrentPage.join(newRecordsOnPreviousPages));
         }
 
-        return Pair.pair(keyword(newCheckpoint, Date.class), newRecordsOnCurrentPage);
+        return Pair.pair(newCheckpoint, newRecordsOnCurrentPage);
     }
 
-    public Pair<Sequence<Record>, Boolean> crawl(URL url, RecordDefinition recordDefinition, Keyword<Date> checkpoint) throws Exception {
-        Document document = document(url);
-        return crawl(document, recordDefinition, checkpoint);
+    public Pair<Sequence<Record>, Boolean> crawlOnePageAtUrl(Record crawlingDefinition) throws Exception {
+        Document document = document(crawlingDefinition.get(URL));
+        return crawlDocument(crawlingDefinition.set(DOCUMENT, document));
     }
 
-    public Pair<Sequence<Record>, Boolean> crawl(Document document, RecordDefinition recordDefinition, Keyword<Date> checkpoint) throws Exception {
-        XmlRecords xmlRecords = records(document);
-        Sequence<Keyword> allFields = recordDefinition.fields();
+    public Pair<Sequence<Record>, Boolean> crawlDocument(Record documentCrawlingDefinition) throws Exception {
+        XmlRecords xmlRecords = records(documentCrawlingDefinition.get(DOCUMENT));
+        Sequence<Keyword> allFields = documentCrawlingDefinition.get(RECORD_DEFINITION).fields();
 
-        xmlRecords.define(recordDefinition.recordName(), allFields.toArray(Keyword.class));
+        xmlRecords.define(documentCrawlingDefinition.get(RECORD_DEFINITION).recordName(), allFields.toArray(Keyword.class));
 
-        Sequence<Record> results = xmlRecords.get(recordDefinition.recordName());
+        Sequence<Record> results = xmlRecords.get(documentCrawlingDefinition.get(RECORD_DEFINITION).recordName());
         Sequence<Record> sortedResults = sortResults(allFields, results);
-        Sequence<Record> sortedResultsAfterCheckpoint = sortedResults.takeWhile(not(checkpointReached(checkpoint)));
+        Sequence<Record> sortedResultsAfterCheckpoint = sortedResults.takeWhile(not(checkpointReached(documentCrawlingDefinition.get(CHECKPOINT_VALUE))));
 
         Sequence<Record> records = allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
                 fold(sortedResultsAfterCheckpoint, crawlSubFeeds()).realise();
@@ -108,30 +111,28 @@ public class Crawler {
         return Xml.document(xml);
     }
 
-    private String evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Keyword<Date> oldCheckpoint) {
-        if (recordsSoFar.isEmpty()) return oldCheckpoint.name();
+    private Date evaluateNewCheckpoint(Sequence<Record> recordsSoFar, Date oldCheckpoint) {
+        if (recordsSoFar.isEmpty()) return oldCheckpoint;
         Option<Keyword> checkpoint = recordsSoFar.first().keywords().find(checkpoint());
-        if (checkpoint.isEmpty()) return oldCheckpoint.name();
-        return recordsSoFar.first().get(checkpoint.get()).toString();
+        if (checkpoint.isEmpty()) return oldCheckpoint;
+        return (Date) recordsSoFar.first().get(checkpoint.get());
     }
 
-    private String moreLink(Keyword<String> moreSelector, Document document) {
-        return selectContents(document, moreSelector.name());
+    private String moreLink(String moreSelector, Document document) {
+        return selectContents(document, moreSelector);
     }
 
-    private boolean moreResultsLink(Keyword<String> more, Document document) {
-        return !Strings.isEmpty(more.name()) && !Strings.isEmpty(moreLink(more, document));
+    private boolean moreResultsLink(String more, Document document) {
+        return !Strings.isEmpty(more) && !Strings.isEmpty(moreLink(more, document));
     }
 
-    private Predicate<? super Record> checkpointReached(final Keyword checkpointValue) {
+    private Predicate<? super Record> checkpointReached(final Date checkpointValue) {
         return new Predicate<Record>() {
             public boolean matches(Record record) {
                 Option<Keyword> checkpoint = record.keywords().filter(checkpoint()).headOption();
-                if(!checkpoint.isEmpty() && !checkpointValue.name().isEmpty()) {
-                    DateFormatConverter converter = new DateFormatConverter(Dates.RFC3339(), Dates.RFC822(), Dates.javaToString());
+                if (!checkpoint.isEmpty() && checkpointValue != null) {
                     Date recordDate = (Date) record.get(checkpoint.get());
-                    Date checkpointDate = converter.toDate(checkpointValue.name());
-                    return recordDate.equals(checkpointDate) || recordDate.before(checkpointDate);
+                    return recordDate.equals(checkpointValue) || recordDate.before(checkpointValue);
                 }
                 return false;
             }
@@ -160,7 +161,7 @@ public class Crawler {
                 try {
                     URL subFeed = url(currentRecord.get(sourceUrl).toString());
                     RecordDefinition subDefinitions = sourceUrl.metadata().get(RECORD_DEFINITION);
-                    return crawl(subFeed, subDefinitions, keyword("", Date.class)).first().
+                    return crawlOnePageAtUrl(record().set(URL, subFeed).set(RECORD_DEFINITION, subDefinitions)).first().
                             map(merge(currentRecord));
                 } catch (Exception e) {
                     return Sequences.sequence(currentRecord);
