@@ -154,7 +154,7 @@ public class CrawlerResource {
 
     private Date toDate(String checkpoint) {
         if(checkpoint.isEmpty()) return null;
-        return new DateFormatConverter(Dates.RFC3339(), Dates.RFC822(), Dates.javaToString()).toDate(checkpoint);
+        return new DateFormatConverter(Dates.RFC3339(), Dates.RFC822(), Dates.javaUtilDateToString()).toDate(checkpoint);
     }
 
     private Model modelFor(UUID id) {
