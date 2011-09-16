@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.crawler.Crawler.CHECKPOINT_VALUE;
 import static com.googlecode.barongreenback.crawler.Crawler.MORE;
 import static com.googlecode.barongreenback.crawler.Crawler.URL;
+import static com.googlecode.barongreenback.jobs.JobsResource.DEFAULT_INTERVAL;
 import static com.googlecode.barongreenback.shared.ModelRepository.ID;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
@@ -47,6 +49,7 @@ import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.proxy.Resource.redirect;
 import static com.googlecode.utterlyidle.proxy.Resource.resource;
+import static com.googlecode.utterlyidle.proxy.Resource.urlOf;
 
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
@@ -140,7 +143,7 @@ public class CrawlerResource {
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
         Pair<Date, Sequence<Record>> newCheckpointAndRecords = crawler.crawl(crawlingDefinition(from, more, checkpoint, recordDefinition));
-        System.out.println(String.format("Crawled %d new items", newCheckpointAndRecords.second().size()));
+        System.out.println(String.format("Crawled %d new items for %s", newCheckpointAndRecords.second().size(), update));
         modelRepository.set(id, Forms.form(update, from, more, newCheckpointAndRecords.first().toString(), recordDefinition.toModel()));
         return put(keyword(update), uniqueFields(recordDefinition), newCheckpointAndRecords.second());
     }
@@ -163,9 +166,18 @@ public class CrawlerResource {
             public Model call(Pair<UUID, Model> pair) throws Exception {
                 return model().
                         add("id", pair.first().toString()).
-                        add("model", pair.second());
+                        add("model", pair.second()).
+                        add("jobUrl", jobUrl(pair.second()));
             }
         };
+    }
+
+    private String jobUrl(Model model) throws Exception {
+        return urlOf(resource(JobsResource.class).schedule(extractUpdate(model), DEFAULT_INTERVAL, urlOf(resource(CrawlerResource.class).crawl(null))));
+    }
+
+    private String extractUpdate(Model model) {
+        return (String)((Model)model.get("form")).get("update");
     }
 
     private Response redirectToList() {
