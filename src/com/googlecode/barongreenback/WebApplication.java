@@ -6,8 +6,10 @@ import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
 import com.googlecode.barongreenback.views.ViewsModule;
 import com.googlecode.utterlyidle.RestApplication;
+import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.dsl.StaticBindingBuilder;
 import com.googlecode.utterlyidle.httpserver.RestServer;
+import com.googlecode.waitrest.Restaurant;
 
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
@@ -35,6 +37,7 @@ public class WebApplication extends RestApplication {
     }
 
     public static void main(String[] args) throws Exception {
+        new RestServer(new Restaurant(), ServerConfiguration.defaultConfiguration().port(8899));
         new RestServer(new WebApplication(), defaultConfiguration().port(9000));
     }
 }
