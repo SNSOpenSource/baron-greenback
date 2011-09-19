@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.jobs;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class SchedulerAdapter implements FixedScheduler{
@@ -11,7 +10,7 @@ public class SchedulerAdapter implements FixedScheduler{
         this.service = service;
     }
 
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        return service.scheduleWithFixedDelay(command, initialDelay, delay, unit);
+    public ScheduledJob scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+        return new ScheduledJobAdapter(service.scheduleWithFixedDelay(command, initialDelay, delay, unit));
     }
 }

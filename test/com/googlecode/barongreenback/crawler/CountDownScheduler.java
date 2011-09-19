@@ -1,9 +1,9 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.FixedScheduler;
+import com.googlecode.barongreenback.jobs.ScheduledJob;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class CountDownScheduler implements FixedScheduler{
@@ -15,7 +15,7 @@ public class CountDownScheduler implements FixedScheduler{
         this.latch = latch;
     }
 
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+    public ScheduledJob scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
         return fixedScheduler.scheduleWithFixedDelay(decorate(command), initialDelay, delay, unit);
     }
 

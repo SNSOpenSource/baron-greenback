@@ -12,8 +12,6 @@ import com.googlecode.utterlyidle.Request;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -33,13 +31,13 @@ public class HttpScheduler {
     public static final Keyword<TimeUnit> TIME_UNIT = keyword("timeUnit", TimeUnit.class);
 
     private final Records records = new MemoryRecords();
-    private final Map<String, ScheduledFuture<?>> scheduledFutures = new HashMap<String, ScheduledFuture<?>>();
+    private final Map<String, ScheduledJob> scheduledJobs = new HashMap<String, ScheduledJob>();
 
-    private final FixedScheduler executorService;
+    private final FixedScheduler scheduler;
     private final Application application;
 
-    public HttpScheduler(final FixedScheduler executorService, final Application application) {
-        this.executorService = executorService;
+    public HttpScheduler(final FixedScheduler scheduler, final Application application) {
+        this.scheduler = scheduler;
         this.application = application;
         records.define(SCHEDULED_REQUESTS, JOB_ID, REQUEST, INITIAL_DELAY, INTERVAL, TIME_UNIT);
     }
@@ -68,14 +66,14 @@ public class HttpScheduler {
     }
 
     private String schedule(String id, Request request, Long initialDelay, Long interval, TimeUnit timeUnit) {
-        ScheduledFuture<?> scheduledFuture = executorService.scheduleWithFixedDelay(httpTask(request), initialDelay, interval, timeUnit);
-        scheduledFutures.put(id, scheduledFuture);
+        ScheduledJob scheduledJob = scheduler.scheduleWithFixedDelay(httpTask(request), initialDelay, interval, timeUnit);
+        scheduledJobs.put(id, scheduledJob);
         return id;
     }
 
     private void cancelScheduledFuture(String id) {
-        if (scheduledFutures.containsKey(id)) {
-            scheduledFutures.get(id).cancel(true);
+        if (scheduledJobs.containsKey(id)) {
+            scheduledJobs.get(id).cancel(true);
         }
     }
 

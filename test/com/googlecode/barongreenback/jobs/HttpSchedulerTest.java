@@ -5,9 +5,6 @@ import com.googlecode.utterlyidle.RequestBuilder;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
-import java.util.concurrent.Delayed;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.googlecode.barongreenback.jobs.HttpScheduler.INITIAL_DELAY;
@@ -64,25 +61,17 @@ public class HttpSchedulerTest {
         public long delay;
         public TimeUnit unit;
 
-        public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, final long delay, TimeUnit unit) {
+        public ScheduledJob scheduleWithFixedDelay(Runnable command, long initialDelay, final long delay, TimeUnit unit) {
             this.initialDelay = initialDelay;
             this.delay = delay;
             this.unit = unit;
-            return new DougDoesNotLikeTests(command);
-        }
-    }
-
-    private static class DougDoesNotLikeTests<T> extends FutureTask<T> implements ScheduledFuture<T> {
-        public DougDoesNotLikeTests(Runnable command) {
-            super(command, null);
+            return doNothingJob();
         }
 
-        public long getDelay(TimeUnit unit) {
-            return 0;
-        }
-
-        public int compareTo(Delayed o) {
-            return 0;
+        private ScheduledJob doNothingJob() {
+            return new ScheduledJob() {
+                public void cancel(boolean mayInterruptIfRunning) {}
+            };
         }
     }
 
