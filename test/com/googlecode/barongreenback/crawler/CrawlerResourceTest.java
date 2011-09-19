@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.html.RelativeUrlHandler;
+import com.googlecode.barongreenback.jobs.FixedScheduler;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.HttpHandler;
@@ -12,6 +13,7 @@ import com.googlecode.waitrest.Restaurant;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
 
 import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
 import static com.googlecode.utterlyidle.MediaType.TEXT_XML;
@@ -82,7 +84,12 @@ public class CrawlerResourceTest {
     private ViewSearchPage crawlFeedsWithPaginationAndCheckpoint(String checkpointValue) throws Exception {
         RestServer restServer = setupServerWithDataFeed();
 
-        HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication()));
+        WebApplication application = new WebApplication();
+        CountDownLatch latch = new CountDownLatch(1);
+        application.applicationScope().addInstance(CountDownLatch.class, latch).
+                decorate(FixedScheduler.class, CountDownScheduler.class);
+
+        HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(application));
         CrawlerPage newPage = new CrawlerPage(handler);
         newPage.update().value("news feed");
         newPage.from().value("http://localhost:9001/data");
@@ -109,8 +116,7 @@ public class CrawlerResourceTest {
         CrawlerListPage list = newPage.save();
         list.crawl("news feed");
 
-        Thread.sleep(100);
-
+        latch.await();
         restServer.close();
 
         return new ViewSearchPage(handler, "news feed", "");

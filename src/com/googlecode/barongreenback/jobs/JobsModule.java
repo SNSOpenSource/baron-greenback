@@ -25,6 +25,7 @@ public class JobsModule implements ResourcesModule, ApplicationScopedModule, Req
 
     public Module addPerApplicationObjects(Container container) throws Exception {
         container.addInstance(ScheduledExecutorService.class, Executors.newScheduledThreadPool(5));
+        container.add(FixedScheduler.class, SchedulerAdapter.class);
         container.add(HttpScheduler.class);
         return this;
     }

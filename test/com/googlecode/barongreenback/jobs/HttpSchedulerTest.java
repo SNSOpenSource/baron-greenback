@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class HttpSchedulerTest {
-    private ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+    private FixedScheduler executorService = mock(FixedScheduler.class);
     private Application application = mock(Application.class);
     private HttpScheduler httpScheduler = new HttpScheduler(executorService, application);
     private ScheduledFuture future = mock(ScheduledFuture.class);

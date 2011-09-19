@@ -35,10 +35,10 @@ public class HttpScheduler {
     private final Records records = new MemoryRecords();
     private final Map<String, ScheduledFuture<?>> scheduledFutures = new HashMap<String, ScheduledFuture<?>>();
 
-    private final ScheduledExecutorService executorService;
+    private final FixedScheduler executorService;
     private final Application application;
 
-    public HttpScheduler(final ScheduledExecutorService executorService, final Application application) {
+    public HttpScheduler(final FixedScheduler executorService, final Application application) {
         this.executorService = executorService;
         this.application = application;
         records.define(SCHEDULED_REQUESTS, JOB_ID, REQUEST, INITIAL_DELAY, INTERVAL, TIME_UNIT);
