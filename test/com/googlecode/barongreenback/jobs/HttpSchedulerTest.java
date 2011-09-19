@@ -4,6 +4,7 @@ import com.googlecode.totallylazy.records.Record;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -39,7 +40,7 @@ public class HttpSchedulerTest {
         String id = httpScheduler.schedule(schedulerSpec);
 
         assertThat(httpScheduler.jobs().size(), is(1));
-        assertThat(httpScheduler.job(id).get().get(INTERVAL), is(10L));
+        assertThat(httpScheduler.job(id).get().get(INTERVAL), CoreMatchers.is(10L));
         verify(executorService).scheduleWithFixedDelay(Mockito.any(Runnable.class), eq(0L), eq(10L), eq(TimeUnit.SECONDS));
     }
 
@@ -51,7 +52,7 @@ public class HttpSchedulerTest {
         httpScheduler.schedule(schedulerSpec.set(INTERVAL, 20L));
 
         assertThat(httpScheduler.jobs().size(), is(1));
-        assertThat(httpScheduler.job(id).get().get(INTERVAL), is(20L));
+        assertThat(httpScheduler.job(id).get().get(INTERVAL), CoreMatchers.is(20L));
 
         InOrder inOrder = inOrder(executorService);
         inOrder.verify(executorService).scheduleWithFixedDelay(Mockito.any(Runnable.class), eq(0L), eq(10L), eq(TimeUnit.SECONDS));

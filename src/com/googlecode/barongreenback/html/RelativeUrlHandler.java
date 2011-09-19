@@ -19,8 +19,8 @@ public class RelativeUrlHandler implements HttpHandler {
             if (newUri.toString().equals("")) {
                 request.uri(currentUri);
             } else if (newUri.isRelative()) {
-                String absolutePath = currentUri.path(newUri.path()).path();
-                request.uri(newUri.path(absolutePath));
+                String absolutePath = currentUri.mergePath(newUri.path()).path();
+                request.uri(newUri.mergePath(absolutePath));
             }
         }
         currentUri = request.uri();

@@ -57,13 +57,13 @@ public class Crawler {
 
     public Pair<Date, Sequence<Record>> crawl(Record crawlingDefinition) throws Exception {
         Document document = document(crawlingDefinition.get(URL));
-        Pair<Sequence<Record>, Boolean> newRecordsOnCurrentPageAndMoreIndicator = crawlDocument(crawlingDefinition.set(DOCUMENT, document));
-        Sequence<Record> newRecordsOnCurrentPage = newRecordsOnCurrentPageAndMoreIndicator.first();
-        Boolean moreIndicator = newRecordsOnCurrentPageAndMoreIndicator.second();
+        Pair<Sequence<Record>, Boolean> pair = crawlDocument(crawlingDefinition.set(DOCUMENT, document));
+        Sequence<Record> newRecordsOnCurrentPage = pair.first();
+        Boolean checkpointNotReached = pair.second();
 
         Date newCheckpoint = evaluateNewCheckpoint(newRecordsOnCurrentPage, crawlingDefinition.get(CHECKPOINT_VALUE));
 
-        if (moreIndicator && moreResultsLink(crawlingDefinition.get(MORE), document)) {
+        if (checkpointNotReached && moreResultsLink(crawlingDefinition.get(MORE), document)) {
             Sequence<Record> newRecordsOnPreviousPages = crawl(crawlingDefinition.set(URL, url(moreLink(crawlingDefinition.get(MORE), document)))).second();
             return Pair.pair(newCheckpoint, newRecordsOnCurrentPage.join(newRecordsOnPreviousPages));
         }
@@ -88,8 +88,8 @@ public class Crawler {
 
         Sequence<Record> records = allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
                 fold(sortedResultsAfterCheckpoint, crawlSubFeeds()).realise();
-        boolean hasMore = results.equals(sortedResultsAfterCheckpoint);
-        return Pair.pair(records, hasMore);
+        boolean checkpointNotReached = results.equals(sortedResultsAfterCheckpoint);
+        return Pair.pair(records, checkpointNotReached);
 
     }
 

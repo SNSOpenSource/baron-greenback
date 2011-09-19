@@ -90,7 +90,7 @@ public class CrawlerTest {
     }
 
     public static Uri createFeed(final Server server) {
-        return server.uri().path("static/atom.xml");
+        return server.uri().mergePath("static/atom.xml");
     }
 
     private String fileContent(String name) {
