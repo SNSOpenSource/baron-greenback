@@ -1,9 +1,9 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.html.Checkbox;
-import com.googlecode.barongreenback.html.Html;
-import com.googlecode.barongreenback.html.Input;
-import com.googlecode.barongreenback.html.Select;
+import com.googlecode.utterlyidle.html.Checkbox;
+import com.googlecode.utterlyidle.html.Html;
+import com.googlecode.utterlyidle.html.Input;
+import com.googlecode.utterlyidle.html.Select;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;

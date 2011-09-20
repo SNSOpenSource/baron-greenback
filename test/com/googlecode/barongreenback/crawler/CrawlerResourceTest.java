@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.html.RelativeUrlHandler;
+import com.googlecode.utterlyidle.html.RelativeUrlHandler;
 import com.googlecode.barongreenback.jobs.FixedScheduler;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.totallylazy.Strings;

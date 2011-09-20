@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.html.Html;
+import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.utterlyidle.HttpHandler;
