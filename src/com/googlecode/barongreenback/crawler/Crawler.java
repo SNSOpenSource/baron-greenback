@@ -9,6 +9,7 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.records.AliasedKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
@@ -33,6 +34,7 @@ import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.merge;
+import static com.googlecode.totallylazy.records.SelectCallable.select;
 import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static java.lang.Boolean.TRUE;
@@ -77,12 +79,14 @@ public class Crawler {
     }
 
     public Pair<Sequence<Record>, Boolean> crawlDocument(Record documentCrawlingDefinition) throws Exception {
+        RecordDefinition recordDefinition = documentCrawlingDefinition.get(RECORD_DEFINITION);
+        Keyword<Object> recordName = recordDefinition.recordName();
+        Sequence<Keyword> allFields = recordDefinition.fields();
+
         XmlRecords xmlRecords = records(documentCrawlingDefinition.get(DOCUMENT));
-        Sequence<Keyword> allFields = documentCrawlingDefinition.get(RECORD_DEFINITION).fields();
+        xmlRecords.define(recordName, allFields.map(asSourceKeywords()).toArray(Keyword.class));
 
-        xmlRecords.define(documentCrawlingDefinition.get(RECORD_DEFINITION).recordName(), allFields.toArray(Keyword.class));
-
-        Sequence<Record> results = xmlRecords.get(documentCrawlingDefinition.get(RECORD_DEFINITION).recordName());
+        Sequence<Record> results = xmlRecords.get(recordName).map(select(allFields));
         Sequence<Record> sortedResults = sortResults(allFields, results);
         Sequence<Record> sortedResultsAfterCheckpoint = sortedResults.takeWhile(not(checkpointReached(documentCrawlingDefinition.get(CHECKPOINT_VALUE))));
 
@@ -91,6 +95,17 @@ public class Crawler {
         boolean checkpointNotReached = results.equals(sortedResultsAfterCheckpoint);
         return Pair.pair(records, checkpointNotReached);
 
+    }
+
+    private Callable1<? super Keyword, Keyword> asSourceKeywords() {
+        return new Callable1<Keyword, Keyword>() {
+            public Keyword call(Keyword keyword) throws Exception {
+                if(keyword instanceof AliasedKeyword){
+                    return ((AliasedKeyword) keyword).source();
+                }
+                return keyword;
+            }
+        };
     }
 
     public XmlRecords records(Document document) throws Exception {

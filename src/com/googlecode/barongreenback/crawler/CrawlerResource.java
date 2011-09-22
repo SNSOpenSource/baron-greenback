@@ -144,7 +144,8 @@ public class CrawlerResource {
         RecordDefinition recordDefinition = convert(record);
         Pair<Date, Sequence<Record>> newCheckpointAndRecords = crawler.crawl(crawlingDefinition(from, more, checkpoint, recordDefinition));
         System.out.println(String.format("Crawled %d new items for %s", newCheckpointAndRecords.second().size(), update));
-        modelRepository.set(id, Forms.form(update, from, more, newCheckpointAndRecords.first().toString(), recordDefinition.toModel()));
+        Date checkPoint = newCheckpointAndRecords.first();
+        modelRepository.set(id, Forms.form(update, from, more, checkPoint != null ? checkPoint.toString() : "", recordDefinition.toModel()));
         return put(keyword(update), uniqueFields(recordDefinition), newCheckpointAndRecords.second());
     }
 

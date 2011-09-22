@@ -1,11 +1,10 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.barongreenback.jobs.JobsListPage;
-import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.html.Html;
 
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.proxy.Resource.resource;

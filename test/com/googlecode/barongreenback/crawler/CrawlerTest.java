@@ -21,7 +21,6 @@ import java.util.Date;
 
 import static com.googlecode.barongreenback.crawler.Crawler.CHECKPOINT_VALUE;
 import static com.googlecode.barongreenback.crawler.Crawler.DOCUMENT;
-import static com.googlecode.barongreenback.crawler.Crawler.MORE;
 import static com.googlecode.barongreenback.crawler.Crawler.URL;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.totallylazy.URLs.packageUrl;
@@ -36,8 +35,7 @@ import static org.hamcrest.Matchers.is;
 public class CrawlerTest {
     private static final Keyword<Object> USER = keyword("/user");
     private static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
-    private static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class);
-
+    private static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class).as(keyword("first", String.class));
 
     private static final Keyword<Object> ENTRIES = keyword("/feed/entry");
     private static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
@@ -46,6 +44,7 @@ public class CrawlerTest {
     private static final Keyword<Date> UPDATED = keyword("updated", Date.class).metadata(record().set(Crawler.CHECKPOINT, true));
     private static final Keyword<String> TITLE = keyword("title", String.class);
 
+    public static final RecordDefinition ATOM_DEFINITION = new RecordDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE));
 
     @Test
     public void shouldGetTheContentsOfAUrlAndExtractContent() throws Exception {
@@ -75,18 +74,14 @@ public class CrawlerTest {
     }
 
     private void shouldNotGoPastTheCheckpoint(Date date) throws Exception {
-        Record documentCrawlingDefinition = record().set(DOCUMENT, document(fileContent("atom.xml"))).set(RECORD_DEFINITION, defintion()).set(CHECKPOINT_VALUE, date);
+        Record documentCrawlingDefinition = record().set(DOCUMENT, document(fileContent("atom.xml"))).set(RECORD_DEFINITION, ATOM_DEFINITION).set(CHECKPOINT_VALUE, date);
         Sequence<Record> records = new Crawler().crawlDocument(documentCrawlingDefinition).first();
 
         assertThat(records.size(), Matchers.<Number>is(1));
     }
 
     public static Sequence<Record> crawl(Uri feed) throws Exception {
-        return new Crawler().crawl(record().set(URL, feed.toURL()).set(RECORD_DEFINITION, defintion())).second();
-    }
-
-    private static RecordDefinition defintion() {
-        return new RecordDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE));
+        return new Crawler().crawl(record().set(URL, feed.toURL()).set(RECORD_DEFINITION, ATOM_DEFINITION)).second();
     }
 
     public static Uri createFeed(final Server server) {
