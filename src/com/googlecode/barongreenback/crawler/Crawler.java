@@ -9,11 +9,11 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.Xml;
 import com.googlecode.totallylazy.records.AliasedKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.xml.Xml;
 import com.googlecode.totallylazy.records.xml.XmlRecords;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
@@ -35,7 +35,6 @@ import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.merge;
 import static com.googlecode.totallylazy.records.SelectCallable.select;
-import static com.googlecode.totallylazy.records.xml.Xml.selectContents;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static java.lang.Boolean.TRUE;
 
@@ -134,7 +133,7 @@ public class Crawler {
     }
 
     private String moreLink(String moreSelector, Document document) {
-        return selectContents(document, moreSelector);
+        return Xml.selectContents(document, moreSelector);
     }
 
     private boolean moreResultsLink(String more, Document document) {
