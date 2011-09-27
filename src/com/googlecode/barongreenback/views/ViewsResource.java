@@ -8,6 +8,7 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.FormParam;
@@ -22,17 +23,18 @@ import static com.googlecode.barongreenback.shared.Forms.addTemplates;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toModel;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.utterlyidle.proxy.Resource.redirect;
-import static com.googlecode.utterlyidle.proxy.Resource.resource;
-import static com.googlecode.utterlyidle.proxy.Resource.urlOf;
+import static com.googlecode.totallylazy.proxy.Call.method;
+import static com.googlecode.totallylazy.proxy.Call.on;
 
 @Produces(MediaType.TEXT_HTML)
 @Path("views")
 public class ViewsResource {
     private final Views views;
+    private final Redirector redirector;
 
-    public ViewsResource(Views views) {
+    public ViewsResource(Views views, Redirector redirector) {
         this.views = views;
+        this.redirector = redirector;
     }
 
     @GET
@@ -86,7 +88,7 @@ public class ViewsResource {
 
 
     private Response redirectToList() {
-        return redirect(resource(getClass()).list());
+        return redirector.seeOther(method(on(getClass()).list()));
     }
 
     private Callable1<? super View, Model> asModel(final String current) {
@@ -96,7 +98,7 @@ public class ViewsResource {
                 return model().
                         add("current", keyword.name().equalsIgnoreCase(current)).
                         add("name", keyword.name()).
-                        add("url", urlOf(resource(SearchResource.class).list(keyword.name(), "")));
+                        add("url", redirector.uriOf(method(on(SearchResource.class).list(keyword.name(), ""))));
             }
         };
     }

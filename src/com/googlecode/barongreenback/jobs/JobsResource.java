@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.utterlyidle.HttpMessageParser;
+import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.FormParam;
@@ -23,9 +24,9 @@ import static com.googlecode.barongreenback.jobs.HttpScheduler.JOB_ID;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.REQUEST;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.TIME_UNIT;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.proxy.Call.method;
+import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.MapRecord.record;
-import static com.googlecode.utterlyidle.proxy.Resource.redirect;
-import static com.googlecode.utterlyidle.proxy.Resource.resource;
 
 @Path("jobs")
 public class JobsResource {
@@ -33,10 +34,12 @@ public class JobsResource {
     public static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.SECONDS;
     private final HttpScheduler scheduler;
     private final Request request;
+    private final Redirector redirector;
 
-    public JobsResource(HttpScheduler scheduler, Request request) {
+    public JobsResource(HttpScheduler scheduler, Request request, Redirector redirector) {
         this.scheduler = scheduler;
         this.request = request;
+        this.redirector = redirector;
     }
 
     @POST
@@ -78,7 +81,7 @@ public class JobsResource {
     }
 
     private Response redirectToList() {
-        return redirect(resource(getClass()).list());
+        return redirector.seeOther(method(on(getClass()).list()));
     }
 
     private List<Model> jobsModel(Sequence<Record> jobs) {

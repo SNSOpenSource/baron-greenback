@@ -12,10 +12,12 @@ import com.googlecode.totallylazy.DateFormatConverter;
 import com.googlecode.totallylazy.Dates;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
@@ -42,14 +44,14 @@ import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.URLs.url;
+import static com.googlecode.totallylazy.proxy.Call.method;
+import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
-import static com.googlecode.utterlyidle.proxy.Resource.redirect;
-import static com.googlecode.utterlyidle.proxy.Resource.resource;
-import static com.googlecode.utterlyidle.proxy.Resource.urlOf;
+import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
@@ -58,12 +60,14 @@ public class CrawlerResource {
     private final ModelRepository modelRepository;
     private final Crawler crawler;
     private final Views views;
+    private final Redirector redirector;
 
-    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Views views) {
+    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Views views, Redirector redirector) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.crawler = crawler;
         this.views = views;
+        this.redirector = redirector;
     }
 
     @GET
@@ -173,8 +177,8 @@ public class CrawlerResource {
         };
     }
 
-    private String jobUrl(Model model) throws Exception {
-        return urlOf(resource(JobsResource.class).schedule(extractUpdate(model), DEFAULT_INTERVAL, urlOf(resource(CrawlerResource.class).crawl(null))));
+    private Uri jobUrl(Model model) throws Exception {
+        return redirector.uriOf(method(on(JobsResource.class).schedule(extractUpdate(model), DEFAULT_INTERVAL, "/"+relativeUriOf(method(on(CrawlerResource.class).crawl(null))).toString())));
     }
 
     private String extractUpdate(Model model) {
@@ -182,7 +186,7 @@ public class CrawlerResource {
     }
 
     private Response redirectToList() {
-        return redirect(resource(getClass()).list());
+        return redirector.seeOther(method(on(getClass()).list()));
     }
 
     private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
@@ -190,7 +194,7 @@ public class CrawlerResource {
         views.put(view(recordName).withFields(keywords));
         records.define(recordName, keywords.toArray(Keyword.class));
         records.put(recordName, update(using(unique), recordsToAdd));
-        return redirect(resource(SearchResource.class).list(recordName.name(), EMPTY));
+        return redirector.seeOther(method(on(SearchResource.class).list(recordName.name(), EMPTY)));
     }
 
 }

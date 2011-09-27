@@ -1,16 +1,17 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.utterlyidle.HttpHandler;
+import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Checkbox;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Input;
 import com.googlecode.utterlyidle.html.Select;
-import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.Response;
 
+import static com.googlecode.totallylazy.proxy.Call.method;
+import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
-import static com.googlecode.utterlyidle.proxy.Resource.resource;
-import static com.googlecode.utterlyidle.proxy.Resource.urlOf;
+import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -38,7 +39,7 @@ public class CrawlerPage {
     }
 
     public CrawlerPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get(urlOf(resource(CrawlerResource.class).newForm())).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerResource.class).newForm()))).build()));
     }
 
     public CrawlerListPage save() throws Exception {
