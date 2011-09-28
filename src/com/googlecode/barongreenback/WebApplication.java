@@ -27,7 +27,6 @@ public class WebApplication extends RestApplication {
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
                 staticRule(contentType(TEXT_HTML), templateName("twitter"))));
-        add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("").set("less", "text/css"))));
     }
 
     public static void addModules(Application application) {
@@ -36,6 +35,7 @@ public class WebApplication extends RestApplication {
         application.add(new SearchModule());
         application.add(new ViewsModule());
         application.add(new JobsModule());
+        application.add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("baron-greenback").set("less", "text/css"))));
     }
 
     public static void main(String[] args) throws Exception {

@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>$title$ - Baron Greenback</title>
-    <link rel="stylesheet/less" type="text/css" href="$base$shared/twitter/twitter.less"/>
-    <script src="$base$shared/less-1.1.3.min.js" type="text/javascript"></script>
+    <link rel="stylesheet/less" type="text/css" href="$base$baron-greenback/shared/twitter/twitter.less"/>
+    <script src="$base$baron-greenback/shared/less-1.1.3.min.js" type="text/javascript"></script>
 </head>
 <body class="$body.class$">
 
@@ -31,7 +31,7 @@
     $body$
 </div>
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script type="text/javascript" src="$base$shared/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="$base$shared/subfeed.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/subfeed.js"></script>
 </body>
 </html>
