@@ -22,10 +22,12 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,6 +40,7 @@ import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
+import static com.googlecode.totallylazy.records.lucene.Lucene.and;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -58,7 +61,7 @@ public class SearchResource {
     public Model list(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
         Sequence<Keyword> allHeaders = headers(view);
         Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Sequence<Record> results = records.query(parse(prefix(view, query), visibleHeaders), allHeaders);
+        Sequence<Record> results = records.query(and(type(view), parse(query, visibleHeaders)), allHeaders);
         return model().
                 add("view", view).
                 add("query", query).
@@ -66,11 +69,15 @@ public class SearchResource {
                 add("results", results.map(RecordMethods.asMap()).toList());
     }
 
+    private TermQuery type(String view) {
+        return new TermQuery(new Term(Lucene.RECORD_KEY.name(), view));
+    }
+
     @GET
     @Path("unique")
     public Model unique(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
         Sequence<Keyword> headers = headers(view);
-        Record record = records.query(parse(prefix(view, query), headers), headers).head();
+        Record record = records.query(and(type(view), parse(query, headers)), headers).head();
         Map<String, Map<String, Object>> fold = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return model().
                 add("view", view).
@@ -123,13 +130,6 @@ public class SearchResource {
                         add("unique", keyword.metadata().get(Keywords.UNIQUE));
             }
         };
-    }
-
-    private String prefix(String view, String query) {
-        if (view.isEmpty()) {
-            return query;
-        }
-        return String.format("+%s:\"%s\" %s", Lucene.RECORD_KEY, view, query);
     }
 
     private Query parse(String query, Sequence<Keyword> keywords) throws ParseException {
