@@ -10,7 +10,6 @@ import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.modules.ResponseHandlersModule;
 import com.googlecode.utterlyidle.sitemesh.TemplateName;
 import com.googlecode.yadic.Container;
-import com.googlecode.yadic.generics.TypeFor;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import java.util.UUID;
