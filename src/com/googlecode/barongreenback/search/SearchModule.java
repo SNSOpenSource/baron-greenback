@@ -33,7 +33,6 @@ public class SearchModule implements ResourcesModule, ApplicationScopedModule, R
         container.addInstance(Version.class, Version.LUCENE_33);
         container.addActivator(Directory.class, DirectoryActivator.class);
         container.addActivator(IndexWriter.class, IndexWriterActivator.class);
-        container.add(Analyzer.class, KeywordAnalyzer.class);
         return this;
     }
 
