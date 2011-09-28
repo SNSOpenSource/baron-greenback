@@ -178,7 +178,8 @@ public class CrawlerResource {
     }
 
     private Uri jobUrl(Model model) throws Exception {
-        return redirector.uriOf(method(on(JobsResource.class).schedule(extractUpdate(model), DEFAULT_INTERVAL, redirector.uriOf(method(on(CrawlerResource.class).crawl(null))).path().toString())));
+        Uri uri = relativeUriOf(method(on(CrawlerResource.class).crawl(null)));
+        return redirector.uriOf(method(on(JobsResource.class).schedule(extractUpdate(model), DEFAULT_INTERVAL, "/"+uri.toString())));
     }
 
     private String extractUpdate(Model model) {

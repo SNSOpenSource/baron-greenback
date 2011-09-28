@@ -12,7 +12,6 @@ import com.googlecode.utterlyidle.Request;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.googlecode.totallylazy.Predicates.is;
