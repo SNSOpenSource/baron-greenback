@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Search</title>
+    <title>$view$ Search</title>
     <meta name="view" content="$view$" />
 </head>
 <body class="$view$">
