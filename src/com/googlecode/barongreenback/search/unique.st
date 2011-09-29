@@ -7,7 +7,7 @@
 <body class="$view$">
 <div>
     $record.keys:{ groupName |
-    <fieldset>
+    <fieldset class="$groupName$">
         <legend>$groupName$</legend>
 
         $record.(groupName).keys:{ name |
