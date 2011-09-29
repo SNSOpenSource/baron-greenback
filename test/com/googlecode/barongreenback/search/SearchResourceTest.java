@@ -19,6 +19,7 @@ import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.yadic.Container;
 import org.junit.Test;
 
+import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.IterableMatcher.hasExactly;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -33,15 +34,20 @@ import static org.hamcrest.Matchers.is;
 public class SearchResourceTest {
     @Test
     public void canQuery() throws Exception {
-        Response response = application(addSomeData(new WebApplication())).handle(get("users/search/list").withQuery("query", "type:users"));
-        assertThat(response.status(), is(OK));
+        using(new WebApplication(), new Callable1<WebApplication, Void>() {
+            public Void call(WebApplication application) throws Exception {
+                Response response = application(addSomeData(application)).handle(get("users/search/list").withQuery("query", "type:users"));
+                assertThat(response.status(), is(OK));
 
-        XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
-        Keyword results = keyword("//table[contains(@class, 'results')]/tbody/tr");
-        Keyword<String> id = keyword("td[@class='id']", String.class);
-        xmlRecords.define(results, id);
-        Sequence<String> result = xmlRecords.get(results).map(id);
-        assertThat(result, hasExactly("urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1", "urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef2"));
+                XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
+                Keyword results = keyword("//table[contains(@class, 'results')]/tbody/tr");
+                Keyword<String> id = keyword("td[@class='id']", String.class);
+                xmlRecords.define(results, id);
+                Sequence<String> result = xmlRecords.get(results).map(id);
+                assertThat(result, hasExactly("urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1", "urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef2"));
+                return VOID;
+            }
+        });
     }
 
     public static Application addSomeData(final WebApplication application) throws Exception {

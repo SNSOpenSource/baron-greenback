@@ -1,13 +1,14 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.utterlyidle.html.RelativeUrlHandler;
 import com.googlecode.barongreenback.jobs.FixedScheduler;
 import com.googlecode.barongreenback.search.ViewSearchPage;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
+import com.googlecode.utterlyidle.html.RelativeUrlHandler;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Restaurant;
 import org.junit.Test;
@@ -15,6 +16,8 @@ import org.junit.Test;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
+import static com.googlecode.totallylazy.Closeables.using;
+import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
 import static com.googlecode.utterlyidle.MediaType.TEXT_XML;
 import static com.googlecode.utterlyidle.RequestBuilder.put;
@@ -25,40 +28,51 @@ import static org.hamcrest.Matchers.is;
 public class CrawlerResourceTest {
     @Test
     public void canSaveAndLoadACrawler() throws Exception {
-        CrawlerPage newPage = new CrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication())));
-        newPage.update().value("news");
-        newPage.from().value("http://feeds.bbci.co.uk/news/rss.xml");
-        newPage.more().value("//link[@rel='prev-archive']/@href");
-        newPage.recordName().value("/rss/channel/item");
-        newPage.keyword(1).value("title");
-        newPage.alias(1).value("foo");
-        newPage.group(1).value("foo");
-        newPage.type(1).value(String.class.getName());
-        newPage.unique(1).check();
-        newPage.visible(1).uncheck();
-        newPage.subfeed(1).uncheck();
-        CrawlerListPage list = newPage.save();
+        using(new WebApplication(), new Callable1<WebApplication, Void>() {
+            public Void call(WebApplication application) throws Exception {
+                CrawlerPage newPage = new CrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(application)));
+                newPage.update().value("news");
+                newPage.from().value("http://feeds.bbci.co.uk/news/rss.xml");
+                newPage.more().value("//link[@rel='prev-archive']/@href");
+                newPage.recordName().value("/rss/channel/item");
+                newPage.keyword(1).value("title");
+                newPage.alias(1).value("foo");
+                newPage.group(1).value("foo");
+                newPage.type(1).value(String.class.getName());
+                newPage.unique(1).check();
+                newPage.visible(1).uncheck();
+                newPage.subfeed(1).uncheck();
+                CrawlerListPage list = newPage.save();
 
-        CrawlerPage edit = list.edit("news");
-        assertThat(edit.update().value(), is("news"));
-        assertThat(edit.from().value(), is("http://feeds.bbci.co.uk/news/rss.xml"));
-        assertThat(edit.more().value(), is("//link[@rel='prev-archive']/@href"));
-        assertThat(edit.recordName().value(), is("/rss/channel/item"));
-        assertThat(edit.keyword(1).value(), is("title"));
-        assertThat(edit.alias(1).value(), is("foo"));
-        assertThat(edit.group(1).value(), is("foo"));
-        assertThat(edit.type(1).value(), is(String.class.getName()));
-        assertThat(edit.unique(1).checked(), is(true));
-        assertThat(edit.visible(1).checked(), is(false));
-        assertThat(edit.subfeed(1).checked(), is(false));
+                CrawlerPage edit = list.edit("news");
+                assertThat(edit.update().value(), is("news"));
+                assertThat(edit.from().value(), is("http://feeds.bbci.co.uk/news/rss.xml"));
+                assertThat(edit.more().value(), is("//link[@rel='prev-archive']/@href"));
+                assertThat(edit.recordName().value(), is("/rss/channel/item"));
+                assertThat(edit.keyword(1).value(), is("title"));
+                assertThat(edit.alias(1).value(), is("foo"));
+                assertThat(edit.group(1).value(), is("foo"));
+                assertThat(edit.type(1).value(), is(String.class.getName()));
+                assertThat(edit.unique(1).checked(), is(true));
+                assertThat(edit.visible(1).checked(), is(false));
+                assertThat(edit.subfeed(1).checked(), is(false));
+                return VOID;
+            }
+        });
+
     }
 
     @Test
     public void canImportCrawlerInJsonFormat() throws Exception {
-        ImportCrawlerPage importPage = new ImportCrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(new WebApplication())));
-        importPage.model().value(fileContent("crawler.json"));
-        CrawlerListPage listPage = importPage.importModel();
-        assertThat(listPage.contains("news"), is(true));
+        using(new WebApplication(), new Callable1<WebApplication, Void>() {
+            public Void call(WebApplication application) throws Exception {
+                ImportCrawlerPage importPage = new ImportCrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(application)));
+                importPage.model().value(fileContent("crawler.json"));
+                CrawlerListPage listPage = importPage.importModel();
+                assertThat(listPage.contains("news"), is(true));
+                return VOID;
+            }
+        });
     }
 
     @Test
@@ -81,45 +95,48 @@ public class CrawlerResourceTest {
         assertThat(viewSearchPage.containsCell("Created user", "title"), is(true));
     }
 
-    private ViewSearchPage crawlFeedsWithPaginationAndCheckpoint(String checkpointValue) throws Exception {
-        RestServer restServer = setupServerWithDataFeed();
+    private ViewSearchPage crawlFeedsWithPaginationAndCheckpoint(final String checkpointValue) throws Exception {
+        return using(new WebApplication(), new Callable1<WebApplication, ViewSearchPage>() {
+            public ViewSearchPage call(WebApplication application) throws Exception {
+                final RestServer restServer = setupServerWithDataFeed();
 
-        WebApplication application = new WebApplication();
-        CountDownLatch latch = new CountDownLatch(1);
-        application.applicationScope().addInstance(CountDownLatch.class, latch).
-                decorate(FixedScheduler.class, CountDownScheduler.class);
+                CountDownLatch latch = new CountDownLatch(1);
+                application.applicationScope().addInstance(CountDownLatch.class, latch).
+                        decorate(FixedScheduler.class, CountDownScheduler.class);
 
-        HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(application));
-        CrawlerPage newPage = new CrawlerPage(handler);
-        newPage.update().value("news feed");
-        newPage.from().value("http://localhost:9001/data");
-        newPage.more().value("//link[@rel='prev-archive']/@href");
-        newPage.checkpoint().value(checkpointValue);
-        newPage.recordName().value("/feed/entry");
-        newPage.keyword(1).value("title");
-        newPage.alias(1).value("");
-        newPage.group(1).value("group1");
-        newPage.type(1).value(String.class.getName());
-        newPage.unique(1).check();
-        newPage.visible(1).check();
-        newPage.subfeed(1).uncheck();
-        newPage.subfeed(1).uncheck();
-        newPage.checkpoint(1).uncheck();
-        newPage.keyword(2).value("updated");
-        newPage.alias(2).value("");
-        newPage.group(2).value("");
-        newPage.type(2).value(Date.class.getName());
-        newPage.unique(2).uncheck();
-        newPage.visible(2).uncheck();
-        newPage.subfeed(2).uncheck();
-        newPage.checkpoint(2).check();
-        CrawlerListPage list = newPage.save();
-        list.crawl("news feed");
+                HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(application));
+                CrawlerPage newPage = new CrawlerPage(handler);
+                newPage.update().value("news feed");
+                newPage.from().value("http://localhost:9001/data");
+                newPage.more().value("//link[@rel='prev-archive']/@href");
+                newPage.checkpoint().value(checkpointValue);
+                newPage.recordName().value("/feed/entry");
+                newPage.keyword(1).value("title");
+                newPage.alias(1).value("");
+                newPage.group(1).value("group1");
+                newPage.type(1).value(String.class.getName());
+                newPage.unique(1).check();
+                newPage.visible(1).check();
+                newPage.subfeed(1).uncheck();
+                newPage.subfeed(1).uncheck();
+                newPage.checkpoint(1).uncheck();
+                newPage.keyword(2).value("updated");
+                newPage.alias(2).value("");
+                newPage.group(2).value("");
+                newPage.type(2).value(Date.class.getName());
+                newPage.unique(2).uncheck();
+                newPage.visible(2).uncheck();
+                newPage.subfeed(2).uncheck();
+                newPage.checkpoint(2).check();
+                CrawlerListPage list = newPage.save();
+                list.crawl("news feed");
 
-        latch.await();
-        restServer.close();
+                latch.await();
+                restServer.close();
 
-        return new ViewSearchPage(handler, "news feed", "");
+                return new ViewSearchPage(handler, "news feed", "");
+            }
+        });
     }
 
     private RestServer setupServerWithDataFeed() throws Exception {
