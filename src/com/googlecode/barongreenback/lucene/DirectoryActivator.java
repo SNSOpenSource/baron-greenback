@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.search;
+package com.googlecode.barongreenback.lucene;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
@@ -8,14 +8,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.totallylazy.Files.TEMP_DIR;
 
 public class DirectoryActivator implements Callable<Directory>, Closeable{
+    public static final File DEFAULT_DIRECTORY = new File(TEMP_DIR, "baron-greenback");
     private Directory directory;
 
     public Directory call() throws Exception {
-        File path = temporaryDirectory("baron-greenback");
-        directory = new NIOFSDirectory(path);
+        directory = new NIOFSDirectory(DEFAULT_DIRECTORY);
         return directory;
     }
 

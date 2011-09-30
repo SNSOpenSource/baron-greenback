@@ -1,7 +1,9 @@
 package com.googlecode.barongreenback.views;
 
 import com.googlecode.barongreenback.WebApplication;
+import com.googlecode.barongreenback.lucene.DirectoryActivator;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Sequence;
@@ -10,6 +12,7 @@ import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.yadic.Container;
+import org.junit.Before;
 import org.junit.Test;
 
 import static com.googlecode.barongreenback.views.View.view;
@@ -22,6 +25,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class ViewsTest {
+    @Before
+    public void deleteIndex() {
+        Files.delete(DirectoryActivator.DEFAULT_DIRECTORY);
+    }
+
     @Test
     public void createAndRetrieveAView() throws Exception {
         using(new WebApplication(), new Callable1<WebApplication, Void>() {

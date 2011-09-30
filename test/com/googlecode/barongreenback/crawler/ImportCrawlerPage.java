@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.TextArea;
 import com.googlecode.utterlyidle.HttpHandler;

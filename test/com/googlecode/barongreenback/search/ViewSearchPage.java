@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;

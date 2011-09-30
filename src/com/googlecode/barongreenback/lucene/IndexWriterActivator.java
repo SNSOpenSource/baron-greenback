@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.search;
+package com.googlecode.barongreenback.lucene;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
@@ -22,7 +22,7 @@ public class IndexWriterActivator implements Callable<IndexWriter>, Closeable {
     }
 
     public IndexWriter call() throws Exception {
-        indexWriter = new IndexWriter(directory, new IndexWriterConfig(version, analyzer()));
+        indexWriter = new IndexWriter(directory, new IndexWriterConfig(version, analyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND));
         indexWriter.commit();
         return indexWriter;
     }

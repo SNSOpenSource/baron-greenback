@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Checkbox;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Input;
@@ -12,8 +13,10 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.fail;
 
 public class CrawlerPage {
     public static final String UPDATE = "//input[@name='form.update']";
@@ -69,34 +72,34 @@ public class CrawlerPage {
     }
 
     public Input keyword(int index) {
-        return html.input(String.format(KEYWORD_NAME, index));
+        return html.input(format(KEYWORD_NAME, index));
     }
 
     public Input alias(int index) {
-        return html.input(String.format(ALIAS, index));
+        return html.input(format(ALIAS, index));
     }
 
     public Input group(int index) {
-        return html.input(String.format(GROUP, index));
+        return html.input(format(GROUP, index));
     }
 
     public Select type(int index) {
-        return html.select(String.format(TYPE, index));
+        return html.select(format(TYPE, index));
     }
 
     public Checkbox unique(int index) {
-        return html.checkbox(String.format(UNIQUE, index));
+        return html.checkbox(format(UNIQUE, index));
     }
 
     public Checkbox visible(int index) {
-        return html.checkbox(String.format(VISIBLE, index));
+        return html.checkbox(format(VISIBLE, index));
     }
 
     public Checkbox subfeed(int index) {
-        return html.checkbox(String.format(SUBFEED, index));
+        return html.checkbox(format(SUBFEED, index));
     }
 
     public Checkbox checkpoint(int index) {
-        return html.checkbox(String.format(CHECKPOINT, index));
+        return html.checkbox(format(CHECKPOINT, index));
     }
 }

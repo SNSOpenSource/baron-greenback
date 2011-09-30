@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Html;
 
 import static com.googlecode.totallylazy.proxy.Call.method;

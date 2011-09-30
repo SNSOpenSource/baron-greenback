@@ -1,26 +1,27 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.totallylazy.records.Record;
+import com.googlecode.totallylazy.records.memory.MemoryRecords;
 import com.googlecode.utterlyidle.RequestBuilder;
+import com.googlecode.utterlyidle.Response;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import static com.googlecode.barongreenback.jobs.HttpScheduler.INITIAL_DELAY;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.INTERVAL;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.JOB_ID;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.REQUEST;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.TIME_UNIT;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static org.junit.Assert.assertThat;
 
 public class HttpSchedulerTest {
     private String request = RequestBuilder.get("/test").build().toString();
-    private Record schedulerSpec = record().set(REQUEST, request).set(JOB_ID, "orders").set(INITIAL_DELAY, 0L).set(INTERVAL, 10L).set(TIME_UNIT, TimeUnit.SECONDS);
-    private final StubFixedScheduler stub = new StubFixedScheduler();
-    private final HttpScheduler httpScheduler = new HttpScheduler(stub, null);
+    private Record schedulerSpec = record().set(REQUEST, request).set(JOB_ID, "orders").set(INTERVAL, 10L);
+    private final StubScheduler stub = new StubScheduler();
+    private final HttpScheduler httpScheduler = new HttpScheduler(new MemoryRecords(), stub, null);
 
     @Test
     public void scheduleRequest() throws Exception {
@@ -28,19 +29,13 @@ public class HttpSchedulerTest {
 
         assertThat(httpScheduler.jobs().size(), is(1));
         assertThat(httpScheduler.job(id).get().get(INTERVAL), CoreMatchers.is(10L));
-        assertThat(stub.initialDelay, CoreMatchers.is(0L));
         assertThat(stub.delay, CoreMatchers.is(10L));
-        assertThat(stub.unit, CoreMatchers.is(TimeUnit.SECONDS));
     }
 
     @Test
     public void rescheduleRequest() throws Exception {
         String id = httpScheduler.schedule(schedulerSpec);
-
-        assertThat(stub.initialDelay, CoreMatchers.is(0L));
         assertThat(stub.delay, CoreMatchers.is(10L));
-        assertThat(stub.unit, CoreMatchers.is(TimeUnit.SECONDS));
-
 
         httpScheduler.schedule(schedulerSpec.set(INTERVAL, 20L));
 
@@ -56,21 +51,21 @@ public class HttpSchedulerTest {
         assertThat(httpScheduler.jobs().size(), is(0));
     }
 
-    private static class StubFixedScheduler implements FixedScheduler {
-        public long initialDelay;
+    private static class StubScheduler implements Scheduler {
         public long delay;
-        public TimeUnit unit;
 
-        public ScheduledJob scheduleWithFixedDelay(Runnable command, long initialDelay, final long delay, TimeUnit unit) {
-            this.initialDelay = initialDelay;
+        public Job schedule(String id, Callable<Response> command, final long delay) {
             this.delay = delay;
-            this.unit = unit;
             return doNothingJob();
         }
 
-        private ScheduledJob doNothingJob() {
-            return new ScheduledJob() {
-                public void cancel(boolean mayInterruptIfRunning) {}
+        public void cancel(String id) {
+        }
+
+        private Job doNothingJob() {
+            return new Job() {
+                public void cancel() {
+                }
             };
         }
     }

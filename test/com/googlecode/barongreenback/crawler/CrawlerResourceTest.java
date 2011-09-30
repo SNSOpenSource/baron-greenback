@@ -1,9 +1,11 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.jobs.FixedScheduler;
+import com.googlecode.barongreenback.jobs.Scheduler;
+import com.googlecode.barongreenback.lucene.DirectoryActivator;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
@@ -11,6 +13,7 @@ import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
 import com.googlecode.utterlyidle.html.RelativeUrlHandler;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Restaurant;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
@@ -26,6 +29,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class CrawlerResourceTest {
+    @Before
+    public void deleteIndex() {
+        Files.delete(DirectoryActivator.DEFAULT_DIRECTORY);
+    }
+
     @Test
     public void canSaveAndLoadACrawler() throws Exception {
         using(new WebApplication(), new Callable1<WebApplication, Void>() {
@@ -97,45 +105,46 @@ public class CrawlerResourceTest {
 
     private ViewSearchPage crawlFeedsWithPaginationAndCheckpoint(final String checkpointValue) throws Exception {
         return using(new WebApplication(), new Callable1<WebApplication, ViewSearchPage>() {
-            public ViewSearchPage call(WebApplication application) throws Exception {
-                final RestServer restServer = setupServerWithDataFeed();
+            public ViewSearchPage call(final WebApplication application) throws Exception {
+                return using(setupServerWithDataFeed(), new Callable1<RestServer, ViewSearchPage>() {
+                    public ViewSearchPage call(RestServer restServer) throws Exception {
+                        CountDownLatch latch = new CountDownLatch(1);
+                        application.applicationScope().addInstance(CountDownLatch.class, latch).
+                                decorate(Scheduler.class, CountDownScheduler.class);
 
-                CountDownLatch latch = new CountDownLatch(1);
-                application.applicationScope().addInstance(CountDownLatch.class, latch).
-                        decorate(FixedScheduler.class, CountDownScheduler.class);
+                        HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(application));
+                        CrawlerPage newPage = new CrawlerPage(handler);
+                        newPage.update().value("news feed");
+                        newPage.from().value("http://localhost:9001/data");
+                        newPage.more().value("//link[@rel='prev-archive']/@href");
+                        newPage.checkpoint().value(checkpointValue);
+                        newPage.recordName().value("/feed/entry");
+                        newPage.keyword(1).value("title");
+                        newPage.alias(1).value("");
+                        newPage.group(1).value("group1");
+                        newPage.type(1).value(String.class.getName());
+                        newPage.unique(1).check();
+                        newPage.visible(1).check();
+                        newPage.subfeed(1).uncheck();
+                        newPage.subfeed(1).uncheck();
+                        newPage.checkpoint(1).uncheck();
+                        newPage.keyword(2).value("updated");
+                        newPage.alias(2).value("");
+                        newPage.group(2).value("");
+                        newPage.type(2).value(Date.class.getName());
+                        newPage.unique(2).uncheck();
+                        newPage.visible(2).uncheck();
+                        newPage.subfeed(2).uncheck();
+                        newPage.checkpoint(2).check();
+                        CrawlerListPage list = newPage.save();
+                        list.crawl("news feed");
 
-                HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(application));
-                CrawlerPage newPage = new CrawlerPage(handler);
-                newPage.update().value("news feed");
-                newPage.from().value("http://localhost:9001/data");
-                newPage.more().value("//link[@rel='prev-archive']/@href");
-                newPage.checkpoint().value(checkpointValue);
-                newPage.recordName().value("/feed/entry");
-                newPage.keyword(1).value("title");
-                newPage.alias(1).value("");
-                newPage.group(1).value("group1");
-                newPage.type(1).value(String.class.getName());
-                newPage.unique(1).check();
-                newPage.visible(1).check();
-                newPage.subfeed(1).uncheck();
-                newPage.subfeed(1).uncheck();
-                newPage.checkpoint(1).uncheck();
-                newPage.keyword(2).value("updated");
-                newPage.alias(2).value("");
-                newPage.group(2).value("");
-                newPage.type(2).value(Date.class.getName());
-                newPage.unique(2).uncheck();
-                newPage.visible(2).uncheck();
-                newPage.subfeed(2).uncheck();
-                newPage.checkpoint(2).check();
-                CrawlerListPage list = newPage.save();
-                list.crawl("news feed");
+                        latch.await();
 
-                latch.await();
-                restServer.close();
-
-                return new ViewSearchPage(handler, "news feed", "");
-            }
+                        return new ViewSearchPage(handler, "news feed", "");
+                    }
+                });
+            };
         });
     }
 

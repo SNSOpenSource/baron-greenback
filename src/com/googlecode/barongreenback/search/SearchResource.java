@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.barongreenback.lucene.QueryParserActivator;
 import com.googlecode.barongreenback.views.View;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
@@ -9,7 +10,6 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
@@ -24,7 +24,6 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;

@@ -4,19 +4,17 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.RecordMethods;
 import com.googlecode.totallylazy.records.Records;
-import com.googlecode.totallylazy.records.memory.MemoryRecords;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.Response;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Callable;
 
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.HttpMessageParser.parseRequest;
 
@@ -25,34 +23,30 @@ public class HttpScheduler {
 
     public static final Keyword<String> JOB_ID = keyword("scheduledRequests_id", String.class);
     public static final Keyword<String> REQUEST = keyword("request", String.class);
-    public static final Keyword<Long> INITIAL_DELAY = keyword("initialDelay", Long.class);
     public static final Keyword<Long> INTERVAL = keyword("delay", Long.class);
-    public static final Keyword<TimeUnit> TIME_UNIT = keyword("timeUnit", TimeUnit.class);
 
-    private final Records records = new MemoryRecords();
-    private final Map<String, ScheduledJob> scheduledJobs = new HashMap<String, ScheduledJob>();
-
-    private final FixedScheduler scheduler;
+    private final Records records;
+    private final Scheduler scheduler;
     private final Application application;
 
-    public HttpScheduler(final FixedScheduler scheduler, final Application application) {
+    public HttpScheduler(final Records records, final Scheduler scheduler, final Application application) {
+        this.records = records;
         this.scheduler = scheduler;
         this.application = application;
-        records.define(SCHEDULED_REQUESTS, JOB_ID, REQUEST, INITIAL_DELAY, INTERVAL, TIME_UNIT);
+        records.define(SCHEDULED_REQUESTS, JOB_ID, REQUEST, INTERVAL);
     }
 
-    public synchronized String schedule(Record schedulerSpec) {
-        records.put(SCHEDULED_REQUESTS, RecordMethods.update(using(JOB_ID), schedulerSpec));
+    public String schedule(Record possiblePartialRecord) {
+        records.put(SCHEDULED_REQUESTS, update(using(JOB_ID), possiblePartialRecord));
+        String id = possiblePartialRecord.get(JOB_ID);
 
-        Record record = job(schedulerSpec.get(JOB_ID)).get();
-        String id = record.get(JOB_ID);
-        cancelScheduledFuture(id);
-
-        return schedule(id, parseRequest(record.get(REQUEST)), record.get(INITIAL_DELAY), record.get(INTERVAL), record.get(TIME_UNIT));
+        Record fullRecord = job(id).get();
+        scheduler.schedule(id, httpTask(parseRequest(fullRecord.get(REQUEST))), fullRecord.get(INTERVAL));
+        return id;
     }
 
-    public synchronized void remove(String id) {
-        cancelScheduledFuture(id);
+    public void remove(String id) {
+        scheduler.cancel(id);
         records.remove(SCHEDULED_REQUESTS, where(JOB_ID, is(id)));
     }
 
@@ -61,29 +55,13 @@ public class HttpScheduler {
     }
 
     public Option<Record> job(String id) {
-        return records.get(SCHEDULED_REQUESTS).filter(where(JOB_ID, is(id))).headOption();
+        return records.get(SCHEDULED_REQUESTS).find(where(JOB_ID, is(id)));
     }
 
-    private String schedule(String id, Request request, Long initialDelay, Long interval, TimeUnit timeUnit) {
-        ScheduledJob scheduledJob = scheduler.scheduleWithFixedDelay(httpTask(request), initialDelay, interval, timeUnit);
-        scheduledJobs.put(id, scheduledJob);
-        return id;
-    }
-
-    private void cancelScheduledFuture(String id) {
-        if (scheduledJobs.containsKey(id)) {
-            scheduledJobs.get(id).cancel(true);
-        }
-    }
-
-    public Runnable httpTask(final Request request) {
-        return new Runnable() {
-            public void run() {
-                try {
-                    application.handle(request);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    public Callable<Response> httpTask(final Request request) {
+        return new Callable<Response>() {
+            public Response call() throws Exception {
+                return application.handle(request);
             }
         };
     }

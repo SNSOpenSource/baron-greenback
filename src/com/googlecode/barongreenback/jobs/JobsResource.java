@@ -18,11 +18,9 @@ import com.googlecode.utterlyidle.annotations.QueryParam;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.googlecode.barongreenback.jobs.HttpScheduler.INITIAL_DELAY;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.INTERVAL;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.JOB_ID;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.REQUEST;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.TIME_UNIT;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -47,7 +45,7 @@ public class JobsResource {
     public Response schedule(@PathParam("id") String id, @PathParam("interval") Long interval, @PathParam("$") String endOfUrl) throws Exception {
         Request scheduledRequest = request.uri(request.uri().path(endOfUrl));
 
-        scheduler.schedule(record().set(INITIAL_DELAY, 0L).set(INTERVAL, interval).set(TIME_UNIT, DEFAULT_TIME_UNIT).set(JOB_ID, id).set(REQUEST, scheduledRequest.toString()));
+        scheduler.schedule(record().set(INTERVAL, interval).set(JOB_ID, id).set(REQUEST, scheduledRequest.toString()));
 
         return redirectToList();
     }

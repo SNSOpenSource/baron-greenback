@@ -23,33 +23,9 @@ import org.apache.lucene.util.Version;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.io.HierarchicalPath.hierarchicalPath;
 
-public class SearchModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule {
+public class SearchModule implements ResourcesModule{
     public Module addResources(Resources resources) throws ParseException {
         resources.add(annotatedClass(SearchResource.class));
         return this;
     }
-
-    public Module addPerApplicationObjects(Container container) {
-        container.addInstance(Version.class, Version.LUCENE_33);
-        container.addActivator(Directory.class, DirectoryActivator.class);
-        container.addActivator(IndexWriter.class, IndexWriterActivator.class);
-        return this;
-    }
-
-    public Module addPerRequestObjects(Container container) {
-        container.add(LuceneRecords.class);
-        container.addActivator(Records.class, container.getActivator(LuceneRecords.class));
-        container.add(QueryParserActivator.class);
-        return this;
-    }
-
-    public static Callable1<? super Pair<Request, Response>, String> file() {
-        return new Callable1<Pair<Request, Response>, String>() {
-            public String call(Pair<Request, Response> pair) throws Exception {
-                return hierarchicalPath(pair.first().uri().path()).file();
-            }
-        };
-    }
-
-
 }

@@ -1,29 +1,35 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.jobs.FixedScheduler;
-import com.googlecode.barongreenback.jobs.ScheduledJob;
+import com.googlecode.barongreenback.jobs.Scheduler;
+import com.googlecode.barongreenback.jobs.Job;
+import com.googlecode.utterlyidle.Response;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-public class CountDownScheduler implements FixedScheduler{
-    private final FixedScheduler fixedScheduler;
+public class CountDownScheduler implements Scheduler {
+    private final Scheduler scheduler;
     private final CountDownLatch latch;
 
-    public CountDownScheduler(FixedScheduler fixedScheduler, CountDownLatch latch) {
-        this.fixedScheduler = fixedScheduler;
+    public CountDownScheduler(Scheduler scheduler, CountDownLatch latch) {
+        this.scheduler = scheduler;
         this.latch = latch;
     }
 
-    public ScheduledJob scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        return fixedScheduler.scheduleWithFixedDelay(decorate(command), initialDelay, delay, unit);
+    public Job schedule(String id, Callable<Response> command, long delay) {
+        return scheduler.schedule(id, decorate(command), delay);
     }
 
-    private Runnable decorate(final Runnable command) {
-        return new Runnable() {
-            public void run() {
-                command.run();
+    public void cancel(String id) {
+        scheduler.cancel(id);
+    }
+
+    private Callable<Response> decorate(final Callable<Response> command) {
+        return new Callable<Response>() {
+            public Response call() throws Exception {
+                Response response = command.call();
                 latch.countDown();
+                return response;
             }
         };
     }
