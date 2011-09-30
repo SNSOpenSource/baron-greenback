@@ -1,4 +1,4 @@
-@import "bootstrap.less";
+@import "twitter/bootstrap.less";
 
 .large-input {
     width: 270px;
@@ -29,9 +29,14 @@ input.more, a.export, input.delete, a.import, a.edit, a.cancel {
     .btn;
 }
 
-input.delete {
+input.delete, input.stop {
     .btn;
     .btn.danger;
+}
+
+input.start {
+    .btn;
+//    .btn.success;
 }
 
 div.control {
@@ -91,7 +96,7 @@ form.view {
 }
 
 
-html body form.delete, html body.list form.crawl {
+form.delete, form.crawl, form.start, form.stop {
     margin: 0;
     padding: 0;
     display: inline-block;
@@ -111,7 +116,7 @@ body {
 
 .topbar {
     a.home {
-        background: left no-repeat url(../small-logo.png);
+        background: left no-repeat url(small-logo.png);
         padding-left: 40px;
     }
 }
