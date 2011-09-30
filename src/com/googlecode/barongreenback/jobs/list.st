@@ -18,5 +18,10 @@
     </tbody>
 </table>
 
+<div class="actions">
+    $post(name="start")$
+    $post(name="stop")$
+</div>
+
 </body>
 </html>

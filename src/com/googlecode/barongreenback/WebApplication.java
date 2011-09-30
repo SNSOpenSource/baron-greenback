@@ -27,7 +27,7 @@ public class WebApplication extends RestApplication {
         addModules(this);
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
-                staticRule(contentType(TEXT_HTML), templateName("twitter"))));
+                staticRule(contentType(TEXT_HTML), templateName("decorator"))));
     }
 
     public static void addModules(Application application) {

@@ -1,6 +1,8 @@
 package com.googlecode.barongreenback.jobs;
 
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
@@ -13,6 +15,7 @@ import java.util.concurrent.Callable;
 
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
@@ -45,6 +48,14 @@ public class HttpScheduler {
         return id;
     }
 
+    public void resumeAll() {
+        jobs().each(resume());
+    }
+
+    public void pauseAll() {
+        jobs().each(pause());
+    }
+
     public void remove(String id) {
         scheduler.cancel(id);
         records.remove(SCHEDULED_REQUESTS, where(JOB_ID, is(id)));
@@ -58,10 +69,28 @@ public class HttpScheduler {
         return records.get(SCHEDULED_REQUESTS).find(where(JOB_ID, is(id)));
     }
 
-    public Callable<Response> httpTask(final Request request) {
+    private Callable<Response> httpTask(final Request request) {
         return new Callable<Response>() {
             public Response call() throws Exception {
                 return application.handle(request);
+            }
+        };
+    }
+
+    private Callable1<Record, Void> pause() {
+        return new Callable1<Record, Void>() {
+            public Void call(Record record) throws Exception {
+                scheduler.cancel(record.get(JOB_ID));
+                return VOID;
+            }
+        };
+    }
+
+    private Callable1<Record, Void> resume() {
+        return new Callable1<Record, Void>() {
+            public Void call(Record record) throws Exception {
+                scheduler.schedule(record.get(JOB_ID), httpTask(parseRequest(record.get(REQUEST))), record.get(INTERVAL));
+                return VOID;
             }
         };
     }

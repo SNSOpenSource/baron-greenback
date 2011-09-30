@@ -78,6 +78,20 @@ public class JobsResource {
         return model().add("jobs", jobsModel(scheduler.jobs()));
     }
 
+    @POST
+    @Path("start")
+    public Response resumeAll() {
+        scheduler.resumeAll();
+        return redirector.seeOther(method(on(JobsResource.class).list()));
+    }
+
+    @POST
+    @Path("stop")
+    public Response pauseAll() {
+        scheduler.pauseAll();
+        return redirector.seeOther(method(on(JobsResource.class).list()));
+    }
+
     private Response redirectToList() {
         return redirector.seeOther(method(on(getClass()).list()));
     }
