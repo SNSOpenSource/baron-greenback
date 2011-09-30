@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
@@ -48,12 +47,12 @@ public class HttpScheduler {
         return id;
     }
 
-    public void resumeAll() {
-        jobs().each(resume());
+    public void start() {
+        jobs().each(schedule());
     }
 
-    public void pauseAll() {
-        jobs().each(pause());
+    public void stop() {
+        jobs().each(cancel());
     }
 
     public void remove(String id) {
@@ -77,7 +76,7 @@ public class HttpScheduler {
         };
     }
 
-    private Callable1<Record, Void> pause() {
+    private Callable1<Record, Void> cancel() {
         return new Callable1<Record, Void>() {
             public Void call(Record record) throws Exception {
                 scheduler.cancel(record.get(JOB_ID));
@@ -86,7 +85,7 @@ public class HttpScheduler {
         };
     }
 
-    private Callable1<Record, Void> resume() {
+    private Callable1<Record, Void> schedule() {
         return new Callable1<Record, Void>() {
             public Void call(Record record) throws Exception {
                 scheduler.schedule(record.get(JOB_ID), httpTask(parseRequest(record.get(REQUEST))), record.get(INTERVAL));

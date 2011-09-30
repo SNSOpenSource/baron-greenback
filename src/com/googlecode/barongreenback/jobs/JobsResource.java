@@ -4,7 +4,6 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.utterlyidle.HttpMessageParser;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
@@ -80,15 +79,15 @@ public class JobsResource {
 
     @POST
     @Path("start")
-    public Response resumeAll() {
-        scheduler.resumeAll();
+    public Response start() {
+        scheduler.start();
         return redirector.seeOther(method(on(JobsResource.class).list()));
     }
 
     @POST
     @Path("stop")
-    public Response pauseAll() {
-        scheduler.pauseAll();
+    public Response stop() {
+        scheduler.stop();
         return redirector.seeOther(method(on(JobsResource.class).list()));
     }
 
