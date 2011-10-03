@@ -52,6 +52,7 @@ import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
+import static java.lang.String.format;
 
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
@@ -137,7 +138,8 @@ public class CrawlerResource {
 
     @POST
     @Path("crawl")
-    public Response crawl(@FormParam("id") UUID id) throws Exception {
+    @Produces(MediaType.TEXT_PLAIN)
+    public String crawl(@FormParam("id") UUID id) throws Exception {
         Model model = modelRepository.get(id);
         Model form = model.get("form", Model.class);
         String from = form.get("from", String.class);
@@ -158,7 +160,7 @@ public class CrawlerResource {
     }
 
     private Date toDate(String checkpoint) {
-        if(checkpoint.isEmpty()) return null;
+        if (checkpoint.isEmpty()) return null;
         return new DateFormatConverter(Dates.RFC3339(), Dates.RFC822(), Dates.javaUtilDateToString()).toDate(checkpoint);
     }
 
@@ -172,30 +174,33 @@ public class CrawlerResource {
                 return model().
                         add("id", pair.first().toString()).
                         add("model", pair.second()).
-                        add("jobUrl", jobUrl(pair.second()));
+                        add("jobUrl", jobUrl(pair.first()));
             }
         };
     }
 
-    private Uri jobUrl(Model model) throws Exception {
+    private Uri jobUrl(UUID uuid) throws Exception {
         Uri uri = relativeUriOf(method(on(CrawlerResource.class).crawl(null)));
-        return redirector.uriOf(method(on(JobsResource.class).schedule(extractUpdate(model), DEFAULT_INTERVAL, "/"+uri.toString())));
-    }
-
-    private String extractUpdate(Model model) {
-        return (String)((Model)model.get("form")).get("update");
+        return redirector.uriOf(method(on(JobsResource.class).schedule(uuid, DEFAULT_INTERVAL, "/" + uri.toString())));
     }
 
     private Response redirectToList() {
         return redirector.seeOther(method(on(getClass()).list()));
     }
 
-    private Response put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
+    private String put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
+        if(recordsToAdd.isEmpty()){
+            return numberOfRecordsUpdated(0);
+        }
         Sequence<Keyword> keywords = keywords(recordsToAdd);
         views.put(view(recordName).withFields(keywords));
         records.define(recordName, keywords.toArray(Keyword.class));
-        records.put(recordName, update(using(unique), recordsToAdd));
-        return redirector.seeOther(method(on(SearchResource.class).list(recordName.name(), EMPTY)));
+        Number updated = records.put(recordName, update(using(unique), recordsToAdd));
+        return numberOfRecordsUpdated(updated);
+    }
+
+    private String numberOfRecordsUpdated(Number updated) {
+        return format("%s Records updated", updated);
     }
 
 }

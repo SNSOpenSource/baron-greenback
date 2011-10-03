@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.barongreenback.jobs.Job;
 import com.googlecode.totallylazy.Runnables;
 
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
@@ -16,11 +17,11 @@ public class CountDownScheduler implements Scheduler {
         this.latch = latch;
     }
 
-    public Job schedule(String id, Callable<?> command, long delay) {
-        return scheduler.schedule(id, decorate(command), delay);
+    public Job schedule(UUID id, Callable<?> command, long numberOfSeconds) {
+        return scheduler.schedule(id, decorate(command), numberOfSeconds);
     }
 
-    public void cancel(String id) {
+    public void cancel(UUID id) {
         scheduler.cancel(id);
     }
 

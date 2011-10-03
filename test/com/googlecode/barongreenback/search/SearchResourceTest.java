@@ -2,9 +2,11 @@ package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.crawler.CrawlerTest;
+import com.googlecode.barongreenback.lucene.DirectoryActivator;
 import com.googlecode.barongreenback.views.View;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.Xml;
@@ -17,6 +19,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Server;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.yadic.Container;
+import org.junit.Before;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Closeables.using;
@@ -32,6 +35,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class SearchResourceTest {
+    @Before
+    public void deleteIndex() {
+        Files.delete(DirectoryActivator.DEFAULT_DIRECTORY);
+    }
+
     @Test
     public void canQuery() throws Exception {
         using(new WebApplication(), new Callable1<WebApplication, Void>() {

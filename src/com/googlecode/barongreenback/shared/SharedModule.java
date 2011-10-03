@@ -41,7 +41,6 @@ public class SharedModule implements ResponseHandlersModule, RequestScopedModule
 
     public Module addPerArgumentObjects(Container container) throws Exception {
         container.addActivator(Model.class, ModelActivator.class);
-        container.addActivator(UUID.class, UUIDActivator.class);
         return this;
     }
 }

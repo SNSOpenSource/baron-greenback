@@ -2,10 +2,11 @@ package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.utterlyidle.Response;
 
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 public interface Scheduler {
-    Job schedule(String id, Callable<?> command, long delay);
+    Job schedule(UUID id, Callable<?> command, long numberOfSeconds);
 
-    void cancel(String id);
+    void cancel(UUID id);
 }

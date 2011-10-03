@@ -8,9 +8,11 @@
 <table class="results zebra-striped">
     <thead>
     <tr>
-        $th(class="blue", header="crawler")$
-        $th(class="green", header="interval (seconds)")$
-        $th(class="orange", header="action")$
+        $th(class="blue", header="Id")$
+        $th(class="green", header="Interval (seconds)")$
+        $th(class="orange", header="Request")$
+        $th(class="blue", header="Response")$
+        $th(class="green", header="action")$
     </tr>
     </thead>
     <tbody>
