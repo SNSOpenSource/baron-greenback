@@ -3,12 +3,10 @@ package com.googlecode.barongreenback.jobs;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.memory.MemoryRecords;
 import com.googlecode.utterlyidle.RequestBuilder;
-import com.googlecode.utterlyidle.Response;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import static com.googlecode.barongreenback.jobs.HttpScheduler.INTERVAL;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.JOB_ID;
@@ -54,7 +52,7 @@ public class HttpSchedulerTest {
     private static class StubScheduler implements Scheduler {
         public long delay;
 
-        public Job schedule(String id, Callable<Response> command, final long delay) {
+        public Job schedule(String id, Callable<?> command, final long delay) {
             this.delay = delay;
             return doNothingJob();
         }

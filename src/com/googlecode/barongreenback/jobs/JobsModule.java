@@ -9,6 +9,7 @@ import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
+import com.googlecode.utterlyidle.modules.StartupModule;
 import com.googlecode.yadic.Container;
 
 import java.util.concurrent.Callable;
@@ -17,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
-public class JobsModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule {
+public class JobsModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, StartupModule {
     public Module addResources(Resources resources) throws Exception {
         resources.add(annotatedClass(JobsResource.class));
         return this;
@@ -33,5 +34,11 @@ public class JobsModule implements ResourcesModule, ApplicationScopedModule, Req
         container.addInstance(ScheduledExecutorService.class, Executors.newScheduledThreadPool(5));
         container.add(Scheduler.class, FixedScheduler.class);
         return this;
+    }
+
+    public Container start(Container container){
+        JobsResource jobsResource = container.get(JobsResource.class);
+        jobsResource.start();
+        return container;
     }
 }
