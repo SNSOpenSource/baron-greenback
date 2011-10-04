@@ -23,7 +23,7 @@ import static com.googlecode.totallylazy.records.Using.using;
 public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUID, Model>> {
     public static final Keyword<Object> MODELS = keyword("models");
     public static final Keyword<String> ID = keyword("models_id", String.class);
-    public static final Keyword<String> MODEL = keyword("model", String.class);
+    public static final Keyword<Model> MODEL = keyword("model", Model.class);
     private final Records records;
 
     public ModelRepository(final Records records) {
@@ -38,13 +38,13 @@ public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUI
     public Sequence<Pair<UUID, Model>> find(Predicate<? super Record> predicate) {
         return records.get(MODELS).filter(predicate).map(new Callable1<Record, Pair<UUID, Model>>() {
             public Pair<UUID, Model> call(Record record) throws Exception {
-                return Pair.pair(UUID.fromString(record.get(ID)), Model.parse(record.get(MODEL)));
+                return Pair.pair(UUID.fromString(record.get(ID)), record.get(MODEL));
             }
         });
     }
 
     public void set(UUID key, Model value) {
-        records.put(MODELS, update(using(ID), record().set(ID, key.toString()).set(MODEL, value.toString())));
+        records.put(MODELS, update(using(ID), record().set(ID, key.toString()).set(MODEL, value)));
     }
 
     public void remove(UUID key) {
