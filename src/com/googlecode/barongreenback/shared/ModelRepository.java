@@ -22,7 +22,7 @@ import static com.googlecode.totallylazy.records.Using.using;
 
 public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUID, Model>> {
     public static final Keyword<Object> MODELS = keyword("models");
-    public static final Keyword<String> ID = keyword("models_id", String.class);
+    public static final Keyword<UUID> ID = keyword("models_id", UUID.class);
     public static final Keyword<Model> MODEL = keyword("model", Model.class);
     private final Records records;
 
@@ -32,22 +32,22 @@ public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUI
     }
 
     public Model get(UUID key) {
-        return find(where(ID, is(key.toString()))).map(second(Model.class)).head();
+        return find(where(ID, is(key))).map(second(Model.class)).head();
     }
 
     public Sequence<Pair<UUID, Model>> find(Predicate<? super Record> predicate) {
         return records.get(MODELS).filter(predicate).map(new Callable1<Record, Pair<UUID, Model>>() {
             public Pair<UUID, Model> call(Record record) throws Exception {
-                return Pair.pair(UUID.fromString(record.get(ID)), record.get(MODEL));
+                return Pair.pair(record.get(ID), record.get(MODEL));
             }
         });
     }
 
     public void set(UUID key, Model value) {
-        records.put(MODELS, update(using(ID), record().set(ID, key.toString()).set(MODEL, value)));
+        records.put(MODELS, update(using(ID), record().set(ID, key).set(MODEL, value)));
     }
 
     public void remove(UUID key) {
-        records.remove(MODELS, where(ID, is(key.toString())));
+        records.remove(MODELS, where(ID, is(key)));
     }
 }
