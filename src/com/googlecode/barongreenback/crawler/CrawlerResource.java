@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.JobsResource;
-import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
@@ -42,7 +41,6 @@ import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -193,7 +191,7 @@ public class CrawlerResource {
             return numberOfRecordsUpdated(0);
         }
         Sequence<Keyword> keywords = keywords(recordsToAdd);
-        views.put(view(recordName).withFields(keywords));
+        views.put(view(recordName).fields(keywords));
         records.define(recordName, keywords.toArray(Keyword.class));
         Number updated = records.put(recordName, update(using(unique), recordsToAdd));
         return numberOfRecordsUpdated(updated);

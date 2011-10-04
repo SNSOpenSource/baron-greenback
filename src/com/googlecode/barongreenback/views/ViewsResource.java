@@ -75,7 +75,7 @@ public class ViewsResource {
         String update = form.get("update", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        views.put(View.view(Keywords.keyword(update)).withFields(recordDefinition.fields()));
+        views.put(View.view(Keywords.keyword(update)).fields(recordDefinition.fields()));
         return redirectToList();
     }
 

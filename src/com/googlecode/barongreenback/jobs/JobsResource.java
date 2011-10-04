@@ -60,7 +60,6 @@ public class JobsResource {
     @GET
     @Path("edit")
     public Model edit(@QueryParam("id") UUID id) {
-        // TODO: handle 404
         Record job = scheduler.job(id).get();
         return model().add("id", id.toString()).add("seconds", job.get(SECONDS));
     }

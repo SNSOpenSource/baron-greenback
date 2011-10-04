@@ -38,7 +38,7 @@ public class ViewsTest {
                     public Void call(Container container) throws Exception {
                         Records records = container.get(Records.class);
                         Keyword<Integer> id = keyword("id", Integer.class).metadata(record().set(Keywords.UNIQUE, true).set(Views.VISIBLE, true));
-                        View view = view(keyword("users")).withFields(id, keyword("name", String.class));
+                        View view = view(keyword("users")).fields(id, keyword("name", String.class));
                         Views views = new Views(records).put(view);
 
                         Sequence<Record> actual = records.get(Views.RECORDS_NAME).realise();

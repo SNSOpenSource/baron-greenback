@@ -6,18 +6,14 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 
-import java.util.UUID;
-
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.comparators.Comparators.ascending;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
@@ -79,7 +75,7 @@ public class Views {
     private Callable1<? super Group<String, Record>, View> asView() {
         return new Callable1<Group<String, Record>, View>() {
             public View call(Group<String, Record> group) throws Exception {
-                return View.view(keyword(group.key())).withFields(group.map(asField()));
+                return View.view(keyword(group.key())).fields(group.map(asField()));
             }
         };
     }

@@ -25,11 +25,11 @@ public class View {
         };
     }
 
-    public View withFields(Keyword<?>... keywords) {
-        return withFields(Sequences.<Keyword>sequence(keywords));
+    public View fields(Keyword<?>... keywords) {
+        return fields(Sequences.<Keyword>sequence(keywords));
     }
 
-    public View withFields(Sequence<Keyword> sequence) {
+    public View fields(Sequence<Keyword> sequence) {
         this.fields = sequence;
         return this;
     }

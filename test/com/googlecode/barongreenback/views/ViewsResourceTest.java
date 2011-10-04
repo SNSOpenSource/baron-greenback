@@ -36,7 +36,7 @@ public class ViewsResourceTest {
             public Void call(WebApplication application) throws Exception {
                 application.usingRequestScope(new Callable1<Container, Void>() {
                     public Void call(Container container) throws Exception {
-                        View view = view(keyword("users")).withFields(keyword("name", String.class));
+                        View view = view(keyword("users")).fields(keyword("name", String.class));
                         container.get(Views.class).put(view);
                         return Runnables.VOID;
                     }
