@@ -80,6 +80,7 @@ public class SearchResource {
         Map<String, Map<String, Object>> fold = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return model().
                 add("view", view).
+                add("query", query).
                 add("record", fold);
     }
 

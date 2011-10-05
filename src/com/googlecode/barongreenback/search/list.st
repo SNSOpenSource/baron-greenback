@@ -3,6 +3,7 @@
 <head>
     <title>$view$ Search</title>
     <meta name="view" content="$view$" />
+    <meta name="query" content="$query$" />
 </head>
 <body class="$view$">
 <div>
