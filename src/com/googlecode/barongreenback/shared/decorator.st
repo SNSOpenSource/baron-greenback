@@ -3,6 +3,7 @@
 <head>
     <title>$title$ - Baron Greenback</title>
     <link rel="stylesheet/less" type="text/css" href="$base$baron-greenback/shared/style.less"/>
+    <script type="text/javascript">var less = less || {env : 'production'};</script>
     <script src="$base$baron-greenback/shared/less-1.1.3.min.js" type="text/javascript"></script>
     $head$
 </head>

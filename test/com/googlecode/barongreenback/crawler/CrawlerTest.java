@@ -2,8 +2,8 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
-import com.googlecode.totallylazy.DateFormatConverter;
-import com.googlecode.totallylazy.Dates;
+import com.googlecode.totallylazy.time.DateFormatConverter;
+import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
