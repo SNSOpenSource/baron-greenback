@@ -12,22 +12,24 @@ import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
+import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-import static com.googlecode.barongreenback.jobs.HttpScheduler.RESPONSE;
-import static com.googlecode.barongreenback.jobs.HttpScheduler.SECONDS;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.JOB_ID;
 import static com.googlecode.barongreenback.jobs.HttpScheduler.REQUEST;
+import static com.googlecode.barongreenback.jobs.HttpScheduler.RESPONSE;
+import static com.googlecode.barongreenback.jobs.HttpScheduler.SECONDS;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.MapRecord.record;
+import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 
 @Path("jobs")
+@Produces(TEXT_HTML)
 public class JobsResource {
     public static final Long DEFAULT_INTERVAL = 30L;
     private final HttpScheduler scheduler;

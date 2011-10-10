@@ -9,7 +9,7 @@ import com.googlecode.barongreenback.views.ViewsModule;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.httpserver.RestServer;
-import com.googlecode.utterlyidle.modules.CachingModule;
+import com.googlecode.utterlyidle.modules.PerformanceModule;
 
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
@@ -32,7 +32,7 @@ public class WebApplication extends RestApplication {
     }
 
     public static void addModules(Application application) {
-        application.add(new CachingModule());
+        application.add(new PerformanceModule());
         application.add(new LuceneModule());
         application.add(new SharedModule());
         application.add(new CrawlerModule());
