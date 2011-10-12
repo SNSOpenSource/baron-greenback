@@ -7,12 +7,11 @@ import com.googlecode.utterlyidle.HttpHeaders;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
 import java.io.IOException;
 
-import static com.googlecode.totallylazy.callables.TimeCallable.calculateMilliseconds;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
-import static java.lang.String.format;
 
 public class LessCssHandler implements HttpHandler {
     private final HttpHandler httpHandler;
@@ -47,17 +46,12 @@ public class LessCssHandler implements HttpHandler {
 
         public String call(String newUri) throws Exception {
             try {
-                long start = System.nanoTime();
                 uri = uri.mergePath(newUri);
                 Response response = httpHandler.handle(get(uri).header(HttpHeaders.ACCEPT, MediaType.TEXT_CSS).build());
-                long finish = System.nanoTime();
-                System.out.println(format("time to load %s %s ", calculateMilliseconds(start, finish), uri));
                 return new String((byte[]) response.entity());
             } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                return "";
+                return ExceptionRenderer.toString(e);
             }
         }
-
     }
 }
