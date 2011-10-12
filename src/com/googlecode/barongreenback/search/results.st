@@ -1,3 +1,4 @@
+$if(!results.empty)$
 <div id="results">
     <table class="results zebra-striped">
         <thead>
@@ -12,3 +13,4 @@
         </tbody>
     </table>
 </div>
+$endif$

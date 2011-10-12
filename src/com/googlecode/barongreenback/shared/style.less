@@ -16,6 +16,12 @@
     box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
 }
 
+.inlineBlock {
+    display: inline-block;
+    zoom: 1;
+    *display: inline;
+}
+
 h1, h2, h3, h4, h5, h6, .btn, a.update {
     text-transform: capitalize;
 }
@@ -35,7 +41,7 @@ input.delete, input.stop {
 }
 
 div.control {
-    display: inline-block;
+    .inlineBlock;
     margin: 5px;
 }
 
@@ -94,7 +100,7 @@ form.view {
 form.delete, form.crawl, form.start, form.stop {
     margin: 0;
     padding: 0;
-    display: inline-block;
+    .inlineBlock;
 }
 
 body {
