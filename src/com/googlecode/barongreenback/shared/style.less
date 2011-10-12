@@ -45,25 +45,27 @@ h1, h2, h3, h4, h5, h6, .btn, a.update {
     text-transform: capitalize;
 }
 
-input.crawl, input.search, a.new, input.import, input.save, input.start  {
-    .btn;
-    .btn.primary;
+.button {
     &:hover {
         color: #fff;
     }
 }
 
-input.more, a.export, input.delete, a.import, a.edit, a.cancel {
+input.crawl, input.search, a.new, input.import, input.save, input.start  {
+    .btn;
+    .btn.primary;
+    .button;
+}
+
+input.more, a.export, a.import, a.edit, a.cancel {
     .btn;
 }
 
 input.delete, input.stop {
     .btn;
     .btn.danger;
-    &:hover {
-        color: #fff;
-    }
     .gradientBar(lighten(@red, 15%), @red);
+    .button;
 }
 
 div.control {

@@ -10,16 +10,21 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 public class LessCssHandler implements HttpHandler {
+    private static final Map<Uri, String> cache = new ConcurrentHashMap<Uri, String>();
     private final HttpHandler httpHandler;
     private final LessCompiler lessCompiler;
+    private final LessCssConfig config;
 
-    public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler) {
+    public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler, LessCssConfig config) {
         this.httpHandler = httpHandler;
         this.lessCompiler = lessCompiler;
+        this.config = config;
     }
 
     public Response handle(Request request) throws Exception {
@@ -34,13 +39,18 @@ public class LessCssHandler implements HttpHandler {
     }
 
     private String processLess(Uri uri, String less) throws IOException {
-        return lessCompiler.compile(less, new Foo(uri));
+        if(cache.containsKey(uri) && config.useCache()){
+            return cache.get(uri);
+        }
+        String result = lessCompiler.compile(less, new Loader(uri));
+        cache.put(uri, result);
+        return result;
     }
 
-    public class Foo implements Callable1<String, String> {
+    public class Loader implements Callable1<String, String> {
         private Uri uri;
 
-        public Foo(Uri uri) {
+        public Loader(Uri uri) {
             this.uri = uri;
         }
 
