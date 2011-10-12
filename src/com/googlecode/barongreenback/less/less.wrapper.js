@@ -7,7 +7,7 @@ function parseLess(content, loader) {
     var result;
     parser.parse(String(content), function (e, css) {
         if (e) {
-            result =  e.message;
+            result =  e;
         } else {
             result = css.toCSS();
         }

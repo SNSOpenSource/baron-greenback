@@ -1,5 +1,9 @@
 @import "twitter/bootstrap.less";
 
+@grayDark:          lighten(@black, 15%);
+@gray:              lighten(@black, 30%);
+
+
 .large-input {
     width: 270px;
 }
@@ -22,6 +26,21 @@
     *display: inline;
 }
 
+.label {
+    padding: 0;
+    display: block;
+    float: none;
+    width: auto;
+    font-weight: bold;
+    text-align: left;
+    line-height: 20px;
+    padding-top: 0;
+    color: @grayDark;
+    background: none;
+    font-size: 13px;
+    text-transform: capitalize;
+}
+
 h1, h2, h3, h4, h5, h6, .btn, a.update {
     text-transform: capitalize;
 }
@@ -29,6 +48,9 @@ h1, h2, h3, h4, h5, h6, .btn, a.update {
 input.crawl, input.search, a.new, input.import, input.save, input.start  {
     .btn;
     .btn.primary;
+    &:hover {
+        color: #fff;
+    }
 }
 
 input.more, a.export, input.delete, a.import, a.edit, a.cancel {
@@ -38,11 +60,19 @@ input.more, a.export, input.delete, a.import, a.edit, a.cancel {
 input.delete, input.stop {
     .btn;
     .btn.danger;
+    &:hover {
+        color: #fff;
+    }
+    .gradientBar(lighten(@red, 15%), @red);
 }
 
 div.control {
     .inlineBlock;
     margin: 5px;
+}
+
+ul.tabs {
+    float: none;
 }
 
 th, ul.tabs li {

@@ -14,7 +14,7 @@
         $record.(groupName).keys:{ name |
 
         <div class="control">
-            <span class="label">$name$</span>
+            <span class="label">$name$:</span>
             <span>$record.(groupName).(name)$</span>
         </div>
         }$
