@@ -1,11 +1,11 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.utterlyidle.Status;
-import com.googlecode.utterlyidle.html.Html;
-import com.googlecode.utterlyidle.html.TextArea;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.html.Html;
+import com.googlecode.utterlyidle.html.Input;
+import com.googlecode.utterlyidle.html.TextArea;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class ImportCrawlerPage {
+    public static final String ID = "//input[@name='id']";
     public static final String MODEL = "//textarea[@name='model']";
     private final HttpHandler httpHandler;
     private final Html html;
@@ -27,6 +28,10 @@ public class ImportCrawlerPage {
         this.httpHandler = httpHandler;
         this.html = Html.html(response);
         assertThat(html.title(), containsString("Import Crawler"));
+    }
+
+    public Input id() {
+        return html.input(ID);
     }
 
     public TextArea model() {

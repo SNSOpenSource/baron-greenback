@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import static com.googlecode.totallylazy.Closeables.using;
@@ -26,6 +27,7 @@ import static com.googlecode.utterlyidle.MediaType.TEXT_XML;
 import static com.googlecode.utterlyidle.RequestBuilder.put;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 public class CrawlerResourceTest {
@@ -78,6 +80,21 @@ public class CrawlerResourceTest {
                 importPage.model().value(fileContent("crawler.json"));
                 CrawlerListPage listPage = importPage.importModel();
                 assertThat(listPage.contains("news"), is(true));
+                return VOID;
+            }
+        });
+    }
+
+    @Test
+    public void canImportCrawlerWithId() throws Exception {
+        using(new WebApplication(), new Callable1<WebApplication, Void>() {
+            public Void call(WebApplication application) throws Exception {
+                ImportCrawlerPage importPage = new ImportCrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(application)));
+                String id = UUID.randomUUID().toString();
+                importPage.id().value(id);
+                importPage.model().value(fileContent("crawler.json"));
+                CrawlerListPage listPage = importPage.importModel();
+                assertThat(listPage.linkFor("news").value(), containsString(id));
                 return VOID;
             }
         });

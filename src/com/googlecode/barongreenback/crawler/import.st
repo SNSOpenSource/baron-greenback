@@ -9,11 +9,8 @@
 <form class="import form-stacked" action="import" method="POST">
     <fieldset>
         <legend>Import</legend>
-        <div class="control">
-            <label for="model">Model:</label>
-            <textarea class="model" id="model" name="model"></textarea>
-            <span class="help-block">Accepts crawling definition in json format</span>
-        </div>
+        $textarea(name="model", label="Model", help="Accepts crawling definition in json format")$
+        $input(name="id", label="Id", help="Optional")$
     </fieldset>
     <div class="actions">
         <input type="submit" name="action" value="Import" class="import"/>

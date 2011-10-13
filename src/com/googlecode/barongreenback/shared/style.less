@@ -112,12 +112,21 @@ div.recordDefinitionTemplate, li.keywordTemplate {
     display:none;
 }
 
-form input.from, form input#query, form.import textarea.model {
+form input.from, form input#query {
     .extra-large-input;
 }
 
-form.import textarea.model {
-    height: 300px;
+form.import {
+    div.control {
+        display: block;
+    }
+    input.id {
+        .large-input;
+    }
+    textarea.model {
+        .extra-large-input;
+        height: 20em;
+    }
 }
 
 form.view {

@@ -7,14 +7,15 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.time.DateFormatConverter;
-import com.googlecode.totallylazy.time.Dates;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
+import com.googlecode.totallylazy.time.DateFormatConverter;
+import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -51,6 +52,7 @@ import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.lang.String.format;
+import static java.util.UUID.randomUUID;
 
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
@@ -90,8 +92,8 @@ public class CrawlerResource {
 
     @POST
     @Path("import")
-    public Response importJson(@FormParam("model") String model) {
-        modelRepository.set(UUID.randomUUID(), Model.parse(model));
+    public Response importJson(@FormParam("model") String model, @FormParam("id") Option<UUID> id) {
+        modelRepository.set(id.getOrElse(randomUUID()), Model.parse(model));
         return redirectToList();
     }
 
@@ -111,7 +113,7 @@ public class CrawlerResource {
     @POST
     @Path("new")
     public Response newCrawler(Model model) throws Exception {
-        return edit(UUID.randomUUID(), model);
+        return edit(randomUUID(), model);
     }
 
     @GET

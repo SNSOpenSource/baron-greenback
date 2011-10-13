@@ -4,8 +4,8 @@ import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Html;
+import com.googlecode.utterlyidle.html.Link;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -33,8 +33,12 @@ public class CrawlerListPage {
     }
 
     public CrawlerPage edit(String value) throws Exception {
-        Request request = html.link(linkTo(value)).click();
+        Request request = linkFor(value).click();
         return new CrawlerPage(httpHandler, httpHandler.handle(request));
+    }
+
+    public Link linkFor(String value) {
+        return html.link(linkTo(value));
     }
 
     private String linkTo(String value) {
