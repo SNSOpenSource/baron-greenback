@@ -2,7 +2,7 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
@@ -31,8 +31,8 @@ public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUI
         records.define(MODELS, ID, MODEL);
     }
 
-    public Model get(UUID key) {
-        return find(where(ID, is(key))).map(second(Model.class)).head();
+    public Option<Model> get(UUID key) {
+        return find(where(ID, is(key))).map(second(Model.class)).headOption();
     }
 
     public Sequence<Pair<UUID, Model>> find(Predicate<? super Record> predicate) {

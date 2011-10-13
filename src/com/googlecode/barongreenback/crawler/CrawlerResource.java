@@ -110,6 +110,13 @@ public class CrawlerResource {
         return Forms.emptyForm(Forms.NUMBER_OF_FIELDS);
     }
 
+    @GET
+    @Path("exists")
+    @Produces(MediaType.TEXT_PLAIN)
+    public boolean exists(@QueryParam("id") UUID id) {
+        return !modelRepository.get(id).isEmpty();
+    }
+
     @POST
     @Path("new")
     public Response newCrawler(Model model) throws Exception {
@@ -140,7 +147,7 @@ public class CrawlerResource {
     @Path("crawl")
     @Produces(MediaType.TEXT_PLAIN)
     public String crawl(@FormParam("id") UUID id) throws Exception {
-        Model model = modelRepository.get(id);
+        Model model = modelFor(id);
         Model form = model.get("form", Model.class);
         String from = form.get("from", String.class);
         String update = form.get("update", String.class);
@@ -165,7 +172,7 @@ public class CrawlerResource {
     }
 
     private Model modelFor(UUID id) {
-        return modelRepository.get(id);
+        return modelRepository.get(id).get();
     }
 
     private Callable1<? super Pair<UUID, Model>, Model> asModelWithId() {
