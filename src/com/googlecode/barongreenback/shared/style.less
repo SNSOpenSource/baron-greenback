@@ -22,8 +22,8 @@
 
 .inlineBlock {
     display: inline-block;
-    zoom: 1;
-    *display: inline;
+    zoom: 1; // IE6-7 only
+    *display: inline; // IE6-7 only
 }
 
 .label {
@@ -45,16 +45,20 @@ h1, h2, h3, h4, h5, h6, .btn, a.update {
     text-transform: capitalize;
 }
 
-.button {
-    &:hover {
-        color: #fff;
+.btn {
+    &.primary, &.danger {
+        &:hover {
+            color: #fff;
+        }
+    }
+    &.danger {
+        .gradientBar(lighten(@red, 15%), @red);
     }
 }
 
 input.crawl, input.search, a.new, input.import, input.save, input.start  {
     .btn;
     .btn.primary;
-    .button;
 }
 
 input.more, a.export, a.import, a.edit, a.cancel {
@@ -64,8 +68,6 @@ input.more, a.export, a.import, a.edit, a.cancel {
 input.delete, input.stop {
     .btn;
     .btn.danger;
-    .gradientBar(lighten(@red, 15%), @red);
-    .button;
 }
 
 div.control {
