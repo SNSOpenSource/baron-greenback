@@ -2,10 +2,9 @@ package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.crawler.CrawlerTest;
-import com.googlecode.barongreenback.lucene.DirectoryActivator;
+import com.googlecode.barongreenback.shared.ApplicationTest;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.Xml;
@@ -18,10 +17,8 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Server;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.yadic.Container;
-import org.junit.Before;
 import org.junit.Test;
 
-import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.IterableMatcher.hasExactly;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -33,31 +30,21 @@ import static com.googlecode.utterlyidle.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class SearchResourceTest {
-    @Before
-    public void deleteIndex() {
-        Files.delete(DirectoryActivator.DEFAULT_DIRECTORY);
-    }
-
+public class SearchResourceTest extends ApplicationTest {
     @Test
     public void canQuery() throws Exception {
-        using(new WebApplication(), new Callable1<WebApplication, Void>() {
-            public Void call(WebApplication application) throws Exception {
-                Response response = application(addSomeData(application)).handle(get("users/search/list").withQuery("query", "type:users"));
-                assertThat(response.status(), is(OK));
+        Response response = application(addSomeData(application)).handle(get("users/search/list").withQuery("query", "type:users"));
+        assertThat(response.status(), is(OK));
 
-                XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
-                Keyword results = keyword("//table[contains(@class, 'results')]/tbody/tr");
-                Keyword<String> id = keyword("td[@class='id']", String.class);
-                xmlRecords.define(results, id);
-                Sequence<String> result = xmlRecords.get(results).map(id);
-                assertThat(result, hasExactly("urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1", "urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef2"));
-                return VOID;
-            }
-        });
+        XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
+        Keyword results = keyword("//table[contains(@class, 'results')]/tbody/tr");
+        Keyword<String> id = keyword("td[@class='id']", String.class);
+        xmlRecords.define(results, id);
+        Sequence<String> result = xmlRecords.get(results).map(id);
+        assertThat(result, hasExactly("urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1", "urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef2"));
     }
 
-    public static Application addSomeData(final WebApplication application) throws Exception {
+    public static Application addSomeData(final Application application) throws Exception {
         Server server = CrawlerTest.startServer();
         Uri feed = CrawlerTest.createFeed(server);
         final Sequence<Record> recordSequence = CrawlerTest.crawl(feed).realise();
