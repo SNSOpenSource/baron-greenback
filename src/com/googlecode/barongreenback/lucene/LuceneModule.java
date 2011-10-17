@@ -30,5 +30,4 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
         container.add(QueryParserActivator.class);
         return this;
     }
-
 }

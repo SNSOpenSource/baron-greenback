@@ -28,11 +28,22 @@ public class ViewsResourceTest extends ApplicationTests {
     public void createView() {
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
-                container.get(ModelRepository.class).set(VIEW_ID, model().
+                ModelRepository repository = container.get(ModelRepository.class);
+                repository.set(VIEW_ID, model().
                         add("view", model().
                                 add("name", "users").
                                 add("keywords", list(model().
                                         add("name", "firstname").
+                                        add("alias", "").
+                                        add("group", "").
+                                        add("type", "java.lang.String").
+                                        add("visible", true).
+                                        add("unique", false)))));
+                repository.set(UUID.randomUUID(), model().
+                        add("view", model().
+                                add("name", "news").
+                                add("keywords", list(model().
+                                        add("name", "title").
                                         add("alias", "").
                                         add("group", "").
                                         add("type", "java.lang.String").
@@ -47,6 +58,7 @@ public class ViewsResourceTest extends ApplicationTests {
     public void displayMenuTabs() throws Exception {
         MenuPage menu = new MenuPage(browser);
         assertThat(menu.link("users").value(), is("/" + relativeUriOf(method(on(SearchResource.class).list("users", "")))));
+        assertThat(menu.link("news").value(), is("/" + relativeUriOf(method(on(SearchResource.class).list("news", "")))));
     }
 
     @Test

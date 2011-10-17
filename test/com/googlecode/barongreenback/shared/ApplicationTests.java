@@ -12,7 +12,7 @@ import org.junit.Before;
 
 import java.io.IOException;
 
-public class ApplicationTest {
+public abstract class ApplicationTests {
     protected Application application;
     protected HttpClient browser;
 

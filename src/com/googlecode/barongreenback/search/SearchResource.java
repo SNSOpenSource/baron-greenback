@@ -6,7 +6,6 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
@@ -32,8 +31,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.asKeywords;
+import static com.googlecode.barongreenback.views.Views.find;
+import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -103,19 +103,10 @@ public class SearchResource {
     }
 
     private Sequence<Keyword> headers(String view) {
-       return modelRepository.find(where(MODEL_TYPE, is("view"))).
-                map(Callables.<Model>second()).
-                find(where(valueFor("name", String.class), is(view))).
+        return find(modelRepository, view).
+                map(unwrap()).
                 map(asKeywords()).
                 getOrElse(Sequences.<Keyword>empty());
-    }
-
-    public static <T> Callable1<? super Model, T> valueFor(final String key, final Class<T> aClass) {
-        return new Callable1<Model, T>() {
-            public T call(Model model) throws Exception {
-                return model.<T>get(key);
-            }
-        };
     }
 
     private List<Map<String, Object>> headers(Sequence<Keyword> headers, Sequence<Record> results) {

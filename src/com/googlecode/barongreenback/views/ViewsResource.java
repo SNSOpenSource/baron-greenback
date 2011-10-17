@@ -114,9 +114,10 @@ public class ViewsResource {
         return new Callable1<Pair<UUID, Model>, Model>() {
             public Model call(Pair<UUID, Model> pair) throws Exception {
                 Model model = pair.second().get("view");
+                String name = model.get("name", String.class);
                 return model.add("id", pair.first()).
-                        add("current", current.equals(model.get("name"))).
-                        add("url", redirector.uriOf(method(on(SearchResource.class).list("users", ""))));
+                        add("current", current.equals(name)).
+                        add("url", redirector.uriOf(method(on(SearchResource.class).list(name, ""))));
             }
         };
     }
