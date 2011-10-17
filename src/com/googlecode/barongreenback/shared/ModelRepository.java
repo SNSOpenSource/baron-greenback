@@ -15,6 +15,7 @@ import java.util.UUID;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.first;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
@@ -23,6 +24,7 @@ import static com.googlecode.totallylazy.records.Using.using;
 public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUID, Model>> {
     public static final Keyword<Object> MODELS = keyword("models");
     public static final Keyword<UUID> ID = keyword("models_id", UUID.class);
+    public static final Keyword<String> MODEL_TYPE = keyword("models_type", String.class);
     public static final Keyword<Model> MODEL = keyword("model", Model.class);
     private final Records records;
 
@@ -48,7 +50,11 @@ public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUI
     }
 
     public void set(UUID key, Model value) {
-        records.put(MODELS, update(using(ID), record().set(ID, key).set(MODEL, value)));
+        records.put(MODELS, update(using(ID), record().set(ID, key).set(MODEL_TYPE, modelType(value)).set(MODEL, value)));
+    }
+
+    private String modelType(Model model) {
+        return first(model.entries()).getKey();
     }
 
     public void remove(UUID key) {

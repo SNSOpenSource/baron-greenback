@@ -4,7 +4,6 @@ import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
-import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
@@ -34,12 +33,11 @@ import static com.googlecode.barongreenback.crawler.Crawler.CHECKPOINT_VALUE;
 import static com.googlecode.barongreenback.crawler.Crawler.MORE;
 import static com.googlecode.barongreenback.crawler.Crawler.URL;
 import static com.googlecode.barongreenback.jobs.JobsResource.DEFAULT_INTERVAL;
-import static com.googlecode.barongreenback.shared.ModelRepository.ID;
+import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -59,21 +57,19 @@ public class CrawlerResource {
     private final Records records;
     private final ModelRepository modelRepository;
     private final Crawler crawler;
-    private final Views views;
     private final Redirector redirector;
 
-    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Views views, Redirector redirector) {
+    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.crawler = crawler;
-        this.views = views;
         this.redirector = redirector;
     }
 
     @GET
     @Path("list")
     public Model list() {
-        return model().add("items", modelRepository.find(where(ID, is(notNullValue()))).map(asModelWithId()).toList());
+        return model().add("items", modelRepository.find(where(MODEL_TYPE, is("form"))).map(asModelWithId()).toList());
     }
 
     @GET
@@ -199,7 +195,7 @@ public class CrawlerResource {
             return numberOfRecordsUpdated(0);
         }
         Sequence<Keyword> keywords = keywords(recordsToAdd);
-        //views.put(view(recordName).fields(keywords));
+        modelRepository.set(UUID.randomUUID(), new RecordDefinition(recordName, keywords).toModel());
         records.define(recordName, keywords.toArray(Keyword.class));
         Number updated = records.put(recordName, update(using(unique), recordsToAdd));
         return numberOfRecordsUpdated(updated);

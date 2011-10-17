@@ -1,15 +1,17 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.lucene.QueryParserActivator;
-import com.googlecode.barongreenback.views.View;
+import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
@@ -32,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
+import static com.googlecode.barongreenback.shared.RecordDefinition.asKeywords;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -47,12 +51,12 @@ import static com.googlecode.totallylazy.records.lucene.Lucene.and;
 public class SearchResource {
     private final LuceneRecords records;
     private final QueryParserActivator parser;
-    private final Views views;
+    private final ModelRepository modelRepository;
 
-    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final Views views) {
+    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final ModelRepository modelRepository) {
         this.records = records;
         this.parser = parser;
-        this.views = views;
+        this.modelRepository = modelRepository;
     }
 
     @GET
@@ -101,8 +105,19 @@ public class SearchResource {
     }
 
     private Sequence<Keyword> headers(String view) {
-        Option<View> optionalView = views.get(view);
-        return optionalView.map(View.asFields()).getOrElse(Sequences.<Keyword>empty());
+        return modelRepository.find(where(MODEL_TYPE, is(view))).
+                map(Callables.<Model>second()).
+                find(contains("name")).
+                map(asKeywords()).
+                getOrElse(Sequences.<Keyword>empty());
+    }
+
+    private Predicate<? super Model> contains(final String key) {
+        return new LogicalPredicate<Model>() {
+            public boolean matches(Model model) {
+                return model.contains(key);
+            }
+        };
     }
 
     private List<Map<String, Object>> headers(Sequence<Keyword> headers, Sequence<Record> results) {

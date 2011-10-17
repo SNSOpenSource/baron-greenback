@@ -5,7 +5,6 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.AliasedKeyword;
@@ -163,7 +162,15 @@ public class RecordDefinition {
         return new RecordDefinition(keyword(model.get("name", String.class)), toKeywords(model.getValues("keywords", Model.class)));
     }
 
-    private static Sequence<Keyword> toKeywords(List<Model> keywords) {
+    public static Callable1<? super Model,Sequence<Keyword>> asKeywords() {
+        return new Callable1<Model, Sequence<Keyword>>() {
+            public Sequence<Keyword> call(Model model) throws Exception {
+                return toKeywords(model.getValues("keywords", Model.class));
+            }
+        };
+    }
+
+    public static Sequence<Keyword> toKeywords(List<Model> keywords) {
         return sequence(keywords).filter(where(value("name", String.class), is(not(empty())))).map(asKeyword());
     }
 

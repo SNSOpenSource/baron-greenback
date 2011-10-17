@@ -21,11 +21,10 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.Forms.NUMBER_OF_FIELDS;
 import static com.googlecode.barongreenback.shared.Forms.addTemplates;
-import static com.googlecode.barongreenback.shared.ModelRepository.ID;
+import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -44,7 +43,7 @@ public class ViewsResource {
     @GET
     @Path("menu")
     public Model menu(@QueryParam("current") @DefaultValue("") String current) {
-        return model().add("views", modelRepository.find(where(ID, is(notNullValue()))).map(asModel(current)).toList());
+        return model().add("views", modelRepository.find(where(MODEL_TYPE, is("view"))).map(asModel(current)).toList());
     }
 
     private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current) {
