@@ -2,7 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.barongreenback.search.ViewSearchPage;
-import com.googlecode.barongreenback.shared.ApplicationTest;
+import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.HttpHandler;
@@ -26,7 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
-public class CrawlerResourceTest extends ApplicationTest {
+public class CrawlerResourceTest extends ApplicationTests {
 
     @Test
     public void canSaveAndLoadACrawler() throws Exception {

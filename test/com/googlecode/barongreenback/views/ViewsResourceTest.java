@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.views;
 
 import com.googlecode.barongreenback.search.SearchResource;
-import com.googlecode.barongreenback.shared.ApplicationTest;
+import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Runnables;
@@ -21,7 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 
-public class ViewsResourceTest extends ApplicationTest {
+public class ViewsResourceTest extends ApplicationTests {
     private static final UUID VIEW_ID = randomUUID();
 
     @Before

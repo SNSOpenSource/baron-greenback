@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
@@ -22,12 +23,13 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.shared.Forms.NUMBER_OF_FIELDS;
 import static com.googlecode.barongreenback.shared.Forms.addTemplates;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
-import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
+import static com.googlecode.barongreenback.views.Views.clean;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static java.util.UUID.randomUUID;
 
 @Produces(MediaType.TEXT_HTML)
 @Path("views")
@@ -45,17 +47,6 @@ public class ViewsResource {
     public Model menu(@QueryParam("current") @DefaultValue("") String current) {
         return model().add("views", modelRepository.find(where(MODEL_TYPE, is("view"))).map(asModel(current)).toList());
     }
-
-    private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current) {
-            return new Callable1<Pair<UUID, Model>, Model>() {
-                public Model call(Pair<UUID, Model> pair) throws Exception {
-                    Model model = pair.second().get("view");
-                    return model.add("id", pair.first()).
-                            add("current", current.equals(model.get("name"))).
-                            add("url", redirector.uriOf(method(on(SearchResource.class).list("users", ""))));
-                }
-            };
-        }
 
     @GET
     @Path("list")
@@ -88,17 +79,6 @@ public class ViewsResource {
         return redirectToList();
     }
 
-    private Model clean(Model root) {
-        Model record = root.get("view", Model.class);
-        String name = record.get("name", String.class);
-        return view(name, convert(record).toModel());
-    }
-
-    public static Model view(String update, Model definition) {
-        return model().
-                add("view", definition);
-    }
-
     @POST
     @Path("delete")
     public Response delete(@FormParam("id") UUID id) {
@@ -106,8 +86,38 @@ public class ViewsResource {
         return redirectToList();
     }
 
+    @GET
+    @Path("export")
+    @Produces("application/json")
+    public String export(@QueryParam("id") UUID id) {
+        return modelRepository.get(id).get().toString();
+    }
+
+    @GET
+    @Path("import")
+    public Model importForm() {
+        return model();
+    }
+
+    @POST
+    @Path("import")
+    public Response importJson(@FormParam("model") String model, @FormParam("id") Option<UUID> id) {
+        modelRepository.set(id.getOrElse(randomUUID()), Model.parse(model));
+        return redirectToList();
+    }
 
     private Response redirectToList() {
         return redirector.seeOther(method(on(getClass()).list()));
+    }
+
+    private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current) {
+        return new Callable1<Pair<UUID, Model>, Model>() {
+            public Model call(Pair<UUID, Model> pair) throws Exception {
+                Model model = pair.second().get("view");
+                return model.add("id", pair.first()).
+                        add("current", current.equals(model.get("name"))).
+                        add("url", redirector.uriOf(method(on(SearchResource.class).list("users", ""))));
+            }
+        };
     }
 }

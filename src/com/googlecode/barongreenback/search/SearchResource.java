@@ -8,10 +8,8 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
@@ -94,8 +92,8 @@ public class SearchResource {
                 Keyword keyword = pair.first();
                 Object value = pair.second();
                 String key = keyword.metadata().get(lookupKeyword);
-                if(key.isEmpty()) key = "Other";
-                if(!map.containsKey(key)){
+                if (key.isEmpty()) key = "Other";
+                if (!map.containsKey(key)) {
                     map.put(key, new LinkedHashMap<String, Object>());
                 }
                 map.get(key).put(keyword.name(), value);
@@ -105,23 +103,23 @@ public class SearchResource {
     }
 
     private Sequence<Keyword> headers(String view) {
-        return modelRepository.find(where(MODEL_TYPE, is(view))).
+       return modelRepository.find(where(MODEL_TYPE, is("view"))).
                 map(Callables.<Model>second()).
-                find(contains("name")).
+                find(where(valueFor("name", String.class), is(view))).
                 map(asKeywords()).
                 getOrElse(Sequences.<Keyword>empty());
     }
 
-    private Predicate<? super Model> contains(final String key) {
-        return new LogicalPredicate<Model>() {
-            public boolean matches(Model model) {
-                return model.contains(key);
+    public static <T> Callable1<? super Model, T> valueFor(final String key, final Class<T> aClass) {
+        return new Callable1<Model, T>() {
+            public T call(Model model) throws Exception {
+                return model.<T>get(key);
             }
         };
     }
 
     private List<Map<String, Object>> headers(Sequence<Keyword> headers, Sequence<Record> results) {
-        if(headers.isEmpty()){
+        if (headers.isEmpty()) {
             return toModel(keywords(results));
         }
         return toModel(headers);

@@ -2,7 +2,7 @@ package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.crawler.CrawlerTest;
-import com.googlecode.barongreenback.shared.ApplicationTest;
+import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
@@ -30,7 +30,7 @@ import static com.googlecode.utterlyidle.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class SearchResourceTest extends ApplicationTest {
+public class SearchResourceTest extends ApplicationTests {
     @Test
     public void canQuery() throws Exception {
         Response response = application(addSomeData(application)).handle(get("users/search/list").withQuery("query", "type:users"));
