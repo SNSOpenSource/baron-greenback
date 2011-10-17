@@ -2,11 +2,10 @@ package com.googlecode.barongreenback.views;
 
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.Forms;
-import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Keywords;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -18,30 +17,46 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
+import java.util.UUID;
+
 import static com.googlecode.barongreenback.shared.Forms.NUMBER_OF_FIELDS;
 import static com.googlecode.barongreenback.shared.Forms.addTemplates;
+import static com.googlecode.barongreenback.shared.ModelRepository.ID;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
-import static com.googlecode.barongreenback.shared.RecordDefinition.toModel;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 
 @Produces(MediaType.TEXT_HTML)
 @Path("views")
 public class ViewsResource {
-    private final Views views;
     private final Redirector redirector;
+    private final ModelRepository modelRepository;
 
-    public ViewsResource(Views views, Redirector redirector) {
-        this.views = views;
+    public ViewsResource(Redirector redirector, ModelRepository modelRepository) {
         this.redirector = redirector;
+        this.modelRepository = modelRepository;
     }
 
     @GET
     @Path("menu")
     public Model menu(@QueryParam("current") @DefaultValue("") String current) {
-        return model().add("views", views.get().map(asModel(current)).toList());
+        return model().add("views", modelRepository.find(where(ID, is(notNullValue()))).map(asModel(current)).toList());
     }
+
+    private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current) {
+            return new Callable1<Pair<UUID, Model>, Model>() {
+                public Model call(Pair<UUID, Model> pair) throws Exception {
+                    Model model = pair.second().get("view");
+                    return model.add("id", pair.first()).
+                            add("current", current.equals(model.get("name"))).
+                            add("url", redirector.uriOf(method(on(SearchResource.class).list("users", ""))));
+                }
+            };
+        }
 
     @GET
     @Path("list")
@@ -51,55 +66,49 @@ public class ViewsResource {
 
     @GET
     @Path("new")
-    public Model createForm() {
+    public Model create() {
         return Forms.emptyForm(NUMBER_OF_FIELDS);
     }
 
     @POST
     @Path("new")
     public Response create(Model model) {
-        return edit(model);
+        return edit(UUID.randomUUID(), model);
     }
 
     @GET
     @Path("edit")
-    public Model editForm(@QueryParam("id") String name) {
-        View view = views.get(name).get();
-        return addTemplates(Forms.form(name, "", "", "", toModel(Keywords.keyword(""), view.fields())));
+    public Model edit(@QueryParam("id") UUID id) {
+        return addTemplates(modelRepository.get(id).get());
     }
 
     @POST
     @Path("edit")
-    public Response edit(final Model root) {
-        Model form = root.get("form", Model.class);
-        String update = form.get("update", String.class);
-        Model record = form.get("record", Model.class);
-        RecordDefinition recordDefinition = convert(record);
-        views.put(View.view(Keywords.keyword(update)).fields(recordDefinition.fields()));
+    public Response edit(@QueryParam("id") UUID id, final Model root) {
+        modelRepository.set(id, clean(root));
         return redirectToList();
+    }
+
+    private Model clean(Model root) {
+        Model record = root.get("view", Model.class);
+        String name = record.get("name", String.class);
+        return view(name, convert(record).toModel());
+    }
+
+    public static Model view(String update, Model definition) {
+        return model().
+                add("view", definition);
     }
 
     @POST
     @Path("delete")
-    public Response delete(@FormParam("id") String id) {
-        views.remove(id);
+    public Response delete(@FormParam("id") UUID id) {
+        modelRepository.remove(id);
         return redirectToList();
     }
 
 
     private Response redirectToList() {
         return redirector.seeOther(method(on(getClass()).list()));
-    }
-
-    private Callable1<? super View, Model> asModel(final String current) {
-        return new Callable1<View, Model>() {
-            public Model call(View view) throws Exception {
-                Keyword keyword = view.name();
-                return model().
-                        add("current", keyword.name().equalsIgnoreCase(current)).
-                        add("name", keyword.name()).
-                        add("url", redirector.uriOf(method(on(SearchResource.class).list(keyword.name(), ""))));
-            }
-        };
     }
 }

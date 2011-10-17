@@ -36,11 +36,15 @@ public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUI
     }
 
     public Sequence<Pair<UUID, Model>> find(Predicate<? super Record> predicate) {
-        return records.get(MODELS).filter(predicate).map(new Callable1<Record, Pair<UUID, Model>>() {
+        return records.get(MODELS).filter(predicate).map(asPair());
+    }
+
+    private Callable1<Record, Pair<UUID, Model>> asPair() {
+        return new Callable1<Record, Pair<UUID, Model>>() {
             public Pair<UUID, Model> call(Record record) throws Exception {
                 return Pair.pair(record.get(ID), record.get(MODEL));
             }
-        });
+        };
     }
 
     public void set(UUID key, Model value) {

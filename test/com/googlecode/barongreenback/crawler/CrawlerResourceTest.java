@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.barongreenback.lucene.DirectoryActivator;
 import com.googlecode.barongreenback.search.ViewSearchPage;
+import com.googlecode.barongreenback.shared.ApplicationTest;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Strings;
@@ -30,7 +31,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
-public class CrawlerResourceTest {
+public class CrawlerResourceTest extends ApplicationTest{
     @Before
     public void deleteIndex() {
         Files.delete(DirectoryActivator.DEFAULT_DIRECTORY);

@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.search;
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.crawler.CrawlerTest;
 import com.googlecode.barongreenback.lucene.DirectoryActivator;
-import com.googlecode.barongreenback.views.View;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Files;
@@ -70,7 +69,7 @@ public class SearchResourceTest {
                 luceneRecords.define(users, keywords(recordSequence).toArray(Keyword.class));
                 luceneRecords.add(users, recordSequence);
                 Views views = container.get(Views.class);
-                views.put(View.view(users).fields(keywords(recordSequence)));
+//                views.put(View.view(users).fields(keywords(recordSequence)));
                 return VOID;
             }
         });

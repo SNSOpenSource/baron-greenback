@@ -6,8 +6,8 @@
 <body>
 
 <form class="view form-stacked" action="" method="post">
-    $input(name="form.update", label="Update", class="update", value=form.update, placeholder="Name")$
-    $recordDefinition(title="Fields", prefix="form.record.", record=form.record)$
+    $input(name="view.name", label="Name", class="name", value=view.name, placeholder="Name")$
+    $recordDefinition(title="Fields", prefix="view.", record=view)$
     <div class="actions">
         <input type="submit" value="Save" name="action" class="save"/>
     </div>

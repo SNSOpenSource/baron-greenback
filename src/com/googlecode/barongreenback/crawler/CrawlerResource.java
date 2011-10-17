@@ -37,7 +37,6 @@ import static com.googlecode.barongreenback.jobs.JobsResource.DEFAULT_INTERVAL;
 import static com.googlecode.barongreenback.shared.ModelRepository.ID;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
-import static com.googlecode.barongreenback.views.View.view;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
@@ -200,7 +199,7 @@ public class CrawlerResource {
             return numberOfRecordsUpdated(0);
         }
         Sequence<Keyword> keywords = keywords(recordsToAdd);
-        views.put(view(recordName).fields(keywords));
+        //views.put(view(recordName).fields(keywords));
         records.define(recordName, keywords.toArray(Keyword.class));
         Number updated = records.put(recordName, update(using(unique), recordsToAdd));
         return numberOfRecordsUpdated(updated);
@@ -209,5 +208,4 @@ public class CrawlerResource {
     private String numberOfRecordsUpdated(Number updated) {
         return format("%s Records updated", updated);
     }
-
 }
