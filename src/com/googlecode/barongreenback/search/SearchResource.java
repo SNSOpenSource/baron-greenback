@@ -6,6 +6,7 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
@@ -13,7 +14,6 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.RecordMethods;
-import com.googlecode.totallylazy.records.lucene.Lucene;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.annotations.GET;
@@ -21,11 +21,9 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,9 +37,9 @@ import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
-import static com.googlecode.totallylazy.records.lucene.Lucene.and;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -59,29 +57,43 @@ public class SearchResource {
 
     @GET
     @Path("list")
-    public Model list(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
-        Sequence<Keyword> allHeaders = headers(view);
+    public Model list(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
+        Option<Model> optionalView = view(viewName);
+        Sequence<Keyword> allHeaders = headers(optionalView);
         Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Sequence<Record> results = records.query(and(type(view), parse(query, visibleHeaders)), allHeaders);
+        Sequence<Record> results = records.query(parse(prefix(optionalView, query), visibleHeaders), allHeaders);
         return model().
-                add("view", view).
+                add("view", viewName).
                 add("query", query).
                 add("headers", headers(visibleHeaders, results)).
                 add("results", results.map(RecordMethods.asMap()).toList());
     }
 
-    private TermQuery type(String view) {
-        return new TermQuery(new Term(Lucene.RECORD_KEY.name(), view));
+    private String prefix(Option<Model> optionalView, final String query) {
+        return sequence(optionalView.map(query())).add(query).toString(" ");
+    }
+
+    private Callable1<Model, String> query() {
+        return new Callable1<Model, String>() {
+            public String call(Model model) throws Exception {
+                return model.get("view", Model.class).get("query", String.class);
+            }
+        };
+    }
+
+    private Option<Model> view(String view) {
+        return find(modelRepository, view);
     }
 
     @GET
     @Path("unique")
-    public Model unique(@PathParam("view") String view, @QueryParam("query") String query) throws ParseException {
-        Sequence<Keyword> headers = headers(view);
-        Record record = records.query(and(type(view), parse(query, headers)), headers).head();
+    public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
+        Option<Model> optionalView = view(viewName);
+        Sequence<Keyword> headers = headers(optionalView);
+        Record record = records.query(parse(prefix(optionalView, query), headers), headers).head();
         Map<String, Map<String, Object>> fold = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return model().
-                add("view", view).
+                add("view", viewName).
                 add("query", query).
                 add("record", fold);
     }
@@ -102,8 +114,8 @@ public class SearchResource {
         };
     }
 
-    private Sequence<Keyword> headers(String view) {
-        return find(modelRepository, view).
+    private Sequence<Keyword> headers(Option<Model> optionalView) {
+        return optionalView.
                 map(unwrap()).
                 map(asKeywords()).
                 getOrElse(Sequences.<Keyword>empty());

@@ -27,30 +27,36 @@ $(document).ready(function() {
         placeholder: "placeholder",
         items: '> li',
         deactivate: function(event, ui) {
-            $(ui.item).parent().children().each(function (index) {
-                $(this).find("label").each(function() {
-                    fixAttribute(this, "for", index)
-                });
-                $(this).find("input, select, textarea, button").each(function() {
-                    fixAttribute(this, "id", index)
-                    fixAttribute(this, "name", index)
-                });
-            });
+            renumberFields($(ui.item).parent());
         }
     });
 
     $(".closeIcon").live("click", function() {
-        $(this).parent().parent().remove();
+        var li = $(this).parent().parent();
+        var ol = li.parent();
+        li.remove();
+        renumberFields(ol);
     });
-
 });
+
+function renumberFields(ol) {
+    ol.children().each(function (index) {
+        $(this).find("label").each(function() {
+            fixAttribute(this, "for", index)
+        });
+        $(this).find("input, select, textarea, button").each(function() {
+            fixAttribute(this, "id", index)
+            fixAttribute(this, "name", index)
+        });
+    });
+}
 
 function fixAttribute(element, name, index) {
     var attr = $(element).attr(name);
     if(typeof(attr) == "undefined"){
-        return
+        return;
     }
-    var newValue = attr.replace(new RegExp("(^form\\.record\\.keywords\\[)(\\d+)"), "$1" + (index + 1));
+    var newValue = attr.replace(/(^[^\[]+keywords\[)(\d+)/, "$1" + (index + 1));
     $(element).attr(name, newValue);
 }
 

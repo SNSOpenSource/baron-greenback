@@ -33,6 +33,10 @@ public class ViewEditPage {
         return html.input("//input[@name='view.name']");
     }
 
+    public Input query() {
+        return html.input("//input[@name='view.query']");
+    }
+
     public static final String fieldName = "//input[@id='view.keywords[%s].name']";
 
     public Input fieldName(int index) {

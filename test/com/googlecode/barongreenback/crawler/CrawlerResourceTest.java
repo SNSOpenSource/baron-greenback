@@ -105,7 +105,7 @@ public class CrawlerResourceTest extends ApplicationTests {
 
                 HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(application));
                 CrawlerPage newPage = new CrawlerPage(handler);
-                newPage.update().value("news feed");
+                newPage.update().value("newsfeed");
                 newPage.from().value("http://localhost:9001/data");
                 newPage.more().value("//link[@rel='prev-archive']/@href");
                 newPage.checkpoint().value(checkpointValue);
@@ -128,11 +128,11 @@ public class CrawlerResourceTest extends ApplicationTests {
                 newPage.subfeed(2).uncheck();
                 newPage.checkpoint(2).check();
                 CrawlerListPage list = newPage.save();
-                list.crawl("news feed");
+                list.crawl("newsfeed");
 
                 latch.await();
 
-                return new ViewSearchPage(handler, "news feed", "");
+                return new ViewSearchPage(handler, "newsfeed", "");
             }
         });
     }

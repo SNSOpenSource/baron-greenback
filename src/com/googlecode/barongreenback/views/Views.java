@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.views;
 
+import com.googlecode.barongreenback.shared.ModelFilter;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
@@ -11,8 +12,8 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
-import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 
@@ -22,7 +23,7 @@ public class Views {
     public static final String ROOT = "view";
 
     public static Model clean(Model root) {
-        return view(convert(root.get(ROOT, Model.class)).toModel());
+        return new ModelFilter(in("view", "name", "query", "keywords", "group", "type", "unique", "visible")).filterModel(root);
     }
 
     public static Model view(Keyword<Object> recordName, Sequence<Keyword> keywords) {
@@ -30,7 +31,7 @@ public class Views {
     }
 
     public static Model view(RecordDefinition recordDefinition) {
-        return view(recordDefinition.toModel());
+        return clean(view(recordDefinition.toModel().add("query", "+type:" + recordDefinition.recordName().name())));
     }
 
     public static Model view(Model definition) {

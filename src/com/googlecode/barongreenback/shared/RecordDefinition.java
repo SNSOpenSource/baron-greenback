@@ -23,6 +23,7 @@ import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.empty;
+import static com.googlecode.totallylazy.Strings.isEmpty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.MapRecord.record;
@@ -181,7 +182,7 @@ public class RecordDefinition {
                         Class.forName(model.get("type", String.class)));
 
                 String alias = model.get("alias", String.class);
-                if (!alias.isEmpty()) {
+                if (!isEmpty(alias)) {
                     keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
                 }
                 return keyword.metadata(record().
