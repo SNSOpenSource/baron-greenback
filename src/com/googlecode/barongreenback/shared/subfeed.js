@@ -17,10 +17,43 @@ $(document).ready(function() {
         var nextIndex = $(ol).children().length;
         var html = "<li>" + $(template).html().replace(/KEYWORD_ID_REPLACE_ME/g, nextIndex) + "</li>";
         var newKeyword = $(html).hide().insertBefore(template);
-        newKeyword.show(speed).css({display:'list-item'});
+        newKeyword.show().css({display:'list-item'});
     });
-    $("table.results").tablesorter({ sortList: [[0,0]] });
+    $("table.results").tablesorter({ sortList: [
+        [0,0]
+    ] });
+
+    $("form > fieldset > ol.fields").sortable({
+        placeholder: "placeholder",
+        items: '> li',
+        deactivate: function(event, ui) {
+            $(ui.item).parent().children().each(function (index) {
+                $(this).find("label").each(function() {
+                    fixAttribute(this, "for", index)
+                });
+                $(this).find("input, select, textarea, button").each(function() {
+                    fixAttribute(this, "id", index)
+                    fixAttribute(this, "name", index)
+                });
+            });
+        }
+    });
+
+    $(".closeIcon").live("click", function() {
+        $(this).parent().parent().remove();
+    });
+
 });
+
+function fixAttribute(element, name, index) {
+    var attr = $(element).attr(name);
+    if(typeof(attr) == "undefined"){
+        return
+    }
+    var newValue = attr.replace(new RegExp("(^form\\.record\\.keywords\\[)(\\d+)"), "$1" + (index + 1));
+    $(element).attr(name, newValue);
+}
+
 
 function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedPrefixSelector) {
     this.content = keywordDefinition;
@@ -46,7 +79,7 @@ function KeywordDefinition(keywordDefinition, subfeedTemplateSelector, subfeedPr
     this.showSubfeed = function() {
         $("div.subrecordDefinition", this.content).show(speed);
     }
-    
+
     this.showOrAddSubfeed = function() {
         this.hasSubfeed() ? this.showSubfeed() : this.addSubfeed();
     }

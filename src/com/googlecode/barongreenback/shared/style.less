@@ -175,4 +175,56 @@ table.results {
     }
 }
 
+ol.fields {
+    li:hover {
+        border: 1px solid @grayLighter;
+    }
+    li {
+        border: 1px solid #fff;
+        position: relative;
+        padding-right: 20px;
+        .closeIcon {
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        .moveIcon {
+            cursor: pointer;
+            position: absolute;
+            top: 24px;
+            right: 0;
+        }
+    }
+    li.ui-sortable-helper {
+        background-color: #fff;
+        border: solid 1px @grayLighter;
+        cursor: move;
+    }
+    li.placeholder {
+        height: 5em;
+        background-color: @grayLight;
+    }
+}
+
+.icon {
+    background: #fff no-repeat;
+    width: 16px;
+    height: 16px;
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    margin: 4px;
+}
+
+.closeIcon {
+    .icon;
+    background: url('icons-red.png') -96px -128px;
+}
+
+.moveIcon {
+    .icon;
+    background: url('icons-grey.png') -128px 0;
+}
+
 

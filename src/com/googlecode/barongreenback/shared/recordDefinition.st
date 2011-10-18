@@ -1,7 +1,7 @@
 <fieldset class="fields $prefix$">
     <legend>$title$</legend>
     $input(id={$prefix$name}, name={$prefix$name}, class="rootXPath", label="Root XPath", value=record.name, placeholder="/xpath/")$
-    <ol>
+    <ol class="fields">
         $record.keywords:li(content={$keywordDefinition(id=i, prefix=prefix + "keywords[" + i + "].", keyword=it)$})$
         $if(!record.keywords)$
             $li(content={$keywordDefinition(id="1", prefix=prefix + "keywords[1].")$}, keyword=emptyKeyword)$

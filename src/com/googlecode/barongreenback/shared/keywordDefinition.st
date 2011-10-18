@@ -17,4 +17,6 @@
         $recordDefinition(title="Fields", prefix=prefix + "record.", record=keyword.record)$
     $endif$
     </div>
+    <div class="closeIcon"></div>
+    <div class="moveIcon"></div>
 </div>
