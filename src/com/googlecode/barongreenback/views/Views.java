@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.views;
 
-import com.googlecode.barongreenback.shared.ModelFilter;
+import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
@@ -23,7 +23,7 @@ public class Views {
     public static final String ROOT = "view";
 
     public static Model clean(Model root) {
-        return new ModelFilter(in("view", "name", "query", "keywords", "group", "type", "unique", "visible")).filterModel(root);
+        return new ModelCleaner(in("view", "name", "query", "keywords", "group", "type", "unique", "visible")).clean(root);
     }
 
     public static Model view(Keyword<Object> recordName, Sequence<Keyword> keywords) {
