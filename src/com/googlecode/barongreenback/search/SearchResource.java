@@ -143,9 +143,14 @@ public class SearchResource {
             public Model call(Keyword keyword) throws Exception {
                 return model().
                         add("name", keyword.name()).
+                        add("escapedName", escape(keyword.name())).
                         add("unique", keyword.metadata().get(Keywords.UNIQUE));
             }
         };
+    }
+
+    private String escape(String name) {
+        return name.replace(' ', '_');
     }
 
     private Query parse(String query, Sequence<Keyword> keywords) throws ParseException {

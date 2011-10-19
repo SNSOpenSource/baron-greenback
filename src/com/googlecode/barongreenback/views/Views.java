@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.views;
 
 import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
-import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
@@ -10,6 +9,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
+import com.googlecode.totallylazy.records.Record;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.funclate.Model.model;
@@ -26,12 +26,25 @@ public class Views {
         return new ModelCleaner(in("view", "name", "query", "keywords", "group", "type", "unique", "visible")).clean(root);
     }
 
-    public static Model view(Keyword<Object> recordName, Sequence<Keyword> keywords) {
-        return view(new RecordDefinition(recordName, keywords));
+    public static Model convertToViewModel(Keyword<Object> recordName, Sequence<Keyword> keywords) {
+        return model().add(ROOT, model().
+                add("name", recordName.name()).
+                add("query", "+type:\"" + recordName.name() + "\"").
+                add("keywords", keywords.map(asModel()).toList()));
     }
 
-    public static Model view(RecordDefinition recordDefinition) {
-        return clean(view(recordDefinition.toModel().add("query", "+type:" + recordDefinition.recordName().name())));
+    private static Callable1<? super Keyword, Model> asModel() {
+        return new Callable1<Keyword, Model>() {
+            public Model call(Keyword keyword) throws Exception {
+                Record metadata = keyword.metadata();
+                return model().
+                        add("name", keyword.name()).
+                        add("group", metadata.get(Views.GROUP)).
+                        add("type", keyword.forClass().getName()).
+                        add("unique", metadata.get(Keywords.UNIQUE)).
+                        add("visible", metadata.get(Views.VISIBLE));
+            }
+        };
     }
 
     public static Model view(Model definition) {

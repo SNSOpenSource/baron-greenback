@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
@@ -198,7 +199,7 @@ public class CrawlerResource {
         }
         Sequence<Keyword> keywords = keywords(recordsToAdd);
         if(find(modelRepository, recordName.name()).isEmpty()) {
-            modelRepository.set(randomUUID(), view(recordName, keywords));
+            modelRepository.set(randomUUID(), Views.convertToViewModel(recordName, keywords));
         }
         records.define(recordName, keywords.toArray(Keyword.class));
         Number updated = records.put(recordName, update(using(unique), recordsToAdd));

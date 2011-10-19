@@ -27,7 +27,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 public class CrawlerResourceTest extends ApplicationTests {
-
     @Test
     public void canSaveAndLoadACrawler() throws Exception {
         CrawlerPage newPage = new CrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(application)));
