@@ -6,20 +6,12 @@
     <meta name="query" content="$query$"/>
 </head>
 <body class="$view$">
-<div>
     $record.keys:{ groupName |
-    <fieldset class="$groupName$">
-        <legend>$groupName$</legend>
-
-        $record.(groupName).keys:{ name |
-
-        <div class="control">
-            <span class="label">$name$:</span>
-            <span>$record.(groupName).(name)$</span>
-        </div>
-        }$
-    </fieldset>
+        $group(name=groupName, content={
+            $record.(groupName).keys:{ name |
+                $nameValue(name=name, value=record.(groupName).(name))$
+            }$
+        })$
     }$
-</div>
 </body>
 </html>

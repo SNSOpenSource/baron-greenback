@@ -13,7 +13,6 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.RecordMethods;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.annotations.GET;
@@ -66,7 +65,23 @@ public class SearchResource {
                 add("view", viewName).
                 add("query", query).
                 add("headers", headers(visibleHeaders, results)).
-                add("results", results.map(RecordMethods.asMap()).toList());
+                add("results", results.map(asModel(visibleHeaders)).toList());
+    }
+
+    private Callable1<? super Record, Model> asModel(final Sequence<Keyword> visibleHeaders) {
+        return new Callable1<Record, Model>() {
+            public Model call(Record record) throws Exception {
+                Model model = model();
+                for (Keyword visibleHeader : visibleHeaders) {
+                    model.add(visibleHeader.name(), record.get(visibleHeader));
+                }
+//                Sequence<Keyword> uniqueHeaders = visibleHeaders.filter(where(metadata(UNIQUE), is(true)));
+//                for (Keyword uniqueHeader : uniqueHeaders) {
+//                    Object value = record.get(uniqueHeader);
+//                }
+                return model;
+            }
+        };
     }
 
     private String prefix(Option<Model> optionalView, final String query) {

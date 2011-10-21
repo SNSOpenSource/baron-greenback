@@ -7,11 +7,10 @@
 
 
 <form class="import form-stacked" action="import" method="POST">
-    <fieldset>
-        <legend>Import</legend>
+    $group(name="Import", content={
         $textarea(name="model", label="Model", help="Accepts view definition in json format")$
         $input(name="id", label="Id", help="Optional")$
-    </fieldset>
+    })$
     <div class="actions">
         <input type="submit" name="action" value="Import" class="import"/>
     </div>

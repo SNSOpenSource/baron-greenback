@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.search;
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.crawler.CrawlerTest;
 import com.googlecode.barongreenback.shared.ApplicationTests;
+import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
@@ -18,6 +19,8 @@ import com.googlecode.utterlyidle.Server;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.yadic.Container;
 import org.junit.Test;
+
+import java.util.UUID;
 
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.IterableMatcher.hasExactly;
@@ -36,7 +39,9 @@ public class SearchResourceTest extends ApplicationTests {
         Response response = application(addSomeData(application)).handle(get("users/search/list").withQuery("query", "type:users"));
         assertThat(response.status(), is(OK));
 
-        XmlRecords xmlRecords = new XmlRecords(Xml.document(new String(response.bytes())));
+        String xml = new String(response.bytes());
+        System.out.println("xml = " + xml);
+        XmlRecords xmlRecords = new XmlRecords(Xml.document(xml));
         Keyword results = keyword("//table[contains(@class, 'results')]/tbody/tr");
         Keyword<String> id = keyword("td[@class='id']", String.class);
         xmlRecords.define(results, id);
@@ -55,8 +60,8 @@ public class SearchResourceTest extends ApplicationTests {
                 Keyword<Object> users = keyword("users");
                 luceneRecords.define(users, keywords(recordSequence).toArray(Keyword.class));
                 luceneRecords.add(users, recordSequence);
-                Views views = container.get(Views.class);
-//                views.put(View.view(users).fields(keywords(recordSequence)));
+                ModelRepository views = container.get(ModelRepository.class);
+                views.set(UUID.randomUUID(), Views.convertToViewModel(users, keywords(recordSequence)));
                 return VOID;
             }
         });
