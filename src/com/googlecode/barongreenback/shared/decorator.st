@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>$title$ - Baron Greenback</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
     <link rel="shortcut icon" href="$base$baron-greenback/shared/favicon.ico" />
     <link rel="stylesheet" type="text/css" href="$base$baron-greenback/shared/style.less"/>
     $head$
