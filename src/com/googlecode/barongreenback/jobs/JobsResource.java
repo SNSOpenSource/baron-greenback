@@ -31,7 +31,7 @@ import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 @Path("jobs")
 @Produces(TEXT_HTML)
 public class JobsResource {
-    public static final Long DEFAULT_INTERVAL = 30L;
+    public static final Long DEFAULT_INTERVAL = 600L;
     private final HttpScheduler scheduler;
     private final Request request;
     private final Redirector redirector;

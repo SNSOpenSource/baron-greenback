@@ -9,6 +9,7 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
@@ -38,7 +39,6 @@ import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.views.Views.find;
-import static com.googlecode.barongreenback.views.Views.view;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -202,9 +202,26 @@ public class CrawlerResource {
             modelRepository.set(randomUUID(), Views.convertToViewModel(recordName, keywords));
         }
         records.define(recordName, keywords.toArray(Keyword.class));
-        Number updated = records.put(recordName, update(using(unique), recordsToAdd));
+        Number updated = records.put(recordName, update(using(unique), filter(unique, recordsToAdd)));
         return numberOfRecordsUpdated(updated);
     }
+
+    private Sequence<Record> filter(final Sequence<Keyword> unique, Sequence<Record> recordsToAdd) {
+        if( unique.isEmpty()){
+            return recordsToAdd;
+        }
+        return recordsToAdd.filter(where(keywords(), new Predicate<Sequence<Keyword>>() {
+            public boolean matches(Sequence<Keyword> other) {
+                for (Keyword keyword : other) {
+                    if(unique.contains(keyword)){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }));
+    }
+
 
     private String numberOfRecordsUpdated(Number updated) {
         return format("%s Records updated", updated);
