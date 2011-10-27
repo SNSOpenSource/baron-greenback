@@ -20,7 +20,7 @@ $(document).ready(function() {
         newKeyword.show().css({display:'list-item'});
     });
     $("table.results").tablesorter({ sortList: [
-        [0,0]
+        [0,1]
     ] });
 
     $("form > fieldset > ol.fields").sortable({
