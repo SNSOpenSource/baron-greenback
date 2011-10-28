@@ -110,7 +110,7 @@ public class JobsResource {
         return new Callable1<Record, Model>() {
             public Model call(Record record) throws Exception {
                 return model().
-                        add("status", record.get(RUNNING)? "running" : "idle").
+                        add("status", Boolean.TRUE.equals(record.get(RUNNING))? "running" : "idle").
                         add("id", record.get(JOB_ID)).
                         add("request", addRequest(record)).
                         add("response", addResponse(record)).

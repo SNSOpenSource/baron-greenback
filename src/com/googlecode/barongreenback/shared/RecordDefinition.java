@@ -27,6 +27,7 @@ import static com.googlecode.totallylazy.Strings.isEmpty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 import static com.googlecode.totallylazy.records.MapRecord.record;
+import static java.lang.Boolean.TRUE;
 
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
@@ -106,11 +107,7 @@ public class RecordDefinition {
     }
 
     private static boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
-        try {
-            return true == keyword.metadata().get(metaKeyword);
-        } catch (Exception e) {
-            return false;
-        }
+        return TRUE.equals(keyword.metadata().get(metaKeyword));
     }
 
     private static boolean unique(Keyword keyword) {
@@ -163,7 +160,7 @@ public class RecordDefinition {
         return new RecordDefinition(keyword(model.get("name", String.class)), toKeywords(model.getValues("keywords", Model.class)));
     }
 
-    public static Callable1<? super Model,Sequence<Keyword>> asKeywords() {
+    public static Callable1<? super Model, Sequence<Keyword>> asKeywords() {
         return new Callable1<Model, Sequence<Keyword>>() {
             public Sequence<Keyword> call(Model model) throws Exception {
                 return toKeywords(model.getValues("keywords", Model.class));
