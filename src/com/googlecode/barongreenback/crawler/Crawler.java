@@ -15,15 +15,19 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.xml.XmlRecords;
+import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.handlers.AuditHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
+import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import org.w3c.dom.Document;
 
 import java.net.URL;
 import java.util.Date;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
+import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -46,14 +50,14 @@ public class Crawler {
     public static final Keyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
     public static final Keyword<Date> CHECKPOINT_VALUE = keyword("checkpointValue", Date.class);
 
-    private final HttpClient httpClient;
+    private final HttpHandler httpClient;
 
     public Crawler() {
-        httpClient = new ClientHttpHandler();
+        this(new ClientHttpHandler());
     }
 
     public Crawler(HttpClient httpClient) {
-        this.httpClient = httpClient;
+        this.httpClient = new AuditHandler(httpClient, new PrintAuditor(System.out));
     }
 
     public Pair<Date, Sequence<Record>> crawl(Record crawlingDefinition) throws Exception {
@@ -85,7 +89,8 @@ public class Crawler {
         XmlRecords xmlRecords = records(documentCrawlingDefinition.get(DOCUMENT));
         xmlRecords.define(recordName, allFields.map(asSourceKeywords()).toArray(Keyword.class));
 
-        Sequence<Record> results = xmlRecords.get(recordName).map(select(allFields));
+        Sequence<Keyword> uniqueFields = uniqueFields(recordDefinition);
+        Sequence<Record> results = xmlRecords.get(recordName).map(select(allFields)).filter(unique(uniqueFields));
         Sequence<Record> sortedResults = sortResults(allFields, results);
         Sequence<Record> sortedResultsAfterCheckpoint = sortedResults.takeWhile(not(checkpointReached(documentCrawlingDefinition.get(CHECKPOINT_VALUE))));
 
@@ -94,6 +99,10 @@ public class Crawler {
         boolean checkpointNotReached = results.equals(sortedResultsAfterCheckpoint);
         return Pair.pair(records, checkpointNotReached);
 
+    }
+
+    private Predicate<Record> unique(final Sequence<Keyword> uniqueFields) {
+        return new UniqueRecords(uniqueFields);
     }
 
     private Callable1<? super Keyword, Keyword> asSourceKeywords() {

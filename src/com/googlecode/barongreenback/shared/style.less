@@ -176,18 +176,16 @@ body {
 }
 
 table.results {
-    span.request, span.response {
-        white-space: pre-wrap;
-        overflow: hidden;
-        height: 60px;
-        width: 500px;
-        display: block;
+    span.jobstatus {
+        text-transform: capitalize;
+        padding-left: 20px;
     }
-
-    span.response:hover, span.request:hover {
-        height: auto;
+    span.jobstatus.running {
+            background: url(running.gif) no-repeat;
     }
-
+    span.jobstatus.idle {
+            background: url(idle.gif) no-repeat;
+    }
 }
 
 ol.fields {

@@ -75,10 +75,6 @@ public class SearchResource {
                 for (Keyword visibleHeader : visibleHeaders) {
                     model.add(visibleHeader.name(), record.get(visibleHeader));
                 }
-//                Sequence<Keyword> uniqueHeaders = visibleHeaders.filter(where(metadata(UNIQUE), is(true)));
-//                for (Keyword uniqueHeader : uniqueHeaders) {
-//                    Object value = record.get(uniqueHeader);
-//                }
                 return model;
             }
         };
