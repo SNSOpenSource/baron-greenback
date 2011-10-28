@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class UniqueRecordsTest {
     private final Keyword<Integer> ID = Keywords.keyword("ID", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
+    private final Keyword<Integer> SOME_OTHER_KEY = Keywords.keyword("SOME_OTHER_KEY", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
     private final Keyword<Uri> URI = Keywords.keyword("URI", Uri.class).metadata(record().set(Keywords.UNIQUE, true));
 
     @Test
@@ -29,6 +30,13 @@ public class UniqueRecordsTest {
         Sequence<Record> records = sequence(record().set(ID, 12), record().set(ID, 23));
         assertThat(records.size(), is(2));
         assertThat(records.filter(new UniqueRecords(ID)).size(), is(2));
+    }
+
+    @Test
+    public void ifUniqueKeyIsNotPresentAllowAllRecordsThrough() throws Exception{
+        Sequence<Record> records = sequence(record().set(ID, 12), record().set(ID, 23));
+        assertThat(records.size(), is(2));
+        assertThat(records.filter(new UniqueRecords(SOME_OTHER_KEY)).size(), is(2));
     }
 
     @Test

@@ -90,7 +90,7 @@ public class Crawler {
         xmlRecords.define(recordName, allFields.map(asSourceKeywords()).toArray(Keyword.class));
 
         Sequence<Keyword> uniqueFields = uniqueFields(recordDefinition);
-        Sequence<Record> results = xmlRecords.get(recordName).map(select(allFields)).filter(unique(uniqueFields));
+        Sequence<Record> results = xmlRecords.get(recordName).map(select(allFields)).filter(unique(uniqueFields)).realise();
         Sequence<Record> sortedResults = sortResults(allFields, results);
         Sequence<Record> sortedResultsAfterCheckpoint = sortedResults.takeWhile(not(checkpointReached(documentCrawlingDefinition.get(CHECKPOINT_VALUE))));
 
