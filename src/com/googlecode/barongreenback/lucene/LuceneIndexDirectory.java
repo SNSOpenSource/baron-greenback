@@ -23,6 +23,10 @@ public class LuceneIndexDirectory {
         this.value = directory;
     }
 
+    public LuceneIndexDirectory() {
+        this(new File(DEFAULT));
+    }
+
     public File value() {
         return value;
     }
