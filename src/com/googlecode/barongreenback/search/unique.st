@@ -4,6 +4,10 @@
     <title>$view$ Details</title>
     <meta name="view" content="$view$"/>
     <meta name="query" content="$query$"/>
+$record.keys:{ groupName | $record.(groupName).keys:{ name |
+    <meta name="record.$name$" content='$record.(groupName).(name)$'/>
+}$}$
+
 </head>
 <body class="$view$">
     $record.keys:{ groupName |

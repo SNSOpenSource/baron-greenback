@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Jobs</title>
+    <meta http-equiv="refresh" content="30"/>
 </head>
 <body class="list">
 
