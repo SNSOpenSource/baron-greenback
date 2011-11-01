@@ -30,4 +30,7 @@ public class MenuPage {
         return html.link("//a[contains(@class, 'tab') and text() = '" + value + "']");
     }
 
+    public Number numberOfItems() {
+        return html.count("//a[contains(@class, 'tab')]");
+    }
 }

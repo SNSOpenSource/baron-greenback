@@ -39,8 +39,8 @@ public class ViewListPage {
         return new ViewEditPage(httpHandler, response);
     }
 
-    public int count() {
-        return html.nodes("//table[contains(@class, 'results')]/tbody/tr").size().intValue();
+    public Number count() {
+        return html.count("//table[contains(@class, 'results')]/tbody/tr");
     }
 
     public ViewListPage delete(UUID id) throws Exception {

@@ -8,6 +8,7 @@ import com.googlecode.totallylazy.regex.Regex;
 
 import java.util.regex.MatchResult;
 
+import static com.googlecode.totallylazy.Sequences.repeat;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class ParametersToModel {
@@ -28,16 +29,17 @@ public class ParametersToModel {
     }
 
     private static Object toValue(final String value) {
-        if(value.equals("true")){
+        if (value.equals("true")) {
             return true;
         }
-        if(value.equals("false")){
+        if (value.equals("false")) {
             return false;
         }
         return value;
     }
 
     private static Regex list = Regex.regex("([^\\[]+)\\[(\\d+)\\]$");
+
     private static Model parentOf(final Model startingModel, final Sequence<String> parents) {
         return parents.fold(startingModel, new Callable2<Model, String, Model>() {
             public Model call(Model model, String parent) throws Exception {
@@ -45,12 +47,12 @@ public class ParametersToModel {
                     MatchResult match = list.match(parent);
                     return getModel(model, match.group(1), Integer.valueOf(match.group(2)) - 1);
                 }
-                return getModel(model, parent, 0);
+                return fixMeModel(model, parent, 0);
             }
         });
     }
 
-    private static Model getModel(Model model, String name, Integer index) {
+    private static Model fixMeModel(Model model, String name, Integer index) {
         int numb = numberOfModelsNeeded(model, name, index + 1);
         for (int i = 0; i < numb; i++) {
             model.add(name, Model.model());
@@ -58,8 +60,14 @@ public class ParametersToModel {
         return model.getValues(name, Model.class).get(index);
     }
 
+    private static Model getModel(Model model, String name, Integer index) {
+        int numb = numberOfModelsNeeded(model, name, index + 1);
+        model.add(name, repeat(Model.model()).take(numb).toList());
+        return model.getValues(name, Model.class).get(index);
+    }
+
     private static int numberOfModelsNeeded(Model model, String name, final int numberNeeded) {
-        if(!model.contains(name)){
+        if (!model.contains(name)) {
             return numberNeeded;
         }
         return numberNeeded - model.getValues(name).size();

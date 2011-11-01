@@ -7,6 +7,9 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Second;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -24,9 +27,9 @@ import static com.googlecode.barongreenback.shared.Forms.NUMBER_OF_FIELDS;
 import static com.googlecode.barongreenback.shared.Forms.addTemplates;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.views.Views.clean;
+import static com.googlecode.barongreenback.views.Views.valueFor;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static java.util.UUID.randomUUID;
@@ -45,13 +48,21 @@ public class ViewsResource {
     @GET
     @Path("menu")
     public Model menu(@QueryParam("current") @DefaultValue("") String current) {
-        return model().add("views", modelRepository.find(where(MODEL_TYPE, is("view"))).map(asModel(current)).toList());
+        return models(current, Views.where(valueFor("visible", Boolean.class), is(true)));
+    }
+
+    private Model models(String current, Predicate<Second<Model>> predicate) {
+        return model().add("views", modelRepository.
+                find(Predicates.where(MODEL_TYPE, is("view"))).
+                filter(predicate).
+                map(asModel(current)).
+                toList());
     }
 
     @GET
     @Path("list")
     public Model list() {
-        return menu("");
+        return models("", Predicates.<Second<Model>>all());
     }
 
     @GET

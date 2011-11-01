@@ -16,6 +16,5 @@ public class RecordDefinitionActivator implements Callable<RecordDefinition>{
         Model model = ParametersToModel.modelOf(form);
         Model record = model.get("record", Model.class);
         return RecordDefinition.convert(record);
-//        return new RecordDefinitionExtractor(form).extract();
     }
 }

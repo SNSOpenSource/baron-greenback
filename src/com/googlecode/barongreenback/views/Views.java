@@ -6,6 +6,9 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Second;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
@@ -13,9 +16,9 @@ import com.googlecode.totallylazy.records.Record;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.where;
 
 public class Views {
     public static final Keyword<Boolean> VISIBLE = Keywords.keyword("visible", Boolean.class);
@@ -30,6 +33,7 @@ public class Views {
         return model().add(ROOT, model().
                 add("name", recordName.name()).
                 add("query", "+type:\"" + recordName.name() + "\"").
+                add("visible", true).
                 add("keywords", keywords.map(asModel()).toList()));
     }
 
@@ -52,9 +56,9 @@ public class Views {
     }
 
     public static Option<Model> find(final ModelRepository modelRepository, final String name) {
-        return modelRepository.find(where(MODEL_TYPE, is(ROOT))).
-                map(Callables.<Model>second()).
-                find(where(unwrap(), where(valueFor("name", String.class), is(name))));
+        return modelRepository.find(Predicates.where(MODEL_TYPE, is(ROOT))).
+                find(where(valueFor("name", String.class), is(name))).
+                map(Callables.<Model>second());
     }
 
     public static Callable1<? super Model, Model> unwrap() {
@@ -73,4 +77,9 @@ public class Views {
         };
     }
 
+    public static <T> Predicate<Second<Model>> where(Callable1<? super Model, T> callable1, Predicate<? super T> predicate) {
+        return Predicates.where(second(Model.class),
+                Predicates.where(unwrap(),
+                        Predicates.where(callable1, predicate)));
+    }
 }
