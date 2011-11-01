@@ -9,6 +9,6 @@ mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:531
 mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:431
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:132
-mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:51
+mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:52
 
 mvn:rhino:js:jar:1.6R7

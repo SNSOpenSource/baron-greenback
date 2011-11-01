@@ -5,7 +5,7 @@
     <meta name="view" content="$view$"/>
     <meta name="query" content="$query$"/>
 $record.keys:{ groupName | $record.(groupName).keys:{ name |
-    <meta name="record.$name$" content='$record.(groupName).(name)$'/>
+    <meta name="record.$name$" content='$record.(groupName).(name); format="raw,html"$'/>
 }$}$
 
 </head>
