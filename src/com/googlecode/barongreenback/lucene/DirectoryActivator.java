@@ -2,25 +2,28 @@ package com.googlecode.barongreenback.lucene;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.RAMDirectory;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.totallylazy.Files.TEMP_DIR;
-
 public class DirectoryActivator implements Callable<Directory>, Closeable{
     private Directory directory;
-    private final LuceneIndexDirectory luceneIndexDirectory;
+    private final LuceneIndexConfiguration luceneIndexConfiguration;
 
-    public DirectoryActivator(LuceneIndexDirectory luceneIndexDirectory) {
-        this.luceneIndexDirectory = luceneIndexDirectory;
+    public DirectoryActivator(LuceneIndexConfiguration luceneIndexConfiguration) {
+        this.luceneIndexConfiguration = luceneIndexConfiguration;
     }
 
     public Directory call() throws Exception {
-        directory = new NIOFSDirectory(luceneIndexDirectory.value());
-        return directory;
+        if (luceneIndexConfiguration.getIndexType() == LuceneIndexType.RAM) {
+            directory = new RAMDirectory();
+            return directory;
+        } else {
+            directory = new NIOFSDirectory(luceneIndexConfiguration.getDirectory());
+            return directory;
+        }
     }
 
     public void close() throws IOException {

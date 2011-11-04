@@ -12,13 +12,12 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 
-import java.io.File;
 import java.io.PrintStream;
 
 public class LuceneModule implements ApplicationScopedModule, RequestScopedModule{
     public Module addPerApplicationObjects(Container container) {
         container.addInstance(Version.class, Version.LUCENE_33);
-        container.add(LuceneIndexDirectory.class);
+        container.add(LuceneIndexConfiguration.class);
         container.addActivator(Directory.class, DirectoryActivator.class);
         container.addActivator(IndexWriter.class, IndexWriterActivator.class);
         return this;
