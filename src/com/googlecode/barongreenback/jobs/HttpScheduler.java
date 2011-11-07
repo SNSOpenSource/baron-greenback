@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.jobs;
 
+import com.googlecode.barongreenback.crawler.UniqueRecords;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
@@ -17,8 +18,10 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Runnables.VOID;
+import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.records.RecordMethods.update;
@@ -77,11 +80,11 @@ public class HttpScheduler {
     }
 
     public Sequence<Record> jobs() {
-        return records.get(JOBS);
+        return records.get(JOBS).realise().filter(where(REQUEST, not(empty()))).filter(new UniqueRecords(JOB_ID));
     }
 
     public Option<Record> job(UUID id) {
-        return records.get(JOBS).find(where(JOB_ID, is(id)));
+        return jobs().find(where(JOB_ID, is(id)));
     }
 
     private Callable<Void> httpTask(final UUID id, final Application application, final Request request) {

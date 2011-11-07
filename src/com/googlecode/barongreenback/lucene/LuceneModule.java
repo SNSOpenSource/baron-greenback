@@ -18,8 +18,8 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
     public Module addPerApplicationObjects(Container container) {
         container.addInstance(Version.class, Version.LUCENE_33);
         container.add(LuceneIndexConfiguration.class);
-        container.addActivator(Directory.class, DirectoryActivator.class);
         container.addActivator(IndexWriter.class, IndexWriterActivator.class);
+        container.addActivator(Directory.class, DirectoryActivator.class);
         return this;
     }
 
