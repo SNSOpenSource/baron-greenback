@@ -10,7 +10,7 @@ public class LuceneIndexConfiguration {
     public static final String LUCENE_INDEX_TYPE = "baron-greenback.lucene.index.type";
     public static final String LUCENE_INDEX_DIRECTORY = "baron-greenback.lucene.index.directory";
     public static final LuceneIndexType DEFAULT_TYPE = LuceneIndexType.FILESYSTEM;
-    public static String DEFAULT_DIRECTORY = Files.temporaryDirectory("baron-greenback").getAbsolutePath();
+    public static String DEFAULT_DIRECTORY = new File(Files.TEMP_DIR, "baron-greenback").getAbsolutePath();
     private final LuceneIndexType indexType;
     private final File directory;
 
