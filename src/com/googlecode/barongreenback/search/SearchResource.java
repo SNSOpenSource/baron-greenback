@@ -4,17 +4,13 @@ import com.googlecode.barongreenback.lucene.QueryParserActivator;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
@@ -39,8 +35,12 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.proxy.Call.method;
+import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
+import static com.googlecode.utterlyidle.BaseUri.baseUri;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static com.googlecode.totallylazy.records.RecordMethods.toMap;
 
 
@@ -51,11 +51,13 @@ public class SearchResource {
     private final LuceneRecords records;
     private final QueryParserActivator parser;
     private final ModelRepository modelRepository;
+    private Redirector redirector;
 
-    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final ModelRepository modelRepository) {
+    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final ModelRepository modelRepository, final Redirector redirector) {
         this.records = records;
         this.parser = parser;
         this.modelRepository = modelRepository;
+        this.redirector = redirector;
     }
 
     @GET
@@ -69,10 +71,10 @@ public class SearchResource {
                 add("view", viewName).
                 add("query", query).
                 add("headers", headers(visibleHeaders, results)).
-                add("results", results.map(asModel(visibleHeaders)).toList());
+                add("results", results.map(asModel(viewName, visibleHeaders)).toList());
     }
 
-    private Callable1<? super Record, Model> asModel(final Sequence<Keyword> visibleHeaders) {
+    private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword> visibleHeaders) {
         return new Callable1<Record, Model>() {
             public Model call(Record record) throws Exception {
                 if(visibleHeaders.isEmpty()){
@@ -80,11 +82,24 @@ public class SearchResource {
                 }
                 Model model = model();
                 for (Keyword visibleHeader : visibleHeaders) {
-                    model.add(visibleHeader.name(), record.get(visibleHeader));
+                    Model field = model().
+                            add("value", record.get(visibleHeader));
+
+                    if (Boolean.TRUE.equals(visibleHeader.metadata().get(Keywords.UNIQUE))) {
+                        field.add("url", uniqueUrlOf(record, visibleHeader, viewName));
+                    }
+
+                    model.add(visibleHeader.name(), field);
                 }
                 return model;
             }
         };
+    }
+
+    private Uri uniqueUrlOf(Record record, Keyword visibleHeader, String viewName) throws ParseException {
+        return redirector.uriOf(method(on(SearchResource.class).
+                unique(viewName, String.format("%s:\"%s\"", visibleHeader.name(), record.get(visibleHeader))))).
+                dropScheme().dropAuthority();
     }
 
     private String prefix(Option<Model> optionalView, final String query) {

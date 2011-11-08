@@ -8,7 +8,7 @@ $if(!results.empty)$
         </thead>
         <tbody>
         $results:{ record |
-            <tr>$headers:{ header | <td class="$header.escapedName$">$if(header.unique)$<a href='unique?query=$header.name$:$record.(header.name)$'>$endif$$record.(header.name)$$if(header.unique)$</a>$endif$</td>}$ </tr>
+            <tr>$headers:{ header | <td class="$header.escapedName$">$if(record.(header.name).url)$<a href='$record.(header.name).url$'>$endif$$record.(header.name).value$$if(record.(header.name).url)$</a>$endif$</td>}$ </tr>
         }$
         </tbody>
     </table>
