@@ -29,8 +29,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.asKeywords;
+import static com.googlecode.barongreenback.views.Views.allRecords;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.barongreenback.views.Views.unwrap;
+import static com.googlecode.funclate.Model.fromMap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -39,11 +41,13 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
+import static com.googlecode.totallylazy.records.RecordMethods.toMap;
 
 
 @Produces(MediaType.TEXT_HTML)
 @Path("{view}/search")
 public class SearchResource {
+    public static String ALL_RECORDS_VIEW = "records";
     private final LuceneRecords records;
     private final QueryParserActivator parser;
     private final ModelRepository modelRepository;
@@ -71,6 +75,9 @@ public class SearchResource {
     private Callable1<? super Record, Model> asModel(final Sequence<Keyword> visibleHeaders) {
         return new Callable1<Record, Model>() {
             public Model call(Record record) throws Exception {
+                if(visibleHeaders.isEmpty()){
+                    return fromMap(toMap(record));
+                }
                 Model model = model();
                 for (Keyword visibleHeader : visibleHeaders) {
                     model.add(visibleHeader.name(), record.get(visibleHeader));
@@ -93,6 +100,9 @@ public class SearchResource {
     }
 
     private Option<Model> view(String view) {
+        if(view.equals(ALL_RECORDS_VIEW)){
+            return Option.some(allRecords());
+        }
         return find(modelRepository, view);
     }
 
