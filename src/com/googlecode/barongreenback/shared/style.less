@@ -102,17 +102,23 @@ div.container, .container {
     margin: 50px 20px;
 }
 
-fieldset {
+div.fieldset {
     .shadow(lightgray);
-    margin: 5px;
-    padding: 5px;
-
-    legend {
-        background-color: white;
+    border: 1px solid #ddd;
+    margin-top: 1em;
+    padding-top: 1em;
+    
+    position: relative;
+    
+    div.legend {
+        display: inline;
+        padding: 0.0em 0.4em;
+        margin: 0.0em 0.4em;
+        background-color: #fff;
+        position: absolute;
+        top: -0.8em;
         font-size: 110%;
         font-weight: bold;
-        padding: 5px;
-        margin-bottom: 0;
         color: @grayDark;
         text-transform: capitalize;
     }

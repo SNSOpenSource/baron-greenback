@@ -1,4 +1,4 @@
-<fieldset class="$name$">
-    <legend>$name$</legend>
+<div class="fieldset $name$">
+    <div class="legend">$name$</div>
     $content$
-</fieldset>
+</div>
