@@ -98,7 +98,7 @@ public class SearchResource {
 
     private Uri uniqueUrlOf(Record record, Keyword visibleHeader, String viewName) throws ParseException {
         return redirector.uriOf(method(on(SearchResource.class).
-                unique(viewName, String.format("%s:%s", visibleHeader.name(), record.get(visibleHeader))))).
+                unique(viewName, String.format("%s:\"%s\"", visibleHeader.name(), record.get(visibleHeader))))).
                 dropScheme().dropAuthority();
     }
 
