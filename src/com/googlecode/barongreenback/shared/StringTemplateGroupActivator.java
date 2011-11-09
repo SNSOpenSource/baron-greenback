@@ -38,12 +38,10 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
 
     public StringTemplateGroup call() throws Exception {
         EnhancedStringTemplateGroup shared = new EnhancedStringTemplateGroup(URLs.packageUrl(SharedModule.class));
-        shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
-        shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
         shared.registerRenderer(always(), Xml.escape());
-        EnhancedStringTemplateGroup group = new EnhancedStringTemplateGroup(baseUrl);
-        group.setSuperGroup(shared);
-        return group;
+        shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
+        shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
+        return new EnhancedStringTemplateGroup(baseUrl, shared);
     }
 
     private URL append(URL url, String path) {
