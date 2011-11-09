@@ -2,10 +2,13 @@ package com.googlecode.barongreenback.search.parser;
 
 import com.googlecode.lazyparsec.Parser;
 import com.googlecode.lazyparsec.Parsers;
+import com.googlecode.lazyparsec.Scanners;
 import com.googlecode.lazyparsec.pattern.CharacterPredicates;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Quadruple;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Triple;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
@@ -29,39 +32,45 @@ public class Grammar {
     public static final Parser<String> VALUE = QUOTED_TEXT.or(TEXT);
     public static final Parser<List<String>> VALUES = VALUE.sepBy(isChar(','));
     public static final Parser<String> NAME = VALUE;
+    public static final Parser<Prefix> PREFIX = Scanners.among("+-").optional().source().map(new Callable1<String, Prefix>() {
+        public Prefix call(String value) throws Exception {
+            return Prefix.parse(value);
+        }
+    });
 
     public static Parser<Predicate<Record>> VALUE_ONLY(final Sequence<Keyword> keywords) {
-        return VALUES.map(new Callable1<List<String>, Predicate<Record>>() {
-            public Predicate<Record> call(final List<String> values) throws Exception {
+        return Parsers.pair(PREFIX, VALUES).map(new Callable1<Pair<Prefix, List<String>>, Predicate<Record>>() {
+            public Predicate<Record> call(final Pair<Prefix, List<String>> pair) throws Exception {
                 return or(keywords.map(new Callable1<Keyword, Predicate>() {
                     public Predicate call(final Keyword keyword) throws Exception {
-                        return matchesValues(keyword, values);
+                        return matchesValues(keyword, pair.second(), asCallable(pair.first()));
                     }
                 }).toArray(Predicate.class));
             }
         });
     }
 
-    private static LogicalPredicate matchesValues(final Keyword keyword, List<String> values) {
+    private static Callable1<String, Predicate<String>> asCallable(final Prefix prefix) {
+        return new Callable1<String, Predicate<String>>() {
+            public Predicate<String> call(String value) throws Exception {
+                if (prefix.equals(Prefix.Minus)) {
+                    return Predicates.not(value);
+                }
+                return Predicates.is(value);
+            }
+        };
+    }
+
+    private static LogicalPredicate matchesValues(final Keyword keyword, List<String> values, final Callable1<String, Predicate<String>> predicate) {
         return or(sequence(values).map(new Callable1<String, Predicate>() {
             public Predicate call(String value) throws Exception {
-                return where(keyword, Predicates.is(value));
+                return where(keyword, predicate.call(value));
             }
         }).toArray(Predicate.class));
     }
 
-    public static final Parser<Callable1<Predicate<Record>, Predicate<Record>>> NEGATION = isChar('-').optional().map(new Callable1<Void, Callable1<Predicate<Record>, Predicate<Record>>>() {
-        public Callable1<Predicate<Record>, Predicate<Record>> call(Void aVoid) throws Exception {
-            return new Callable1<Predicate<Record>, Predicate<Record>>() {
-                public Predicate<Record> call(Predicate<Record> recordPredicate) throws Exception {
-                    return Predicates.not(recordPredicate);
-                }
-            };
-        }
-    });
-
     public static Parser<Predicate<Record>> PARTS(final Sequence<Keyword> keywords) {
-        return Parsers.or(NAME_AND_VALUE, VALUE_ONLY(keywords)).prefix(NEGATION);
+        return Parsers.or(NAME_AND_VALUE, VALUE_ONLY(keywords));
     }
 
     public static Parser<Predicate<Record>> PARSER(final Sequence<Keyword> keywords) {
@@ -72,11 +81,12 @@ public class Grammar {
         });
     }
 
-    public static final Parser<Predicate<Record>> NAME_AND_VALUE = Parsers.tuple(NAME, isChar(':'), VALUES).map(new Callable1<Triple<String, Void, List<String>>, Predicate<Record>>() {
-        public Predicate<Record> call(Triple<String, Void, List<String>> triple) throws Exception {
-            final String name = triple.first();
-            final List<String> values = triple.third();
-            return matchesValues(keyword(name, String.class), values);
+    public static final Parser<Predicate<Record>> NAME_AND_VALUE = Parsers.tuple(PREFIX, NAME, isChar(':'), VALUES).map(new Callable1<Quadruple<Prefix, String, Void, List<String>>, Predicate<Record>>() {
+        public Predicate<Record> call(Quadruple<Prefix, String, Void, List<String>> tuple) throws Exception {
+            final Prefix prefix = tuple.first();
+            final String name = tuple.second();
+            final List<String> values = tuple.fourth();
+            return matchesValues(keyword(name, String.class), values, asCallable(prefix));
         }
     });
 

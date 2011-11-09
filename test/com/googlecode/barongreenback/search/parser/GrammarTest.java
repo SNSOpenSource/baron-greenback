@@ -11,4 +11,12 @@ public class GrammarTest {
         assertThat(Grammar.QUOTED_TEXT.parse("\"foo bar\""), is("foo bar"));
     }
 
+    @Test
+    public void prefix() throws Exception{
+        assertThat(Grammar.PREFIX.parse("+"), is(Prefix.Plus));
+        assertThat(Grammar.PREFIX.parse("-"), is(Prefix.Minus));
+        assertThat(Grammar.PREFIX.parse(""), is(Prefix.None));
+
+    }
+
 }

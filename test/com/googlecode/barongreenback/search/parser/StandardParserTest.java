@@ -55,7 +55,6 @@ public class StandardParserTest {
     }
 
     @Test
-    @Ignore
     public void supportsNegationWithImplicit() throws Exception {
         PredicateParser predicateParser = new StandardParser(keyword("name", String.class));
         Predicate<Record> predicate = predicateParser.parse("-bob age:12");
@@ -67,11 +66,10 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "dan").set(age, "13")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("-name:[bob TO bob] +age:[12 TO 12]"));
+        assertThat(luceneQuery, is("+(((-name:[bob TO bob]))) +(age:[12 TO 12])"));
     }
 
     @Test
-    @Ignore
     public void supportsNegationWithExplicit() throws Exception {
         PredicateParser predicateParser = new StandardParser();
         Predicate<Record> predicate = predicateParser.parse("-name:bob age:12");
