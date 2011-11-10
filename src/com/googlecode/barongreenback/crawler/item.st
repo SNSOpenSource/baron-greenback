@@ -6,5 +6,6 @@
         $get(name="edit", id=item.id)$
         $get(name="export", id=item.id)$
         $post(name="delete", id=item.id)$
+        $if(item.resettable)$$post(name="reset", id=item.id)$$endif$
     </td>
 </tr>

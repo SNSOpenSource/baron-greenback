@@ -11,6 +11,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
@@ -102,6 +103,16 @@ public class CrawlerResource {
         return redirectToList();
     }
 
+    @POST
+    @Path("reset")
+    public Response reset(@FormParam("id") UUID id) {
+        Model model = modelRepository.get(id).get();
+        Model form = model.get("form", Model.class);
+        form.remove("checkpoint", String.class);
+        modelRepository.set(id, model);
+        return redirectToList();
+    }
+
     @GET
     @Path("new")
     public Model newForm() {
@@ -179,9 +190,14 @@ public class CrawlerResource {
                 return model().
                         add("id", pair.first().toString()).
                         add("model", pair.second()).
-                        add("jobUrl", jobUrl(pair.first()));
+                        add("jobUrl", jobUrl(pair.first())).
+                        add("resettable", hasCheckpoint(pair.second()));
             }
         };
+    }
+
+    private boolean hasCheckpoint(Model model) {
+        return !Strings.isEmpty(model.get("form", Model.class).get("checkpoint", String.class));
     }
 
     private Uri jobUrl(UUID uuid) throws Exception {
