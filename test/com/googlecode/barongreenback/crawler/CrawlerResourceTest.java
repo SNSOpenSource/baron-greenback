@@ -5,10 +5,8 @@ import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.utterlyidle.HttpHandler;
+import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
-import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
-import com.googlecode.utterlyidle.html.RelativeUrlHandler;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Restaurant;
 import org.junit.Test;
@@ -28,8 +26,21 @@ import static org.hamcrest.Matchers.is;
 
 public class CrawlerResourceTest extends ApplicationTests {
     @Test
+    public void canResetACrawler() throws Exception {
+        CrawlerPage newPage = new CrawlerPage(browser);
+        newPage.update().value("news");
+        newPage.checkpoint().value("some value");
+        CrawlerListPage list = newPage.save();
+        assertThat(list.isResettable("news"), is(true));
+        list = list.reset("news");
+        assertThat(list.isResettable("news"), is(false));
+        CrawlerPage edit = list.edit("news");
+        assertThat(edit.checkpoint().value(), is(""));
+    }
+
+    @Test
     public void canSaveAndLoadACrawler() throws Exception {
-        CrawlerPage newPage = new CrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(application)));
+        CrawlerPage newPage = new CrawlerPage(browser);
         newPage.update().value("news");
         newPage.from().value("http://feeds.bbci.co.uk/news/rss.xml");
         newPage.more().value("//link[@rel='prev-archive']/@href");
@@ -59,7 +70,7 @@ public class CrawlerResourceTest extends ApplicationTests {
 
     @Test
     public void canImportCrawlerInJsonFormat() throws Exception {
-        ImportCrawlerPage importPage = new ImportCrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(application)));
+        ImportCrawlerPage importPage = new ImportCrawlerPage(browser);
         importPage.model().value(fileContent("crawler.json"));
         CrawlerListPage listPage = importPage.importModel();
         assertThat(listPage.contains("news"), is(true));
@@ -67,7 +78,7 @@ public class CrawlerResourceTest extends ApplicationTests {
 
     @Test
     public void canImportCrawlerWithId() throws Exception {
-        ImportCrawlerPage importPage = new ImportCrawlerPage(new RedirectHttpHandler(new RelativeUrlHandler(application)));
+        ImportCrawlerPage importPage = new ImportCrawlerPage(browser);
         String id = UUID.randomUUID().toString();
         importPage.id().value(id);
         importPage.model().value(fileContent("crawler.json"));
@@ -102,8 +113,7 @@ public class CrawlerResourceTest extends ApplicationTests {
                 application.applicationScope().addInstance(CountDownLatch.class, latch).
                         decorate(Scheduler.class, CountDownScheduler.class);
 
-                HttpHandler handler = new RedirectHttpHandler(new RelativeUrlHandler(application));
-                CrawlerPage newPage = new CrawlerPage(handler);
+                CrawlerPage newPage = new CrawlerPage(browser);
                 newPage.update().value("newsfeed");
                 newPage.from().value("http://localhost:9001/data");
                 newPage.more().value("//link[@rel='prev-archive']/@href");
@@ -131,13 +141,13 @@ public class CrawlerResourceTest extends ApplicationTests {
 
                 latch.await();
 
-                return new ViewSearchPage(handler, "newsfeed", "");
+                return new ViewSearchPage(browser, "newsfeed", "");
             }
         });
     }
 
     private RestServer setupServerWithDataFeed() throws Exception {
-        RestServer dataSourceServer = new RestServer(new Restaurant(), defaultConfiguration().port(9001));
+        RestServer dataSourceServer = new RestServer(new Restaurant(BasePath.basePath("/")), defaultConfiguration().port(9001));
         ClientHttpHandler restClient = new ClientHttpHandler();
         restClient.handle(put(dataSourceServer.uri() + "data").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom.xml").getBytes()).build());
         restClient.handle(put(dataSourceServer.uri() + "data/prev").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom-prev.xml").getBytes()).build());

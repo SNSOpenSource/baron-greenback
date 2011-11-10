@@ -5,6 +5,11 @@
         $post(url=item.jobUrl, name="crawl", id=item.id)$
         $get(name="edit", id=item.id)$
         $get(name="export", id=item.id)$
+        $if(item.resettable)$
+            $post(name="reset", id=item.id)$
+        $else$
+            $post(name="reset", id=item.id, disabled="true")$
+        $endif$
         $post(name="delete", id=item.id)$
     </td>
 </tr>

@@ -8,14 +8,16 @@ import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
 import com.googlecode.barongreenback.views.ViewsModule;
 import com.googlecode.utterlyidle.Application;
+import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.RestApplication;
-import com.googlecode.utterlyidle.httpserver.RestServer;
+import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.modules.Modules;
 import com.googlecode.utterlyidle.modules.PerformanceModule;
 
 import java.util.Properties;
 
 import static com.googlecode.totallylazy.URLs.packageUrl;
+import static com.googlecode.utterlyidle.ApplicationBuilder.application;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 import static com.googlecode.utterlyidle.dsl.DslBindings.bindings;
@@ -26,9 +28,11 @@ import static com.googlecode.utterlyidle.sitemesh.MetaTagRule.metaTagRule;
 import static com.googlecode.utterlyidle.sitemesh.StaticDecoratorRule.staticRule;
 import static com.googlecode.utterlyidle.sitemesh.StringTemplateDecorators.stringTemplateDecorators;
 import static com.googlecode.utterlyidle.sitemesh.TemplateName.templateName;
+import static java.lang.System.getProperties;
 
 public class WebApplication extends RestApplication {
-    public WebApplication(Properties properties) {
+    public WebApplication(BasePath basePath, Properties properties) {
+        super(basePath);
         add(Modules.applicationInstance(properties));
         addModules(this);
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
@@ -49,6 +53,7 @@ public class WebApplication extends RestApplication {
     }
 
     public static void main(String[] args) throws Exception {
-        new RestServer(new WebApplication(System.getProperties()), defaultConfiguration().port(9000));
+        ServerConfiguration config = defaultConfiguration().port(9000);
+        application(new WebApplication(config.basePath(), getProperties())).start(config);
     }
 }

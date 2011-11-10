@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Checkbox;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Input;
@@ -16,7 +15,6 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeU
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.fail;
 
 public class CrawlerPage {
     public static final String UPDATE = "//input[@name='form.update']";

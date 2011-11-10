@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.lucene.LuceneIndexConfiguration;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.utterlyidle.Application;
+import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
 import com.googlecode.utterlyidle.html.RelativeUrlHandler;
@@ -29,7 +30,7 @@ public abstract class ApplicationTests {
         Properties properties = new Properties();
         properties.put(LuceneIndexConfiguration.LUCENE_INDEX_TYPE, LuceneIndexConfiguration.DEFAULT_TYPE.name());
         properties.put(LuceneIndexConfiguration.LUCENE_INDEX_DIRECTORY, LuceneIndexConfiguration.DEFAULT_DIRECTORY);
-        application = new WebApplication(properties);
+        application = new WebApplication(BasePath.basePath("/"), properties);
         browser = new RedirectHttpHandler(new RelativeUrlHandler(application));
     }
 
