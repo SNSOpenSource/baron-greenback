@@ -30,7 +30,7 @@ public class CrawlerListPage {
     }
 
     public boolean contains(String name) {
-        return html.selectContent("//a[contains(@class, 'update')]/text()").equals(name);
+        return html.selectContent("descendant::a[contains(@class, 'update')]/text()").equals(name);
     }
 
     public CrawlerPage edit(String name) throws Exception {
@@ -43,7 +43,7 @@ public class CrawlerListPage {
     }
 
     private String linkTo(String crawlerName) {
-        return "//a[contains(@class, 'update') and text() = '" + crawlerName + "']";
+        return "descendant::a[contains(@class, 'update') and text() = '" + crawlerName + "']";
     }
 
     public JobsListPage crawl(String name) throws Exception {
@@ -63,10 +63,10 @@ public class CrawlerListPage {
     }
 
     private String formFor(String crawlerName, String formName) {
-        return format("//tr[%s]/descendant::form[contains(@class, '%s')]", linkTo(crawlerName), formName);
+        return format("descendant::tr[%s]/descendant::form[contains(@class, '%s')]", linkTo(crawlerName), formName);
     }
 
     public boolean isResettable(String name) {
-        return html.contains(formFor(name, "reset"));
+        return html.input(formFor(name, "reset") + "/" + button("reset")).enabled();
     }
 }

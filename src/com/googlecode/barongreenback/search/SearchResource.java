@@ -4,7 +4,13 @@ import com.googlecode.barongreenback.lucene.QueryParserActivator;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
@@ -28,7 +34,6 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.asKeywords;
 import static com.googlecode.barongreenback.views.Views.allRecords;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.barongreenback.views.Views.unwrap;
-import static com.googlecode.funclate.Model.fromMap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -39,9 +44,6 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
-import static com.googlecode.utterlyidle.BaseUri.baseUri;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static com.googlecode.totallylazy.records.RecordMethods.toMap;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -77,19 +79,17 @@ public class SearchResource {
     private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword> visibleHeaders) {
         return new Callable1<Record, Model>() {
             public Model call(Record record) throws Exception {
-                if(visibleHeaders.isEmpty()){
-                    return fromMap(toMap(record));
-                }
+                Sequence<Keyword> headers = visibleHeaders.isEmpty() ? record.keywords() : visibleHeaders;
                 Model model = model();
-                for (Keyword visibleHeader : visibleHeaders) {
+                for (Keyword header : headers) {
                     Model field = model().
-                            add("value", record.get(visibleHeader));
+                            add("value", record.get(header));
 
-                    if (Boolean.TRUE.equals(visibleHeader.metadata().get(Keywords.UNIQUE))) {
-                        field.add("url", uniqueUrlOf(record, visibleHeader, viewName));
+                    if (Boolean.TRUE.equals(header.metadata().get(Keywords.UNIQUE))) {
+                        field.add("url", uniqueUrlOf(record, header, viewName));
                     }
 
-                    model.add(visibleHeader.name(), field);
+                    model.add(header.name(), field);
                 }
                 return model;
             }

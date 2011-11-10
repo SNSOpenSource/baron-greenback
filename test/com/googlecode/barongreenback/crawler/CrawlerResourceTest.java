@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Restaurant;
@@ -146,7 +147,7 @@ public class CrawlerResourceTest extends ApplicationTests {
     }
 
     private RestServer setupServerWithDataFeed() throws Exception {
-        RestServer dataSourceServer = new RestServer(new Restaurant(), defaultConfiguration().port(9001));
+        RestServer dataSourceServer = new RestServer(new Restaurant(BasePath.basePath("/")), defaultConfiguration().port(9001));
         ClientHttpHandler restClient = new ClientHttpHandler();
         restClient.handle(put(dataSourceServer.uri() + "data").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom.xml").getBytes()).build());
         restClient.handle(put(dataSourceServer.uri() + "data/prev").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom-prev.xml").getBytes()).build());
