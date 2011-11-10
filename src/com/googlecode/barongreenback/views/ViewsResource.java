@@ -114,6 +114,13 @@ public class ViewsResource {
     }
 
     @GET
+    @Path("exists")
+    @Produces(MediaType.TEXT_PLAIN)
+    public boolean exists(@QueryParam("id") UUID id) {
+        return !modelRepository.get(id).isEmpty();
+    }
+
+    @GET
     @Path("import")
     public Model importForm() {
         return model();
