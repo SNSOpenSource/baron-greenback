@@ -1,0 +1,249 @@
+@import "twitter/bootstrap.less";
+
+@grayDark:          lighten(@black, 15%);
+@gray:              lighten(@black, 30%);
+
+.t+l{
+    color: red;
+    &:hover {
+        border: 1px solid red;
+    }
+}
+
+.large-input {
+    width: 270px;
+}
+
+.extra-large-input {
+    width: 530px;
+}
+
+.shadow (@shadow-color) {
+    @blur-radius: 3px;
+    @spread-radius: 1px;
+    -moz-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    -webkit-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+}
+
+.inlineBlock {
+    display: inline-block;
+    zoom: 1; // IE6-7 only
+    *display: inline; // IE6-7 only
+}
+
+.label {
+    padding: 0;
+    display: block;
+    float: none;
+    width: auto;
+    font-weight: bold;
+    text-align: left;
+    line-height: 20px;
+    padding-top: 0;
+    color: @grayDark;
+    background: none;
+    font-size: 13px;
+    text-transform: capitalize;
+}
+
+h1, h2, h3, h4, h5, h6, .btn, a.update {
+    text-transform: capitalize;
+}
+
+.btn {
+    &.primary, &.danger {
+        &:hover {
+            color: #fff;
+        }
+    }
+    &.danger {
+        .gradientBar(lighten(@red, 15%), @red);
+    }
+}
+
+input[type="submit"] {
+    .btn;
+}
+
+input.crawl, input.search, a.new, input.import, input.save, input.start  {
+    .btn;
+    .btn.primary;
+}
+
+input.more, a.export, a.import, a.edit, a.cancel {
+    .btn;
+}
+
+input.delete, input.stop {
+    .btn;
+    .btn.danger;
+}
+
+div.control, div.nameValue {
+    .inlineBlock;
+    margin: 5px;
+}
+
+ul.tabs {
+    float: none;
+}
+
+th, ul.tabs li {
+    text-transform: capitalize;
+}
+
+div.container, .container {
+    margin: 0 0 0 40px;
+    width: auto;
+}
+
+.content {
+    margin: 50px 20px;
+}
+
+div.fieldset {
+    .shadow(lightgray);
+    border: 1px solid #ddd;
+    margin-top: 1em;
+    padding-top: 1em;
+    
+    position: relative;
+    
+    div.legend {
+        display: inline;
+        padding: 0.0em 0.4em;
+        margin: 0.0em 0.4em;
+        background-color: #fff;
+        position: absolute;
+        top: -0.8em;
+        font-size: 110%;
+        font-weight: bold;
+        color: @grayDark;
+        text-transform: capitalize;
+    }
+}
+
+div.recordDefinitionTemplate, li.keywordTemplate {
+    display:none;
+}
+
+form input.from, form input#query {
+    .extra-large-input;
+}
+
+form.import {
+    div.control {
+        display: block;
+    }
+    input.id {
+        .large-input;
+    }
+    textarea.model {
+        .extra-large-input;
+        height: 20em;
+    }
+}
+
+form.view {
+    div.rootXPath, div.alias, div.subfeed, div.checkpoint {
+        display: none;
+    }
+}
+
+.subrecordDefinition div.checkpoint {
+    display: none;
+}
+
+
+form.delete, form.crawl, form.start, form.stop, form.copy {
+    margin: 0;
+    padding: 0;
+    .inlineBlock;
+}
+
+body {
+    form {
+        input[type=text], input[type=password], textarea, select {
+            color: #333;
+        }
+    }
+}
+
+.actions {
+    padding-left: 20px;
+}
+
+.topbar {
+    a.home {
+        background: left no-repeat url(small-logo.png);
+        padding-left: 40px;
+    }
+}
+
+table.results {
+    span.jobstatus {
+        text-transform: capitalize;
+        padding-left: 20px;
+    }
+    span.jobstatus.running {
+            background: url(running.gif) no-repeat;
+    }
+    span.jobstatus.idle {
+            background: url(idle.gif) no-repeat;
+    }
+}
+
+ol.fields {
+    li:hover {
+        border: 1px solid @grayLighter;
+    }
+    li {
+        border: 1px solid #fff;
+        position: relative;
+        padding-right: 20px;
+        .closeIcon {
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        .moveIcon {
+            cursor: pointer;
+            position: absolute;
+            top: 24px;
+            right: 0;
+        }
+    }
+    li.ui-sortable-helper {
+        background-color: #fff;
+        border: solid 1px @grayLighter;
+        cursor: move;
+    }
+    li.placeholder {
+        height: 5em;
+        background-color: @grayLight;
+    }
+}
+
+.icon {
+    background: #fff no-repeat;
+    width: 16px;
+    height: 16px;
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    margin: 4px;
+}
+
+.closeIcon {
+    .icon;
+    background: url('icons-red.png') -96px -128px;
+}
+
+.moveIcon {
+    .icon;
+    background: url('icons-grey.png') -128px 0;
+}
+
+
