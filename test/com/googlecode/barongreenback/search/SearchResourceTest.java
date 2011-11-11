@@ -25,6 +25,14 @@ import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SearchResourceTest extends ApplicationTests {
+     @Test
+    public void supportsDelete() throws Exception {
+        SearchPage searchPage = new SearchPage(browser, "users", "", true);
+        assertThat(searchPage.numberOfResults(), is(2));
+        searchPage = searchPage.delete();
+        assertThat(searchPage.numberOfResults(), is(0));
+    }
+
     @Test
     public void supportsQueryAll() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "");

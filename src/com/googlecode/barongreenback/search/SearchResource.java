@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.lucene.QueryParserActivator;
+import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
@@ -18,7 +19,9 @@ import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.GET;
+import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
@@ -54,13 +57,29 @@ public class SearchResource {
     private final LuceneRecords records;
     private final QueryParserActivator parser;
     private final ModelRepository modelRepository;
-    private Redirector redirector;
+    private final Redirector redirector;
+    private final AdvancedMode mode;
 
-    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final ModelRepository modelRepository, final Redirector redirector) {
+    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode) {
         this.records = records;
         this.parser = parser;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
+        this.mode = mode;
+    }
+
+    @POST
+    @Path("delete")
+    public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
+        if(!mode.equals(AdvancedMode.Enable)){
+            return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
+        }
+        Option<Model> optionalView = view(viewName);
+        Sequence<Keyword> allHeaders = headers(optionalView);
+        Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
+        Query luceneQuery = parse(prefix(optionalView, query), visibleHeaders);
+        records.remove(luceneQuery);
+        return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
 
     @GET
@@ -69,7 +88,8 @@ public class SearchResource {
         Option<Model> optionalView = view(viewName);
         Sequence<Keyword> allHeaders = headers(optionalView);
         Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Sequence<Record> results = optionalView.isEmpty() ? Sequences.<Record>empty() : records.query(parse(prefix(optionalView, query), visibleHeaders), allHeaders);
+        Query luceneQuery = parse(prefix(optionalView, query), visibleHeaders);
+        Sequence<Record> results = optionalView.isEmpty() ? Sequences.<Record>empty() : records.query(luceneQuery, allHeaders);
         return model().
                 add("view", viewName).
                 add("query", query).

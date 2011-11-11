@@ -11,7 +11,9 @@
         $input(name="query", value=query)$
         <input type="submit" value="Search" class="search"/>
     </form>
-
+    $if(advanced)$
+        $post(url={delete?query=$query$&amp;advanced=$advanced$}, name="delete")$
+    $endif$
     $results()$
 </div>
 </body>

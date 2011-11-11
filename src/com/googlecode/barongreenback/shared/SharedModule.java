@@ -12,8 +12,6 @@ import com.googlecode.utterlyidle.sitemesh.TemplateName;
 import com.googlecode.yadic.Container;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
-import java.util.UUID;
-
 import static com.googlecode.totallylazy.Predicates.instanceOf;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -31,6 +29,7 @@ public class SharedModule implements ResponseHandlersModule, RequestScopedModule
         container.addActivator(TemplateName.class, TemplateNameActivator.class);
         container.addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class);
         container.add(ModelRepository.class, ModelRepository.class);
+        container.addActivator(AdvancedMode.class, AdvancedModeActivator.class);
         return this;
     }
 

@@ -10,17 +10,20 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 public class ModelRenderer implements Renderer<Model> {
     private final StringTemplateGroup group;
     private final BasePath basePath;
+    private final AdvancedMode mode;
     private final TemplateName templateName;
 
-    public ModelRenderer(StringTemplateGroup group, TemplateName templateName, BasePath basePath) {
+    public ModelRenderer(StringTemplateGroup group, TemplateName templateName, BasePath basePath, AdvancedMode mode) {
         this.templateName = templateName;
         this.group = group;
         this.basePath = basePath;
+        this.mode = mode;
     }
 
     public String render(Model value) throws Exception {
         StringTemplate template = group.getInstanceOf(templateName.value(), value.toMap());
         template.setAttribute("base", basePath);
+        template.setAttribute("advanced", mode.equals(AdvancedMode.Enable));
         return template.toString();
     }
 }
