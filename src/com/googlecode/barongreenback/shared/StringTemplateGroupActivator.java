@@ -38,9 +38,9 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
 
     public StringTemplateGroup call() throws Exception {
         EnhancedStringTemplateGroup shared = new EnhancedStringTemplateGroup(URLs.packageUrl(SharedModule.class));
+        shared.registerRenderer(always(), Xml.escape());
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
-        shared.registerRenderer(always(), Xml.escape());
         return new EnhancedStringTemplateGroup(baseUrl, shared);
     }
 
