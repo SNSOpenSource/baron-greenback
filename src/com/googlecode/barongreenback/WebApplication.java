@@ -38,18 +38,19 @@ public class WebApplication extends RestApplication {
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
                 staticRule(contentType(TEXT_HTML), templateName("decorator"))));
+        // must come after sitemesh
+        add(new PerformanceModule());
     }
 
     public static void addModules(Application application) {
         application.add(new LessCssModule());
-        application.add(new PerformanceModule());
         application.add(new LuceneModule());
         application.add(new SharedModule());
         application.add(new CrawlerModule());
         application.add(new SearchModule());
         application.add(new ViewsModule());
         application.add(new JobsModule());
-        application.add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("baron-greenback").set("less", "text/css"))));
+        application.add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("baron-greenback"))));
     }
 
     public static void main(String[] args) throws Exception {
