@@ -7,6 +7,7 @@ import com.googlecode.utterlyidle.HttpHeaders;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class LessCssHandler implements HttpHandler {
         Response response = httpHandler.handle(request);
 
         Uri uri = request.uri();
-        if (!uri.path().endsWith(".less")) {
+        if (!(uri.path().endsWith(".less") && response.status().equals(Status.OK))) {
             return response;
         }
         String less = new String(response.bytes());
@@ -40,7 +41,8 @@ public class LessCssHandler implements HttpHandler {
 
     private String processLess(Uri uri, String less) throws IOException {
         if(cache.containsKey(uri) && config.useCache()){
-            return cache.get(uri);
+            String value = cache.get(uri);
+            return value;
         }
         String result = lessCompiler.compile(less, new Loader(uri));
         cache.put(uri, result);
