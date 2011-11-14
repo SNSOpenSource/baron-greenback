@@ -18,6 +18,7 @@ import com.googlecode.totallylazy.records.Record;
 import java.util.List;
 
 import static com.googlecode.lazyparsec.Scanners.isChar;
+import static com.googlecode.lazyparsec.Scanners.notChar;
 import static com.googlecode.totallylazy.Predicates.and;
 import static com.googlecode.totallylazy.Predicates.or;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -27,7 +28,7 @@ import static com.googlecode.totallylazy.records.Keywords.keyword;
 @SuppressWarnings("unchecked")
 public class Grammar {
     public static final Parser<String> TEXT = isChar(CharacterPredicates.IS_ALPHA_NUMERIC).many1().source();
-    public static final Parser<String> QUOTED_TEXT = isChar(CharacterPredicates.IS_ALPHA_NUMERIC).or(isChar(' ')).many1().source().
+    public static final Parser<String> QUOTED_TEXT = notChar('"').many1().source().
             between(isChar('"'), isChar('"'));
     public static final Parser<String> VALUE = QUOTED_TEXT.or(TEXT);
     public static final Parser<List<String>> VALUES = VALUE.sepBy(isChar(','));

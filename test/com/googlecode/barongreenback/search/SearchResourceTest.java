@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.search.SearchResource.ALL_RECORDS_VIEW;
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -49,12 +48,6 @@ public class SearchResourceTest extends ApplicationTests {
     public void whenAnUnknownViewIsSpecifiedThenNoResultsShouldBeShown() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "UNKNOWN", "");
         assertThat(searchPage.numberOfResults(), is(0));
-    }
-
-    @Test
-    public void whenRecordsViewIsSpecifiedThenShowAllRecords() throws Exception {
-        SearchPage searchPage = new SearchPage(browser, ALL_RECORDS_VIEW, "");
-        assertThat(searchPage.numberOfResults(), is(3));  // 2 users and 1 view
     }
 
     @Before

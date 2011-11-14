@@ -38,11 +38,6 @@ public class Views {
                 add("keywords", keywords.map(asModel()).toList()));
     }
 
-    public static Model allRecords() {
-        return model().add(ROOT, model().
-                add("query", "*:*"));
-    }
-
     private static Callable1<? super Keyword, Model> asModel() {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {

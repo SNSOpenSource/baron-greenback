@@ -121,6 +121,16 @@ public class StandardParserTest {
     }
 
     @Test
+    public void supportsQuotesContainingNonAlphaNumericCharacters() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("id:\"urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1\"");
+
+        Keyword<String> id = keyword("id", String.class);
+        assertThat(predicate.matches(record().set(id, "urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1")), is(true));
+        assertThat(predicate.matches(record().set(id, "fail")), is(false));
+    }
+
+    @Test
     public void supportsQuotedName() throws Exception {
         PredicateParser predicateParser = new StandardParser();
         Predicate<Record> predicate = predicateParser.parse("\"First Name\":Dan");
@@ -128,5 +138,15 @@ public class StandardParserTest {
         Keyword<String> name = keyword("First Name", String.class);
         assertThat(predicate.matches(record().set(name, "Dan")), is(true));
         assertThat(predicate.matches(record().set(name, "Mat")), is(false));
+    }
+
+    @Test
+    public void supportsEmptyQueries() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("");
+
+        Keyword<String> name = keyword("First Name", String.class);
+        assertThat(predicate.matches(record().set(name, "Dan")), is(true));
+        assertThat(predicate.matches(record().set(name, "Mat")), is(true));
     }
 }
