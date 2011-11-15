@@ -83,22 +83,19 @@ public class SearchResource {
 
     @GET
     @Path("list")
-    public Model list(@PathParam("view") String viewName, @QueryParam("query") final String query) throws ParseException {
-        Model model = model().
-                add("view", viewName).
-                add("query", query);
+    public Model list(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
+        return optionalView(viewName).
+                fold(model().add("view", viewName).add("query", query), executeQuery(viewName, query));
+    }
 
-        Option<Model> optionalView = optionalView(viewName);
-        if (optionalView.isEmpty()) {
-            return model;
-        }
-
-        final Model view = optionalView.get();
-        final Sequence<Keyword> visibleHeaders = visibleHeaders(headers(view));
-
-        return parse(prefix(view, query), visibleHeaders).
-                map(addQueryException(model),
-                        addResults(model, viewName, visibleHeaders));
+    private Callable2<Model, Model, Model> executeQuery(final String viewName, final String query) {
+        return new Callable2<Model, Model, Model>() {
+            public Model call(Model result, Model view) throws Exception {
+                final Sequence<Keyword> visibleHeaders = visibleHeaders(headers(view));
+                return parse(prefix(view, query), visibleHeaders).
+                        map(addQueryException(result), addResults(result, viewName, visibleHeaders));
+            }
+        };
     }
 
     private Callable1<? super Pair<Keyword, Predicate<Record>>, Model> addResults(final Model model, final String viewName, final Sequence<Keyword> visibleHeaders) {
@@ -120,7 +117,6 @@ public class SearchResource {
             }
         };
     }
-
 
     @GET
     @Path("unique")
