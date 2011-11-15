@@ -10,8 +10,10 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
+import com.googlecode.totallylazy.regex.Matches;
 import com.googlecode.utterlyidle.Server;
 import com.googlecode.yadic.Container;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,6 +26,12 @@ import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SearchResourceTest extends ApplicationTests {
+     @Test
+    public void handlesInvalidQueriesInANiceWay() throws Exception {
+        SearchPage searchPage = new SearchPage(browser, "users", "^&%$^%");
+        assertThat(searchPage.queryMessage(), Matchers.is("Invalid Query"));
+    }
+
      @Test
     public void supportsDelete() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "", true);

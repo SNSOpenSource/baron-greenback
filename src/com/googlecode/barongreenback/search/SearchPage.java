@@ -45,4 +45,8 @@ public class SearchPage {
         Response response = httpHandler.handle(request);
         return new SearchPage(httpHandler, response);
     }
+
+    public String queryMessage() {
+        return html.selectContent("//div[contains(@class, 'error')]/span[contains(@class, 'message')]");
+    }
 }

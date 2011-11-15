@@ -87,7 +87,12 @@ div.nameValue {
 div.control, div.nameValue {
     .inlineBlock;
     margin: 5px;
+    span.message {
+        .help-block;
+    }
 }
+
+
 
 ul.tabs {
     float: none;
@@ -164,6 +169,10 @@ form.view {
 
 form.search {
     .inlineBlock;
+    input.search {
+        vertical-align: top;
+        margin-top: 4px;
+    }
 }
 
 form.delete, form.crawl, form.start, form.stop, form.copy, form.reset {
@@ -255,5 +264,22 @@ ol.fields {
     .icon;
     background: url('icons-grey.png') -128px 0;
 }
+
+form div.error {
+  @error-color: desaturate(lighten(@red, 25%), 25%);
+  > label, span.message {
+    color: @red;
+  }
+  input,
+  textarea {
+    border-color: @error-color;
+    .box-shadow(0 0 3px rgba(171,41,32,.25));
+    &:focus {
+      border-color: darken(@error-color, 10%);
+      .box-shadow(0 0 6px rgba(171,41,32,.5));
+    }
+  }
+}
+
 
 

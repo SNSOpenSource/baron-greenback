@@ -8,7 +8,12 @@
 <body class="$view$">
 <div>
     <form class="search" method="get">
-        $input(name="query", value=query)$
+        $if(queryException)$
+            $input(name="query", value=query, message="Invalid Query", messageType="error")$
+            <!-- $queryException$ -->
+        $else$
+            $input(name="query", value=query)$
+        $endif$
         <input type="submit" value="Search" class="search"/>
     </form>
     $if(advanced)$

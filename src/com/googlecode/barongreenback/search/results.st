@@ -1,4 +1,4 @@
-$if(!results.empty)$
+$if(results)$
 <div id="results">
     <table class="results zebra-striped">
         <thead>

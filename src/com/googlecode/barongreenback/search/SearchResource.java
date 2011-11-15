@@ -6,13 +6,14 @@ import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyparsec.error.ParserException;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
@@ -35,7 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.googlecode.barongreenback.shared.RecordDefinition.asKeywords;
+import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
@@ -69,13 +70,13 @@ public class SearchResource {
     @POST
     @Path("delete")
     public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
-        if(!mode.equals(AdvancedMode.Enable)){
+        if (!mode.equals(AdvancedMode.Enable)) {
             return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
         }
-        Option<Model> optionalView = view(viewName);
-        Sequence<Keyword> allHeaders = headers(optionalView);
+        Model view = view(viewName);
+        Sequence<Keyword> allHeaders = headers(view);
         Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Pair<Keyword, Predicate<Record>> pair = parse(prefix(optionalView, query), visibleHeaders);
+        Pair<Keyword, Predicate<Record>> pair = parse(prefix(view, query), visibleHeaders).right();
         records.remove(pair.first(), pair.second());
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
@@ -83,17 +84,28 @@ public class SearchResource {
     @GET
     @Path("list")
     public Model list(@PathParam("view") String viewName, @QueryParam("query") final String query) throws ParseException {
-        final Option<Model> optionalView = view(viewName);
-        final Sequence<Keyword> allHeaders = headers(optionalView);
+        Option<Model> optionalView = optionalView(viewName);
+        if(optionalView.isEmpty()){
+            return model().
+                add("view", viewName).
+                add("query", query);
+        }
+        
+        final Model view = optionalView.get();
+        final Sequence<Keyword> allHeaders = headers(view);
         final Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
 
-        Sequence<Record> results = sequence(optionalView).flatMap(new Callable1<Model, Sequence<Record>>() {
-            public Sequence<Record> call(Model model) throws Exception {
-                Pair<Keyword, Predicate<Record>> pair = parse(prefix(optionalView, query), visibleHeaders);
-                records.define(pair.first(), allHeaders.toArray(Keyword.class));
-                return records.get(pair.first()).filter(pair.second());
-            }
-        });
+        Either<String, Pair<Keyword, Predicate<Record>>> parse = parse(prefix(view, query), visibleHeaders);
+        if(parse.isLeft()){
+            return model().
+                add("view", viewName).
+                add("query", query).
+                add("queryException", parse.left());
+        }
+        Pair<Keyword, Predicate<Record>> pair = parse.right();
+        records.define(pair.first(), allHeaders.toArray(Keyword.class));
+        Sequence<Record> results = records.get(pair.first()).filter(pair.second());
+
         return model().
                 add("view", viewName).
                 add("query", query).
@@ -101,19 +113,21 @@ public class SearchResource {
                 add("results", results.map(asModel(viewName, visibleHeaders)).toList());
     }
 
+
+
     @GET
     @Path("unique")
     public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
-        Option<Model> optionalView = view(viewName);
-        Sequence<Keyword> headers = headers(optionalView);
-        Pair<Keyword, Predicate<Record>> pair = parse(prefix(optionalView, query), headers);
+        Model view = view(viewName);
+        Sequence<Keyword> headers = headers(view);
+        Pair<Keyword, Predicate<Record>> pair = parse(prefix(view, query), headers).right();
         records.define(pair.first(), headers.toArray(Keyword.class));
         Record record = records.get(pair.first()).filter(pair.second()).head();
-        Map<String, Map<String, Object>> fold = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
+        Map<String, Map<String, Object>> group = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return model().
                 add("view", viewName).
                 add("query", query).
-                add("record", fold);
+                add("record", group);
     }
 
     private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword> visibleHeaders) {
@@ -142,19 +156,19 @@ public class SearchResource {
                 dropScheme().dropAuthority();
     }
 
-    private String prefix(Option<Model> optionalView, final String query) {
-        return sequence(optionalView.map(query())).add(query).toString(" ");
+    private String prefix(Model view, final String query) {
+        return sequence(queryFrom(view)).add(query).toString(" ");
     }
 
-    private Callable1<Model, String> query() {
-        return new Callable1<Model, String>() {
-            public String call(Model model) throws Exception {
-                return model.get("view", Model.class).get("query", String.class);
-            }
-        };
+    private String queryFrom(Model model) {
+        return model.get("view", Model.class).get("query", String.class);
     }
 
-    private Option<Model> view(String view) {
+    private Model view(String view) {
+        return optionalView(view).get();
+    }
+
+    private Option<Model> optionalView(String view) {
         return find(modelRepository, view);
     }
 
@@ -174,11 +188,8 @@ public class SearchResource {
         };
     }
 
-    private Sequence<Keyword> headers(Option<Model> optionalView) {
-        return optionalView.
-                map(unwrap()).
-                map(asKeywords()).
-                getOrElse(Sequences.<Keyword>empty());
+    private Sequence<Keyword> headers(Model view) {
+        return toKeywords(unwrap(view));
     }
 
     private List<Map<String, Object>> headers(Sequence<Keyword> headers, Sequence<Record> results) {
@@ -214,13 +225,18 @@ public class SearchResource {
     }
 
     private final Regex extractRecordName = Regex.regex("\\+?type:(\\w+|\".+?\")");
-    private Pair<Keyword, Predicate<Record>> parse(String query, Sequence<Keyword> keywords) throws ParseException {
+
+    private Either<String, Pair<Keyword, Predicate<Record>>> parse(String query, Sequence<Keyword> keywords) throws ParseException {
         String recordName = unquote(extractRecordName.match(query).group(1));
         String noRecordName = query.replaceFirst(extractRecordName.toString(), "").trim();
         PredicateParser parser = new StandardParser(keywords);
-        Predicate<Record> predicate = parser.parse(noRecordName);
-        Keyword keyword = keyword(recordName);
-        return Pair.pair(keyword, predicate);
+        try {
+            Predicate<Record> predicate = parser.parse(noRecordName);
+            Keyword keyword = keyword(recordName);
+            return Either.right(Pair.pair(keyword, predicate));
+        } catch (ParserException e) {
+            return Either.left(e.getMessage());
+        }
     }
 
     private String unquote(String possiblyQuoted) {

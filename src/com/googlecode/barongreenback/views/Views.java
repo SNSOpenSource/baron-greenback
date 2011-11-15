@@ -75,10 +75,15 @@ public class Views {
     public static Callable1<? super Model, Model> unwrap() {
         return new Callable1<Model, Model>() {
             public Model call(Model model) throws Exception {
-                return model.get(ROOT, Model.class);
+                return unwrap(model);
             }
         };
     }
+
+    public static Model unwrap(Model model) {
+        return model.get(ROOT, Model.class);
+    }
+
 
     public static <T> Callable1<? super Model, T> valueFor(final String key, final Class<T> aClass) {
         return new Callable1<Model, T>() {

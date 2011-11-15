@@ -157,15 +157,19 @@ public class RecordDefinition {
         if (model == null) {
             return null;
         }
-        return new RecordDefinition(keyword(model.get("name", String.class)), toKeywords(model.getValues("keywords", Model.class)));
+        return new RecordDefinition(keyword(model.get("name", String.class)), toKeywords(model));
     }
 
     public static Callable1<? super Model, Sequence<Keyword>> asKeywords() {
         return new Callable1<Model, Sequence<Keyword>>() {
             public Sequence<Keyword> call(Model model) throws Exception {
-                return toKeywords(model.getValues("keywords", Model.class));
+                return toKeywords(model);
             }
         };
+    }
+
+    public static Sequence<Keyword> toKeywords(Model model) {
+        return toKeywords(model.getValues("keywords", Model.class));
     }
 
     public static Sequence<Keyword> toKeywords(List<Model> keywords) {
