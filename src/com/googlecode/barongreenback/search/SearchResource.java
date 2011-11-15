@@ -89,27 +89,37 @@ public class SearchResource {
                 add("query", query);
 
         Option<Model> optionalView = optionalView(viewName);
-        if(optionalView.isEmpty()){
+        if (optionalView.isEmpty()) {
             return model;
         }
-        
+
         final Model view = optionalView.get();
-        final Sequence<Keyword> allHeaders = headers(view);
-        final Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
+        final Sequence<Keyword> visibleHeaders = visibleHeaders(headers(view));
 
-        Either<String, Pair<Keyword, Predicate<Record>>> parse = parse(prefix(view, query), visibleHeaders);
-        if(parse.isLeft()){
-            return model.add("queryException", parse.left());
-        }
-        Pair<Keyword, Predicate<Record>> pair = parse.right();
-        records.define(pair.first(), allHeaders.toArray(Keyword.class));
-        Sequence<Record> results = records.get(pair.first()).filter(pair.second());
-
-        return model.
-                add("headers", headers(visibleHeaders, results)).
-                add("results", results.map(asModel(viewName, visibleHeaders)).toList());
+        return parse(prefix(view, query), visibleHeaders).
+                map(addQueryException(model),
+                        addResults(model, viewName, visibleHeaders));
     }
 
+    private Callable1<? super Pair<Keyword, Predicate<Record>>, Model> addResults(final Model model, final String viewName, final Sequence<Keyword> visibleHeaders) {
+        return new Callable1<Pair<Keyword, Predicate<Record>>, Model>() {
+            public Model call(Pair<Keyword, Predicate<Record>> pair) throws Exception {
+                records.define(pair.first(), visibleHeaders.toArray(Keyword.class));
+                Sequence<Record> results = records.get(pair.first()).filter(pair.second());
+                return model.
+                        add("headers", headers(visibleHeaders, results)).
+                        add("results", results.map(asModel(viewName, visibleHeaders)).toList());
+            }
+        };
+    }
+
+    private Callable1<? super String, Model> addQueryException(final Model model) {
+        return new Callable1<String, Model>() {
+            public Model call(String value) throws Exception {
+                return model.add("queryException", value);
+            }
+        };
+    }
 
 
     @GET
