@@ -15,7 +15,6 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.totallylazy.records.ImmutableKeyword;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
@@ -31,7 +30,6 @@ import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.Query;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,7 +39,6 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.asKeywords;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -51,6 +48,7 @@ import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
+import static com.googlecode.totallylazy.records.SelectCallable.select;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -86,12 +84,13 @@ public class SearchResource {
     @Path("list")
     public Model list(@PathParam("view") String viewName, @QueryParam("query") final String query) throws ParseException {
         final Option<Model> optionalView = view(viewName);
-        Sequence<Keyword> allHeaders = headers(optionalView);
+        final Sequence<Keyword> allHeaders = headers(optionalView);
         final Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
 
         Sequence<Record> results = sequence(optionalView).flatMap(new Callable1<Model, Sequence<Record>>() {
             public Sequence<Record> call(Model model) throws Exception {
                 Pair<Keyword, Predicate<Record>> pair = parse(prefix(optionalView, query), visibleHeaders);
+                records.define(pair.first(), allHeaders.toArray(Keyword.class));
                 return records.get(pair.first()).filter(pair.second());
             }
         });
@@ -108,6 +107,7 @@ public class SearchResource {
         Option<Model> optionalView = view(viewName);
         Sequence<Keyword> headers = headers(optionalView);
         Pair<Keyword, Predicate<Record>> pair = parse(prefix(optionalView, query), headers);
+        records.define(pair.first(), headers.toArray(Keyword.class));
         Record record = records.get(pair.first()).filter(pair.second()).head();
         Map<String, Map<String, Object>> fold = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return model().
@@ -183,7 +183,7 @@ public class SearchResource {
 
     private List<Map<String, Object>> headers(Sequence<Keyword> headers, Sequence<Record> results) {
         if (headers.isEmpty()) {
-            return toModel(keywords(results));
+            return toModel(keywords(results).realise());
         }
         return toModel(headers);
     }

@@ -16,7 +16,11 @@ public class GrammarTest {
         assertThat(Grammar.PREFIX.parse("+"), is(Prefix.Plus));
         assertThat(Grammar.PREFIX.parse("-"), is(Prefix.Minus));
         assertThat(Grammar.PREFIX.parse(""), is(Prefix.None));
+    }
 
+    @Test
+    public void values() throws Exception{
+        assertThat(Grammar.VALUES.parse("a , b").size(), is(2));
     }
 
 }

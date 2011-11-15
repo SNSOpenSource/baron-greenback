@@ -20,7 +20,8 @@ public class StandardParser implements PredicateParser {
         this.keywords = Sequences.sequence(keywords);
     }
 
-    public Predicate<Record> parse(String query) {
+    public Predicate<Record> parse(String raw) {
+        final String query = raw.trim();
         if(Strings.isEmpty(query)) {
             return Predicates.all();
         }

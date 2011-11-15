@@ -55,6 +55,21 @@ public class StandardParserTest {
     }
 
     @Test
+    public void supportsMultipleConditionsSeparatedByManySpaces() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name:bob    age:12");
+
+        Keyword<String> name = keyword("name", String.class);
+        Keyword<String> age = keyword("age", String.class);
+        assertThat(predicate.matches(record().set(name, "bob").set(age, "12")), is(true));
+        assertThat(predicate.matches(record().set(name, "bob").set(age, "13")), is(false));
+        assertThat(predicate.matches(record().set(name, "dan").set(age, "12")), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:[bob TO bob]) +(age:[12 TO 12])"));
+    }
+
+    @Test
     public void supportsNegationWithImplicit() throws Exception {
         PredicateParser predicateParser = new StandardParser(keyword("name", String.class));
         Predicate<Record> predicate = predicateParser.parse("-bob age:12");
@@ -99,6 +114,20 @@ public class StandardParserTest {
     public void supportsOrWithExplicit() throws Exception {
         PredicateParser predicateParser = new StandardParser();
         Predicate<Record> predicate = predicateParser.parse("name:dan,bob");
+
+        Keyword<String> name = keyword("name", String.class);
+        assertThat(predicate.matches(record().set(name, "dan")), is(true));
+        assertThat(predicate.matches(record().set(name, "bob")), is(true));
+        assertThat(predicate.matches(record().set(name, "mat")), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:[dan TO dan] name:[bob TO bob])"));
+    }
+
+    @Test
+    public void ignoreWhitespaces() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("  name  :  dan  ,   bob  ");
 
         Keyword<String> name = keyword("name", String.class);
         assertThat(predicate.matches(record().set(name, "dan")), is(true));
