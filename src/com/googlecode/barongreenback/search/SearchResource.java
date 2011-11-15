@@ -84,11 +84,13 @@ public class SearchResource {
     @GET
     @Path("list")
     public Model list(@PathParam("view") String viewName, @QueryParam("query") final String query) throws ParseException {
-        Option<Model> optionalView = optionalView(viewName);
-        if(optionalView.isEmpty()){
-            return model().
+        Model model = model().
                 add("view", viewName).
                 add("query", query);
+
+        Option<Model> optionalView = optionalView(viewName);
+        if(optionalView.isEmpty()){
+            return model;
         }
         
         final Model view = optionalView.get();
@@ -97,18 +99,13 @@ public class SearchResource {
 
         Either<String, Pair<Keyword, Predicate<Record>>> parse = parse(prefix(view, query), visibleHeaders);
         if(parse.isLeft()){
-            return model().
-                add("view", viewName).
-                add("query", query).
-                add("queryException", parse.left());
+            return model.add("queryException", parse.left());
         }
         Pair<Keyword, Predicate<Record>> pair = parse.right();
         records.define(pair.first(), allHeaders.toArray(Keyword.class));
         Sequence<Record> results = records.get(pair.first()).filter(pair.second());
 
-        return model().
-                add("view", viewName).
-                add("query", query).
+        return model.
                 add("headers", headers(visibleHeaders, results)).
                 add("results", results.map(asModel(viewName, visibleHeaders)).toList());
     }
