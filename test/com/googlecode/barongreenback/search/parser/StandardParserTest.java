@@ -87,7 +87,7 @@ public class StandardParserTest {
     @Test
     public void supportsNegationWithExplicit() throws Exception {
         PredicateParser predicateParser = new StandardParser();
-        Predicate<Record> predicate = predicateParser.parse("-name:bob age:12");
+        Predicate<Record> predicate = predicateParser.parse("name:-bob age:12");
 
         Keyword<String> name = keyword("name", String.class);
         Keyword<String> age = keyword("age", String.class);
@@ -147,6 +147,48 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Dan Bod")), is(true));
         assertThat(predicate.matches(record().set(name, "Dan")), is(false));
         assertThat(predicate.matches(record().set(name, "Bod")), is(false));
+    }
+
+    @Test
+    public void supportsStartsWith() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name:Dan*");
+
+        Keyword<String> name = keyword("name", String.class);
+        assertThat(predicate.matches(record().set(name, "Dan Bod")), is(true));
+        assertThat(predicate.matches(record().set(name, "Dan")), is(true));
+        assertThat(predicate.matches(record().set(name, "Bod")), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:Dan*)"));
+    }
+
+    @Test
+    public void supportsEndsWith() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name:*Bod");
+
+        Keyword<String> name = keyword("name", String.class);
+        assertThat(predicate.matches(record().set(name, "Dan Bod")), is(true));
+        assertThat(predicate.matches(record().set(name, "Dan")), is(false));
+        assertThat(predicate.matches(record().set(name, "Bod")), is(true));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:*Bod)"));
+    }
+
+    @Test
+    public void supportsContains() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name:*ell*");
+
+        Keyword<String> name = keyword("name", String.class);
+        assertThat(predicate.matches(record().set(name, "Hello")), is(true));
+        assertThat(predicate.matches(record().set(name, "Helo")), is(false));
+        assertThat(predicate.matches(record().set(name, "ell")), is(true));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:*ell*)"));
     }
 
     @Test
