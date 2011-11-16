@@ -59,12 +59,14 @@ public class SearchResource {
     private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final AdvancedMode mode;
+    private final PredicateParser parser;
 
-    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode) {
+    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final PredicateParser parser) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.mode = mode;
+        this.parser = parser;
     }
 
     @POST
@@ -232,9 +234,8 @@ public class SearchResource {
     private Either<String, Pair<Keyword, Predicate<Record>>> parse(String query, Sequence<Keyword> keywords) throws ParseException {
         String recordName = unquote(extractRecordName.match(query).group(1));
         String noRecordName = query.replaceFirst(extractRecordName.toString(), "").trim();
-        PredicateParser parser = new StandardParser(keywords);
         try {
-            Predicate<Record> predicate = parser.parse(noRecordName);
+            Predicate<Record> predicate = parser.parse(noRecordName, keywords);
             Keyword keyword = keyword(recordName);
             return Either.right(Pair.pair(keyword, predicate));
         } catch (ParserException e) {

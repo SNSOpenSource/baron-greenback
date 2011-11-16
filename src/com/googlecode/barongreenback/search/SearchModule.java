@@ -1,5 +1,7 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.barongreenback.search.parser.PredicateParser;
+import com.googlecode.barongreenback.search.parser.StandardParser;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.records.Records;
@@ -23,9 +25,14 @@ import org.apache.lucene.util.Version;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.io.HierarchicalPath.hierarchicalPath;
 
-public class SearchModule implements ResourcesModule{
+public class SearchModule implements ResourcesModule, RequestScopedModule {
     public Module addResources(Resources resources) throws ParseException {
         resources.add(annotatedClass(SearchResource.class));
+        return this;
+    }
+
+    public Module addPerRequestObjects(Container container) throws Exception {
+        container.add(PredicateParser.class, StandardParser.class);
         return this;
     }
 }
