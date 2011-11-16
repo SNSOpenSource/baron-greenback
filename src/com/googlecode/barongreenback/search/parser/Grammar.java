@@ -36,6 +36,14 @@ import static com.googlecode.totallylazy.records.Keywords.keyword;
 
 @SuppressWarnings("unchecked")
 public class Grammar {
+    private static Parser<Void> ws(char value) {
+        return ws(String.valueOf(value));
+    }
+
+    private static Parser<Void> ws(String value) {
+        return pattern(regex(String.format("\\s*%s\\s*", value)), value);
+    }
+
     public static final Parser<Date> DATE = pattern(regex("\\d{4}/\\d{1,2}/\\d{1,2}"), "date").source().map(new Callable1<String, Date>() {
         public Date call(String value) throws Exception {
             return Dates.format("yyyy/MM/dd").parse(value);
@@ -44,9 +52,10 @@ public class Grammar {
     public static final Parser<String> TEXT = isChar(CharacterPredicates.IS_ALPHA_NUMERIC).many1().source();
     public static final Parser<String> QUOTED_TEXT = notChar('"').many1().source().between(isChar('"'), isChar('"'));
     public static final Parser<String> TEXT_ONLY = Parsers.or(QUOTED_TEXT, TEXT);
-    //public static final Parser<Comparable> VALUE = Parsers.<Comparable>or(DATE, QUOTED_TEXT, TEXT);
     public static final Parser<String> NAME = TEXT_ONLY;
     public static final Parser<Void> WILDCARD = isChar('*');
+    public static final Parser<Void> GT = ws('>');
+    public static final Parser<Void> LT = ws('<');
 
     public static final Parser<Pair<Class, Predicate>> TEXT_STARTS_WITH = TEXT.followedBy(WILDCARD).map(new Callable1<String, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(String value) throws Exception {
@@ -85,19 +94,26 @@ public class Grammar {
         }
     });
 
+    public static final Parser<Pair<Class, Predicate>> GREATER_THAN_DATE = Parsers.sequence(GT, DATE).map(new Callable1<Comparable, Pair<Class, Predicate>>() {
+        public Pair<Class, Predicate> call(Comparable value) throws Exception {
+            return Pair.<Class, Predicate>pair(value.getClass(), Predicates.greaterThan(value));
+        }
+    });
+
+    public static final Parser<Pair<Class, Predicate>> LESS_THAN_DATE = Parsers.sequence(LT, DATE).map(new Callable1<Comparable, Pair<Class, Predicate>>() {
+        public Pair<Class, Predicate> call(Comparable value) throws Exception {
+            return Pair.<Class, Predicate>pair(value.getClass(), Predicates.lessThan(value));
+        }
+    });
+
     public static final Parser<Pair<Class, Predicate>> TEXT_IS = TEXT_ONLY.map(new Callable1<String, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(String value) throws Exception {
             return Pair.<Class, Predicate>pair(String.class, Predicates.is(value));
         }
     });
 
-    public static final Parser<Pair<Class, Predicate>> VALUE_PREDICATE = Parsers.or(DATE_IS, TEXT_CONTAINS, TEXT_STARTS_WITH, TEXT_ENDS_WITH, TEXT_IS).prefix(NEGATION());
-    public static final Parser<List<Pair<Class, Predicate>>> VALUE_PREDICATES = VALUE_PREDICATE.sepBy(ws(","));
-
-    private static Parser<Void> ws(String value) {
-        return pattern(regex(String.format("\\s*%s\\s*", value)), value);
-    }
-
+    public static final Parser<Pair<Class, Predicate>> VALUE_PREDICATE = Parsers.or(GREATER_THAN_DATE, LESS_THAN_DATE, DATE_IS, TEXT_CONTAINS, TEXT_STARTS_WITH, TEXT_ENDS_WITH, TEXT_IS).prefix(NEGATION());
+    public static final Parser<List<Pair<Class, Predicate>>> VALUE_PREDICATES = VALUE_PREDICATE.sepBy(ws(','));
 
     public static Parser<Predicate<Record>> VALUE_ONLY(final Sequence<Keyword> keywords) {
         return VALUE_PREDICATES.map(new Callable1<List<Pair<Class, Predicate>>, Predicate<Record>>() {
@@ -131,7 +147,7 @@ public class Grammar {
         });
     }
 
-    public static final Parser<Predicate<Record>> NAME_AND_VALUE = Parsers.tuple(NAME, ws(":"), VALUE_PREDICATES).map(new Callable1<Triple<String, Void, List<Pair<Class, Predicate>>>, Predicate<Record>>() {
+    public static final Parser<Predicate<Record>> NAME_AND_VALUE = Parsers.tuple(NAME, ws(':'), VALUE_PREDICATES).map(new Callable1<Triple<String, Void, List<Pair<Class, Predicate>>>, Predicate<Record>>() {
         public Predicate<Record> call(Triple<String, Void, List<Pair<Class, Predicate>>> tuple) throws Exception {
             final String name = tuple.first();
             final List<Pair<Class, Predicate>> values = tuple.third();

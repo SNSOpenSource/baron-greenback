@@ -226,7 +226,7 @@ public class StandardParserTest {
     }
 
     @Test
-    public void supportsDateBasedQueries() throws Exception {
+    public void supportsExplicitDateBasedQueries() throws Exception {
         PredicateParser predicateParser = new StandardParser();
         Predicate<Record> predicate = predicateParser.parse("dob:2001/1/10");
 
@@ -250,5 +250,33 @@ public class StandardParserTest {
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
         assertThat(luceneQuery, is("+((dob:[20010110000000000 TO 20010110235959000]))"));
+    }
+
+    @Test
+    public void supportsGreaterThanQueries() throws Exception {
+        Keyword<Date> dob = keyword("dob", Date.class);
+        PredicateParser predicateParser = new StandardParser(dob);
+        Predicate<Record> predicate = predicateParser.parse("dob: > 2001/1/10");
+
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 11))), is(true));
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(false));
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 9))), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(dob:{20010110000000000 TO *])"));
+    }
+
+    @Test
+    public void supportsLowerThanQueries() throws Exception {
+        Keyword<Date> dob = keyword("dob", Date.class);
+        PredicateParser predicateParser = new StandardParser(dob);
+        Predicate<Record> predicate = predicateParser.parse("dob: < 2001/1/10");
+
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 9))), is(true));
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 11))), is(false));
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(dob:[* TO 20010110000000000})"));
     }
 }
