@@ -309,16 +309,31 @@ public class StandardParserTest {
     }
 
     @Test
-    public void supportsImplicitDateBasedComparisonsQueries() throws Exception {
-        Keyword<Date> dob = keyword("dob", Date.class);
-        PredicateParser predicateParser = new StandardParser(dob);
-        Predicate<Record> predicate = predicateParser.parse("> 2001/1/10");
+    public void supportsGreaterThanOrEqualStringQueries() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name >= Dan");
 
-        assertThat(predicate.matches(record().set(dob, date(2001, 1, 11))), is(true));
-        assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(false));
-        assertThat(predicate.matches(record().set(dob, date(2001, 1, 9))), is(false));
+        Keyword<String> name = keyword("name", String.class);
+        assertThat(predicate.matches(record().set(name, "Mat")), is(true));
+        assertThat(predicate.matches(record().set(name, "Dan")), is(true));
+        assertThat(predicate.matches(record().set(name, "Bob")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+((dob:{20010110000000000 TO *]))"));
+        assertThat(luceneQuery, is("+(name:[Dan TO *])"));
     }
+
+    @Test
+    public void supportsLessThanOrEqualStringQueries() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name <= Dan");
+
+        Keyword<String> name = keyword("name", String.class);
+        assertThat(predicate.matches(record().set(name, "Bob")), is(true));
+        assertThat(predicate.matches(record().set(name, "Dan")), is(true));
+        assertThat(predicate.matches(record().set(name, "Mat")), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:[* TO Dan])"));
+    }
+
 }
