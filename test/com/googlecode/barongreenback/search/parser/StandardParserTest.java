@@ -254,10 +254,10 @@ public class StandardParserTest {
 
     @Test
     public void supportsGreaterThanQueries() throws Exception {
-        Keyword<Date> dob = keyword("dob", Date.class);
-        PredicateParser predicateParser = new StandardParser(dob);
+        PredicateParser predicateParser = new StandardParser();
         Predicate<Record> predicate = predicateParser.parse("dob: > 2001/1/10");
 
+        Keyword<Date> dob = keyword("dob", Date.class);
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 11))), is(true));
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(false));
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 9))), is(false));
@@ -267,16 +267,44 @@ public class StandardParserTest {
     }
 
     @Test
-    public void supportsLowerThanQueries() throws Exception {
-        Keyword<Date> dob = keyword("dob", Date.class);
-        PredicateParser predicateParser = new StandardParser(dob);
+    public void supportsLowerThanDateQueries() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
         Predicate<Record> predicate = predicateParser.parse("dob: < 2001/1/10");
 
+        Keyword<Date> dob = keyword("dob", Date.class);
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 9))), is(true));
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 11))), is(false));
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
         assertThat(luceneQuery, is("+(dob:[* TO 20010110000000000})"));
+    }
+
+    @Test
+    public void supportsLowerThanStringQueries() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name: < Dan");
+
+        Keyword<String> name = keyword("name", String.class);
+        assertThat(predicate.matches(record().set(name, "Bob")), is(true));
+        assertThat(predicate.matches(record().set(name, "Dan")), is(false));
+        assertThat(predicate.matches(record().set(name, "Mat")), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:[* TO Dan})"));
+    }
+    
+    @Test
+    public void supportsGreaterThanStringQueries() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name: > Dan");
+
+        Keyword<String> name = keyword("name", String.class);
+        assertThat(predicate.matches(record().set(name, "Mat")), is(true));
+        assertThat(predicate.matches(record().set(name, "Dan")), is(false));
+        assertThat(predicate.matches(record().set(name, "Bob")), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:{Dan TO *])"));
     }
 }

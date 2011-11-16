@@ -2,22 +2,17 @@ package com.googlecode.barongreenback.search.parser;
 
 import com.googlecode.lazyparsec.Parser;
 import com.googlecode.lazyparsec.Parsers;
-import com.googlecode.lazyparsec.Scanners;
 import com.googlecode.lazyparsec.pattern.CharacterPredicates;
-import com.googlecode.lazyparsec.pattern.Patterns;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.Quadruple;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Triple;
-import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.time.Dates;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +47,7 @@ public class Grammar {
     public static final Parser<String> TEXT = isChar(CharacterPredicates.IS_ALPHA_NUMERIC).many1().source();
     public static final Parser<String> QUOTED_TEXT = notChar('"').many1().source().between(isChar('"'), isChar('"'));
     public static final Parser<String> TEXT_ONLY = Parsers.or(QUOTED_TEXT, TEXT);
+    public static final Parser<Comparable> VALUES = Parsers.<Comparable>or(DATE, TEXT_ONLY);
     public static final Parser<String> NAME = TEXT_ONLY;
     public static final Parser<Void> WILDCARD = isChar('*');
     public static final Parser<Void> GT = ws('>');
@@ -94,13 +90,13 @@ public class Grammar {
         }
     });
 
-    public static final Parser<Pair<Class, Predicate>> GREATER_THAN_DATE = Parsers.sequence(GT, DATE).map(new Callable1<Comparable, Pair<Class, Predicate>>() {
+    public static final Parser<Pair<Class, Predicate>> GREATER_THAN = Parsers.sequence(GT, VALUES).map(new Callable1<Comparable, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(Comparable value) throws Exception {
             return Pair.<Class, Predicate>pair(value.getClass(), Predicates.greaterThan(value));
         }
     });
 
-    public static final Parser<Pair<Class, Predicate>> LESS_THAN_DATE = Parsers.sequence(LT, DATE).map(new Callable1<Comparable, Pair<Class, Predicate>>() {
+    public static final Parser<Pair<Class, Predicate>> LESS_THAN = Parsers.sequence(LT, VALUES).map(new Callable1<Comparable, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(Comparable value) throws Exception {
             return Pair.<Class, Predicate>pair(value.getClass(), Predicates.lessThan(value));
         }
@@ -112,7 +108,7 @@ public class Grammar {
         }
     });
 
-    public static final Parser<Pair<Class, Predicate>> VALUE_PREDICATE = Parsers.or(GREATER_THAN_DATE, LESS_THAN_DATE, DATE_IS, TEXT_CONTAINS, TEXT_STARTS_WITH, TEXT_ENDS_WITH, TEXT_IS).prefix(NEGATION());
+    public static final Parser<Pair<Class, Predicate>> VALUE_PREDICATE = Parsers.or(GREATER_THAN, LESS_THAN, DATE_IS, TEXT_CONTAINS, TEXT_STARTS_WITH, TEXT_ENDS_WITH, TEXT_IS).prefix(NEGATION());
     public static final Parser<List<Pair<Class, Predicate>>> VALUE_PREDICATES = VALUE_PREDICATE.sepBy(ws(','));
 
     public static Parser<Predicate<Record>> VALUE_ONLY(final Sequence<Keyword> keywords) {
