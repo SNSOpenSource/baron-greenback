@@ -17,7 +17,7 @@ public class StandardParser implements PredicateParser {
     }
 
     public StandardParser(Keyword... keywords) {
-        this.keywords = Sequences.sequence(keywords);
+        this(Sequences.sequence(keywords));
     }
 
     public Predicate<Record> parse(String raw) {

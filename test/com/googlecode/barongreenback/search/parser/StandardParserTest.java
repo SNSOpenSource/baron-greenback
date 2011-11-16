@@ -5,11 +5,15 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.Lucene;
 import com.googlecode.totallylazy.records.lucene.mappings.Mappings;
+import com.googlecode.totallylazy.time.Dates;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
+import static com.googlecode.totallylazy.time.Dates.date;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -219,5 +223,32 @@ public class StandardParserTest {
         Keyword<String> name = keyword("First Name", String.class);
         assertThat(predicate.matches(record().set(name, "Dan")), is(true));
         assertThat(predicate.matches(record().set(name, "Mat")), is(true));
+    }
+
+    @Test
+    public void supportsDateBasedQueries() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("dob:2001/1/10");
+
+        Keyword<Date> dob = keyword("dob", Date.class);
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(true));
+        assertThat(predicate.matches(record().set(dob, date(2001, 10, 1))), is(false));
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 10, 3, 15, 59, 123))), is(true));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(dob:[20010110000000000 TO 20010110235959000])"));
+    }
+
+    @Test
+    public void supportsImplicitDateBasedQueries() throws Exception {
+        Keyword<Date> dob = keyword("dob", Date.class);
+        PredicateParser predicateParser = new StandardParser(dob);
+        Predicate<Record> predicate = predicateParser.parse("2001/1/10");
+
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(true));
+        assertThat(predicate.matches(record().set(dob, date(2001, 10, 1))), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+((dob:[20010110000000000 TO 20010110235959000]))"));
     }
 }
