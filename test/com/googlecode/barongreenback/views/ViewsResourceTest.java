@@ -34,7 +34,7 @@ public class ViewsResourceTest extends ApplicationTests {
                 repository.set(VIEW_ID, model().
                         add("view", model().
                                 add("name", "users").
-                                add("query", "+type:users").
+                                add("query", "type:users").
                                 add("visible", true).
                                 add("keywords", list(model().
                                         add("name", "firstname").
@@ -46,7 +46,7 @@ public class ViewsResourceTest extends ApplicationTests {
                 repository.set(UUID.randomUUID(), model().
                         add("view", model().
                                 add("name", "news").
-                                add("query", "+type:news").
+                                add("query", "type:news").
                                 add("visible", true).
                                 add("keywords", list(model().
                                         add("name", "title").
@@ -58,7 +58,7 @@ public class ViewsResourceTest extends ApplicationTests {
                 repository.set(UUID.randomUUID(), model().
                         add("view", model().
                                 add("name", "hidden view").
-                                add("query", "+type:news").
+                                add("query", "type:news").
                                 add("visible", false).
                                 add("keywords", list(model().
                                         add("name", "title").
@@ -85,16 +85,16 @@ public class ViewsResourceTest extends ApplicationTests {
         ViewListPage views = new ViewListPage(browser);
         assertThat(relativeUriOf(method(on(ViewsResource.class).edit(VIEW_ID))).toString(), endsWith(views.link("users").value()));
         ViewEditPage edit = views.edit(VIEW_ID);
-        assertThat(edit.query().value(), is("+type:users"));
+        assertThat(edit.query().value(), is("type:users"));
         assertThat(edit.fieldName(1).value(), is("firstname"));
         edit.name().value("people");
-        edit.query().value("+type:people");
+        edit.query().value("type:people");
 
         ViewListPage modifiedViews = edit.save();
 
         assertThat(relativeUriOf(method(on(ViewsResource.class).edit(VIEW_ID))).toString(), endsWith(modifiedViews.link("people").value()));
         ViewEditPage modifiedView = views.edit(VIEW_ID);
-        assertThat(modifiedView.query().value(), is("+type:people"));
+        assertThat(modifiedView.query().value(), is("type:people"));
         assertThat(modifiedView.fieldName(1).value(), is("firstname"));
     }
 

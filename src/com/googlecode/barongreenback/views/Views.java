@@ -33,7 +33,7 @@ public class Views {
     public static Model convertToViewModel(Keyword<Object> recordName, Sequence<Keyword> keywords) {
         return model().add(ROOT, model().
                 add("name", recordName.name()).
-                add("query", "+type:\"" + recordName.name() + "\"").
+                add("query", "type:\"" + recordName.name() + "\"").
                 add("visible", true).
                 add("keywords", keywords.map(asModel()).toList()));
     }

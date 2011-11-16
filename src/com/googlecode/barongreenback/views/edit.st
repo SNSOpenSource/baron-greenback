@@ -6,7 +6,7 @@
 <body>
 <form class="view form-stacked" action="" method="post">
     $input(name="view.name", label="Name", class="name", value=view.name, placeholder="Name")$
-    $input(name="view.query", label="Query", class="query", value=view.query, placeholder="+type:your_type")$
+    $input(name="view.query", label="Query", class="query", value=view.query, placeholder="type:your_type")$
     $checkbox(id="view.visible", name="view.visible", class="visible", label="Visible", checked=view.visible)$
     <fieldset class="fields view">
         <legend>Fields</legend>
