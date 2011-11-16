@@ -255,7 +255,7 @@ public class StandardParserTest {
     @Test
     public void supportsGreaterThanQueries() throws Exception {
         PredicateParser predicateParser = new StandardParser();
-        Predicate<Record> predicate = predicateParser.parse("dob: > 2001/1/10");
+        Predicate<Record> predicate = predicateParser.parse("dob > 2001/1/10");
 
         Keyword<Date> dob = keyword("dob", Date.class);
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 11))), is(true));
@@ -269,7 +269,7 @@ public class StandardParserTest {
     @Test
     public void supportsLowerThanDateQueries() throws Exception {
         PredicateParser predicateParser = new StandardParser();
-        Predicate<Record> predicate = predicateParser.parse("dob: < 2001/1/10");
+        Predicate<Record> predicate = predicateParser.parse("dob < 2001/1/10");
 
         Keyword<Date> dob = keyword("dob", Date.class);
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 9))), is(true));
@@ -283,7 +283,7 @@ public class StandardParserTest {
     @Test
     public void supportsLowerThanStringQueries() throws Exception {
         PredicateParser predicateParser = new StandardParser();
-        Predicate<Record> predicate = predicateParser.parse("name: < Dan");
+        Predicate<Record> predicate = predicateParser.parse("name < Dan");
 
         Keyword<String> name = keyword("name", String.class);
         assertThat(predicate.matches(record().set(name, "Bob")), is(true));
@@ -297,7 +297,7 @@ public class StandardParserTest {
     @Test
     public void supportsGreaterThanStringQueries() throws Exception {
         PredicateParser predicateParser = new StandardParser();
-        Predicate<Record> predicate = predicateParser.parse("name: > Dan");
+        Predicate<Record> predicate = predicateParser.parse("name > Dan");
 
         Keyword<String> name = keyword("name", String.class);
         assertThat(predicate.matches(record().set(name, "Mat")), is(true));
@@ -306,5 +306,19 @@ public class StandardParserTest {
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
         assertThat(luceneQuery, is("+(name:{Dan TO *])"));
+    }
+
+    @Test
+    public void supportsImplicitDateBasedComparisonsQueries() throws Exception {
+        Keyword<Date> dob = keyword("dob", Date.class);
+        PredicateParser predicateParser = new StandardParser(dob);
+        Predicate<Record> predicate = predicateParser.parse("> 2001/1/10");
+
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 11))), is(true));
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(false));
+        assertThat(predicate.matches(record().set(dob, date(2001, 1, 9))), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+((dob:{20010110000000000 TO *]))"));
     }
 }

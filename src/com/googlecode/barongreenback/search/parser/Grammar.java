@@ -52,6 +52,7 @@ public class Grammar {
     public static final Parser<Void> WILDCARD = isChar('*');
     public static final Parser<Void> GT = ws('>');
     public static final Parser<Void> LT = ws('<');
+    public static final Parser<Void> OPERATORS = Parsers.or(GT,LT);
 
     public static final Parser<Pair<Class, Predicate>> TEXT_STARTS_WITH = TEXT.followedBy(WILDCARD).map(new Callable1<String, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(String value) throws Exception {
@@ -143,7 +144,7 @@ public class Grammar {
         });
     }
 
-    public static final Parser<Predicate<Record>> NAME_AND_VALUE = Parsers.tuple(NAME, ws(':'), VALUE_PREDICATES).map(new Callable1<Triple<String, Void, List<Pair<Class, Predicate>>>, Predicate<Record>>() {
+    public static final Parser<Predicate<Record>> NAME_AND_VALUE = Parsers.tuple(NAME, ws(':').or(OPERATORS.peek()), VALUE_PREDICATES).map(new Callable1<Triple<String, Void, List<Pair<Class, Predicate>>>, Predicate<Record>>() {
         public Predicate<Record> call(Triple<String, Void, List<Pair<Class, Predicate>>> tuple) throws Exception {
             final String name = tuple.first();
             final List<Pair<Class, Predicate>> values = tuple.third();
