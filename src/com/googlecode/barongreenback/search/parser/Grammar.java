@@ -14,6 +14,8 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.time.Dates;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -41,9 +43,10 @@ public class Grammar {
         return pattern(regex(String.format("\\s*%s\\s*", value)), value);
     }
 
+    public static final DateFormat DATE_FORMAT = Dates.format("yyyy/MM/dd");
     public static final Parser<Date> DATE = pattern(regex("\\d{4}/\\d{1,2}/\\d{1,2}"), "date").source().map(new Callable1<String, Date>() {
         public Date call(String value) throws Exception {
-            return Dates.format("yyyy/MM/dd").parse(value);
+            return DATE_FORMAT.parse(value);
         }
     });
     public static final Parser<String> TEXT = isChar(CharacterPredicates.IS_ALPHA_NUMERIC).many1().source();
