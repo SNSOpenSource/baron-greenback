@@ -4,6 +4,7 @@ import com.googlecode.lazyparsec.Parser;
 import com.googlecode.lazyparsec.Parsers;
 import com.googlecode.lazyparsec.pattern.CharacterPredicates;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
@@ -31,6 +32,7 @@ import static com.googlecode.totallylazy.records.Keywords.keyword;
 
 @SuppressWarnings("unchecked")
 public class Grammar {
+
     private static Parser<Void> ws(char value) {
         return ws(String.valueOf(value));
     }
@@ -55,6 +57,25 @@ public class Grammar {
     public static final Parser<Void> LT = ws('<');
     public static final Parser<Void> LTE = ws("<=");
     public static final Parser<Void> OPERATORS = Parsers.or(GTE, GT, LTE, LT);
+
+    public static final Parser<Callable2<Predicate<Record>, Predicate<Record>, Predicate<Record>>> OR = ws("OR").map(new Callable1<Void, Callable2<Predicate<Record>, Predicate<Record>, Predicate<Record>>>() {
+        public Callable2<Predicate<Record>, Predicate<Record>, Predicate<Record>> call(Void aVoid) throws Exception {
+            return new Callable2<Predicate<Record>, Predicate<Record>, Predicate<Record>>() {
+                public Predicate<Record> call(Predicate<Record> p1, Predicate<Record> p2) throws Exception {
+                    return Predicates.or(p1, p2);
+                }
+            };
+        }
+    });
+    public static final Parser<Callable2<Predicate<Record>, Predicate<Record>, Predicate<Record>>> AND = ws("AND").or(isChar(' ').skipMany()).map(new Callable1<Void, Callable2<Predicate<Record>, Predicate<Record>, Predicate<Record>>>() {
+        public Callable2<Predicate<Record>, Predicate<Record>, Predicate<Record>> call(Void aVoid) throws Exception {
+            return new Callable2<Predicate<Record>, Predicate<Record>, Predicate<Record>>() {
+                public Predicate<Record> call(Predicate<Record> p1, Predicate<Record> p2) throws Exception {
+                    return Predicates.and(p1, p2);
+                }
+            };
+        }
+    });
 
     public static final Parser<Pair<Class, Predicate>> TEXT_STARTS_WITH = TEXT.followedBy(WILDCARD).map(new Callable1<String, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(String value) throws Exception {
@@ -150,12 +171,9 @@ public class Grammar {
         return Parsers.or(NAME_AND_VALUE, VALUE_ONLY(keywords));
     }
 
+
     public static Parser<Predicate<Record>> PARSER(final Sequence<Keyword> keywords) {
-        return PARTS(keywords).followedBy(isChar(' ').many().optional()).many().map(new Callable1<List<Predicate<Record>>, Predicate<Record>>() {
-            public Predicate<Record> call(final List<Predicate<Record>> predicates) throws Exception {
-                return and(predicates.toArray(new Predicate[0]));
-            }
-        });
+        return PARTS(keywords).infixl(OR.or(AND));
     }
 
     public static final Parser<Predicate<Record>> NAME_AND_VALUE = Parsers.tuple(NAME, ws(':').or(OPERATORS.peek()), VALUE_PREDICATES).map(new Callable1<Triple<String, Void, List<Pair<Class, Predicate>>>, Predicate<Record>>() {

@@ -27,7 +27,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "dan")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+((name:[bob TO bob]))"));
+        assertThat(luceneQuery, is("(name:[bob TO bob])"));
     }
 
     @Test
@@ -40,7 +40,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "dan")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[bob TO bob])"));
+        assertThat(luceneQuery, is("name:[bob TO bob]"));
     }
 
     @Test
@@ -111,13 +111,28 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "mat")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+((name:[dan TO dan] name:[bob TO bob]))"));
+        assertThat(luceneQuery, is("(name:[dan TO dan] name:[bob TO bob])"));
+    }
+
+    @Test
+    public void supportsAndWithExplicit() throws Exception {
+        PredicateParser predicateParser = new StandardParser();
+        Predicate<Record> predicate = predicateParser.parse("name:bodart AND title:baron");
+
+        Keyword<String> name = keyword("name", String.class);
+        Keyword<String> title = keyword("title", String.class);
+        assertThat(predicate.matches(record().set(title, "baron").set(name, "bodart")), is(true));
+        assertThat(predicate.matches(record().set(title, "duke").set(name, "bodart")), is(false));
+        assertThat(predicate.matches(record().set(title, "baron").set(name, "greenback")), is(false));
+
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is("+(name:[bodart TO bodart]) +(title:[baron TO baron])"));
     }
 
     @Test
     public void supportsOrWithExplicit() throws Exception {
         PredicateParser predicateParser = new StandardParser();
-        Predicate<Record> predicate = predicateParser.parse("name:dan,bob");
+        Predicate<Record> predicate = predicateParser.parse("name:dan OR name:bob");
 
         Keyword<String> name = keyword("name", String.class);
         assertThat(predicate.matches(record().set(name, "dan")), is(true));
@@ -125,7 +140,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "mat")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[dan TO dan] name:[bob TO bob])"));
+        assertThat(luceneQuery, is("(name:[dan TO dan]) (name:[bob TO bob])"));
     }
 
     @Test
@@ -139,7 +154,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "mat")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[dan TO dan] name:[bob TO bob])"));
+        assertThat(luceneQuery, is("name:[dan TO dan] name:[bob TO bob]"));
     }
 
     @Test
@@ -164,7 +179,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Bod")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:Dan*)"));
+        assertThat(luceneQuery, is("name:Dan*"));
     }
 
     @Test
@@ -178,7 +193,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Bod")), is(true));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:*Bod)"));
+        assertThat(luceneQuery, is("name:*Bod"));
     }
 
     @Test
@@ -192,7 +207,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "ell")), is(true));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:*ell*)"));
+        assertThat(luceneQuery, is("name:*ell*"));
     }
 
     @Test
@@ -236,7 +251,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 10, 3, 15, 59, 123))), is(true));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(dob:[20010110000000000 TO 20010110235959000])"));
+        assertThat(luceneQuery, is("dob:[20010110000000000 TO 20010110235959000]"));
     }
 
     @Test
@@ -249,7 +264,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(dob, date(2001, 10, 1))), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+((dob:[20010110000000000 TO 20010110235959000]))"));
+        assertThat(luceneQuery, is("(dob:[20010110000000000 TO 20010110235959000])"));
     }
 
     @Test
@@ -263,7 +278,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 9))), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(dob:{20010110000000000 TO *])"));
+        assertThat(luceneQuery, is("dob:{20010110000000000 TO *]"));
     }
 
     @Test
@@ -277,7 +292,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 10))), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(dob:[* TO 20010110000000000})"));
+        assertThat(luceneQuery, is("dob:[* TO 20010110000000000}"));
     }
 
     @Test
@@ -291,7 +306,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Mat")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[* TO Dan})"));
+        assertThat(luceneQuery, is("name:[* TO Dan}"));
     }
     
     @Test
@@ -305,7 +320,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Bob")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:{Dan TO *])"));
+        assertThat(luceneQuery, is("name:{Dan TO *]"));
     }
 
     @Test
@@ -319,7 +334,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Bob")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[Dan TO *])"));
+        assertThat(luceneQuery, is("name:[Dan TO *]"));
     }
 
     @Test
@@ -333,7 +348,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Mat")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[* TO Dan])"));
+        assertThat(luceneQuery, is("name:[* TO Dan]"));
     }
 
 }
