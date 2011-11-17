@@ -38,6 +38,7 @@ import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.find;
+import static com.googlecode.barongreenback.views.Views.recordName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -78,8 +79,8 @@ public class SearchResource {
         Model view = view(viewName);
         Sequence<Keyword> allHeaders = headers(view);
         Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Pair<Keyword, Predicate<Record>> pair = parse(prefix(view, query), visibleHeaders).right();
-        records.remove(pair.first(), pair.second());
+        Predicate<Record> predicate = parse(prefix(view, query), visibleHeaders).right();
+        records.remove(recordName(view), predicate);
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
 
@@ -93,18 +94,19 @@ public class SearchResource {
     private Callable2<Model, Model, Model> executeQuery(final String viewName, final String query) {
         return new Callable2<Model, Model, Model>() {
             public Model call(Model result, Model view) throws Exception {
-                final Sequence<Keyword> visibleHeaders = visibleHeaders(headers(view));
+                Sequence<Keyword> allHeaders = headers(view);
+                final Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
                 return parse(prefix(view, query), visibleHeaders).
-                        map(addQueryException(result), addResults(result, viewName, visibleHeaders));
+                        map(addQueryException(result), addResults(recordName(view), allHeaders, result, viewName, visibleHeaders));
             }
         };
     }
 
-    private Callable1<? super Pair<Keyword, Predicate<Record>>, Model> addResults(final Model model, final String viewName, final Sequence<Keyword> visibleHeaders) {
-        return new Callable1<Pair<Keyword, Predicate<Record>>, Model>() {
-            public Model call(Pair<Keyword, Predicate<Record>> pair) throws Exception {
-                records.define(pair.first(), visibleHeaders.toArray(Keyword.class));
-                Sequence<Record> results = records.get(pair.first()).filter(pair.second());
+    private Callable1<Predicate<Record>, Model> addResults(final Keyword recordName, final Sequence<Keyword> allHeaders, final Model model, final String viewName, final Sequence<Keyword> visibleHeaders) {
+        return new Callable1<Predicate<Record>, Model>() {
+            public Model call(Predicate<Record> predicate) throws Exception {
+                records.define(recordName, allHeaders.toArray(Keyword.class));
+                Sequence<Record> results = records.get(recordName).filter(predicate);
                 return model.
                         add("headers", headers(visibleHeaders, results)).
                         add("results", results.map(asModel(viewName, visibleHeaders)).toList());
@@ -124,10 +126,11 @@ public class SearchResource {
     @Path("unique")
     public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
         Model view = view(viewName);
+        Keyword recordName = Views.recordName(view);
         Sequence<Keyword> headers = headers(view);
-        Pair<Keyword, Predicate<Record>> pair = parse(prefix(view, query), headers).right();
-        records.define(pair.first(), headers.toArray(Keyword.class));
-        Record record = records.get(pair.first()).filter(pair.second()).head();
+        Predicate<Record> predicate = parse(prefix(view, query), headers).right();
+        records.define(recordName, headers.toArray(Keyword.class));
+        Record record = records.get(recordName).filter(predicate).head();
         Map<String, Map<String, Object>> group = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return model().
                 add("view", viewName).
@@ -229,15 +232,10 @@ public class SearchResource {
         return name.replace(' ', '_');
     }
 
-    private final Regex extractRecordName = Regex.regex("\\+?type:(\\w+|\".+?\")");
-
-    private Either<String, Pair<Keyword, Predicate<Record>>> parse(String query, Sequence<Keyword> keywords) throws ParseException {
-        String recordName = unquote(extractRecordName.match(query).group(1));
-        String noRecordName = query.replaceFirst(extractRecordName.toString(), "").trim();
+    private Either<String, Predicate<Record>> parse(String query, Sequence<Keyword> keywords) throws ParseException {
         try {
-            Predicate<Record> predicate = parser.parse(noRecordName, keywords);
-            Keyword keyword = keyword(recordName);
-            return Either.right(Pair.pair(keyword, predicate));
+            Predicate<Record> predicate = parser.parse(query, keywords);
+            return Either.right(predicate);
         } catch (IllegalArgumentException e) {
             return Either.left(e.getMessage());
         }

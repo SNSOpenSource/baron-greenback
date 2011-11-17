@@ -33,6 +33,10 @@ public class ViewEditPage {
         return html.input("//input[@name='view.name']");
     }
 
+    public Input records() {
+        return html.input("//input[@name='view.records']");
+    }
+
     public Input query() {
         return html.input("//input[@name='view.query']");
     }

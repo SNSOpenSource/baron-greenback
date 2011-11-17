@@ -20,20 +20,22 @@ import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.records.Keywords.keyword;
 
 public class Views {
-    public static final Keyword<Boolean> VISIBLE = Keywords.keyword("visible", Boolean.class);
-    public static final Keyword<String> GROUP = Keywords.keyword("group", String.class);
+    public static final Keyword<Boolean> VISIBLE = keyword("visible", Boolean.class);
+    public static final Keyword<String> GROUP = keyword("group", String.class);
     public static final String ROOT = "view";
 
     public static Model clean(Model root) {
-        return new ModelCleaner(in("view", "name", "query", "keywords", "group", "type", "unique", "visible")).clean(root);
+        return new ModelCleaner(in("view", "name", "records", "query", "keywords", "group", "type", "unique", "visible")).clean(root);
     }
 
     public static Model convertToViewModel(Keyword<Object> recordName, Sequence<Keyword> keywords) {
         return model().add(ROOT, model().
                 add("name", recordName.name()).
-                add("query", "type:\"" + recordName.name() + "\"").
+                add("records", recordName.name()).
+                add("query", "").
                 add("visible", true).
                 add("keywords", keywords.map(asModel()).toList()));
     }
@@ -97,5 +99,9 @@ public class Views {
         return Predicates.where(second(Model.class),
                 Predicates.where(unwrap(),
                         Predicates.where(callable1, predicate)));
+    }
+
+    public static Keyword recordName(Model view) {
+        return keyword(unwrap(view).<String>get("records"));
     }
 }
