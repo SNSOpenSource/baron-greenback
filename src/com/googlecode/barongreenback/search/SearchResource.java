@@ -238,7 +238,7 @@ public class SearchResource {
             Predicate<Record> predicate = parser.parse(noRecordName, keywords);
             Keyword keyword = keyword(recordName);
             return Either.right(Pair.pair(keyword, predicate));
-        } catch (ParserException e) {
+        } catch (IllegalArgumentException e) {
             return Either.left(e.getMessage());
         }
     }

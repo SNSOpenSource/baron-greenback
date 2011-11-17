@@ -9,17 +9,16 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.totallylazy.time.Dates.date;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class DecoratingParserTest {
+public class ParametrizedParserTest {
     @Test
     public void canInjectCurrentTime() throws Exception{
-        PredicateParser parser = new DecoratingParser(new StandardParser(), model().add("now", Dates.date(2001, 2, 3)).toMap());
+        PredicateParser parser = new ParametrizedParser(new StandardParser(), new ParserParameters().add("now", Dates.date(2001, 2, 3)));
         Predicate<Record> predicate = parser.parse("Created > $now$", Sequences.<Keyword>empty());
         
         Keyword<Date> created = keyword("Created", Date.class);

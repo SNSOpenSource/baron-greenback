@@ -2,36 +2,33 @@ package com.googlecode.barongreenback.search.parser;
 
 import com.googlecode.funclate.Funclate;
 import com.googlecode.funclate.StringFunclate;
-import com.googlecode.lazyparsec.error.ParserException;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.LazyException;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 
 import java.util.Date;
-import java.util.Map;
 
 import static com.googlecode.totallylazy.Predicates.instanceOf;
 
-public class DecoratingParser implements PredicateParser {
+public class ParametrizedParser implements PredicateParser {
     private final PredicateParser parser;
-    private final Map<String, Object> data;
+    private final ParserParameters data;
 
-    public DecoratingParser(PredicateParser parser, Map<String, Object> data) {
+    public ParametrizedParser(PredicateParser parser, ParserParameters data) {
         this.parser = parser;
         this.data = data;
     }
 
-    public Predicate<Record> parse(String query, Sequence<? extends Keyword> implicits) {
+    public Predicate<Record> parse(String query, Sequence<? extends Keyword> implicits) throws IllegalArgumentException {
         try {
             Funclate funclate = new StringFunclate(query);
             funclate.add(instanceOf(Date.class), formatDate());
-            String newQuery = funclate.render(data);
+            String newQuery = funclate.render(data.values());
             return parser.parse(newQuery, implicits);
         } catch (Exception e) {
-            throw new UnsupportedOperationException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 
