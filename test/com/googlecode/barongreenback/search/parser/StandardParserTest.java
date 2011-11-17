@@ -79,7 +79,7 @@ public class StandardParserTest {
     @Test
     public void supportsNegationWithImplicit() throws Exception {
         PredicateParser predicateParser = new StandardParser();
-        Predicate<Record> predicate = predicateParser.parse("-bob age:12", sequence(keyword("name", String.class)));
+        Predicate<Record> predicate = predicateParser.parse(" NOT bob age:12", sequence(keyword("name", String.class)));
 
         Keyword<String> name = keyword("name", String.class);
         Keyword<String> age = keyword("age", String.class);

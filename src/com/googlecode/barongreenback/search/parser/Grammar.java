@@ -98,7 +98,7 @@ public class Grammar {
     });
 
     private static Parser<Callable1<Predicate<Record>, Predicate<Record>>> NEGATION() {
-        return isChar('-').optional().map(new Callable1<Void, Callable1<Predicate<Record>, Predicate<Record>>>() {
+        return ws('-').or(ws("NOT")).optional().map(new Callable1<Void, Callable1<Predicate<Record>, Predicate<Record>>>() {
             public Callable1<Predicate<Record>, Predicate<Record>> call(Void aVoid) throws Exception {
                 return new Callable1<Predicate<Record>, Predicate<Record>>() {
                     public Predicate<Record> call(Predicate<Record> predicate) throws Exception {
