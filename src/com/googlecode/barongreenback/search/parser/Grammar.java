@@ -13,6 +13,7 @@ import com.googlecode.totallylazy.Triple;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.time.Dates;
+import com.googlecode.totallylazy.time.Seconds;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -111,7 +112,7 @@ public class Grammar {
 
     public static final Parser<Pair<Class, Predicate>> DATE_IS = DATE.map(new Callable1<Date, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(Date dateWithoutTime) throws Exception {
-            Date upper = Dates.addSeconds(dateWithoutTime, (24 * 60 * 60) - 1);
+            Date upper = Seconds.add(dateWithoutTime, (24 * 60 * 60) - 1);
             return Pair.<Class, Predicate>pair(Date.class, Predicates.between(dateWithoutTime, upper));
         }
     });
