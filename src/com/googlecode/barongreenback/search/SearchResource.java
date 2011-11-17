@@ -95,9 +95,11 @@ public class SearchResource {
         return new Callable2<Model, Model, Model>() {
             public Model call(Model result, Model view) throws Exception {
                 Sequence<Keyword> allHeaders = headers(view);
+                Keyword recordName = recordName(view);
+                records.define(recordName, allHeaders.toArray(Keyword.class));
                 final Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
                 return parse(prefix(view, query), visibleHeaders).
-                        map(addQueryException(result), addResults(recordName(view), allHeaders, result, viewName, visibleHeaders));
+                        map(addQueryException(result), addResults(recordName, allHeaders, result, viewName, visibleHeaders));
             }
         };
     }
@@ -105,7 +107,6 @@ public class SearchResource {
     private Callable1<Predicate<Record>, Model> addResults(final Keyword recordName, final Sequence<Keyword> allHeaders, final Model model, final String viewName, final Sequence<Keyword> visibleHeaders) {
         return new Callable1<Predicate<Record>, Model>() {
             public Model call(Predicate<Record> predicate) throws Exception {
-                records.define(recordName, allHeaders.toArray(Keyword.class));
                 Sequence<Record> results = records.get(recordName).filter(predicate);
                 return model.
                         add("headers", headers(visibleHeaders, results)).

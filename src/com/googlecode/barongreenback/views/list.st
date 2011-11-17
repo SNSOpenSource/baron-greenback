@@ -3,7 +3,7 @@
 <head>
     <title>Views</title>
 </head>
-<body class="list">
+<body class="list views">
 
 <table class="results zebra-striped">
     <thead>
