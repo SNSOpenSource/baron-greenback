@@ -88,13 +88,13 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "dan").set(age, "13")), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(((-name:[bob TO bob]))) +(age:[12 TO 12])"));
+        assertThat(luceneQuery, is("-((name:[bob TO bob])) +(age:[12 TO 12])"));
     }
 
     @Test
     public void supportsNegationWithExplicit() throws Exception {
         PredicateParser predicateParser = new StandardParser();
-        Predicate<Record> predicate = predicateParser.parse("name:-bob age:12", Sequences.<Keyword>empty());
+        Predicate<Record> predicate = predicateParser.parse("-name:bob age:12", Sequences.<Keyword>empty());
 
         Keyword<String> name = keyword("name", String.class);
         Keyword<String> age = keyword("age", String.class);
@@ -311,7 +311,7 @@ public class StandardParserTest {
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
         assertThat(luceneQuery, is("name:[* TO Dan}"));
     }
-    
+
     @Test
     public void supportsGreaterThanStringQueries() throws Exception {
         PredicateParser predicateParser = new StandardParser();

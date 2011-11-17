@@ -15,7 +15,6 @@ import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.time.Dates;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -98,12 +97,12 @@ public class Grammar {
         }
     });
 
-    public static Parser<Callable1<Pair<Class, Predicate>, Pair<Class, Predicate>>> NEGATION() {
-        return isChar('-').optional().map(new Callable1<Void, Callable1<Pair<Class, Predicate>, Pair<Class, Predicate>>>() {
-            public Callable1<Pair<Class, Predicate>, Pair<Class, Predicate>> call(Void aVoid) throws Exception {
-                return new Callable1<Pair<Class, Predicate>, Pair<Class, Predicate>>() {
-                    public Pair<Class, Predicate> call(Pair<Class, Predicate> pair) throws Exception {
-                        return Pair.<Class, Predicate>pair(pair.first(), Predicates.not(pair.second()));
+    private static Parser<Callable1<Predicate<Record>, Predicate<Record>>> NEGATION() {
+        return isChar('-').optional().map(new Callable1<Void, Callable1<Predicate<Record>, Predicate<Record>>>() {
+            public Callable1<Predicate<Record>, Predicate<Record>> call(Void aVoid) throws Exception {
+                return new Callable1<Predicate<Record>, Predicate<Record>>() {
+                    public Predicate<Record> call(Predicate<Record> predicate) throws Exception {
+                        return Predicates.not(predicate);
                     }
                 };
             }
@@ -140,14 +139,14 @@ public class Grammar {
             return Pair.<Class, Predicate>pair(value.getClass(), Predicates.lessThan(value));
         }
     });
-
     public static final Parser<Pair<Class, Predicate>> TEXT_IS = TEXT_ONLY.map(new Callable1<String, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(String value) throws Exception {
             return Pair.<Class, Predicate>pair(String.class, Predicates.is(value));
         }
     });
 
-    public static final Parser<Pair<Class, Predicate>> VALUE_PREDICATE = Parsers.or(GREATER_THAN_OR_EQUALS, LESS_THAN_OR_EQUALS, GREATER_THAN, LESS_THAN, DATE_IS, TEXT_CONTAINS, TEXT_STARTS_WITH, TEXT_ENDS_WITH, TEXT_IS).prefix(NEGATION());
+    public static final Parser<Pair<Class, Predicate>> VALUE_PREDICATE = Parsers.or(GREATER_THAN_OR_EQUALS, LESS_THAN_OR_EQUALS, GREATER_THAN, LESS_THAN, DATE_IS, TEXT_CONTAINS, TEXT_STARTS_WITH, TEXT_ENDS_WITH, TEXT_IS);
+
     public static final Parser<List<Pair<Class, Predicate>>> VALUE_PREDICATES = VALUE_PREDICATE.sepBy(ws(','));
 
     public static Parser<Predicate<Record>> VALUE_ONLY(final Sequence<Keyword> keywords) {
@@ -162,6 +161,7 @@ public class Grammar {
         });
     }
 
+
     private static Predicate<Record> matchesValues(final String name, List<Pair<Class, Predicate>> values) {
         return or(sequence(values).map(new Callable1<Pair<Class, Predicate>, Predicate<Record>>() {
             public Predicate<Record> call(Pair<Class, Predicate> pair) throws Exception {
@@ -171,9 +171,8 @@ public class Grammar {
     }
 
     public static Parser<Predicate<Record>> PARTS(final Sequence<Keyword> keywords) {
-        return Parsers.or(NAME_AND_VALUE, VALUE_ONLY(keywords));
+        return Parsers.or(NAME_AND_VALUE, VALUE_ONLY(keywords)).prefix(NEGATION());
     }
-
 
     public static Parser<Predicate<Record>> PARSER(final Sequence<Keyword> keywords) {
         return PARTS(keywords).infixl(OR.or(AND));
@@ -186,5 +185,6 @@ public class Grammar {
             return matchesValues(name, values);
         }
     });
+
 
 }
