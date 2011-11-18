@@ -1,14 +1,12 @@
 package com.googlecode.barongreenback.search.parser;
 
 import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.Lucene;
 import com.googlecode.totallylazy.records.lucene.mappings.Mappings;
-import com.googlecode.totallylazy.time.Dates;
-import org.junit.Ignore;
+import com.googlecode.totallylazy.records.sql.expressions.WhereClause;
 import org.junit.Test;
 
 import java.util.Date;
@@ -29,8 +27,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "bob")), is(true));
         assertThat(predicate.matches(record().set(name, "dan")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("(name:[bob TO bob])"));
+        assertLuceneSyntax(predicate, "name:[bob TO bob]");
+        assertSqlSyntax(predicate, "name = 'bob'");
     }
 
     @Test
@@ -42,8 +40,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "bob")), is(true));
         assertThat(predicate.matches(record().set(name, "dan")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("name:[bob TO bob]"));
+        assertLuceneSyntax(predicate, "name:[bob TO bob]");
+        assertSqlSyntax(predicate, "name = 'bob'");
     }
 
     @Test
@@ -57,8 +55,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "bob").set(age, "13")), is(false));
         assertThat(predicate.matches(record().set(name, "dan").set(age, "12")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[bob TO bob]) +(age:[12 TO 12])"));
+        assertLuceneSyntax(predicate, "+name:[bob TO bob] +age:[12 TO 12]");
+        assertSqlSyntax(predicate, "(name = 'bob' and age = '12')");
     }
 
     @Test
@@ -72,8 +70,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "bob").set(age, "13")), is(false));
         assertThat(predicate.matches(record().set(name, "dan").set(age, "12")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[bob TO bob]) +(age:[12 TO 12])"));
+        assertLuceneSyntax(predicate, "+name:[bob TO bob] +age:[12 TO 12]");
+        assertSqlSyntax(predicate, "(name = 'bob' and age = '12')");
     }
 
     @Test
@@ -87,8 +85,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "bob").set(age, "12")), is(false));
         assertThat(predicate.matches(record().set(name, "dan").set(age, "13")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("-((name:[bob TO bob])) +(age:[12 TO 12])"));
+        assertLuceneSyntax(predicate, "-name:[bob TO bob] +age:[12 TO 12]");
+        assertSqlSyntax(predicate, "(not name = 'bob' and age = '12')");
     }
 
     @Test
@@ -101,6 +99,9 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "dan").set(age, "12")), is(true));
         assertThat(predicate.matches(record().set(name, "bob").set(age, "12")), is(false));
         assertThat(predicate.matches(record().set(name, "dan").set(age, "13")), is(false));
+
+        assertLuceneSyntax(predicate, "-name:[bob TO bob] +age:[12 TO 12]");
+        assertSqlSyntax(predicate, "(not name = 'bob' and age = '12')");
     }
 
     @Test
@@ -113,8 +114,9 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "bob")), is(true));
         assertThat(predicate.matches(record().set(name, "mat")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("(name:[dan TO dan] name:[bob TO bob])"));
+        assertLuceneSyntax(predicate, "name:[dan TO dan] name:[bob TO bob]");
+        assertSqlSyntax(predicate, "(name = 'dan' or name = 'bob')");
+
     }
 
     @Test
@@ -128,8 +130,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(title, "duke").set(name, "bodart")), is(false));
         assertThat(predicate.matches(record().set(title, "baron").set(name, "greenback")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("+(name:[bodart TO bodart]) +(title:[baron TO baron])"));
+        assertLuceneSyntax(predicate, "+name:[bodart TO bodart] +title:[baron TO baron]");
+        assertSqlSyntax(predicate, "(name = 'bodart' and title = 'baron')");
     }
 
     @Test
@@ -142,8 +144,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "bob")), is(true));
         assertThat(predicate.matches(record().set(name, "mat")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("(name:[dan TO dan]) (name:[bob TO bob])"));
+        assertLuceneSyntax(predicate, "name:[dan TO dan] name:[bob TO bob]");
+        assertSqlSyntax(predicate, "(name = 'dan' or name = 'bob')");
     }
 
     @Test
@@ -156,8 +158,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "bob")), is(true));
         assertThat(predicate.matches(record().set(name, "mat")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("name:[dan TO dan] name:[bob TO bob]"));
+        assertLuceneSyntax(predicate, "name:[dan TO dan] name:[bob TO bob]");
+        assertSqlSyntax(predicate, "(name = 'dan' or name = 'bob')");
     }
 
     @Test
@@ -169,6 +171,9 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Dan Bod")), is(true));
         assertThat(predicate.matches(record().set(name, "Dan")), is(false));
         assertThat(predicate.matches(record().set(name, "Bod")), is(false));
+
+        assertLuceneSyntax(predicate, "name:[Dan Bod TO Dan Bod]");
+        assertSqlSyntax(predicate, "name = 'Dan Bod'");
     }
 
     @Test
@@ -181,8 +186,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Dan")), is(true));
         assertThat(predicate.matches(record().set(name, "Bod")), is(false));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("name:Dan*"));
+        assertLuceneSyntax(predicate, "name:Dan*");
+        assertSqlSyntax(predicate, "name like 'Dan%'");
     }
 
     @Test
@@ -195,8 +200,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Dan")), is(false));
         assertThat(predicate.matches(record().set(name, "Bod")), is(true));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("name:*Bod"));
+        assertLuceneSyntax(predicate, "name:*Bod");
+        assertSqlSyntax(predicate, "name like '%Bod'");
     }
 
     @Test
@@ -209,8 +214,8 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(name, "Helo")), is(false));
         assertThat(predicate.matches(record().set(name, "ell")), is(true));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("name:*ell*"));
+        assertLuceneSyntax(predicate, "name:*ell*");
+        assertSqlSyntax(predicate, "name like '%ell%'");
     }
 
     @Test
@@ -221,6 +226,9 @@ public class StandardParserTest {
         Keyword<String> id = keyword("id", String.class);
         assertThat(predicate.matches(record().set(id, "urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1")), is(true));
         assertThat(predicate.matches(record().set(id, "fail")), is(false));
+
+        assertLuceneSyntax(predicate, "id:[urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1 TO urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1]");
+        assertSqlSyntax(predicate, "id = 'urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1'");
     }
 
     @Test
@@ -253,8 +261,9 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(dob, date(2001, 10, 1))), is(false));
         assertThat(predicate.matches(record().set(dob, date(2001, 1, 10, 3, 15, 59, 123))), is(true));
 
-        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("dob:[20010110000000000 TO 20010110235959000]"));
+        assertLuceneSyntax(predicate, "dob:[20010110000000000 TO 20010110235959000]");
+        assertSqlSyntax(predicate, "dob between 'Wed Jan 10 00:00:00 GMT 2001' and 'Wed Jan 10 23:59:59 GMT 2001'");
+
     }
 
     @Test
@@ -267,7 +276,7 @@ public class StandardParserTest {
         assertThat(predicate.matches(record().set(dob, date(2001, 10, 1))), is(false));
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
-        assertThat(luceneQuery, is("(dob:[20010110000000000 TO 20010110235959000])"));
+        assertThat(luceneQuery, is("dob:[20010110000000000 TO 20010110235959000]"));
     }
 
     @Test
@@ -352,6 +361,15 @@ public class StandardParserTest {
 
         String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
         assertThat(luceneQuery, is("name:[* TO Dan]"));
+    }
+
+    private void assertSqlSyntax(Predicate<Record> predicate, String expression) {
+        assertThat(WhereClause.toSql(predicate).toString(), is(expression));
+    }
+
+    private void assertLuceneSyntax(Predicate<Record> predicate, String expression) {
+        String luceneQuery = new Lucene(new Mappings()).query(predicate).toString();
+        assertThat(luceneQuery, is(expression));
     }
 
 }
