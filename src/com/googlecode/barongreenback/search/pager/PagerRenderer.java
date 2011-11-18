@@ -30,7 +30,7 @@ public class PagerRenderer implements Renderer<Pager> {
     }
 
     private Page getNextPage(Pager pager) {
-        String buttonText = "Next &rarr;";
+        String buttonText = "Next &#8594;";
         if (pager.getCurrentPage() == pager.getNumberOfPages().intValue()) {
             return new Page(buttonText, "next disabled", "#");
         } else {
@@ -39,7 +39,7 @@ public class PagerRenderer implements Renderer<Pager> {
     }
 
     private Page getPreviousPage(Pager pager) {
-        String buttonText = "&larr; Previous";
+        String buttonText = "&#8592; Previous";
         if (pager.getCurrentPage() == 1) {
             return new Page(buttonText, "prev disabled", "#");
         } else {
