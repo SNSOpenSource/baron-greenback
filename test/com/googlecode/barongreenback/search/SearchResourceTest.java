@@ -10,14 +10,15 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
+import com.googlecode.totallylazy.regex.Matches;
 import com.googlecode.utterlyidle.Server;
 import com.googlecode.yadic.Container;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.search.SearchResource.ALL_RECORDS_VIEW;
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
@@ -25,6 +26,12 @@ import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SearchResourceTest extends ApplicationTests {
+     @Test
+    public void handlesInvalidQueriesInANiceWay() throws Exception {
+        SearchPage searchPage = new SearchPage(browser, "users", "^&%$^%");
+        assertThat(searchPage.queryMessage(), Matchers.is("Invalid Query"));
+    }
+
      @Test
     public void supportsDelete() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "", true);
@@ -49,12 +56,6 @@ public class SearchResourceTest extends ApplicationTests {
     public void whenAnUnknownViewIsSpecifiedThenNoResultsShouldBeShown() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "UNKNOWN", "");
         assertThat(searchPage.numberOfResults(), is(0));
-    }
-
-    @Test
-    public void whenRecordsViewIsSpecifiedThenShowAllRecords() throws Exception {
-        SearchPage searchPage = new SearchPage(browser, ALL_RECORDS_VIEW, "");
-        assertThat(searchPage.numberOfResults(), is(3));  // 2 users and 1 view
     }
 
     @Before

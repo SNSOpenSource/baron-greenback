@@ -166,10 +166,11 @@ public class CrawlerResource {
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
         Pair<Date, Sequence<Record>> newCheckpointAndRecords = crawler.crawl(crawlingDefinition(from, more, checkpoint, recordDefinition));
-        System.out.println(String.format("Crawled %d new items for %s", newCheckpointAndRecords.second().size(), update));
         Date checkPoint = newCheckpointAndRecords.first();
+        Sequence<Record> records = newCheckpointAndRecords.second();
+        System.out.println(String.format("Crawled %d new items for %s", records.size(), update));
         modelRepository.set(id, Forms.form(update, from, more, checkPoint != null ? checkPoint.toString() : "", recordDefinition.toModel()));
-        return put(keyword(update), uniqueFields(recordDefinition), newCheckpointAndRecords.second());
+        return put(keyword(update), uniqueFields(recordDefinition), records);
     }
 
     private Record crawlingDefinition(String from, String more, String checkpoint, RecordDefinition recordDefinition) {
@@ -214,7 +215,7 @@ public class CrawlerResource {
         if(recordsToAdd.isEmpty()){
             return numberOfRecordsUpdated(0);
         }
-        Sequence<Keyword> keywords = keywords(recordsToAdd);
+        Sequence<Keyword> keywords = keywords(recordsToAdd).realise();
         if(find(modelRepository, recordName.name()).isEmpty()) {
             modelRepository.set(randomUUID(), Views.convertToViewModel(recordName, keywords));
         }

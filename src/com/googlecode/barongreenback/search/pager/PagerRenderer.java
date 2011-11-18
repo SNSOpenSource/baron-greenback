@@ -23,6 +23,7 @@ public class PagerRenderer implements Renderer<Pager> {
         pages.add(getNextPage(pager));
 
         EnhancedStringTemplateGroup stringTemplateGroup = new EnhancedStringTemplateGroup(URLs.packageUrl(this.getClass()));
+        stringTemplateGroup.enableFormatsAsFunctions();
         Map<String, Object> attributes = new HashMap<String, Object>();
         attributes.put("pages", pages);
         return stringTemplateGroup.getInstanceOf("pager", attributes).toString();

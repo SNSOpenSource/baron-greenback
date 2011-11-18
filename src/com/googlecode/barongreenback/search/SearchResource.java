@@ -1,23 +1,27 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.lucene.QueryParserActivator;
 import com.googlecode.barongreenback.search.pager.Pager;
+import com.googlecode.barongreenback.search.parser.PredicateParser;
+import com.googlecode.barongreenback.search.parser.StandardParser;
 import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyparsec.error.ParserException;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.lucene.LuceneRecords;
+import com.googlecode.totallylazy.records.Records;
+import com.googlecode.totallylazy.regex.Regex;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -28,77 +32,115 @@ import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.googlecode.barongreenback.shared.RecordDefinition.asKeywords;
-import static com.googlecode.barongreenback.views.Views.allRecords;
+import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.find;
+import static com.googlecode.barongreenback.views.Views.recordName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
+import static com.googlecode.totallylazy.records.SelectCallable.select;
 
 
 @Produces(MediaType.TEXT_HTML)
 @Path("{view}/search")
 public class SearchResource {
-    public static String ALL_RECORDS_VIEW = "records";
-    private final LuceneRecords records;
-    private final QueryParserActivator parser;
+    private final Records records;
     private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final AdvancedMode mode;
-    private final Pager pager;
+    private final PredicateParser parser;
+    private Pager pager;
 
-    public SearchResource(final LuceneRecords records, final QueryParserActivator parser, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final Pager pager) {
+    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final PredicateParser parser, final Pager pager) {
         this.records = records;
-        this.parser = parser;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.mode = mode;
+        this.parser = parser;
         this.pager = pager;
     }
 
     @POST
     @Path("delete")
     public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
-        if(!mode.equals(AdvancedMode.Enable)){
+        if (!mode.equals(AdvancedMode.Enable)) {
             return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
         }
-        Option<Model> optionalView = view(viewName);
-        Sequence<Keyword> allHeaders = headers(optionalView);
+        Model view = view(viewName);
+        Sequence<Keyword> allHeaders = headers(view);
         Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Query luceneQuery = parse(prefix(optionalView, query), visibleHeaders);
-        records.remove(luceneQuery);
+        Predicate<Record> predicate = parse(prefix(view, query), visibleHeaders).right();
+        records.remove(recordName(view), predicate);
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
 
     @GET
     @Path("list")
-    public Model list(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
-        Option<Model> optionalView = view(viewName);
-        Sequence<Keyword> allHeaders = headers(optionalView);
-        Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Query luceneQuery = parse(prefix(optionalView, query), visibleHeaders);
-        Sequence<Record> results = optionalView.isEmpty() ? Sequences.<Record>empty() : records.query(luceneQuery, allHeaders);
+    public Model list(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
+        return optionalView(viewName).
+                fold(model().add("view", viewName).add("query", query), executeQuery(viewName, query));
+    }
+
+    private Callable2<Model, Model, Model> executeQuery(final String viewName, final String query) {
+        return new Callable2<Model, Model, Model>() {
+            public Model call(Model result, Model view) throws Exception {
+                Sequence<Keyword> allHeaders = headers(view);
+                Keyword recordName = recordName(view);
+                records.define(recordName, allHeaders.toArray(Keyword.class));
+                final Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
+                return parse(prefix(view, query), visibleHeaders).
+                        map(addQueryException(result), addResults(recordName, allHeaders, result, viewName, visibleHeaders));
+            }
+        };
+    }
+
+    private Callable1<Predicate<Record>, Model> addResults(final Keyword recordName, final Sequence<Keyword> allHeaders, final Model model, final String viewName, final Sequence<Keyword> visibleHeaders) {
+        return new Callable1<Predicate<Record>, Model>() {
+            public Model call(Predicate<Record> predicate) throws Exception {
+                Sequence<Record> results = records.get(recordName).filter(predicate);
+                return model.
+                        add("headers", headers(visibleHeaders, results)).
+                        add("pager", pager).
+                        add("results", pager.paginate(results).map(asModel(viewName, visibleHeaders)).toList());
+            }
+        };
+    }
+
+    private Callable1<? super String, Model> addQueryException(final Model model) {
+        return new Callable1<String, Model>() {
+            public Model call(String value) throws Exception {
+                return model.add("queryException", value);
+            }
+        };
+    }
+
+    @GET
+    @Path("unique")
+    public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
+        Model view = view(viewName);
+        Keyword recordName = Views.recordName(view);
+        Sequence<Keyword> headers = headers(view);
+        Predicate<Record> predicate = parse(prefix(view, query), headers).right();
+        records.define(recordName, headers.toArray(Keyword.class));
+        Record record = records.get(recordName).filter(predicate).head();
+        Map<String, Map<String, Object>> group = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return model().
                 add("view", viewName).
                 add("query", query).
-                add("headers", headers(visibleHeaders, results)).
-                add("pager", pager).
-                add("results", pager.paginate(results).map(asModel(viewName, visibleHeaders)).toList());
+                add("record", group);
     }
 
     private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword> visibleHeaders) {
@@ -127,36 +169,20 @@ public class SearchResource {
                 dropScheme().dropAuthority();
     }
 
-    private String prefix(Option<Model> optionalView, final String query) {
-        return sequence(optionalView.map(query())).add(query).toString(" ");
+    private String prefix(Model view, final String query) {
+        return sequence(queryFrom(view)).add(query).toString(" ");
     }
 
-    private Callable1<Model, String> query() {
-        return new Callable1<Model, String>() {
-            public String call(Model model) throws Exception {
-                return model.get("view", Model.class).get("query", String.class);
-            }
-        };
+    private String queryFrom(Model model) {
+        return model.get("view", Model.class).get("query", String.class);
     }
 
-    private Option<Model> view(String view) {
-        if(view.equals(ALL_RECORDS_VIEW)){
-            return Option.some(allRecords());
-        }
+    private Model view(String view) {
+        return optionalView(view).get();
+    }
+
+    private Option<Model> optionalView(String view) {
         return find(modelRepository, view);
-    }
-
-    @GET
-    @Path("unique")
-    public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
-        Option<Model> optionalView = view(viewName);
-        Sequence<Keyword> headers = headers(optionalView);
-        Record record = records.query(parse(prefix(optionalView, query), headers), headers).head();
-        Map<String, Map<String, Object>> fold = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
-        return model().
-                add("view", viewName).
-                add("query", query).
-                add("record", fold);
     }
 
     public static Callable2<Map<String, Map<String, Object>>, Pair<Keyword, Object>, Map<String, Map<String, Object>>> groupBy(final Keyword<String> lookupKeyword) {
@@ -175,16 +201,13 @@ public class SearchResource {
         };
     }
 
-    private Sequence<Keyword> headers(Option<Model> optionalView) {
-        return optionalView.
-                map(unwrap()).
-                map(asKeywords()).
-                getOrElse(Sequences.<Keyword>empty());
+    private Sequence<Keyword> headers(Model view) {
+        return toKeywords(unwrap(view));
     }
 
     private List<Map<String, Object>> headers(Sequence<Keyword> headers, Sequence<Record> results) {
         if (headers.isEmpty()) {
-            return toModel(keywords(results));
+            return toModel(keywords(results).realise());
         }
         return toModel(headers);
     }
@@ -214,11 +237,17 @@ public class SearchResource {
         return name.replace(' ', '_');
     }
 
-    private Query parse(String query, Sequence<Keyword> keywords) throws ParseException {
-        if (query.isEmpty()) {
-            return new MatchAllDocsQuery();
+    private Either<String, Predicate<Record>> parse(String query, Sequence<Keyword> keywords) throws ParseException {
+        try {
+            Predicate<Record> predicate = parser.parse(query, keywords);
+            return Either.right(predicate);
+        } catch (IllegalArgumentException e) {
+            return Either.left(e.getMessage());
         }
-        return parser.create(keywords.map(asString()).toArray(String.class)).parse(query);
+    }
+
+    private String unquote(String possiblyQuoted) {
+        return possiblyQuoted.replace("\"", "");
     }
 
 }

@@ -25,6 +25,8 @@ import org.w3c.dom.Document;
 
 import java.net.URL;
 import java.util.Date;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
@@ -41,6 +43,7 @@ import static com.googlecode.totallylazy.records.RecordMethods.merge;
 import static com.googlecode.totallylazy.records.SelectCallable.select;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static java.lang.Boolean.TRUE;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 
 
 public class Crawler {
@@ -49,8 +52,10 @@ public class Crawler {
     public static final Keyword<String> MORE = keyword("more", String.class);
     public static final Keyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
     public static final Keyword<Date> CHECKPOINT_VALUE = keyword("checkpointValue", Date.class);
+    public static final int DEFAULT_NUMBER_OF_THREADS = 10;
 
     private final HttpHandler httpClient;
+    private final int numberOfCrawlerThreads;
 
     public Crawler() {
         this(new ClientHttpHandler());
@@ -58,6 +63,7 @@ public class Crawler {
 
     public Crawler(HttpClient httpClient) {
         this.httpClient = new AuditHandler(httpClient, new PrintAuditor(System.out));
+        numberOfCrawlerThreads = DEFAULT_NUMBER_OF_THREADS;
     }
 
     public Pair<Date, Sequence<Record>> crawl(Record crawlingDefinition) throws Exception {
@@ -173,7 +179,7 @@ public class Crawler {
     private Callable2<Sequence<Record>, Keyword, Sequence<Record>> crawlSubFeeds() {
         return new Callable2<Sequence<Record>, Keyword, Sequence<Record>>() {
             public Sequence<Record> call(Sequence<Record> records, Keyword keyword) throws Exception {
-                return records.flatMap(crawl(keyword));
+                return records.flatMapConcurrently(crawl(keyword), newFixedThreadPool(numberOfCrawlerThreads));
             }
         };
     }
