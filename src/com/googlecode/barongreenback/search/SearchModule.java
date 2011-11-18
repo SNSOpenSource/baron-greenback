@@ -1,15 +1,12 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.search.parser.ParametrizedParser;
+import com.googlecode.barongreenback.search.parser.ParserParameters;
 import com.googlecode.barongreenback.search.parser.PredicateParser;
 import com.googlecode.barongreenback.search.parser.StandardParser;
-import com.googlecode.barongreenback.search.parser.ParserParameters;
 import com.googlecode.utterlyidle.Resources;
-import com.googlecode.utterlyidle.modules.Module;
-import com.googlecode.utterlyidle.modules.ModuleDefiner;
-import com.googlecode.utterlyidle.modules.ModuleDefinitions;
-import com.googlecode.utterlyidle.modules.RequestScopedModule;
-import com.googlecode.utterlyidle.modules.ResourcesModule;
+import com.googlecode.utterlyidle.modules.*;
 import com.googlecode.yadic.Container;
 import org.apache.lucene.queryParser.ParseException;
 
@@ -22,6 +19,7 @@ public class SearchModule implements ResourcesModule, RequestScopedModule, Modul
     }
 
     public Module addPerRequestObjects(Container container) throws Exception {
+		container.add(Pager.class);
         container.add(PredicateParser.class, StandardParser.class);
         container.decorate(PredicateParser.class, ParametrizedParser.class);
         container.add(ParserParameters.class);

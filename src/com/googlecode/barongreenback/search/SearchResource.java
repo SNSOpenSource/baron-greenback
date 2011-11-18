@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.search.parser.PredicateParser;
 import com.googlecode.barongreenback.search.parser.StandardParser;
 import com.googlecode.barongreenback.shared.AdvancedMode;
@@ -61,13 +62,15 @@ public class SearchResource {
     private final Redirector redirector;
     private final AdvancedMode mode;
     private final PredicateParser parser;
+    private Pager pager;
 
-    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final PredicateParser parser) {
+    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final PredicateParser parser, final Pager pager) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.mode = mode;
         this.parser = parser;
+        this.pager = pager;
     }
 
     @POST
@@ -110,7 +113,8 @@ public class SearchResource {
                 Sequence<Record> results = records.get(recordName).filter(predicate);
                 return model.
                         add("headers", headers(visibleHeaders, results)).
-                        add("results", results.map(asModel(viewName, visibleHeaders)).toList());
+                        add("pager", pager).
+                        add("results", pager.paginate(results).map(asModel(viewName, visibleHeaders)).toList());
             }
         };
     }
