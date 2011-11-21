@@ -17,7 +17,7 @@ public class PagerModel {
     private Page getNextPage(Pager pager) {
         String buttonText = "Next &#8594;";
         if (pager.getCurrentPage() == pager.getNumberOfPages().intValue()) {
-            return new Page(buttonText, "next disabled", "#");
+            return new Page(buttonText, "next disabled");
         } else {
             return new Page(buttonText, "next", pager.getQueryStringForPage(pager.getCurrentPage() + 1));
         }
@@ -26,7 +26,7 @@ public class PagerModel {
     private Page getPreviousPage(Pager pager) {
         String buttonText = "&#8592; Previous";
         if (pager.getCurrentPage() == 1) {
-            return new Page(buttonText, "prev disabled", "#");
+            return new Page(buttonText, "prev disabled");
         } else {
             return new Page(buttonText, "prev", pager.getQueryStringForPage(pager.getCurrentPage() - 1));
         }
@@ -60,7 +60,7 @@ public class PagerModel {
     }
 
     private Page disabledPage() {
-        return new Page("...", "disabled", "#");
+        return new Page("...", "disabled");
     }
 
     private Sequence<Number> pageNumbers(Pager pager) {

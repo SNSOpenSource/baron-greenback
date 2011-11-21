@@ -5,6 +5,10 @@ public class Page {
     private String cssClass;
     private String link;
 
+    public Page(String text, String cssClass) {
+        this(text, cssClass, null);
+    }
+
     public Page(String text, String cssClass, String link) {
         this.text = text;
         this.cssClass = cssClass;
@@ -40,7 +44,7 @@ public class Page {
         Page page = (Page) o;
 
         if (!cssClass.equals(page.cssClass)) return false;
-        if (!link.equals(page.link)) return false;
+        if (link != null ? !link.equals(page.link) : page.link != null) return false;
         if (!text.equals(page.text)) return false;
 
         return true;
@@ -50,7 +54,7 @@ public class Page {
     public int hashCode() {
         int result = text.hashCode();
         result = 31 * result + cssClass.hashCode();
-        result = 31 * result + link.hashCode();
+        result = 31 * result + (link != null ? link.hashCode() : 0);
         return result;
     }
 }

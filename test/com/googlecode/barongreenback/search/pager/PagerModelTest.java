@@ -2,12 +2,14 @@ package com.googlecode.barongreenback.search.pager;
 
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.numbers.Numbers.range;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class PagerModelTest {
@@ -27,7 +29,7 @@ public class PagerModelTest {
 
         Page previousPage = sequence(new PagerModel().pages(pager)).head();
         assertThat(previousPage.getCssClass(), containsString("disabled"));
-        assertThat(previousPage.getLink(), is("#"));
+        assertThat(previousPage.getLink(), is(nullValue()));
     }
 
     @Test
@@ -36,7 +38,7 @@ public class PagerModelTest {
 
         Page nextPage = sequence(new PagerModel().pages(pager)).last();
         assertThat(nextPage.getCssClass(), containsString("disabled"));
-        assertThat(nextPage.getLink(), is("#"));
+        assertThat(nextPage.getLink(), is(nullValue()));
     }
 
     @Test
