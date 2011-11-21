@@ -4,13 +4,12 @@
     <id>urn:uuid:d199d2c5-8975-f344-4bc8-a698158c6ef1</id>
     <updated>2011-05-19T12:43:26Z</updated>
     <link rel="prev-archive" href=""/>
-    <!-- Order switched deliberately -->
-    <entry>
-        <title>Created user</title>
-        <updated>2011-07-19T12:43:20Z</updated>
-    </entry>
     <entry>
         <title>Updated user</title>
         <updated>2011-07-19T12:43:22Z</updated>
+    </entry>
+    <entry>
+        <title>Created user</title>
+        <updated>2011-07-19T12:43:20Z</updated>
     </entry>
 </feed>
