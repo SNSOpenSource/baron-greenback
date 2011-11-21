@@ -2,26 +2,16 @@ package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.search.parser.PredicateParser;
-import com.googlecode.barongreenback.search.parser.StandardParser;
+import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyparsec.error.ParserException;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
-import com.googlecode.totallylazy.regex.Regex;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -63,14 +53,16 @@ public class SearchResource {
     private final AdvancedMode mode;
     private final PredicateParser parser;
     private Pager pager;
+    private Sorter sorter;
 
-    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final PredicateParser parser, final Pager pager) {
+    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final PredicateParser parser, final Pager pager, final Sorter sorter) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.mode = mode;
         this.parser = parser;
         this.pager = pager;
+        this.sorter = sorter;
     }
 
     @POST
@@ -114,9 +106,26 @@ public class SearchResource {
                 return model.
                         add("headers", headers(visibleHeaders, results)).
                         add("pager", pager).
-                        add("results", pager.paginate(results).map(asModel(viewName, visibleHeaders)).toList());
+                        add("sorter", sorter).
+                        add("sortLinks", sortLinks(sorter, visibleHeaders)).
+                        add("sortedHeaders", sortedHeaders(sorter, visibleHeaders)).
+                        add("results", pager.paginate(sorter.sort(results, allHeaders)).map(asModel(viewName, visibleHeaders)).toList());
             }
         };
+    }
+
+    private Map<String, String> sortedHeaders(Sorter sorter, Sequence<Keyword> visibleHeaders) {
+        return Maps.map(Pair.pair(sorter.getSortedColumn(visibleHeaders), sorter.isSortedDescending() ? "headerSortUp" : "headerSortDown"));
+    }
+
+    private Map<String, String> sortLinks(final Sorter sorter, final Sequence<Keyword> visibleHeaders) {
+        Map<String, String> linkMap = Maps.map();
+        return visibleHeaders.fold(linkMap, new Callable2<Map<String, String>, Keyword, Map<String, String>>() {
+            public Map<String, String> call(Map<String, String> linkMap, Keyword keyword) throws Exception {
+                linkMap.put(keyword.name(), sorter.linkFor(keyword, visibleHeaders));
+                return linkMap;
+            }
+        });
     }
 
     private Callable1<? super String, Model> addQueryException(final Model model) {

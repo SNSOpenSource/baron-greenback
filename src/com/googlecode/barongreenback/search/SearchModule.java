@@ -6,6 +6,7 @@ import com.googlecode.barongreenback.search.parser.ParametrizedParser;
 import com.googlecode.barongreenback.search.parser.ParserParameters;
 import com.googlecode.barongreenback.search.parser.PredicateParser;
 import com.googlecode.barongreenback.search.parser.StandardParser;
+import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.*;
 import com.googlecode.yadic.Container;
@@ -21,6 +22,7 @@ public class SearchModule implements ResourcesModule, RequestScopedModule, Modul
 
     public Module addPerRequestObjects(Container container) throws Exception {
 		container.add(Pager.class, RequestPager.class);
+        container.add(Sorter.class, Sorter.class);
         container.add(PredicateParser.class, StandardParser.class);
         container.decorate(PredicateParser.class, ParametrizedParser.class);
         container.add(ParserParameters.class);
