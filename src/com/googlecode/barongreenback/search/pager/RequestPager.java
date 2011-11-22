@@ -42,7 +42,11 @@ public class RequestPager implements Pager {
     }
 
     private boolean isShowingAllPages() {
-        return "ALL".equalsIgnoreCase(numberOfRowsPerPage);
+        return "ALL".equalsIgnoreCase(numberOfRowsPerPage) || getCalculatedNumberOfPages() == 1;
+    }
+
+    private double getCalculatedNumberOfPages() {
+        return Math.ceil(totalRows.doubleValue() / getRowsPerPageAsInteger());
     }
 
     private int getRowsPerPageAsInteger() {
@@ -65,7 +69,7 @@ public class RequestPager implements Pager {
         if (isShowingAllPages()) {
             return 1;
         }
-        return Math.ceil(totalRows.doubleValue() / getRowsPerPageAsInteger());
+        return getCalculatedNumberOfPages();
     }
 
     public String getQueryStringForPage(int pageNumber) {

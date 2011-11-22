@@ -66,6 +66,17 @@ public class RequestPagerTest {
         assertThat(pager.getNumberOfPages(), NumberMatcher.is(1));
     }
 
+    @Test
+    public void ignoredPagesNumbersWhenShowingAllRecords() throws Exception {
+        Pager pager = new RequestPager(RequestBuilder.get("/somePage").withQuery(Pager.CURRENT_PAGE_PARAM, 25).withQuery(Pager.ROWS_PER_PAGE_PARAM, "100001").build());
+        Sequence<Number> sequence = range(1, 100001).realise();
+
+        Sequence<Number> paginatedSequence = pager.paginate(sequence);
+        assertThat(paginatedSequence, is(sequence));
+        assertThat(pager.getTotalRows(), is(sequence.size()));
+        assertThat(pager.getNumberOfPages(), NumberMatcher.is(1));
+    }
+
     private String removeLeadingQuestionMark(Pager pager) {
         return pager.getQueryStringForPage(2).substring(1);
     }
