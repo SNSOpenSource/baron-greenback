@@ -37,7 +37,7 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer(always(), Xml.escape());
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
-        shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer());
+        shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer(shared));
         return new EnhancedStringTemplateGroup(baseUrl, shared);
     }
 

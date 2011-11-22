@@ -5,6 +5,9 @@ import com.googlecode.totallylazy.Sequence;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.numbers.Numbers.range;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -19,8 +22,8 @@ public class PagerModelTest {
         Pager pager = pagerWithValues(range(1, 101), 2, 20);
 
         Sequence<Page> pages = sequence(new PagerModel().pages(pager));
-        assertThat(pages.head(), is(new Page("&#8592; Previous", "prev", "QS1")));
-        assertThat(pages.last(), is(new Page("Next &#8594;", "next", "QS3")));
+        assertThat(pages.head(), is(new Page("← Previous", "prev", "QS1")));
+        assertThat(pages.last(), is(new Page("Next →", "next", "QS3")));
     }
 
     @Test
@@ -89,11 +92,11 @@ public class PagerModelTest {
     private Pager pagerWithValues(final Sequence<?> originalSequence, final int currentPage, final int rowsPerPage) {
         return new Pager() {
             public <T> Sequence<T> paginate(Sequence<T> sequence) {
-                return (Sequence<T>) originalSequence.drop((getCurrentPage()-1) * getRowsPerPage()).take(getRowsPerPage());
+                return (Sequence<T>) originalSequence.drop((getCurrentPage()-1) * rowsPerPage).take(rowsPerPage);
             }
 
-            public int getRowsPerPage() {
-                return rowsPerPage;
+            public String getRowsPerPage() {
+                return String.valueOf(rowsPerPage);
             }
 
             public Number getTotalRows() {
@@ -105,7 +108,7 @@ public class PagerModelTest {
             }
 
             public Number getNumberOfPages() {
-                return Math.ceil(getTotalRows().doubleValue() / getRowsPerPage());
+                return Math.ceil(getTotalRows().doubleValue() / rowsPerPage);
             }
 
             public String getQueryStringForPage(int pageNumber) {
@@ -114,6 +117,10 @@ public class PagerModelTest {
 
             public boolean isPaged() {
                 return getNumberOfPages().intValue() > 1;
+            }
+
+            public List<Map.Entry<String, String>> getQueryParametersToUrl() {
+                return null;  
             }
         };
     }

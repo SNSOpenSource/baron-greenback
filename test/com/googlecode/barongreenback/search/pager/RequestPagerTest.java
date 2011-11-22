@@ -12,7 +12,7 @@ import static com.googlecode.totallylazy.numbers.Numbers.range;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class PagerTest {
+public class RequestPagerTest {
 
     @Test
     public void defaultsTheCurrentPageAndRows() throws Exception {
@@ -20,7 +20,7 @@ public class PagerTest {
         Pager pager = new RequestPager(request);
 
         assertThat(pager.getCurrentPage(), is(1));
-        assertThat(pager.getRowsPerPage(), is(20));
+        assertThat(pager.getRowsPerPage(), is("20"));
     }
 
     @Test
@@ -29,7 +29,7 @@ public class PagerTest {
         Pager pager = new RequestPager(request);
         
         assertThat(pager.getCurrentPage(), is(30));
-        assertThat(pager.getRowsPerPage(), is(25));
+        assertThat(pager.getRowsPerPage(), is("25"));
     }
 
     @Test
@@ -53,7 +53,17 @@ public class PagerTest {
         Parameters actualOtherParams = parameters.remove(Pager.CURRENT_PAGE_PARAM);
         Parameters expectedOtherParams = QueryParameters.parse(requestForCurrentPageAndRows(5, 10).withQuery("dont", "touchme").build().uri().query()).remove(Pager.CURRENT_PAGE_PARAM);
         assertThat(actualOtherParams, is(expectedOtherParams));
+    }
 
+    @Test
+    public void supportsAllParameter() throws Exception {
+        Pager pager = new RequestPager(RequestBuilder.get("/somePage").withQuery(Pager.ROWS_PER_PAGE_PARAM, "ALL").build());
+        Sequence<Number> sequence = range(1, 100001).realise();
+
+        Sequence<Number> paginatedSequence = pager.paginate(sequence);
+        assertThat(paginatedSequence, is(sequence));
+        assertThat(pager.getTotalRows(), is(sequence.size()));
+        assertThat(pager.getNumberOfPages(), NumberMatcher.is(1));
     }
 
     private String removeLeadingQuestionMark(Pager pager) {

@@ -15,7 +15,7 @@ public class PagerModel {
     public static final int THRESHOLD_NUMBER_OF_PAGES_BEFORE_PARTITIONING = 5;
 
     private Page getNextPage(Pager pager) {
-        String buttonText = "Next &#8594;";
+        String buttonText = "Next →";
         if (pager.getCurrentPage() == pager.getNumberOfPages().intValue()) {
             return new Page(buttonText, "next disabled");
         } else {
@@ -24,7 +24,7 @@ public class PagerModel {
     }
 
     private Page getPreviousPage(Pager pager) {
-        String buttonText = "&#8592; Previous";
+        String buttonText = "← Previous";
         if (pager.getCurrentPage() == 1) {
             return new Page(buttonText, "prev disabled");
         } else {
