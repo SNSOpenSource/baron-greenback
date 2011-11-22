@@ -33,16 +33,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class CrawlerTest {
-    private static final Keyword<Object> USER = keyword("/user");
-    private static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
-    private static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class).as(keyword("first", String.class));
+    public static final Keyword<Object> USER = keyword("/user");
+    public static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
+    public static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class).as(keyword("first", String.class));
 
-    private static final Keyword<Object> ENTRIES = keyword("/feed/entry");
-    private static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
-    private static final Keyword<URI> LINK = keyword("link/@href", URI.class).
+    public static final Keyword<Object> ENTRIES = keyword("/feed/entry");
+    public static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
+    public static final Keyword<URI> LINK = keyword("link/@href", URI.class).
             metadata(MapRecord.record().set(RECORD_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
-    private static final Keyword<Date> UPDATED = keyword("updated", Date.class).metadata(record().set(Crawler.CHECKPOINT, true));
-    private static final Keyword<String> TITLE = keyword("title", String.class);
+    public static final Keyword<Date> UPDATED = keyword("updated", Date.class).metadata(record().set(Crawler.CHECKPOINT, true));
+    public static final Keyword<String> TITLE = keyword("title", String.class);
 
     public static final RecordDefinition ATOM_DEFINITION = new RecordDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE));
 

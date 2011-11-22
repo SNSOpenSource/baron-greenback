@@ -146,7 +146,7 @@ public class CrawlerResourceTest extends ApplicationTests {
         });
     }
 
-    private RestServer setupServerWithDataFeed() throws Exception {
+    public static RestServer setupServerWithDataFeed() throws Exception {
         RestServer dataSourceServer = new RestServer(new Restaurant(BasePath.basePath("/")), defaultConfiguration().port(9001));
         ClientHttpHandler restClient = new ClientHttpHandler();
         restClient.handle(put(dataSourceServer.uri() + "data").withHeader(CONTENT_TYPE, TEXT_XML).withInput(fileContent("atom.xml").getBytes()).build());
@@ -154,7 +154,7 @@ public class CrawlerResourceTest extends ApplicationTests {
         return dataSourceServer;
     }
 
-    private String fileContent(String name) {
-        return Strings.toString(getClass().getResourceAsStream(name));
+    private static String fileContent(String name) {
+        return Strings.toString(CrawlerResourceTest.class.getResourceAsStream(name));
     }
 }
