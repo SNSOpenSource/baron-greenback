@@ -17,4 +17,6 @@ public interface Pager {
     Number getNumberOfPages();
 
     String getQueryStringForPage(int pageNumber);
+
+    boolean isPaged();
 }

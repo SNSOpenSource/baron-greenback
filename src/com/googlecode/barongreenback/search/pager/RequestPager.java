@@ -46,4 +46,8 @@ public class RequestPager implements Pager {
     public String getQueryStringForPage(int pageNumber) {
         return queryParameters.remove(CURRENT_PAGE_PARAM).add(CURRENT_PAGE_PARAM, String.valueOf(pageNumber)).toString();
     }
+
+    public boolean isPaged() {
+        return getNumberOfPages().intValue() > 1;
+    }
 }

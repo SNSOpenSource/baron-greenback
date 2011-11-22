@@ -111,6 +111,10 @@ public class PagerModelTest {
             public String getQueryStringForPage(int pageNumber) {
                 return "QS"+pageNumber;
             }
+
+            public boolean isPaged() {
+                return getNumberOfPages().intValue() > 1;
+            }
         };
     }
 
