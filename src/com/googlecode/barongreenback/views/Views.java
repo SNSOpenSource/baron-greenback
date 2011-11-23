@@ -5,7 +5,6 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Callers;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
@@ -111,15 +110,6 @@ public class Views {
         return keyword(unwrap(view).<String>get("records"));
     }
 
-//    public static Callable1<Model, Comparable> priority() {
-//        return new Callable1<Model, Comparable>() {
-//            public Comparable call(Model model) throws Exception {
-//                final Option<Number> priority = Numbers.valueOf(model.get("priority", String.class));
-//                return priority.isEmpty() ? Double.MAX_VALUE : priority.get().doubleValue();
-//            }
-//        };
-//    }
-
     private static String name(Model model) {
         return model.get("name", String.class);
     }
@@ -144,18 +134,5 @@ public class Views {
             }
         };
     }
-
-    public static <T> Comparator<T> compositeComparator(final Comparator<? super T>... comparators) {
-        return new Comparator<T>() {
-            public int compare(T m1, T m2) {
-                for(Comparator<? super T> comparator : comparators) {
-                    int comparisonResult = comparator.compare(m1, m2);
-                    if(comparisonResult != 0) return comparisonResult;
-                }
-                return 0;
-            }
-        };
-    }
-
 
 }

@@ -10,6 +10,7 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Second;
+import com.googlecode.totallylazy.comparators.Comparators;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -27,8 +28,8 @@ import static com.googlecode.barongreenback.shared.Forms.NUMBER_OF_FIELDS;
 import static com.googlecode.barongreenback.shared.Forms.addTemplates;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.views.Views.clean;
-import static com.googlecode.barongreenback.views.Views.compositeComparator;
-import static com.googlecode.barongreenback.views.Views.unwrap;
+import static com.googlecode.barongreenback.views.Views.name;
+import static com.googlecode.barongreenback.views.Views.priority;
 import static com.googlecode.barongreenback.views.Views.valueFor;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.ascending;
@@ -59,7 +60,7 @@ public class ViewsResource {
                 find(Predicates.where(MODEL_TYPE, is("view"))).
                 filter(predicate).
                 map(asModel(current)).
-                sortBy(compositeComparator(ascending(Views.priority()), ascending(Views.name()))).
+                sortBy(Comparators.comparators(ascending(priority()), ascending(name()))).
                 toList());
     }
 
