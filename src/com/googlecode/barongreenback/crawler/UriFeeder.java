@@ -25,6 +25,8 @@ public class UriFeeder implements Feeder<Uri> {
     public Sequence<Record> get(Uri uri, RecordDefinition definition) throws Exception {
         Response response = httpClient.handle(RequestBuilder.get(uri).build());
         Document document = document(new String(response.bytes()));
-        return feeder.get(document, definition);
+        Sequence<Record> recordSequence = feeder.get(document, definition).realise();
+        System.out.println(String.format("uri: %s returned %s records", uri, recordSequence.size()));
+        return recordSequence;
     }
 }

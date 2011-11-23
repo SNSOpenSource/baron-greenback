@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.crawler.CrawlerTest;
+import com.googlecode.barongreenback.crawler.CrawlerTests;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
@@ -12,6 +13,7 @@ import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.totallylazy.regex.Matches;
 import com.googlecode.utterlyidle.Server;
+import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.yadic.Container;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -60,9 +62,9 @@ public class SearchResourceTest extends ApplicationTests {
 
     @Before
     public void addSomeData() throws Exception {
-        Server server = CrawlerTest.startServer();
-        Uri feed = CrawlerTest.createFeed(server);
-        final Sequence<Record> recordSequence = CrawlerTest.crawl(feed).realise();
+        RestServer server = CrawlerTests.setupServerWithDataFeed();
+
+        final Sequence<Record> recordSequence = CrawlerTest.crawl(CrawlerTests.atomXml).realise();
 
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
@@ -75,6 +77,7 @@ public class SearchResourceTest extends ApplicationTests {
                 return VOID;
             }
         });
+
         server.close();
     }
 }

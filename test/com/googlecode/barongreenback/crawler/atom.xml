@@ -6,7 +6,7 @@
   <link rel="prev-archive" href="http://localhost:9001/data/prev" />
   <entry>
     <title>Added user</title>
-    <link href="http://localhost:10010/static/entry1.xml" />
+    <link href="http://localhost:9001/entry1.xml" />
     <id>urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1</id>
     <content type="text/xml">
         <div>Hello</div>
@@ -18,7 +18,7 @@
   </entry>
   <entry>
     <title>Deleted user</title>
-    <link href="http://localhost:10010/static/entry2.xml" />
+    <link href="http://localhost:9001/entry2.xml" />
     <id>urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef2</id>
     <content type="text/xml">
         <div>Byte</div>

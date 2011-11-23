@@ -2,38 +2,33 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.matchers.IterableMatcher;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
-import com.googlecode.utterlyidle.httpserver.RestServer;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
-import static com.googlecode.barongreenback.crawler.CrawlerResourceTest.setupServerWithDataFeed;
 import static com.googlecode.barongreenback.crawler.CrawlerTest.ATOM_DEFINITION;
+import static com.googlecode.barongreenback.crawler.CrawlerTest.FIRST_NAME;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 
-public class DocumentFeederTest {
+public class DocumentFeederTest extends CrawlerTests {
     private HttpHandler client = new AuditHandler(new ClientHttpHandler(), new PrintAuditor(System.out));
-    private RestServer restServer;
-    private Uri atomXml = Uri.uri("http://localhost:9001/data");
 
     @Test
     public void supportsGettingRecords() throws Exception {
@@ -57,6 +52,13 @@ public class DocumentFeederTest {
     }
 
     @Test
+    public void supportsSubFeeds() throws Exception {
+        Feeder<Uri> feeder = new SubFeeder(new UriFeeder(client, "/feed/link/@href"));
+        Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
+        assertThat(records.map(FIRST_NAME).filter(Predicates.notNullValue()).realise(), IterableMatcher.hasExactly("Dan", "Matt"));
+    }
+
+    @Test
     @Ignore
     public void demo() throws Exception {
         Feeder<Uri> feeder = new CheckPointStopper(date("2011-11-22T13:29:57Z"), new UriFeeder(client, ""));
@@ -73,16 +75,6 @@ public class DocumentFeederTest {
 
     private Date date(String value) throws ParseException {
         return Dates.RFC3339().parse(value);
-    }
-
-    @Before
-    public void startWaitrest() throws Exception {
-        restServer = setupServerWithDataFeed();
-    }
-
-    @After
-    public void stopWaitrest() throws IOException {
-        restServer.close();
     }
 
 }

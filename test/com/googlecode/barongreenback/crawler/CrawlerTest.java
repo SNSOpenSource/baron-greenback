@@ -32,7 +32,7 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class CrawlerTest {
+public class CrawlerTest extends CrawlerTests{
     public static final Keyword<Object> USER = keyword("/user");
     public static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
     public static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class).as(keyword("first", String.class));
@@ -48,15 +48,12 @@ public class CrawlerTest {
 
     @Test
     public void shouldGetTheContentsOfAUrlAndExtractContent() throws Exception {
-        Server server = startServer();
-        final Uri feed = createFeed(server);
-        Sequence<Record> records = crawl(feed);
+        Sequence<Record> records = crawl(atomXml);
         Record entry = records.head();
 
         assertThat(entry.get(ID), is("urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1"));
         assertThat(entry.get(USER_ID), is(1234));
         assertThat(entry.get(FIRST_NAME), is("Dan"));
-        server.close();
     }
 
     @Test
@@ -74,7 +71,7 @@ public class CrawlerTest {
     }
 
     private void shouldNotGoPastTheCheckpoint(Date date) throws Exception {
-        Record documentCrawlingDefinition = record().set(DOCUMENT, document(fileContent("atom.xml"))).set(RECORD_DEFINITION, ATOM_DEFINITION).set(CHECKPOINT_VALUE, date);
+        Record documentCrawlingDefinition = record().set(DOCUMENT, document(contentOf("atom.xml"))).set(RECORD_DEFINITION, ATOM_DEFINITION).set(CHECKPOINT_VALUE, date);
         Sequence<Record> records = new Crawler().crawlDocument(documentCrawlingDefinition).first();
 
         assertThat(records.size(), Matchers.<Number>is(1));
@@ -84,16 +81,6 @@ public class CrawlerTest {
         return new Crawler().crawl(record().set(URL, feed.toURL()).set(RECORD_DEFINITION, ATOM_DEFINITION)).second();
     }
 
-    public static Uri createFeed(final Server server) {
-        return server.uri().mergePath("static/atom.xml");
-    }
 
-    private String fileContent(String name) {
-        return Strings.toString(getClass().getResourceAsStream(name));
-    }
-
-    public static Server startServer() {
-        return application().content(packageUrl(CrawlerTest.class), "/static").start(defaultConfiguration().port(10010));
-    }
 
 }
