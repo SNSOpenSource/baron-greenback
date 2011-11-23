@@ -9,6 +9,7 @@
     $input(name="view.records", label="Records", class="records", value=view.records, placeholder="Records")$
     $input(name="view.query", label="Query", class="query", value=view.query, placeholder="name:value")$
     $checkbox(id="view.visible", name="view.visible", class="visible", label="Visible", checked=view.visible)$
+    $input(name="view.priority", label="Priority", class="priority", value=view.priority, placeholder="10")$
     <div class="fieldset fields view">
         <div class="legend">Fields</div>
         <ol class="fields">

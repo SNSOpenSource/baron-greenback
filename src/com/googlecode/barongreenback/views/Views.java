@@ -3,23 +3,28 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.funclate.Models;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Callers;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Second;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
 
+import java.util.Comparator;
+
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Callables.ascending;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 
 public class Views {
@@ -28,7 +33,7 @@ public class Views {
     public static final String ROOT = "view";
 
     public static Model clean(Model root) {
-        return new ModelCleaner(in("view", "name", "records", "query", "keywords", "group", "type", "unique", "visible")).clean(root);
+        return new ModelCleaner(in("view", "name", "records", "query", "priority", "keywords", "group", "type", "unique", "visible")).clean(root);
     }
 
     public static Model convertToViewModel(Keyword<Object> recordName, Sequence<Keyword> keywords) {
@@ -37,6 +42,7 @@ public class Views {
                 add("records", recordName.name()).
                 add("query", "").
                 add("visible", true).
+                add("priority", "").
                 add("keywords", keywords.map(asModel()).toList()));
     }
 
@@ -104,4 +110,52 @@ public class Views {
     public static Keyword recordName(Model view) {
         return keyword(unwrap(view).<String>get("records"));
     }
+
+//    public static Callable1<Model, Comparable> priority() {
+//        return new Callable1<Model, Comparable>() {
+//            public Comparable call(Model model) throws Exception {
+//                final Option<Number> priority = Numbers.valueOf(model.get("priority", String.class));
+//                return priority.isEmpty() ? Double.MAX_VALUE : priority.get().doubleValue();
+//            }
+//        };
+//    }
+
+    private static String name(Model model) {
+        return model.get("name", String.class);
+    }
+
+    private static Double priority(Model model) {
+        final Option<Number> priority = Numbers.valueOf(model.get("priority", String.class));
+        return priority.isEmpty() ? Double.MAX_VALUE : priority.get().doubleValue();
+    }
+
+    public static Callable1<Model, Comparable> priority() {
+        return new Callable1<Model, Comparable>() {
+            public Comparable call(Model model) throws Exception {
+                return priority(model);
+            }
+        };
+    }
+
+    public static Callable1<Model, Comparable> name() {
+        return new Callable1<Model, Comparable>() {
+            public Comparable call(Model model) throws Exception {
+                return name(model);
+            }
+        };
+    }
+
+    public static <T> Comparator<T> compositeComparator(final Comparator<? super T>... comparators) {
+        return new Comparator<T>() {
+            public int compare(T m1, T m2) {
+                for(Comparator<? super T> comparator : comparators) {
+                    int comparisonResult = comparator.compare(m1, m2);
+                    if(comparisonResult != 0) return comparisonResult;
+                }
+                return 0;
+            }
+        };
+    }
+
+
 }
