@@ -40,7 +40,7 @@ public class CrawlerTest extends CrawlerTests{
     public static final Keyword<Object> ENTRIES = keyword("/feed/entry");
     public static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, false).set(Views.VISIBLE, true));
     public static final Keyword<URI> LINK = keyword("link/@href", URI.class).
-            metadata(MapRecord.record().set(RECORD_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
+            metadata(record().set(Keywords.UNIQUE, true).set(RECORD_DEFINITION, new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME))));
     public static final Keyword<Date> UPDATED = keyword("updated", Date.class).metadata(record().set(Crawler.CHECKPOINT, true));
     public static final Keyword<String> TITLE = keyword("title", String.class);
 

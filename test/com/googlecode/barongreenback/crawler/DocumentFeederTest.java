@@ -59,6 +59,13 @@ public class DocumentFeederTest extends CrawlerTests {
     }
 
     @Test
+    public void filtersDuplicates() throws Exception {
+        Feeder<Uri> feeder = new DuplicateRemover(new UriFeeder(client, ""));
+        Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
+        assertThat(records.size(), is(2));
+    }
+
+    @Test
     @Ignore
     public void demo() throws Exception {
         Feeder<Uri> feeder = new CheckPointStopper(date("2011-11-22T13:29:57Z"), new UriFeeder(client, ""));
