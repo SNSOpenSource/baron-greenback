@@ -21,6 +21,7 @@
 <div class="actions">
     <a href="new" class="new">New</a>
     <a href="import" class="import">Import</a>
+    $post(url=item.jobUrl, name="crawlAll", value="Crawl All", id=item.id)$
 </div>
 
 </body>

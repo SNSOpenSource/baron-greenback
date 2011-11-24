@@ -1,7 +1,5 @@
 package com.googlecode.barongreenback.jobs;
 
-import com.googlecode.utterlyidle.Response;
-
 import java.util.UUID;
 import java.util.concurrent.Callable;
 

@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 
 import static com.googlecode.utterlyidle.io.HierarchicalPath.hierarchicalPath;
 import static com.googlecode.utterlyidle.sitemesh.TemplateName.templateName;
-import static java.lang.String.format;
 
 public class TemplateNameActivator implements Callable<TemplateName> {
     private final HierarchicalPath path;

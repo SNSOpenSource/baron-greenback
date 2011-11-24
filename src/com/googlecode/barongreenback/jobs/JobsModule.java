@@ -1,10 +1,6 @@
 package com.googlecode.barongreenback.jobs;
 
-import com.googlecode.totallylazy.Callers;
-import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Resources;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
@@ -12,7 +8,6 @@ import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.modules.StartupModule;
 import com.googlecode.yadic.Container;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 

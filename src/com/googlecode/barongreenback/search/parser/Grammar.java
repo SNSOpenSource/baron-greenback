@@ -23,7 +23,6 @@ import static com.googlecode.lazyparsec.Scanners.isChar;
 import static com.googlecode.lazyparsec.Scanners.notChar;
 import static com.googlecode.lazyparsec.Scanners.pattern;
 import static com.googlecode.lazyparsec.pattern.Patterns.regex;
-import static com.googlecode.totallylazy.Predicates.and;
 import static com.googlecode.totallylazy.Predicates.or;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;

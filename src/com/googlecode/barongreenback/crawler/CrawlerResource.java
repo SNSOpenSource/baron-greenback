@@ -13,13 +13,16 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.proxy.Invocation;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.totallylazy.time.DateFormatConverter;
 import com.googlecode.totallylazy.time.Dates;
+import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
+import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
@@ -41,6 +44,7 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.URLs.url;
@@ -62,18 +66,38 @@ public class CrawlerResource {
     private final ModelRepository modelRepository;
     private final Crawler crawler;
     private final Redirector redirector;
+    private final Application application;
 
-    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector) {
+    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector, Application application) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.crawler = crawler;
         this.redirector = redirector;
+        this.application = application;
     }
 
     @GET
     @Path("list")
     public Model list() {
-        return model().add("items", modelRepository.find(where(MODEL_TYPE, is("form"))).map(asModelWithId()).toList());
+        return model().add("items", allCrawlerModels().map(asModelWithId()).toList());
+    }
+
+    @POST
+    @Path("crawlAll")
+    public Response crawlAll() throws Exception {
+        final Sequence<UUID> crawlers = allCrawlerModels().map(first(UUID.class));
+
+        for(UUID crawlerId: crawlers) {
+            final Invocation<Object,Response> scheduleMethod = method(on(JobsResource.class).schedule(crawlerId, JobsResource.DEFAULT_INTERVAL, redirector.uriOf(method(on(CrawlerResource.class).crawl(crawlerId))).path().toString()));
+            application.handle(RequestBuilder.post(redirector.uriOf(scheduleMethod)).form("id", crawlerId).build());
+        }
+
+
+        return redirectToJobsList();
+    }
+
+    private Sequence<Pair<UUID, Model>> allCrawlerModels() {
+        return modelRepository.find(where(MODEL_TYPE, is("form")));
     }
 
     @GET
@@ -93,14 +117,14 @@ public class CrawlerResource {
     @Path("import")
     public Response importJson(@FormParam("model") String model, @FormParam("id") Option<UUID> id) {
         modelRepository.set(id.getOrElse(randomUUID()), Model.parse(model));
-        return redirectToList();
+        return redirectToCrawlerList();
     }
 
     @POST
     @Path("delete")
     public Response delete(@FormParam("id") UUID id) {
         modelRepository.remove(id);
-        return redirectToList();
+        return redirectToCrawlerList();
     }
 
     @POST
@@ -111,7 +135,7 @@ public class CrawlerResource {
         form.remove("checkpoint", String.class);
         form.add("checkpoint", "");
         modelRepository.set(id, model);
-        return redirectToList();
+        return redirectToCrawlerList();
     }
 
     @GET
@@ -150,7 +174,7 @@ public class CrawlerResource {
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
         modelRepository.set(id, Forms.form(update, from, more, checkpoint, recordDefinition.toModel()));
-        return redirectToList();
+        return redirectToCrawlerList();
     }
 
     @POST
@@ -207,16 +231,20 @@ public class CrawlerResource {
         return redirector.uriOf(method(on(JobsResource.class).schedule(uuid, DEFAULT_INTERVAL, "/" + uri.toString())));
     }
 
-    private Response redirectToList() {
+    private Response redirectToCrawlerList() {
         return redirector.seeOther(method(on(getClass()).list()));
     }
 
+    private Response redirectToJobsList() {
+        return redirector.seeOther(method(on(JobsResource.class).list()));
+    }
+
     private String put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
-        if(recordsToAdd.isEmpty()){
+        if (recordsToAdd.isEmpty()) {
             return numberOfRecordsUpdated(0);
         }
         Sequence<Keyword> keywords = keywords(recordsToAdd).realise();
-        if(find(modelRepository, recordName.name()).isEmpty()) {
+        if (find(modelRepository, recordName.name()).isEmpty()) {
             modelRepository.set(randomUUID(), Views.convertToViewModel(recordName, keywords));
         }
         records.define(recordName, keywords.toArray(Keyword.class));
@@ -225,13 +253,13 @@ public class CrawlerResource {
     }
 
     private Sequence<Record> filter(final Sequence<Keyword> unique, Sequence<Record> recordsToAdd) {
-        if( unique.isEmpty()){
+        if (unique.isEmpty()) {
             return recordsToAdd;
         }
         return recordsToAdd.filter(where(keywords(), new Predicate<Sequence<Keyword>>() {
             public boolean matches(Sequence<Keyword> other) {
                 for (Keyword keyword : other) {
-                    if(unique.contains(keyword)){
+                    if (unique.contains(keyword)) {
                         return true;
                     }
                 }

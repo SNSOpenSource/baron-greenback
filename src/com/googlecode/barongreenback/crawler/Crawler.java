@@ -25,8 +25,6 @@ import org.w3c.dom.Document;
 
 import java.net.URL;
 import java.util.Date;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;

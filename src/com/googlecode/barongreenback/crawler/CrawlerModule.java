@@ -9,10 +9,7 @@ import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;
 
-import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
-import static com.googlecode.utterlyidle.handlers.HandlerRule.entity;
-import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.renderer;
 
 public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, RequestScopedModule {
     public Module addResources(Resources resources) throws Exception {
