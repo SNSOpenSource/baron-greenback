@@ -28,6 +28,8 @@ import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class DocumentFeederTest extends CrawlerTests {
+    public static final String PILOT_TEST = "http://pilottest-netstream.is.uk.easynet.net:10012/orca/rolo/orderEvents";
+    public static final String PRODUCTION = "http://diamond-quartz.is.uk.easynet.net:10011/orca/rolo/orderEvents";
     private HttpHandler client = new AuditHandler(new ClientHttpHandler(), new PrintAuditor(System.out));
 
     @Test
@@ -68,9 +70,11 @@ public class DocumentFeederTest extends CrawlerTests {
     @Test
     @Ignore
     public void demo() throws Exception {
-        Feeder<Uri> feeder = new CheckPointStopper(date("2011-11-22T13:29:57Z"), new UriFeeder(client, ""));
-        Sequence<Record> records = feeder.get(uri("http://pilottest-netstream.is.uk.easynet.net:10012/orca/rolo/orderEvents"), productionCrawler());
-        assertThat(records.size(), is(1));
+        Feeder<Uri> feeder = new SubFeeder(new DuplicateRemover(new UriFeeder(client, "")));
+        Sequence<Record> records = feeder.get(uri(PILOT_TEST), productionCrawler());
+        for (Record record : records) {
+            System.out.println("record = " + record);
+        }
     }
 
     private RecordDefinition productionCrawler() {
