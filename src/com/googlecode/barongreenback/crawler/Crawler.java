@@ -95,8 +95,7 @@ public class Crawler {
 
         Sequence<Keyword> uniqueFields = uniqueFields(recordDefinition);
         Sequence<Record> results = xmlRecords.get(recordName).map(select(allFields)).filter(unique(uniqueFields)).realise();
-        Sequence<Record> sortedResults = sortResults(allFields, results);
-        Sequence<Record> sortedResultsAfterCheckpoint = sortedResults.takeWhile(not(checkpointReached(documentCrawlingDefinition.get(CHECKPOINT_VALUE))));
+        Sequence<Record> sortedResultsAfterCheckpoint = results.takeWhile(not(checkpointReached(documentCrawlingDefinition.get(CHECKPOINT_VALUE))));
 
         Sequence<Record> records = allFields.filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
                 fold(sortedResultsAfterCheckpoint, crawlSubFeeds()).realise();
@@ -122,14 +121,6 @@ public class Crawler {
 
     public XmlRecords records(Document document) throws Exception {
         return new XmlRecords(document);
-    }
-
-    private Sequence<Record> sortResults(Sequence<Keyword> headers, Sequence<Record> values) {
-        Option<Keyword> checkpointKeyword = headers.find(checkpoint());
-        if (!checkpointKeyword.isEmpty() && checkpointKeyword.get().forClass().equals(Date.class)) {
-            return values.sortBy(descending(checkpointKeyword.get()));
-        }
-        return values;
     }
 
     private Document document(URL url) throws Exception {

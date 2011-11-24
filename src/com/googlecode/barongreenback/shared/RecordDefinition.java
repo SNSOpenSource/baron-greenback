@@ -40,6 +40,10 @@ public class RecordDefinition {
         this.fields = fields;
     }
 
+    public RecordDefinition recordDefinition(Keyword<Object> recordName, Sequence<Keyword> fields) {
+        return new RecordDefinition(recordName, fields);
+    }
+
     public Keyword<Object> recordName() {
         return recordName;
     }
