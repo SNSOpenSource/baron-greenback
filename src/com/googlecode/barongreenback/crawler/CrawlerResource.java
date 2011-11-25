@@ -9,10 +9,10 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.totallylazy.proxy.Invocation;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
@@ -35,25 +35,21 @@ import org.apache.lucene.queryParser.ParseException;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.Crawler.CHECKPOINT_VALUE;
-import static com.googlecode.barongreenback.crawler.Crawler.MORE;
-import static com.googlecode.barongreenback.crawler.Crawler.URL;
+import static com.googlecode.barongreenback.crawler.CheckPointStopper.extractCheckpoint;
 import static com.googlecode.barongreenback.jobs.JobsResource.DEFAULT_INTERVAL;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
+import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
-import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.URLs.url;
+import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
-import static com.googlecode.totallylazy.records.Keywords.keywords;
-import static com.googlecode.totallylazy.records.MapRecord.record;
-import static com.googlecode.totallylazy.records.RecordMethods.update;
 import static com.googlecode.totallylazy.records.Using.using;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.lang.String.format;
@@ -189,19 +185,20 @@ public class CrawlerResource {
         String checkpoint = form.get("checkpoint", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        Pair<Date, Sequence<Record>> newCheckpointAndRecords = crawler.crawl(crawlingDefinition(from, more, checkpoint, recordDefinition));
-        Date checkPoint = newCheckpointAndRecords.first();
-        Sequence<Record> records = newCheckpointAndRecords.second();
-        System.out.println(String.format("Crawled %d new items for %s", records.size(), update));
-        modelRepository.set(id, Forms.form(update, from, more, checkPoint != null ? checkPoint.toString() : "", recordDefinition.toModel()));
-        return put(keyword(update), uniqueFields(recordDefinition), records);
+        Sequence<Record> records = crawler.crawl(uri(from), more, checkpoint, recordDefinition);
+        if(records.isEmpty()){
+            return numberOfRecordsUpdated(0);
+        }
+        Option<Object> checkPoint = getFirstCheckPoint(records);
+        modelRepository.set(id, Forms.form(update, from, more, checkPoint.map(asString()).getOrElse(""), recordDefinition.toModel()));
+        return put(keyword(update), recordDefinition, records);
     }
 
-    private Record crawlingDefinition(String from, String more, String checkpoint, RecordDefinition recordDefinition) {
-        return record().set(URL, url(from)).set(RecordDefinition.RECORD_DEFINITION, recordDefinition).set(MORE, more).set(CHECKPOINT_VALUE, toDate(checkpoint));
+    private Option<Object> getFirstCheckPoint(Sequence<Record> records) {
+        return extractCheckpoint(records.head());
     }
 
-    private Date toDate(String checkpoint) {
+    private Date date(String checkpoint) {
         if (checkpoint.isEmpty()) return null;
         return new DateFormatConverter(Dates.RFC3339(), Dates.RFC822(), Dates.javaUtilDateToString()).toDate(checkpoint);
     }
@@ -239,35 +236,21 @@ public class CrawlerResource {
         return redirector.seeOther(method(on(JobsResource.class).list()));
     }
 
-    private String put(final Keyword<Object> recordName, Sequence<Keyword> unique, final Sequence<Record> recordsToAdd) throws ParseException {
-        if (recordsToAdd.isEmpty()) {
-            return numberOfRecordsUpdated(0);
-        }
-        Sequence<Keyword> keywords = keywords(recordsToAdd).realise();
+    private String put(final Keyword<Object> recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd) throws ParseException {
+        Sequence<Keyword> keywords = RecordDefinition.allFields(recordDefinition);
         if (find(modelRepository, recordName.name()).isEmpty()) {
             modelRepository.set(randomUUID(), Views.convertToViewModel(recordName, keywords));
         }
-        records.define(recordName, keywords.toArray(Keyword.class));
-        Number updated = records.put(recordName, update(using(unique), filter(unique, recordsToAdd)));
+        Number updated = 0;
+        for (Record record : recordsToAdd) {
+            System.out.println("record = " + record);
+            records.define(recordName, record.keywords().toArray(Keyword.class));
+            Sequence<Keyword> unique = record.keywords().filter(UNIQUE_FILTER);
+            Number rows = records.put(recordName, Pair.pair(using(unique).call(record), record));
+            updated = Numbers.add(updated, rows);
+        }
         return numberOfRecordsUpdated(updated);
     }
-
-    private Sequence<Record> filter(final Sequence<Keyword> unique, Sequence<Record> recordsToAdd) {
-        if (unique.isEmpty()) {
-            return recordsToAdd;
-        }
-        return recordsToAdd.filter(where(keywords(), new Predicate<Sequence<Keyword>>() {
-            public boolean matches(Sequence<Keyword> other) {
-                for (Keyword keyword : other) {
-                    if (unique.contains(keyword)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }));
-    }
-
 
     private String numberOfRecordsUpdated(Number updated) {
         return format("%s Records updated", updated);

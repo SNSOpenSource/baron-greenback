@@ -64,7 +64,7 @@ public class SearchResourceTest extends ApplicationTests {
     public void addSomeData() throws Exception {
         RestServer server = CrawlerTests.setupServerWithDataFeed();
 
-        final Sequence<Record> recordSequence = CrawlerTest.crawl(CrawlerTests.atomXml).realise();
+        final Sequence<Record> recordSequence = CrawlerTest.crawlOnePageOnly().realise();
 
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {

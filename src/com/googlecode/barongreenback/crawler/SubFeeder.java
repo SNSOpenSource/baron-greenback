@@ -51,7 +51,11 @@ public class SubFeeder implements Feeder<Uri> {
     private Callable1<Keyword, Sequence<Record>> eachSubFeedWith(final Record record) {
         return new Callable1<Keyword, Sequence<Record>>() {
             public Sequence<Record> call(Keyword keyword) throws Exception {
-                Uri subFeed = uri(record.get(keyword).toString());
+                Object value = record.get(keyword);
+                if(value == null) {
+                    return one(record);
+                }
+                Uri subFeed = uri(value.toString());
                 try {
                     RecordDefinition subFeedDefinition = keyword.metadata().get(RECORD_DEFINITION);
                     return get(subFeed, subFeedDefinition).

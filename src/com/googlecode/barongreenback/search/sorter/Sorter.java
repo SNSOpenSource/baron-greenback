@@ -1,11 +1,16 @@
 package com.googlecode.barongreenback.search.sorter;
 
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Maps;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.utterlyidle.Parameters;
 import com.googlecode.utterlyidle.QueryParameters;
 import com.googlecode.utterlyidle.Request;
+
+import java.util.Map;
 
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Option.option;
@@ -53,4 +58,19 @@ public class Sorter {
     public boolean isSortedDescending() {
         return DESCENDING_SORT_DIRECTION.equalsIgnoreCase(sortDirection);
     }
+
+    public Map<String, String> sortedHeaders(Sequence<Keyword> visibleHeaders) {
+        return Maps.map(Pair.pair(getSortedColumn(visibleHeaders), isSortedDescending() ? "headerSortUp" : "headerSortDown"));
+    }
+
+    public Map<String, String> sortLinks(final Sequence<Keyword> visibleHeaders) {
+        Map<String, String> linkMap = Maps.map();
+        return visibleHeaders.fold(linkMap, new Callable2<Map<String, String>, Keyword, Map<String, String>>() {
+            public Map<String, String> call(Map<String, String> linkMap, Keyword keyword) throws Exception {
+                linkMap.put(keyword.name(), linkFor(keyword, visibleHeaders));
+                return linkMap;
+            }
+        });
+    }
+
 }

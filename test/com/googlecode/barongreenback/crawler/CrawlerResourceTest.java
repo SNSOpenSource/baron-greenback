@@ -126,7 +126,7 @@ public class CrawlerResourceTest extends ApplicationTests {
                 newPage.keyword(2).value("updated");
                 newPage.alias(2).value("");
                 newPage.group(2).value("");
-                newPage.type(2).value(Date.class.getName());
+                newPage.type(2).value(String.class.getName());
                 newPage.unique(2).uncheck();
                 newPage.visible(2).uncheck();
                 newPage.subfeed(2).uncheck();

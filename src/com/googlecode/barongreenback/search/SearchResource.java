@@ -114,25 +114,11 @@ public class SearchResource {
                         add("headers", headers(visibleHeaders, results)).
                         add("pager", pager).
                         add("sorter", sorter).
-                        add("sortLinks", sortLinks(sorter, visibleHeaders)).
-                        add("sortedHeaders", sortedHeaders(sorter, visibleHeaders)).
+                        add("sortLinks", sorter.sortLinks(visibleHeaders)).
+                        add("sortedHeaders", sorter.sortedHeaders(visibleHeaders)).
                         add("results", pager.paginate(sorter.sort(results, allHeaders)).map(asModel(viewName, visibleHeaders)).toList());
             }
         };
-    }
-
-    private Map<String, String> sortedHeaders(Sorter sorter, Sequence<Keyword> visibleHeaders) {
-        return Maps.map(Pair.pair(sorter.getSortedColumn(visibleHeaders), sorter.isSortedDescending() ? "headerSortUp" : "headerSortDown"));
-    }
-
-    private Map<String, String> sortLinks(final Sorter sorter, final Sequence<Keyword> visibleHeaders) {
-        Map<String, String> linkMap = Maps.map();
-        return visibleHeaders.fold(linkMap, new Callable2<Map<String, String>, Keyword, Map<String, String>>() {
-            public Map<String, String> call(Map<String, String> linkMap, Keyword keyword) throws Exception {
-                linkMap.put(keyword.name(), sorter.linkFor(keyword, visibleHeaders));
-                return linkMap;
-            }
-        });
     }
 
     private Callable1<? super String, Model> addQueryException(final Model model) {

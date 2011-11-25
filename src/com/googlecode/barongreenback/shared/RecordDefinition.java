@@ -5,6 +5,8 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.AliasedKeyword;
@@ -32,6 +34,7 @@ import static java.lang.Boolean.TRUE;
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
     public static final Keyword<Boolean> SUBFEED = keyword("subfeed", Boolean.class);
+    public static final Predicate<Keyword> UNIQUE_FILTER = Predicates.and(where(metadata(Keywords.UNIQUE), is(notNullValue())), where(metadata(Keywords.UNIQUE), is(true)));
     private final Keyword<Object> recordName;
     private final Sequence<Keyword> fields;
 
@@ -53,8 +56,7 @@ public class RecordDefinition {
     }
 
     public static Sequence<Keyword> uniqueFields(RecordDefinition recordDefinition) {
-        return allFields(recordDefinition).filter(where(metadata(Keywords.UNIQUE), is(notNullValue())).
-                and(where(metadata(Keywords.UNIQUE), is(true))));
+        return allFields(recordDefinition).filter(UNIQUE_FILTER);
     }
 
     public static Sequence<Keyword> allFields(RecordDefinition recordDefinition) {

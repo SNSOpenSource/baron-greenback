@@ -35,7 +35,10 @@ public class PagerRenderer implements Renderer<Pager> {
 
         Model pageOptions = sequence("10", "20", "50", "100", "ALL").fold(model().add("currentRowsPerPage", String.valueOf(pager.getRowsPerPage())), new Callable2<Model, String, Model>() {
             public Model call(Model model, String key) throws Exception {
-                model.add("rowsPerPage", model().add("name", String.format("%s rows per page", key)).add("value", key).add(key, true));
+                model.add("rowsPerPage", model().
+                        add("name", key).
+                        add("value", key).
+                        add(key, true));
                 return model;
             }
         });
