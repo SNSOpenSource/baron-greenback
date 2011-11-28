@@ -7,6 +7,7 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -17,8 +18,7 @@ import com.googlecode.totallylazy.proxy.Invocation;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
-import com.googlecode.totallylazy.time.DateFormatConverter;
-import com.googlecode.totallylazy.time.Dates;
+import com.googlecode.totallylazy.records.simpledb.mappings.Mappings;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
@@ -32,10 +32,10 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import org.apache.lucene.queryParser.ParseException;
 
-import java.util.Date;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CheckPointStopper.extractCheckpoint;
+import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
 import static com.googlecode.barongreenback.jobs.JobsResource.DEFAULT_INTERVAL;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
@@ -44,6 +44,8 @@ import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.first;
+import static com.googlecode.totallylazy.Callables.toClass;
+import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Uri.uri;
@@ -130,6 +132,8 @@ public class CrawlerResource {
         Model form = model.get("form", Model.class);
         form.remove("checkpoint", String.class);
         form.add("checkpoint", "");
+        form.remove("checkpointType", String.class);
+        form.add("checkpointType", String.class.getName());
         modelRepository.set(id, model);
         return redirectToCrawlerList();
     }
@@ -167,9 +171,10 @@ public class CrawlerResource {
         String update = form.get("update", String.class);
         String more = form.get("more", String.class);
         String checkpoint = form.get("checkpoint", String.class);
+        String checkpointType = form.get("checkpointType", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        modelRepository.set(id, Forms.form(update, from, more, checkpoint, recordDefinition.toModel()));
+        modelRepository.set(id, Forms.form(update, from, more, checkpoint, checkpointType, recordDefinition.toModel()));
         return redirectToCrawlerList();
     }
 
@@ -183,24 +188,55 @@ public class CrawlerResource {
         String update = form.get("update", String.class);
         String more = form.get("more", String.class);
         String checkpoint = form.get("checkpoint", String.class);
+        String checkpointType = form.get("checkpointType", String.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        Sequence<Record> records = crawler.crawl(uri(from), more, checkpoint, recordDefinition);
+        Sequence<Record> records = crawler.crawl(uri(from), more, convertFromString(checkpoint, checkpointType), recordDefinition);
         if(records.isEmpty()){
             return numberOfRecordsUpdated(0);
         }
-        Option<Object> checkPoint = getFirstCheckPoint(records);
-        modelRepository.set(id, Forms.form(update, from, more, checkPoint.map(asString()).getOrElse(""), recordDefinition.toModel()));
+        Option<Object> firstCheckPoint = getFirstCheckPoint(records);
+        modelRepository.set(id, Forms.form(update, from, more, convertToString(firstCheckPoint), getCheckPointType(firstCheckPoint), recordDefinition.toModel()));
         return put(keyword(update), recordDefinition, records);
+    }
+
+    private String getCheckPointType(Option<Object> checkpoint) {
+        return checkpoint.map(toClass()).
+                map(className()).
+                getOrElse(String.class.getName());
+    }
+
+    private static Callable1<? super Class, String> className() {
+        return new Callable1<Class, String>() {
+            public String call(Class aClass) throws Exception {
+                return aClass.getName();
+            }
+        };
+    }
+
+    private final Mappings mappings = new Mappings();
+
+    private Object convertFromString(String checkpoint, String checkpointType) throws Exception {
+        Class<?> aClass = Class.forName(checkpointType);
+        Object value = mappings.get(aClass).toValue(checkpoint);
+        return value;
+    }
+
+    private String convertToString(Option<Object> checkPoint) {
+
+        return checkPoint.map(mapAsString()).getOrElse("");
+    }
+
+    private Callable1<? super Object, String> mapAsString() {
+        return new Callable1<Object, String>() {
+            public String call(Object instance) throws Exception {
+                return mappings.toString(instance.getClass(), instance);
+            }
+        };
     }
 
     private Option<Object> getFirstCheckPoint(Sequence<Record> records) {
         return extractCheckpoint(records.head());
-    }
-
-    private Date date(String checkpoint) {
-        if (checkpoint.isEmpty()) return null;
-        return new DateFormatConverter(Dates.RFC3339(), Dates.RFC822(), Dates.javaUtilDateToString()).toDate(checkpoint);
     }
 
     private Model modelFor(UUID id) {
@@ -237,16 +273,15 @@ public class CrawlerResource {
     }
 
     private String put(final Keyword<Object> recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd) throws ParseException {
-        Sequence<Keyword> keywords = RecordDefinition.allFields(recordDefinition);
+        Sequence<Keyword> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
         if (find(modelRepository, recordName.name()).isEmpty()) {
             modelRepository.set(randomUUID(), Views.convertToViewModel(recordName, keywords));
         }
+        records.define(recordName, keywords.toArray(Keyword.class));
         Number updated = 0;
         for (Record record : recordsToAdd) {
-            System.out.println("record = " + record);
-            records.define(recordName, record.keywords().toArray(Keyword.class));
             Sequence<Keyword> unique = record.keywords().filter(UNIQUE_FILTER);
-            Number rows = records.put(recordName, Pair.pair(using(unique).call(record), record));
+            Number rows = records.put(recordName, pair(using(unique).call(record), record));
             updated = Numbers.add(updated, rows);
         }
         return numberOfRecordsUpdated(updated);

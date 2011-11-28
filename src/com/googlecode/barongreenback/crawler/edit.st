@@ -10,7 +10,8 @@
     $input(name="form.update", label="Update", class="update", value=form.update, placeholder="Name")$
     $input(name="form.from", label="From", class="from", value=form.from, placeholder="http://www.example.com/feed/xml")$
     $input(name="form.more", label="More", class="moreLink", value=form.more, placeholder="//link[@rel='prev-archive']/@href")$
-    $input(name="form.checkpoint", label="Checkpoint", class="checkpoint", value=form.checkpoint, placeholder="2011-07-19T12:43:26Z")$
+    $input(name="form.checkpoint", label="Checkpoint Value", class="checkpoint", value=form.checkpoint, placeholder="2011-07-19T12:43:26Z")$
+    $select(name="form.checkpointType", label="Checkpoint Type", class="checkpointType", value=form.checkpointType, values=types)$
 
     $recordDefinition(title="Fields", prefix="form.record.", record=form.record)$
 
