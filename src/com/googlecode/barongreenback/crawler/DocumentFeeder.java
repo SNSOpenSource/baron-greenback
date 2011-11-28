@@ -28,7 +28,7 @@ public class DocumentFeeder implements Feeder<Document> {
             public Record call(Record record) throws Exception {
                 Record result = MapRecord.record();
                 for (Keyword field : fields) {
-                    Keyword cleanKey = Keywords.keyword(field.name(), field.getClass()).metadata(field.metadata());
+                    Keyword cleanKey = Keywords.keyword(field.name(), field.forClass()).metadata(field.metadata());
                     Object value = field.call(record);
                     result.set(cleanKey, value);
                 }
