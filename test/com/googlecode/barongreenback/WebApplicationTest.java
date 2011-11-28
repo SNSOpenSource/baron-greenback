@@ -12,7 +12,7 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 @Ignore
 public class WebApplicationTest {
     public static void main(String[] args) throws Exception {
-        System.setProperty("baron-greenback.lucene.index.directory", Files.TEMP_DIR + WebApplicationTest.class.getSimpleName());
+        System.setProperty("baron-greenback.lucene.index.directory", Files.TEMP_DIR + "/" + WebApplicationTest.class.getSimpleName());
         new RestServer(new Restaurant(BasePath.basePath("/")), ServerConfiguration.defaultConfiguration().port(8899));
         new RestServer(new WebApplication(BasePath.basePath("/"), System.getProperties()), defaultConfiguration().port(9000));
     }
