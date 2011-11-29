@@ -23,6 +23,9 @@
                 <li class="menu">
                     <a href="$base$jobs/list">Jobs Admin</a>
                 </li>
+                <li class="menu">
+                    <a href="$base$batch/import">Batch Import</a>
+                </li>
             </ul>
         </div>
     </div>
