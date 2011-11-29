@@ -31,15 +31,15 @@ public class BatchResource {
     }
 
     @GET
-    @Path("operations")
+    @Path("import")
     public Model operations() {
         return model();
     }
 
     @GET
-    @Path("operations")
+    @Path("import")
     public Model operations(@QueryParam("message") String message, @QueryParam("category") String category) {
-        return operations().add("message", model().add("text", message).add("category", category));
+        return messageModel(message, category);
     }
 
     @GET
@@ -52,20 +52,24 @@ public class BatchResource {
 
     @POST
     @Path("import")
-    public Response importJson(@FormParam("model") String batchModel) {
+    public Object importJson(@FormParam("model") String batchModel) {
         try {
             Map<String, Object> uuidsAndModels = Json.parse(batchModel);
             for (Map.Entry<String, Object> entry : uuidsAndModels.entrySet()) {
                 modelRepository.set(UUID.fromString(entry.getKey()), Model.fromMap((Map<String, Object>) entry.getValue()));
             }
-            return message(String.format("Imported %s items", uuidsAndModels.size()), "success");
+            return redirectWithMessage(String.format("Imported %s items", uuidsAndModels.size()), "success");
         } catch (Exception e) {
-            return message(String.format("Import error: %s", e.getMessage()), "error");
+            return messageModel(String.format("Import error: %s", e.getMessage()), "error").add("model", batchModel);
         }
 
     }
 
-    private Response message(String text, String category) {
+    private Model messageModel(String message, String category) {
+        return model().add("message", model().add("text", message).add("category", category));
+    }
+
+    private Response redirectWithMessage(String text, String category) {
         return redirector.seeOther(method(on(BatchResource.class).operations(text, category)));
     }
 

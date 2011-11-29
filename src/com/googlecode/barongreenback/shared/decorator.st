@@ -24,7 +24,7 @@
                     <a href="$base$jobs/list">Jobs Admin</a>
                 </li>
                 <li class="menu">
-                    <a href="$base$batch/operations">Batch Operations</a>
+                    <a href="$base$batch/import">Batch Operations</a>
                 </li>
             </ul>
         </div>
