@@ -8,19 +8,12 @@ import com.googlecode.utterlyidle.HttpMessageParser;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.annotations.FormParam;
-import com.googlecode.utterlyidle.annotations.GET;
-import com.googlecode.utterlyidle.annotations.POST;
-import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.PathParam;
-import com.googlecode.utterlyidle.annotations.Produces;
-import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.utterlyidle.annotations.*;
 
 import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.jobs.Job.*;
-import static com.googlecode.barongreenback.jobs.Job.RUNNING;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;

@@ -8,11 +8,7 @@ import com.googlecode.barongreenback.search.parser.PredicateParser;
 import com.googlecode.barongreenback.search.parser.StandardParser;
 import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.utterlyidle.Resources;
-import com.googlecode.utterlyidle.modules.Module;
-import com.googlecode.utterlyidle.modules.ModuleDefiner;
-import com.googlecode.utterlyidle.modules.ModuleDefinitions;
-import com.googlecode.utterlyidle.modules.RequestScopedModule;
-import com.googlecode.utterlyidle.modules.ResourcesModule;
+import com.googlecode.utterlyidle.modules.*;
 import com.googlecode.yadic.Container;
 import org.apache.lucene.queryParser.ParseException;
 

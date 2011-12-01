@@ -7,16 +7,12 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.time.DateFormatConverter;
-import com.googlecode.totallylazy.time.Dates;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.net.URI;
-import java.util.Date;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
-import static com.googlecode.totallylazy.Xml.document;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.MapRecord.record;
 import static org.hamcrest.MatcherAssert.assertThat;

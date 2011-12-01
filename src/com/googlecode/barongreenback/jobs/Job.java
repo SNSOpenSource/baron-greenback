@@ -3,10 +3,7 @@ package com.googlecode.barongreenback.jobs;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
-import com.sun.source.util.TaskListener;
-import com.sun.xml.internal.ws.util.CompletedFuture;
 
-import javax.xml.ws.Response;
 import java.util.Date;
 import java.util.UUID;
 

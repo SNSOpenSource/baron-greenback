@@ -4,18 +4,12 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.LazyException;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
-import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.records.Keywords.metadata;

@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.barongreenback.jobs.Cancellable;
+import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.totallylazy.Runnables;
 
 import java.util.UUID;
