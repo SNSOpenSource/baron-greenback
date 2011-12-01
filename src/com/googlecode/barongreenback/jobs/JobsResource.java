@@ -19,14 +19,11 @@ import com.googlecode.utterlyidle.annotations.QueryParam;
 import java.util.List;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.jobs.HttpScheduler.*;
-import static com.googlecode.barongreenback.jobs.Job.INTERVAL;
-import static com.googlecode.barongreenback.jobs.Job.JOB_ID;
-import static com.googlecode.barongreenback.jobs.Job.REQUEST;
+import static com.googlecode.barongreenback.jobs.Job.*;
+import static com.googlecode.barongreenback.jobs.Job.RUNNING;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
-import static com.googlecode.totallylazy.records.MapRecord.record;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 
 @Path("jobs")

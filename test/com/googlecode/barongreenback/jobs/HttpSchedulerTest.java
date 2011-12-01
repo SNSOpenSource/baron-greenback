@@ -18,7 +18,7 @@ public class HttpSchedulerTest {
     private String request = RequestBuilder.get("/test").build().toString();
     private Job job = Job.job(UUID.randomUUID()).interval(10L).request(request);
     private final StubScheduler stub = new StubScheduler();
-    private final HttpScheduler httpScheduler = new HttpScheduler(new MemoryRecords(), stub, null, new FixedClock(Dates.date(2001, 1, 1)));
+    private final HttpScheduler httpScheduler = new HttpScheduler(new Jobs(new MemoryRecords()), stub, null, new FixedClock(Dates.date(2001, 1, 1)));
 
     @Test
     public void scheduleRequest() throws Exception {

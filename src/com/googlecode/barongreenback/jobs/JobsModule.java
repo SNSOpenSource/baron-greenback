@@ -22,6 +22,7 @@ public class JobsModule implements ResourcesModule, ApplicationScopedModule, Req
 
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(HttpScheduler.class);
+        container.add(Jobs.class);
         return this;
     }
 
