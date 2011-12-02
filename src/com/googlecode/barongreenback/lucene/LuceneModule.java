@@ -10,9 +10,7 @@ import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.Version;
 
 import java.io.PrintStream;
 

@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Html;
 
 import static org.hamcrest.MatcherAssert.assertThat;

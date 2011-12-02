@@ -15,7 +15,6 @@ import java.util.concurrent.CountDownLatch;
 import static com.googlecode.barongreenback.crawler.CrawlerTests.contentOf;
 import static com.googlecode.barongreenback.crawler.CrawlerTests.setupServerWithDataFeed;
 import static com.googlecode.totallylazy.Closeables.using;
-import static com.googlecode.utterlyidle.RequestBuilder.put;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;

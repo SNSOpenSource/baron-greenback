@@ -11,7 +11,6 @@ import com.googlecode.utterlyidle.Status;
 import org.w3c.dom.Document;
 
 import static com.googlecode.totallylazy.Sequences.empty;
-import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.Xml.document;
 
 public class UriFeeder implements Feeder<Uri> {
