@@ -8,17 +8,22 @@ import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Status;
+import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 import com.googlecode.yadic.Container;
 
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.barongreenback.jobs.Job.*;
+import static com.googlecode.barongreenback.jobs.Job.INTERVAL;
+import static com.googlecode.barongreenback.jobs.Job.JOB_ID;
+import static com.googlecode.barongreenback.jobs.Job.REQUEST;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.utterlyidle.HttpMessageParser.parseRequest;
+import static com.googlecode.utterlyidle.Responses.response;
 
 public class HttpScheduler {
     private final Jobs jobs;
@@ -67,12 +72,21 @@ public class HttpScheduler {
         return new Callable<Void>() {
             public Void call() throws Exception {
                 final Date started = clock.now();
-                application.usingRequestScope(updateJob(
-                        Job.job(id).response(null).started(started).completed(null).running(true)));
-                final Response response = application.handle(request);
-                Date completed = clock.now();
-                return application.usingRequestScope(updateJob(
-                        Job.job(id).response(response.toString()).duration(calculateSeconds(started, completed)).completed(completed).running(false)));
+                try {
+                    application.usingRequestScope(updateJob(
+                            Job.job(id).response(null).started(started).completed(null).running(true)));
+                    final Response response = application.handle(request);
+                    Date completed = clock.now();
+                    return application.usingRequestScope(updateJob(
+                            Job.job(id).response(response.toString()).duration(calculateSeconds(started, completed)).completed(completed).running(false)));
+                } catch (Exception e) {
+                    Date completed = clock.now();
+                    return application.usingRequestScope(updateJob(
+                            Job.job(id).response(response(Status.INTERNAL_SERVER_ERROR).
+                                    bytes(ExceptionRenderer.toString(e).getBytes()).toString()).
+                                    duration(calculateSeconds(started, completed)).
+                                    completed(completed).running(false)));
+                }
             }
         };
     }
