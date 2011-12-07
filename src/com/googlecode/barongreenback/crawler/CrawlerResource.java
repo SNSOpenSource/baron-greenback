@@ -8,7 +8,6 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.numbers.Numbers;
-import com.googlecode.totallylazy.proxy.Invocation;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
@@ -37,6 +36,7 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Using.using;
+import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
@@ -44,13 +44,15 @@ import static java.util.UUID.randomUUID;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
+    private RequestGenerator requestGenerator;
     private final Records records;
     private final ModelRepository modelRepository;
     private final Crawler crawler;
     private final Redirector redirector;
     private final Application application;
 
-    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector, Application application) {
+    public CrawlerResource(final RequestGenerator requestGenerator, final Records records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector, Application application) {
+        this.requestGenerator = requestGenerator;
         this.records = records;
         this.modelRepository = modelRepository;
         this.crawler = crawler;
@@ -67,15 +69,39 @@ public class CrawlerResource {
     @POST
     @Path("crawlAll")
     public Response crawlAll() throws Exception {
-        final Sequence<UUID> crawlers = allCrawlerModels().map(first(UUID.class));
+        return forAll(ids(), crawl());
+    }
 
-        for(UUID crawlerId: crawlers) {
-            final Invocation<Object,Response> scheduleMethod = method(on(JobsResource.class).schedule(crawlerId, JobsResource.DEFAULT_INTERVAL, redirector.uriOf(method(on(CrawlerResource.class).crawl(crawlerId))).path().toString()));
-            application.handle(RequestBuilder.post(redirector.uriOf(scheduleMethod)).form("id", crawlerId).build());
-        }
+    @POST
+    @Path("resetAll")
+    public Response resetAll() throws Exception {
+        return forAll(ids(), reset());
+    }
 
+    private Sequence<UUID> ids() {
+        return allCrawlerModels().map(first(UUID.class));
+    }
 
-        return redirectToJobsList();
+    public static <T> Response forAll(final Sequence<T> sequence, final Callable1<T, Response> callable) throws Exception {
+        return sequence.map(callable).last();
+    }
+
+    public Callable1<UUID, Response> crawl() {
+        return new Callable1<UUID, Response>() {
+            public Response call(UUID uuid) throws Exception {
+                Uri crawlerUri = redirector.uriOf(method(on(CrawlerResource.class).crawl(uuid)));
+                Uri jobsUri = redirector.uriOf(method(on(JobsResource.class).schedule(uuid, JobsResource.DEFAULT_INTERVAL, crawlerUri.path())));
+                return application.handle(post(jobsUri).form("id", uuid).build());
+            }
+        };
+    }
+
+    public Callable1<UUID, Response> reset() {
+        return new Callable1<UUID, Response>() {
+            public Response call(UUID uuid) throws Exception {
+                return application.handle(requestGenerator.requestFor(method(on(CrawlerResource.class).reset(uuid))));
+            }
+        };
     }
 
     private Sequence<Pair<UUID, Model>> allCrawlerModels() {
@@ -176,7 +202,7 @@ public class CrawlerResource {
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
         Sequence<Record> records = crawler.crawl(uri(from), more, convertFromString(checkpoint, checkpointType), recordDefinition);
-        if(records.isEmpty()){
+        if (records.isEmpty()) {
             return numberOfRecordsUpdated(0);
         }
         Option<Object> firstCheckPoint = getFirstCheckPoint(records);
