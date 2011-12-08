@@ -18,6 +18,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.*;
 import org.apache.lucene.queryParser.ParseException;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CheckPointStopper.extractCheckpoint;
@@ -59,7 +60,8 @@ public class CrawlerResource {
     @GET
     @Path("list")
     public Model list() {
-        return model().add("items", allCrawlerModels().map(asModelWithId()).toList());
+        List<Model> models = allCrawlerModels().map(asModelWithId()).toList();
+        return model().add("items", models).add("anyExists", !models.isEmpty());
     }
 
     @GET

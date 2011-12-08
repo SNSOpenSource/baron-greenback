@@ -11,6 +11,7 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 public class ViewsModule implements ResourcesModule, RequestScopedModule{
     public Module addResources(Resources resources) throws Exception {
         resources.add(annotatedClass(ViewsResource.class));
+        resources.add(annotatedClass(BatchViewsResource.class));
         return this;
     }
 

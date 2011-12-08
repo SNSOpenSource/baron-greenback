@@ -21,9 +21,16 @@
 <div class="actions">
     <a href="new" class="new">New</a>
     <a href="import" class="import">Import</a>
-    $post(url=item.jobUrl, name="crawlAll", value="Crawl All", id=item.id)$
-    $post(name="resetAll", value="Reset All", id=item.id)$
-    $post(name="deleteAll", value="Delete All", id=item.id)$
+
+    $if(anyExists)$
+        $post(url=item.jobUrl, name="crawlAll", value="Crawl All")$
+        $post(name="resetAll", value="Reset All")$
+        $post(name="deleteAll", value="Delete All")$
+    $else$
+        $post(url=item.jobUrl, name="crawlAll", value="Crawl All", disabled="true")$
+        $post(name="resetAll", value="Reset All", disabled="true")$
+        $post(name="deleteAll", value="Delete All", disabled="true")$
+    $endif$
 </div>
 
 </body>

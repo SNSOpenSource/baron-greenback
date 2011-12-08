@@ -11,6 +11,7 @@ import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.Forms.NUMBER_OF_FIELDS;
@@ -42,12 +43,13 @@ public class ViewsResource {
     }
 
     private Model models(String current, Predicate<Second<Model>> predicate) {
-        return model().add("views", modelRepository.
+        List<Model> models = modelRepository.
                 find(Predicates.where(MODEL_TYPE, is("view"))).
                 filter(predicate).
                 map(asModel(current)).
                 sortBy(Comparators.comparators(ascending(priority()), ascending(name()))).
-                toList());
+                toList();
+        return model().add("views", models).add("anyExists", !models.isEmpty());
     }
 
     @GET

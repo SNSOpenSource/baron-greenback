@@ -20,6 +20,11 @@
 <div class="actions">
     <a href="new" class="new">New</a>
     <a href="import" class="import">Import</a>
+    $if(anyExists)$
+        $post(name="deleteAll", value="Delete All")$
+    $else$
+        $post(name="deleteAll", value="Delete All", disabled="true")$
+    $endif$
 </div>
 
 </body>
