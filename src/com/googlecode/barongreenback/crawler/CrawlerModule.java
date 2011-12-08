@@ -14,6 +14,7 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, RequestScopedModule {
     public Module addResources(Resources resources) throws Exception {
         resources.add(annotatedClass(CrawlerResource.class));
+        resources.add(annotatedClass(BatchCrawlerResource.class));
         return this;
     }
 

@@ -12,7 +12,9 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.Records;
 import com.googlecode.totallylazy.records.simpledb.mappings.Mappings;
-import com.googlecode.utterlyidle.*;
+import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Redirector;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.*;
 import org.apache.lucene.queryParser.ParseException;
 
@@ -26,7 +28,6 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTE
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Callables.toClass;
 import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -36,7 +37,6 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Using.using;
-import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
@@ -44,82 +44,22 @@ import static java.util.UUID.randomUUID;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
-    private RequestGenerator requestGenerator;
     private final Records records;
     private final ModelRepository modelRepository;
     private final Crawler crawler;
     private final Redirector redirector;
-    private final Application application;
 
-    public CrawlerResource(final RequestGenerator requestGenerator, final Records records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector, Application application) {
-        this.requestGenerator = requestGenerator;
+    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.crawler = crawler;
         this.redirector = redirector;
-        this.application = application;
     }
 
     @GET
     @Path("list")
     public Model list() {
         return model().add("items", allCrawlerModels().map(asModelWithId()).toList());
-    }
-
-    @POST
-    @Path("crawlAll")
-    public Response crawlAll() throws Exception {
-        return forAll(ids(), crawl());
-    }
-
-    @POST
-    @Path("resetAll")
-    public Response resetAll() throws Exception {
-        return forAll(ids(), reset());
-    }
-
-    @POST
-    @Path("deleteAll")
-    public Response deleteAll() throws Exception {
-        return forAll(ids(), delete());
-    }
-
-    private Sequence<UUID> ids() {
-        return allCrawlerModels().map(first(UUID.class));
-    }
-
-    public static <T> Response forAll(final Sequence<T> sequence, final Callable1<T, Response> callable) throws Exception {
-        return sequence.map(callable).last();
-    }
-
-    public Callable1<UUID, Response> crawl() {
-        return new Callable1<UUID, Response>() {
-            public Response call(UUID uuid) throws Exception {
-                Uri crawlerUri = redirector.uriOf(method(on(CrawlerResource.class).crawl(uuid)));
-                Uri jobsUri = redirector.uriOf(method(on(JobsResource.class).schedule(uuid, JobsResource.DEFAULT_INTERVAL, crawlerUri.path())));
-                return application.handle(post(jobsUri).form("id", uuid).build());
-            }
-        };
-    }
-
-    public Callable1<UUID, Response> reset() {
-        return new Callable1<UUID, Response>() {
-            public Response call(UUID uuid) throws Exception {
-                return application.handle(requestGenerator.requestFor(method(on(CrawlerResource.class).reset(uuid))));
-            }
-        };
-    }
-
-    public Callable1<UUID, Response> delete() {
-        return new Callable1<UUID, Response>() {
-            public Response call(UUID uuid) throws Exception {
-                return application.handle(requestGenerator.requestFor(method(on(CrawlerResource.class).delete(uuid))));
-            }
-        };
-    }
-
-    private Sequence<Pair<UUID, Model>> allCrawlerModels() {
-        return modelRepository.find(where(MODEL_TYPE, is("form")));
     }
 
     @GET
@@ -168,17 +108,17 @@ public class CrawlerResource {
         return Forms.emptyForm(Forms.NUMBER_OF_FIELDS);
     }
 
+    @POST
+    @Path("new")
+    public Response newCrawler(Model model) throws Exception {
+        return edit(randomUUID(), model);
+    }
+
     @GET
     @Path("exists")
     @Produces(MediaType.TEXT_PLAIN)
     public boolean exists(@QueryParam("id") UUID id) {
         return !modelRepository.get(id).isEmpty();
-    }
-
-    @POST
-    @Path("new")
-    public Response newCrawler(Model model) throws Exception {
-        return edit(randomUUID(), model);
     }
 
     @GET
@@ -222,6 +162,10 @@ public class CrawlerResource {
         Option<Object> firstCheckPoint = getFirstCheckPoint(records);
         modelRepository.set(id, Forms.form(update, from, more, convertToString(firstCheckPoint), getCheckPointType(firstCheckPoint), recordDefinition.toModel()));
         return put(keyword(update), recordDefinition, records);
+    }
+
+    private Sequence<Pair<UUID, Model>> allCrawlerModels() {
+        return modelRepository.find(where(MODEL_TYPE, is("form")));
     }
 
     private String getCheckPointType(Option<Object> checkpoint) {
@@ -292,9 +236,6 @@ public class CrawlerResource {
         return redirector.seeOther(method(on(getClass()).list()));
     }
 
-    private Response redirectToJobsList() {
-        return redirector.seeOther(method(on(JobsResource.class).list()));
-    }
 
     private String put(final Keyword<Object> recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd) throws ParseException {
         Sequence<Keyword> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
