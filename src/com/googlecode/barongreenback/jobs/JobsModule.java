@@ -12,6 +12,7 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 public class JobsModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, StartupModule {
     public Module addResources(Resources resources) throws Exception {
         resources.add(annotatedClass(JobsResource.class));
+        resources.add(annotatedClass(BatchJobsResource.class));
         return this;
     }
 
@@ -29,8 +30,8 @@ public class JobsModule implements ResourcesModule, ApplicationScopedModule, Req
     }
 
     public Container start(Container container){
-        JobsResource jobsResource = container.get(JobsResource.class);
-        jobsResource.start();
+        BatchJobsResource batchJobsResource = container.get(BatchJobsResource.class);
+        batchJobsResource.start();
         return container;
     }
 }

@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.jobs;
 
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.MapRecord;
 import com.googlecode.totallylazy.records.Record;
@@ -70,5 +71,13 @@ public class Job {
 
     public <T> T get(Keyword<T> keyword) {
         return record.get(keyword);
+    }
+
+    public static Callable1<Record, UUID> asJobId() {
+        return new Callable1<Record, UUID>() {
+            public UUID call(Record record) throws Exception {
+                return record.get(JOB_ID);
+            }
+        };
     }
 }

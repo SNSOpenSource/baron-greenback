@@ -27,6 +27,11 @@
 <div class="actions">
     $post(name="start")$
     $post(name="stop")$
+    $if(anyExists)$
+        $post(name="deleteAll", value="Delete All")$
+    $else$
+        $post(name="deleteAll", value="Delete All", disabled="true")$
+    $endif$
 </div>
 
 </body>

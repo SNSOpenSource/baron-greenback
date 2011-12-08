@@ -67,32 +67,19 @@ public class JobsResource {
     @GET
     @Path("list")
     public Model list() {
-        return model().add("jobs", jobsModel(scheduler.jobs()));
-    }
-
-    @POST
-    @Path("start")
-    public Response start() {
-        scheduler.start();
-        return redirector.seeOther(method(on(JobsResource.class).list()));
-    }
-
-    @POST
-    @Path("stop")
-    public Response stop() {
-        scheduler.stop();
-        return redirector.seeOther(method(on(JobsResource.class).list()));
+        List<Model> models = jobsModel(scheduler.jobs());
+        return model().add("jobs", models).add("anyExists", !models.isEmpty());
     }
 
     private Response redirectToList() {
         return redirector.seeOther(method(on(getClass()).list()));
     }
 
-    private List<Model> jobsModel(Sequence<Record> jobs) {
+    public static List<Model> jobsModel(Sequence<Record> jobs) {
         return jobs.map(toModel()).toList();
     }
 
-    private Callable1<? super Record, Model> toModel() {
+    public static Callable1<? super Record, Model> toModel() {
         return new Callable1<Record, Model>() {
             public Model call(Record record) throws Exception {
                 return model().
@@ -108,7 +95,7 @@ public class JobsResource {
         };
     }
 
-    private Model addRequest(Record record) {
+    public static Model addRequest(Record record) {
         String requestMessage = record.get(REQUEST);
         if(requestMessage == null){
             return null;
@@ -121,7 +108,7 @@ public class JobsResource {
                 add("entity", new String(request.input()));
     }
 
-    private Model addResponse(Record record) {
+    public static Model addResponse(Record record) {
         String responseMessage = record.get(RESPONSE);
         if(responseMessage == null){
             return null;
