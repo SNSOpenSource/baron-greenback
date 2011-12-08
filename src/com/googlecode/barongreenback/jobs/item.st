@@ -1,4 +1,4 @@
-<tr>
+<tr class="job">
     <td><span class="jobstatus $item.status$">$item.status$</span></td>
     <td><span class="seconds">$item.seconds$</span></td>
     <td>

@@ -16,4 +16,8 @@ public class JobsListPage {
         this.html = Html.html(response);
         assertThat(html.title(), containsString("Jobs"));
     }
+
+    public int numberOfJobs() {
+        return html.count("//tr[@class='job']").intValue();
+    }
 }

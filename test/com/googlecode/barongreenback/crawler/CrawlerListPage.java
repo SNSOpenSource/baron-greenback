@@ -52,6 +52,12 @@ public class CrawlerListPage {
         return new JobsListPage(httpHandler, response);
     }
 
+    public JobsListPage crawlAll() throws Exception {
+        Request request = html.form(singleForm("crawlAll")).submit(button("crawlAll"));
+        Response response = httpHandler.handle(request);
+        return new JobsListPage(httpHandler, response);
+    }
+
     public CrawlerListPage reset(String name) throws Exception {
         Request request = html.form(formFor(name, "reset")).submit(button("reset"));
         Response response = httpHandler.handle(request);
@@ -64,6 +70,10 @@ public class CrawlerListPage {
 
     private String formFor(String crawlerName, String formName) {
         return format("descendant::tr[%s]/descendant::form[contains(@class, '%s')]", linkTo(crawlerName), formName);
+    }
+
+    private String singleForm(String formName) {
+        return format("//form[contains(@class, '%s')]", formName);
     }
 
     public boolean isResettable(String name) {
