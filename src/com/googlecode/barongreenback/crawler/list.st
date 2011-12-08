@@ -23,6 +23,7 @@
     <a href="import" class="import">Import</a>
     $post(url=item.jobUrl, name="crawlAll", value="Crawl All", id=item.id)$
     $post(name="resetAll", value="Reset All", id=item.id)$
+    $post(name="deleteAll", value="Delete All", id=item.id)$
 </div>
 
 </body>

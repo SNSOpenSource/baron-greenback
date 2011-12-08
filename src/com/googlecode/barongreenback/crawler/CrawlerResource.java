@@ -78,6 +78,12 @@ public class CrawlerResource {
         return forAll(ids(), reset());
     }
 
+    @POST
+    @Path("deleteAll")
+    public Response deleteAll() throws Exception {
+        return forAll(ids(), delete());
+    }
+
     private Sequence<UUID> ids() {
         return allCrawlerModels().map(first(UUID.class));
     }
@@ -100,6 +106,14 @@ public class CrawlerResource {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
                 return application.handle(requestGenerator.requestFor(method(on(CrawlerResource.class).reset(uuid))));
+            }
+        };
+    }
+
+    public Callable1<UUID, Response> delete() {
+        return new Callable1<UUID, Response>() {
+            public Response call(UUID uuid) throws Exception {
+                return application.handle(requestGenerator.requestFor(method(on(CrawlerResource.class).delete(uuid))));
             }
         };
     }
