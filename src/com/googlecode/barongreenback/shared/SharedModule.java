@@ -24,6 +24,7 @@ public class SharedModule implements ResponseHandlersModule, RequestScopedModule
         container.addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class);
         container.add(ModelRepository.class, ModelRepository.class);
         container.addActivator(AdvancedMode.class, AdvancedModeActivator.class);
+        container.add(InvocationHandler.class, InternalInvocationHandler.class);
         return this;
     }
 

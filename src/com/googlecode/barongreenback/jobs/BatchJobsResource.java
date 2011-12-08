@@ -1,10 +1,9 @@
 package com.googlecode.barongreenback.jobs;
 
+import com.googlecode.barongreenback.shared.InvocationHandler;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.RequestGenerator;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -21,16 +20,13 @@ import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 @Path("jobs")
 @Produces(TEXT_HTML)
 public class BatchJobsResource {
-
-    private Application application;
-    private RequestGenerator requestGenerator;
+    private InvocationHandler invocationHandler;
     private Jobs jobs;
     private HttpScheduler scheduler;
     private Redirector redirector;
 
-    public BatchJobsResource(final Application application, final RequestGenerator requestGenerator, final Jobs jobs, final HttpScheduler scheduler, final Redirector redirector) {
-        this.application = application;
-        this.requestGenerator = requestGenerator;
+    public BatchJobsResource(final InvocationHandler invocationHandler, final Jobs jobs, final HttpScheduler scheduler, final Redirector redirector) {
+        this.invocationHandler = invocationHandler;
         this.jobs = jobs;
         this.scheduler = scheduler;
         this.redirector = redirector;
@@ -59,7 +55,7 @@ public class BatchJobsResource {
     public Callable1<UUID, Response> delete() {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
-                return application.handle(requestGenerator.requestFor(method(on(JobsResource.class).delete(uuid))));
+                return invocationHandler.handle(method(on(JobsResource.class).delete(uuid)));
             }
         };
     }

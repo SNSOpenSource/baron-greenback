@@ -1,14 +1,12 @@
 package com.googlecode.barongreenback.views;
 
-import com.googlecode.barongreenback.crawler.CrawlerResource;
+import com.googlecode.barongreenback.shared.InvocationHandler;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.RequestGenerator;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -27,13 +25,11 @@ import static com.googlecode.totallylazy.proxy.Call.on;
 @Produces(MediaType.TEXT_HTML)
 @Path("views")
 public class BatchViewsResource {
-    private Application application;
-    private RequestGenerator requestGenerator;
     private final ModelRepository modelRepository;
+    private InvocationHandler invocationHandler;
 
-    public BatchViewsResource(final Application application, final RequestGenerator requestGenerator, ModelRepository modelRepository) {
-        this.application = application;
-        this.requestGenerator = requestGenerator;
+    public BatchViewsResource(final InvocationHandler invocationHandler, ModelRepository modelRepository) {
+        this.invocationHandler = invocationHandler;
         this.modelRepository = modelRepository;
     }
 
@@ -50,7 +46,7 @@ public class BatchViewsResource {
     public Callable1<UUID, Response> delete() {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
-                return application.handle(requestGenerator.requestFor(method(on(ViewsResource.class).delete(uuid))));
+                return invocationHandler.handle(method(on(ViewsResource.class).delete(uuid)));
             }
         };
     }

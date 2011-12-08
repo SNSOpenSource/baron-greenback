@@ -1,13 +1,17 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.JobsResource;
+import com.googlecode.barongreenback.shared.InvocationHandler;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.utterlyidle.*;
+import com.googlecode.utterlyidle.Application;
+import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Redirector;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
@@ -26,13 +30,13 @@ import static com.googlecode.utterlyidle.RequestBuilder.post;
 @Produces(MediaType.TEXT_HTML)
 public class BatchCrawlerResource {
 
-    private RequestGenerator requestGenerator;
+    private InvocationHandler invocationHandler;
     private final ModelRepository modelRepository;
     private final Redirector redirector;
-    private final Application application;
+    private Application application;
 
-    public BatchCrawlerResource(final RequestGenerator requestGenerator, final ModelRepository modelRepository, Redirector redirector, Application application) {
-        this.requestGenerator = requestGenerator;
+    public BatchCrawlerResource(final InvocationHandler invocationHandler, final ModelRepository modelRepository, final Redirector redirector, final Application application) {
+        this.invocationHandler = invocationHandler;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.application = application;
@@ -78,7 +82,7 @@ public class BatchCrawlerResource {
     public Callable1<UUID, Response> reset() {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
-                return application.handle(requestGenerator.requestFor(method(on(CrawlerResource.class).reset(uuid))));
+                return invocationHandler.handle(method(on(CrawlerResource.class).reset(uuid)));
             }
         };
     }
@@ -86,7 +90,7 @@ public class BatchCrawlerResource {
     public Callable1<UUID, Response> delete() {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
-                return application.handle(requestGenerator.requestFor(method(on(CrawlerResource.class).delete(uuid))));
+                return invocationHandler.handle(method(on(CrawlerResource.class).delete(uuid)));
             }
         };
     }
