@@ -47,21 +47,33 @@ public class CrawlerListPage {
     }
 
     public JobsListPage crawl(String name) throws Exception {
-        Request request = html.form(formFor(name, "crawl")).submit(button("crawl"));
-        Response response = httpHandler.handle(request);
-        return new JobsListPage(httpHandler, response);
+        return goToJobsList(html.form(formFor(name, "crawl")).submit(button("crawl")));
     }
 
     public JobsListPage crawlAll() throws Exception {
-        Request request = html.form(singleForm("crawlAll")).submit(button("crawlAll"));
+        return goToJobsList(html.form(singleForm("crawlAll")).submit(button("crawlAll")));
+    }
+
+    private JobsListPage goToJobsList(Request request) throws Exception {
         Response response = httpHandler.handle(request);
         return new JobsListPage(httpHandler, response);
     }
 
+    public CrawlerListPage deleteAll() throws Exception {
+        return goToCrawlerListPage(html.form(singleForm("deleteAll")).submit(button("deleteAll")));
+    }
+
     public CrawlerListPage reset(String name) throws Exception {
-        Request request = html.form(formFor(name, "reset")).submit(button("reset"));
+        return goToCrawlerListPage(html.form(formFor(name, "reset")).submit(button("reset")));
+    }
+
+    private CrawlerListPage goToCrawlerListPage(Request request) throws Exception {
         Response response = httpHandler.handle(request);
         return new CrawlerListPage(httpHandler, response);
+    }
+
+    public int numberOfCrawlers() {
+        return html.count("//tr[@class='crawler']").intValue();
     }
 
     private String button(String name) {

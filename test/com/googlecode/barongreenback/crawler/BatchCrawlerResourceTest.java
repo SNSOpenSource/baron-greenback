@@ -31,6 +31,17 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
         assertThat(jobsListSize(jobsListPage), is(2));
     }
 
+    @Test
+    public void canDeleteAll() throws Exception {
+        importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
+        CrawlerListPage crawlerListPage = importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
+        assertThat(crawlerListSize(crawlerListPage), is(2));
+
+        crawlerListPage = deleteAll(crawlerListPage);
+
+        assertThat(crawlerListSize(crawlerListPage), is(0));
+    }
+
     private CrawlerListPage importCrawlerWithId(UUID uuid, String crawler) throws Exception {
         ImportCrawlerPage importPage = new ImportCrawlerPage(browser);
         importPage.id().value(uuid.toString());
@@ -42,8 +53,16 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
         return crawlerListPage.crawlAll();
     }
 
+    private CrawlerListPage deleteAll(CrawlerListPage crawlerListPage) throws Exception {
+        return crawlerListPage.deleteAll();
+    }
+
     private int jobsListSize(JobsListPage jobsListPage) {
         return jobsListPage.numberOfJobs();
+    }
+
+    private int crawlerListSize(CrawlerListPage crawlerListPage) {
+        return crawlerListPage.numberOfCrawlers();
     }
 
 }
