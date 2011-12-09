@@ -26,7 +26,7 @@ public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUI
 
     public ModelRepository(final Records records) {
         this.records = records;
-        records.define(MODELS, ID, MODEL);
+        records.define(MODELS, ID, MODEL, MODEL_TYPE);
     }
 
     public Option<Model> get(UUID key) {
