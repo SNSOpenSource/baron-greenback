@@ -87,17 +87,15 @@ public class Grammar {
         }
     });
 
-    private static Parser<Callable1<Predicate<Record>, Predicate<Record>>> NEGATION() {
-        return ws('-').or(ws("NOT")).optional().map(new Callable1<Void, Callable1<Predicate<Record>, Predicate<Record>>>() {
-            public Callable1<Predicate<Record>, Predicate<Record>> call(Void aVoid) throws Exception {
-                return new Callable1<Predicate<Record>, Predicate<Record>>() {
-                    public Predicate<Record> call(Predicate<Record> predicate) throws Exception {
-                        return Predicates.not(predicate);
-                    }
-                };
-            }
-        });
-    }
+    private static Parser<Callable1<Predicate<Record>, Predicate<Record>>> NEGATION = ws('-').or(ws("NOT")).optional().map(new Callable1<Void, Callable1<Predicate<Record>, Predicate<Record>>>() {
+        public Callable1<Predicate<Record>, Predicate<Record>> call(Void aVoid) throws Exception {
+            return new Callable1<Predicate<Record>, Predicate<Record>>() {
+                public Predicate<Record> call(Predicate<Record> predicate) throws Exception {
+                    return Predicates.not(predicate);
+                }
+            };
+        }
+    });
 
     public static final Parser<Pair<Class, Predicate>> DATE_IS = DATE.map(new Callable1<Date, Pair<Class, Predicate>>() {
         public Pair<Class, Predicate> call(Date dateWithoutTime) throws Exception {
@@ -161,7 +159,7 @@ public class Grammar {
     }
 
     public static Parser<Predicate<Record>> PARTS(final Sequence<Keyword> keywords) {
-        return Parsers.or(NAME_AND_VALUE, VALUE_ONLY(keywords)).prefix(NEGATION());
+        return Parsers.or(NAME_AND_VALUE, VALUE_ONLY(keywords)).prefix(NEGATION);
     }
 
     public static Parser<Predicate<Record>> PARSER(final Sequence<Keyword> keywords) {

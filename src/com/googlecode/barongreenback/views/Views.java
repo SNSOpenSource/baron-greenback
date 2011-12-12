@@ -90,7 +90,8 @@ public class Views {
         };
     }
 
-    public static <T> Predicate<Second<Model>> where(Callable1<? super Model, T> callable1, Predicate<? super T> predicate) {
+    public static <T> Predicate<Second<Model>>
+    where(Callable1<? super Model, T> callable1, Predicate<? super T> predicate) {
         return Predicates.where(second(Model.class),
                 Predicates.where(unwrap(),
                         Predicates.where(callable1, predicate)));

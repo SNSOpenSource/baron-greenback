@@ -14,6 +14,7 @@ import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.modules.Modules;
 import com.googlecode.utterlyidle.modules.PerformanceModule;
+import com.googlecode.utterlyidle.profiling.ProfilingModule;
 
 import java.util.Properties;
 
@@ -39,6 +40,7 @@ public class WebApplication extends RestApplication {
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 metaTagRule("decorator"),
                 staticRule(contentType(TEXT_HTML), templateName("decorator"))));
+        add(new ProfilingModule());
         // must come after sitemesh
         add(new PerformanceModule());
     }

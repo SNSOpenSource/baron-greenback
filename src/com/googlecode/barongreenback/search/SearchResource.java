@@ -45,7 +45,8 @@ public class SearchResource {
     private Pager pager;
     private Sorter sorter;
 
-    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode, final PredicateParser parser, final Pager pager, final Sorter sorter) {
+    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode,
+                          final PredicateParser parser, final Pager pager, final Sorter sorter) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
