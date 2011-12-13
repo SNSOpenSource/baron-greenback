@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Batch Operations</title>
+    <title>Batch Import</title>
 </head>
 <body>
 
@@ -16,9 +16,7 @@ $endif$
     })$
     <div class="actions">
         <input type="submit" name="action" value="Import" class="import"/>
-        $get(name="export")$
     </div>
 </form>
-
 </body>
 </html>
