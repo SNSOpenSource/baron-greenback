@@ -9,7 +9,9 @@ import com.googlecode.totallylazy.records.Records;
 
 import java.util.UUID;
 
-import static com.googlecode.totallylazy.Predicates.*;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 import static com.googlecode.totallylazy.records.Using.using;

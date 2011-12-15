@@ -1,7 +1,11 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.utterlyidle.Resources;
-import com.googlecode.utterlyidle.modules.*;
+import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
+import com.googlecode.utterlyidle.modules.Module;
+import com.googlecode.utterlyidle.modules.RequestScopedModule;
+import com.googlecode.utterlyidle.modules.ResourcesModule;
+import com.googlecode.utterlyidle.modules.StartupModule;
 import com.googlecode.yadic.Container;
 
 import java.util.concurrent.Executors;

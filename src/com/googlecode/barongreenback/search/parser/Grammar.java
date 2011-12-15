@@ -3,7 +3,13 @@ package com.googlecode.barongreenback.search.parser;
 import com.googlecode.lazyparsec.Parser;
 import com.googlecode.lazyparsec.Parsers;
 import com.googlecode.lazyparsec.pattern.CharacterPredicates;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Triple;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.time.Dates;
@@ -13,12 +19,16 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static com.googlecode.lazyparsec.Scanners.*;
+import static com.googlecode.lazyparsec.Scanners.isChar;
+import static com.googlecode.lazyparsec.Scanners.notChar;
+import static com.googlecode.lazyparsec.Scanners.pattern;
 import static com.googlecode.lazyparsec.pattern.Patterns.regex;
 import static com.googlecode.totallylazy.Predicates.or;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Strings.*;
+import static com.googlecode.totallylazy.Strings.contains;
+import static com.googlecode.totallylazy.Strings.endsWith;
+import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.records.Keywords.keyword;
 
 @SuppressWarnings("unchecked")

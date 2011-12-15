@@ -3,7 +3,12 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.*;
+import com.googlecode.totallylazy.records.AliasedKeyword;
+import com.googlecode.totallylazy.records.Keyword;
+import com.googlecode.totallylazy.records.Keywords;
+import com.googlecode.totallylazy.records.MapRecord;
+import com.googlecode.totallylazy.records.Record;
+import com.googlecode.totallylazy.records.Records;
 import com.googlecode.totallylazy.records.xml.XmlRecords;
 import org.w3c.dom.Document;
 

@@ -9,7 +9,9 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
-import static com.googlecode.totallylazy.Predicates.*;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.records.Keywords.metadata;

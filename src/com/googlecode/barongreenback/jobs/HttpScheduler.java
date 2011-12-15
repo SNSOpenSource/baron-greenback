@@ -16,7 +16,9 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.barongreenback.jobs.Job.*;
+import static com.googlecode.barongreenback.jobs.Job.INTERVAL;
+import static com.googlecode.barongreenback.jobs.Job.JOB_ID;
+import static com.googlecode.barongreenback.jobs.Job.REQUEST;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Runnables.VOID;
