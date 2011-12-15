@@ -6,6 +6,7 @@ import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.httpserver.RestServer;
+import com.googlecode.waitrest.Waitrest;
 import org.junit.Test;
 
 import java.util.Date;
@@ -104,8 +105,8 @@ public class CrawlerResourceTest extends ApplicationTests {
     }
 
     private ViewSearchPage crawlFeedsWithPaginationAndCheckpoint(final Date checkpointValue) throws Exception {
-        return using(setupServerWithDataFeed(), new Callable1<RestServer, ViewSearchPage>() {
-            public ViewSearchPage call(RestServer restServer) throws Exception {
+        return using(setupServerWithDataFeed(), new Callable1<Waitrest, ViewSearchPage>() {
+            public ViewSearchPage call(Waitrest restServer) throws Exception {
                 CountDownLatch latch = new CountDownLatch(1);
                 application.applicationScope().addInstance(CountDownLatch.class, latch).
                         decorate(Scheduler.class, CountDownScheduler.class);

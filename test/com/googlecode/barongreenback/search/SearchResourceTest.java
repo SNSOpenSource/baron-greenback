@@ -11,6 +11,7 @@ import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Record;
 import com.googlecode.totallylazy.records.lucene.LuceneRecords;
 import com.googlecode.utterlyidle.httpserver.RestServer;
+import com.googlecode.waitrest.Waitrest;
 import com.googlecode.yadic.Container;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -59,7 +60,7 @@ public class SearchResourceTest extends ApplicationTests {
 
     @Before
     public void addSomeData() throws Exception {
-        RestServer server = CrawlerTests.setupServerWithDataFeed();
+        Waitrest waitrest = CrawlerTests.setupServerWithDataFeed();
 
         final Sequence<Record> recordSequence = CrawlerTest.crawlOnePageOnly().realise();
 
@@ -75,6 +76,6 @@ public class SearchResourceTest extends ApplicationTests {
             }
         });
 
-        server.close();
+        waitrest.close();
     }
 }
