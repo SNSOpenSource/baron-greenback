@@ -27,7 +27,7 @@ public class MenuPage {
     }
 
     public Link link(String value) {
-        return html.link("//a[contains(@class, 'tab') and text() = '" + value + "']");
+        return html.link("//a[contains(@class, 'tab') and contains(text(), '" + value + "')]");
     }
 
     public Number numberOfItems() {

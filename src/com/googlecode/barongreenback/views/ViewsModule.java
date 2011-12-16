@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.views;
 
+import com.googlecode.barongreenback.search.SearchService;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
@@ -17,6 +18,7 @@ public class ViewsModule implements ResourcesModule, RequestScopedModule{
 
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(Views.class);
+        container.add(SearchService.class);
         return this;
     }
 }

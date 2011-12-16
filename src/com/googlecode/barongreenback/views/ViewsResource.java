@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.views;
 
 import com.googlecode.barongreenback.search.SearchResource;
+import com.googlecode.barongreenback.search.SearchService;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
@@ -44,10 +45,12 @@ import static java.util.UUID.randomUUID;
 public class ViewsResource {
     private final Redirector redirector;
     private final ModelRepository modelRepository;
+    private final SearchService searchService;
 
-    public ViewsResource(Redirector redirector, ModelRepository modelRepository) {
+    public ViewsResource(Redirector redirector, ModelRepository modelRepository, SearchService searchService) {
         this.redirector = redirector;
         this.modelRepository = modelRepository;
+        this.searchService = searchService;
     }
 
     @GET
@@ -151,6 +154,7 @@ public class ViewsResource {
                 String name = model.get("name", String.class);
                 return model.add("id", pair.first()).
                         add("current", current.equals(name)).
+                        add("itemsTotal", searchService.count(model.<String>get("records"), model.<String>get("query"))).
                         add("url", redirector.uriOf(method(on(SearchResource.class).list(name, ""))));
             }
         };

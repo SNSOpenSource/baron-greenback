@@ -14,6 +14,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
@@ -171,11 +172,11 @@ public class SearchResource {
                 dropScheme().dropAuthority();
     }
 
-    private String prefix(Model view, final String query) {
+    private static String prefix(Model view, final String query) {
         return sequence(queryFrom(view)).add(query).toString(" ");
     }
 
-    private String queryFrom(Model model) {
+    private static String queryFrom(Model model) {
         return model.get("view", Model.class).get("query", String.class);
     }
 
