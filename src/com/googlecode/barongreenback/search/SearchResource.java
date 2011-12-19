@@ -1,10 +1,8 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.search.pager.Pager;
-import com.googlecode.barongreenback.search.parser.PredicateParser;
 import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.barongreenback.shared.AdvancedMode;
-import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
@@ -18,10 +16,11 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
 import com.googlecode.totallylazy.records.Keywords;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.Records;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Responses;
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -35,12 +34,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
-import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
@@ -85,10 +80,11 @@ public class SearchResource {
 
     @GET
     @Path("unique")
-    public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
-        final Record record = recordsService.findUnique(viewName, query);
+    public Object unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
+        final Option<Record> record = recordsService.findUnique(viewName, query);
+        if(record.isEmpty()) return Responses.response(Status.NOT_FOUND);
 
-        Map<String, Map<String, Object>> group = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
+        Map<String, Map<String, Object>> group = record.get().fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
         return baseModel(viewName, query).add("record", group);
     }
 

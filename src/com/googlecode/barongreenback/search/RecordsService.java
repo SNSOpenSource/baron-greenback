@@ -36,35 +36,31 @@ public class RecordsService {
     }
 
     public Number count(String viewName, String query) throws ParseException {
-        Model view = view(viewName);
-        final Keyword recordName = recordName(view);
-        try {
-            return records.get(recordName).filter(parse(prefix(view, query), Sequences.<Keyword>empty()).right()).size();
-        } catch (Exception e) {
-            return 0;
-        }
+        Option<Model> optionalView = findView(viewName);
+        if(optionalView.isEmpty()) return 0;
+
+        Model view = optionalView.get();
+        Keyword recordName = recordName(view);
+        Either<String, Predicate<Record>> invalidQueryOrPredicate = buildPredicate(view, query, Sequences.<Keyword>empty());
+        if(invalidQueryOrPredicate.isLeft()) return 0;
+        return records.get(recordName).filter(invalidQueryOrPredicate.right()).size();
     }
 
     public void delete(String viewName, String query) {
         Model view = view(viewName);
         Keyword recordName = recordName(view);
-        Predicate<Record> predicate = buildPredicate(query, view).right();
+        Predicate<Record> predicate = buildPredicate(view, query, visibleHeaders(view)).right();
         records.remove(recordName, predicate);
     }
 
-    private Either<String, Predicate<Record>> buildPredicate(String query, Model view) {
-        Sequence<Keyword> headers = headers(view);
-        Sequence<Keyword> visibleHeaders = visibleHeaders(headers);
-        return parse(prefix(view, query), visibleHeaders);
-    }
-
-    public Record findUnique(String viewName, String query) {
-        Model view = view(viewName);
+    public Option<Record> findUnique(String viewName, String query) {
+        Option<Model> optionalView = findView(viewName);
+        Model view = optionalView.get();
         Keyword recordName = recordName(view);
         Sequence<Keyword> headers = headers(view);
-        Predicate<Record> predicate = parse(prefix(view, query), headers).right();
+        Predicate<Record> predicate = buildPredicate(view, query, headers).right();
         records.define(recordName, headers.toArray(Keyword.class));
-        return records.get(recordName).filter(predicate).head();
+        return records.get(recordName).find(predicate);
     }
 
     public Either<String, Sequence<Record>> findAll(final String viewName, final String query) {
@@ -74,17 +70,21 @@ public class RecordsService {
         } else {
             final Model view = optionalView.get();
 
-            Either<String, Predicate<Record>> invalidQueryOrPredicate = buildPredicate(query, view);
+            Sequence<Keyword> allHeaders = headers(view);
+            Either<String, Predicate<Record>> invalidQueryOrPredicate = buildPredicate(view, query, visibleHeaders(allHeaders));
 
             if (invalidQueryOrPredicate.isLeft()) {
                 return Either.left(invalidQueryOrPredicate.left());
             } else {
                 Keyword recordName = recordName(view);
-                Sequence<Keyword> allHeaders = headers(view);
                 records.define(recordName, allHeaders.toArray(Keyword.class));
                 return Either.right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
             }
         }
+    }
+
+    private Either<String, Predicate<Record>> buildPredicate(Model view, String query, Sequence<Keyword> keywords) {
+        return parse(prefix(view, query), keywords);
     }
 
 
@@ -93,8 +93,11 @@ public class RecordsService {
     }
 
     public Sequence<Keyword> visibleHeaders(final String viewName) {
-        Sequence<Keyword> allHeaders = headers(view(viewName));
-        return visibleHeaders(allHeaders);
+        return visibleHeaders(view(viewName));
+    }
+
+    public Sequence<Keyword> visibleHeaders(final Model view) {
+        return visibleHeaders(headers(view));
     }
 
     public static Sequence<Keyword> headers(Model view) {
