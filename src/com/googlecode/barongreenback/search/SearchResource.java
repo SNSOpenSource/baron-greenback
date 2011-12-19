@@ -14,7 +14,6 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.records.Keyword;
@@ -61,9 +60,10 @@ public class SearchResource {
     private final PredicateParser parser;
     private Pager pager;
     private Sorter sorter;
+    private final SearchService searchService;
 
     public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode,
-                          final PredicateParser parser, final Pager pager, final Sorter sorter) {
+                          final PredicateParser parser, final Pager pager, final Sorter sorter, final SearchService searchService) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
@@ -71,6 +71,7 @@ public class SearchResource {
         this.parser = parser;
         this.pager = pager;
         this.sorter = sorter;
+        this.searchService = searchService;
     }
 
     @POST
@@ -90,42 +91,38 @@ public class SearchResource {
     @GET
     @Path("list")
     public Model list(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
-        return optionalView(viewName).
-                fold(model().add("view", viewName).add("query", query), executeQuery(viewName, query));
+        final Either<String, Sequence<Record>> errorOrResults = searchService.search(viewName, query);
+
+        return errorOrResults.map(handleError(viewName, query), handleResults(viewName, query));
     }
 
-    private Callable2<Model, Model, Model> executeQuery(final String viewName, final String query) {
-        return new Callable2<Model, Model, Model>() {
-            public Model call(Model result, Model view) throws Exception {
-                Sequence<Keyword> allHeaders = headers(view);
-                Keyword recordName = recordName(view);
-                records.define(recordName, allHeaders.toArray(Keyword.class));
-                final Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-                return parse(prefix(view, query), visibleHeaders).
-                        map(addQueryException(result), addResults(recordName, allHeaders, result, viewName, visibleHeaders));
+    private Model baseModel(String viewName, String query) {
+        return model().add("view", viewName).add("query", query);
+    }
+
+    private Callable1<String, Model> handleError(final String viewName, final String query) {
+        return new Callable1<String, Model>() {
+            @Override
+            public Model call(String errorMessage) throws Exception {
+                return baseModel(viewName, query).add("queryException", errorMessage);
             }
         };
     }
 
-    private Callable1<Predicate<Record>, Model> addResults(final Keyword recordName, final Sequence<Keyword> allHeaders, final Model model, final String viewName, final Sequence<Keyword> visibleHeaders) {
-        return new Callable1<Predicate<Record>, Model>() {
-            public Model call(Predicate<Record> predicate) throws Exception {
-                Sequence<Record> results = records.get(recordName).filter(predicate);
-                return model.
+    private Callable1<Sequence<Record>, Model> handleResults(final String viewName, final String query) {
+        return new Callable1<Sequence<Record>, Model>() {
+            @Override
+            public Model call(Sequence<Record> results) throws Exception {
+                if (results.isEmpty()) return baseModel(viewName, query);
+
+                final Sequence<Keyword> visibleHeaders = visibleHeaders(viewName);
+                return baseModel(viewName, query).
                         add("headers", headers(visibleHeaders, results)).
                         add("pager", pager).
                         add("sorter", sorter).
                         add("sortLinks", sorter.sortLinks(visibleHeaders)).
                         add("sortedHeaders", sorter.sortedHeaders(visibleHeaders)).
-                        add("results", pager.paginate(sorter.sort(results, allHeaders)).map(asModel(viewName, visibleHeaders)).toList());
-            }
-        };
-    }
-
-    private Callable1<? super String, Model> addQueryException(final Model model) {
-        return new Callable1<String, Model>() {
-            public Model call(String value) throws Exception {
-                return model.add("queryException", value);
+                        add("results", pager.paginate(sorter.sort(results, headers(view(viewName)))).map(asModel(viewName, visibleHeaders)).toList());
             }
         };
     }
@@ -140,10 +137,13 @@ public class SearchResource {
         records.define(recordName, headers.toArray(Keyword.class));
         Record record = records.get(recordName).filter(predicate).head();
         Map<String, Map<String, Object>> group = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
-        return model().
-                add("view", viewName).
-                add("query", query).
+        return baseModel(viewName, query).
                 add("record", group);
+    }
+
+    private Sequence<Keyword> visibleHeaders(final String viewName) {
+        Sequence<Keyword> allHeaders = headers(view(viewName));
+        return visibleHeaders(allHeaders);
     }
 
     private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword> visibleHeaders) {
