@@ -38,17 +38,15 @@ public class RecordsService {
         if(optionalView.isEmpty()) return 0;
 
         Model view = optionalView.get();
-        Keyword recordName = recordName(view);
         Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, Sequences.<Keyword>empty());
         if(invalidQueryOrPredicate.isLeft()) return 0;
-        return records.get(recordName).filter(invalidQueryOrPredicate.right()).size();
+        return records.get(recordName(view)).filter(invalidQueryOrPredicate.right()).size();
     }
 
     public void delete(String viewName, String query) {
         Model view = view(viewName);
-        Keyword recordName = recordName(view);
         Predicate<Record> predicate = predicateBuilder.build(view, query, visibleHeaders(view)).right();
-        records.remove(recordName, predicate);
+        records.remove(recordName(view), predicate);
     }
 
     public Option<Record> findUnique(String viewName, String query) {
