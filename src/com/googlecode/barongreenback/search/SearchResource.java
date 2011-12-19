@@ -96,6 +96,20 @@ public class SearchResource {
         return errorOrResults.map(handleError(viewName, query), handleResults(viewName, query));
     }
 
+    @GET
+    @Path("unique")
+    public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
+        Model view = view(viewName);
+        Keyword recordName = Views.recordName(view);
+        Sequence<Keyword> headers = headers(view);
+        Predicate<Record> predicate = parse(prefix(view, query), headers).right();
+        records.define(recordName, headers.toArray(Keyword.class));
+        Record record = records.get(recordName).filter(predicate).head();
+        Map<String, Map<String, Object>> group = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
+        return baseModel(viewName, query).
+                add("record", group);
+    }
+
     private Model baseModel(String viewName, String query) {
         return model().add("view", viewName).add("query", query);
     }
@@ -125,20 +139,6 @@ public class SearchResource {
                         add("results", pager.paginate(sorter.sort(results, headers(view(viewName)))).map(asModel(viewName, visibleHeaders)).toList());
             }
         };
-    }
-
-    @GET
-    @Path("unique")
-    public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
-        Model view = view(viewName);
-        Keyword recordName = Views.recordName(view);
-        Sequence<Keyword> headers = headers(view);
-        Predicate<Record> predicate = parse(prefix(view, query), headers).right();
-        records.define(recordName, headers.toArray(Keyword.class));
-        Record record = records.get(recordName).filter(predicate).head();
-        Map<String, Map<String, Object>> group = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
-        return baseModel(viewName, query).
-                add("record", group);
     }
 
     private Sequence<Keyword> visibleHeaders(final String viewName) {
