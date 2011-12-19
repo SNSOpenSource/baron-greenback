@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.search.parser.PredicateParser;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
@@ -20,19 +19,18 @@ import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 
 public class RecordsService {
 
     private final Records records;
     private final ModelRepository modelRepository;
-    private final PredicateParser queryParser;
+    private final PredicateBuilder predicateBuilder;
 
-    public RecordsService(final Records records, final ModelRepository modelRepository, final PredicateParser queryParser) {
+    public RecordsService(final Records records, final ModelRepository modelRepository, final PredicateBuilder predicateBuilder) {
         this.records = records;
         this.modelRepository = modelRepository;
-        this.queryParser = queryParser;
+        this.predicateBuilder = predicateBuilder;
     }
 
     public Number count(String viewName, String query) throws ParseException {
@@ -41,7 +39,7 @@ public class RecordsService {
 
         Model view = optionalView.get();
         Keyword recordName = recordName(view);
-        Either<String, Predicate<Record>> invalidQueryOrPredicate = buildPredicate(view, query, Sequences.<Keyword>empty());
+        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, Sequences.<Keyword>empty());
         if(invalidQueryOrPredicate.isLeft()) return 0;
         return records.get(recordName).filter(invalidQueryOrPredicate.right()).size();
     }
@@ -49,7 +47,7 @@ public class RecordsService {
     public void delete(String viewName, String query) {
         Model view = view(viewName);
         Keyword recordName = recordName(view);
-        Predicate<Record> predicate = buildPredicate(view, query, visibleHeaders(view)).right();
+        Predicate<Record> predicate = predicateBuilder.build(view, query, visibleHeaders(view)).right();
         records.remove(recordName, predicate);
     }
 
@@ -58,7 +56,7 @@ public class RecordsService {
         Model view = optionalView.get();
         Keyword recordName = recordName(view);
         Sequence<Keyword> headers = headers(view);
-        Predicate<Record> predicate = buildPredicate(view, query, headers).right();
+        Predicate<Record> predicate = predicateBuilder.build(view, query, headers).right();
         records.define(recordName, headers.toArray(Keyword.class));
         return records.get(recordName).find(predicate);
     }
@@ -71,7 +69,7 @@ public class RecordsService {
             final Model view = optionalView.get();
 
             Sequence<Keyword> allHeaders = headers(view);
-            Either<String, Predicate<Record>> invalidQueryOrPredicate = buildPredicate(view, query, visibleHeaders(allHeaders));
+            Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders(allHeaders));
 
             if (invalidQueryOrPredicate.isLeft()) {
                 return Either.left(invalidQueryOrPredicate.left());
@@ -81,10 +79,6 @@ public class RecordsService {
                 return Either.right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
             }
         }
-    }
-
-    private Either<String, Predicate<Record>> buildPredicate(Model view, String query, Sequence<Keyword> keywords) {
-        return parse(prefix(view, query), keywords);
     }
 
 
@@ -113,20 +107,4 @@ public class RecordsService {
         return Views.find(modelRepository, view);
     }
 
-    private static String prefix(Model view, final String query) {
-        return sequence(queryFrom(view)).add(query).toString(" ");
-    }
-
-    private Either<String, Predicate<Record>> parse(String query, Sequence<Keyword> keywords) {
-        try {
-            Predicate<Record> predicate = queryParser.parse(query, keywords);
-            return Either.right(predicate);
-        } catch (IllegalArgumentException e) {
-            return Either.left(e.getMessage());
-        }
-    }
-
-    private static String queryFrom(Model model) {
-        return model.get("view", Model.class).get("query", String.class);
-    }
 }

@@ -29,6 +29,7 @@ public class SearchModule implements ResourcesModule, RequestScopedModule, Modul
         container.add(Sorter.class, Sorter.class);
         container.add(PredicateParser.class, StandardParser.class);
         container.decorate(PredicateParser.class, ParametrizedParser.class);
+        container.add(PredicateBuilder.class);
         container.add(ParserParameters.class);
         return this;
     }
