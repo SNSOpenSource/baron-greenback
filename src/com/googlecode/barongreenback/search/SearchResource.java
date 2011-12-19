@@ -12,7 +12,6 @@ import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
@@ -37,41 +36,32 @@ import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.find;
-import static com.googlecode.barongreenback.views.Views.recordName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.records.Keywords.keywords;
-import static com.googlecode.totallylazy.records.Keywords.metadata;
 
 
 @Produces(MediaType.TEXT_HTML)
 @Path("{view}/search")
 public class SearchResource {
-    private final Records records;
-    private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final AdvancedMode mode;
-    private final PredicateParser parser;
     private Pager pager;
     private Sorter sorter;
-    private final SearchService searchService;
+    private final RecordsService recordsService;
 
-    public SearchResource(final Records records, final ModelRepository modelRepository, final Redirector redirector, final AdvancedMode mode,
-                          final PredicateParser parser, final Pager pager, final Sorter sorter, final SearchService searchService) {
-        this.records = records;
-        this.modelRepository = modelRepository;
+    public SearchResource(final Redirector redirector, final AdvancedMode mode,
+                          final Pager pager, final Sorter sorter, final RecordsService recordsService) {
         this.redirector = redirector;
         this.mode = mode;
-        this.parser = parser;
         this.pager = pager;
         this.sorter = sorter;
-        this.searchService = searchService;
+        this.recordsService = recordsService;
     }
 
     @POST
@@ -80,34 +70,26 @@ public class SearchResource {
         if (!mode.equals(AdvancedMode.Enable)) {
             return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
         }
-        Model view = view(viewName);
-        Sequence<Keyword> allHeaders = headers(view);
-        Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-        Predicate<Record> predicate = parse(prefix(view, query), visibleHeaders).right();
-        records.remove(recordName(view), predicate);
+
+        recordsService.delete(viewName, query);
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
 
     @GET
     @Path("list")
     public Model list(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
-        final Either<String, Sequence<Record>> errorOrResults = searchService.search(viewName, query);
+        final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
 
-        return errorOrResults.map(handleError(viewName, query), handleResults(viewName, query));
+        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query));
     }
 
     @GET
     @Path("unique")
     public Model unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
-        Model view = view(viewName);
-        Keyword recordName = Views.recordName(view);
-        Sequence<Keyword> headers = headers(view);
-        Predicate<Record> predicate = parse(prefix(view, query), headers).right();
-        records.define(recordName, headers.toArray(Keyword.class));
-        Record record = records.get(recordName).filter(predicate).head();
+        final Record record = recordsService.findUnique(viewName, query);
+
         Map<String, Map<String, Object>> group = record.fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
-        return baseModel(viewName, query).
-                add("record", group);
+        return baseModel(viewName, query).add("record", group);
     }
 
     private Model baseModel(String viewName, String query) {
@@ -123,27 +105,22 @@ public class SearchResource {
         };
     }
 
-    private Callable1<Sequence<Record>, Model> handleResults(final String viewName, final String query) {
+    private Callable1<Sequence<Record>, Model> listResults(final String viewName, final String query) {
         return new Callable1<Sequence<Record>, Model>() {
             @Override
             public Model call(Sequence<Record> results) throws Exception {
                 if (results.isEmpty()) return baseModel(viewName, query);
 
-                final Sequence<Keyword> visibleHeaders = visibleHeaders(viewName);
+                final Sequence<Keyword> visibleHeaders = recordsService.visibleHeaders(viewName);
                 return baseModel(viewName, query).
                         add("headers", headers(visibleHeaders, results)).
                         add("pager", pager).
                         add("sorter", sorter).
                         add("sortLinks", sorter.sortLinks(visibleHeaders)).
                         add("sortedHeaders", sorter.sortedHeaders(visibleHeaders)).
-                        add("results", pager.paginate(sorter.sort(results, headers(view(viewName)))).map(asModel(viewName, visibleHeaders)).toList());
+                        add("results", pager.paginate(sorter.sort(results, headers(recordsService.view(viewName)))).map(asModel(viewName, visibleHeaders)).toList());
             }
         };
-    }
-
-    private Sequence<Keyword> visibleHeaders(final String viewName) {
-        Sequence<Keyword> allHeaders = headers(view(viewName));
-        return visibleHeaders(allHeaders);
     }
 
     private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword> visibleHeaders) {
@@ -170,22 +147,6 @@ public class SearchResource {
         return redirector.uriOf(method(on(SearchResource.class).
                 unique(viewName, String.format("%s:\"%s\"", visibleHeader.name(), record.get(visibleHeader))))).
                 dropScheme().dropAuthority();
-    }
-
-    private static String prefix(Model view, final String query) {
-        return sequence(queryFrom(view)).add(query).toString(" ");
-    }
-
-    private static String queryFrom(Model model) {
-        return model.get("view", Model.class).get("query", String.class);
-    }
-
-    private Model view(String view) {
-        return optionalView(view).get();
-    }
-
-    private Option<Model> optionalView(String view) {
-        return find(modelRepository, view);
     }
 
     public static Callable2<Map<String, Map<String, Object>>, Pair<Keyword, Object>, Map<String, Map<String, Object>>> groupBy(final Keyword<String> lookupKeyword) {
@@ -215,10 +176,6 @@ public class SearchResource {
         return toModel(headers);
     }
 
-    private Sequence<Keyword> visibleHeaders(Sequence<Keyword> headers) {
-        return headers.filter(where(metadata(Views.VISIBLE), is(notNullValue(Boolean.class).and(is(true)))));
-    }
-
     private List<Map<String, Object>> toModel(Sequence<Keyword> keywords) {
         return keywords.map(asHeader()).
                 map(Model.asMap()).
@@ -238,19 +195,6 @@ public class SearchResource {
 
     private String escape(String name) {
         return name.replace(' ', '_');
-    }
-
-    private Either<String, Predicate<Record>> parse(String query, Sequence<Keyword> keywords) throws ParseException {
-        try {
-            Predicate<Record> predicate = parser.parse(query, keywords);
-            return Either.right(predicate);
-        } catch (IllegalArgumentException e) {
-            return Either.left(e.getMessage());
-        }
-    }
-
-    private String unquote(String possiblyQuoted) {
-        return possiblyQuoted.replace("\"", "");
     }
 
 }

@@ -15,7 +15,6 @@ import com.googlecode.totallylazy.records.Records;
 import org.apache.lucene.queryParser.ParseException;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
-import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.barongreenback.views.Views.recordName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -24,13 +23,13 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.records.Keywords.metadata;
 
-public class SearchService {
+public class RecordsService {
 
     private final Records records;
     private final ModelRepository modelRepository;
     private final PredicateParser queryParser;
 
-    public SearchService(final Records records, final ModelRepository modelRepository, final PredicateParser queryParser) {
+    public RecordsService(final Records records, final ModelRepository modelRepository, final PredicateParser queryParser) {
         this.records = records;
         this.modelRepository = modelRepository;
         this.queryParser = queryParser;
@@ -46,25 +45,56 @@ public class SearchService {
         }
     }
 
-    public Either<String, Sequence<Record>> search(final String viewName, final String query) {
+    public void delete(String viewName, String query) {
+        Model view = view(viewName);
+        Keyword recordName = recordName(view);
+        Predicate<Record> predicate = buildPredicate(query, view).right();
+        records.remove(recordName, predicate);
+    }
+
+    private Either<String, Predicate<Record>> buildPredicate(String query, Model view) {
+        Sequence<Keyword> headers = headers(view);
+        Sequence<Keyword> visibleHeaders = visibleHeaders(headers);
+        return parse(prefix(view, query), visibleHeaders);
+    }
+
+    public Record findUnique(String viewName, String query) {
+        Model view = view(viewName);
+        Keyword recordName = recordName(view);
+        Sequence<Keyword> headers = headers(view);
+        Predicate<Record> predicate = parse(prefix(view, query), headers).right();
+        records.define(recordName, headers.toArray(Keyword.class));
+        return records.get(recordName).filter(predicate).head();
+    }
+
+    public Either<String, Sequence<Record>> findAll(final String viewName, final String query) {
         final Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) {
             return Either.right(Sequences.<Record>empty());
         } else {
             final Model view = optionalView.get();
 
-            Keyword recordName = recordName(view);
-            Sequence<Keyword> allHeaders = headers(view);
-            Sequence<Keyword> visibleHeaders = visibleHeaders(allHeaders);
-            Either<String, Predicate<Record>> invalidQueryOrPredicate = parse(prefix(view, query), visibleHeaders);
+            Either<String, Predicate<Record>> invalidQueryOrPredicate = buildPredicate(query, view);
 
             if (invalidQueryOrPredicate.isLeft()) {
                 return Either.left(invalidQueryOrPredicate.left());
             } else {
+                Keyword recordName = recordName(view);
+                Sequence<Keyword> allHeaders = headers(view);
                 records.define(recordName, allHeaders.toArray(Keyword.class));
                 return Either.right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
             }
         }
+    }
+
+
+    public Model view(String view) {
+        return findView(view).get();
+    }
+
+    public Sequence<Keyword> visibleHeaders(final String viewName) {
+        Sequence<Keyword> allHeaders = headers(view(viewName));
+        return visibleHeaders(allHeaders);
     }
 
     public static Sequence<Keyword> headers(Model view) {
@@ -72,17 +102,12 @@ public class SearchService {
     }
 
 
-    public static Sequence<Keyword> visibleHeaders(Sequence<Keyword> headers) {
+    private static Sequence<Keyword> visibleHeaders(Sequence<Keyword> headers) {
         return headers.filter(where(metadata(Views.VISIBLE), is(notNullValue(Boolean.class).and(is(true)))));
     }
 
-    private Model view(String view) {
-        return findView(view).get();
-    }
-
-
     private Option<Model> findView(String view) {
-        return find(modelRepository, view);
+        return Views.find(modelRepository, view);
     }
 
     private static String prefix(Model view, final String query) {
@@ -101,5 +126,4 @@ public class SearchService {
     private static String queryFrom(Model model) {
         return model.get("view", Model.class).get("query", String.class);
     }
-
 }
