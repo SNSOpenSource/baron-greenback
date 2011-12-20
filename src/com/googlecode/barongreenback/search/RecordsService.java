@@ -56,7 +56,7 @@ public class RecordsService {
         Sequence<Keyword> headers = headers(view);
         Predicate<Record> predicate = predicateBuilder.build(view, query, headers).right();
         records.define(recordName, headers.toArray(Keyword.class));
-        return records.get(recordName).find(predicate);
+        return records.get(recordName).filter(predicate).headOption();
     }
 
     public Either<String, Sequence<Record>> findAll(final String viewName, final String query) {
