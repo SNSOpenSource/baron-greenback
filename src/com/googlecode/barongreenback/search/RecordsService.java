@@ -50,7 +50,7 @@ public class RecordsService {
         if (optionalView.isEmpty()) return 0;
 
         Model view = optionalView.get();
-        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, Sequences.<Keyword>empty());
+        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headers(view));
         return recordsFound.map(Callables.<String, Integer>ignoreAndReturn(0), size());
     }
 
