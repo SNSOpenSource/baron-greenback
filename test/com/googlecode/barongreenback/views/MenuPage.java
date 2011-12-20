@@ -17,7 +17,7 @@ public class MenuPage {
     private final Html html;
 
     public MenuPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(ViewsResource.class).menu("")))).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(ViewsResource.class).menu("", "")))).build()));
     }
 
     public MenuPage(HttpHandler httpHandler, Response response) throws Exception {
