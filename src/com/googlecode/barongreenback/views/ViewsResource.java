@@ -20,6 +20,7 @@ import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
+import com.googlecode.utterlyidle.annotations.Priority;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
@@ -55,24 +56,15 @@ public class ViewsResource {
 
     @GET
     @Path("menu")
-    public Model menu(@QueryParam("current") @DefaultValue("") String current) {
-        return models(current, Views.where(valueFor("visible", Boolean.class), is(true)));
+    public Model menu(@QueryParam("current") @DefaultValue("") String current, @QueryParam("query") @DefaultValue("") String query) {
+        return models(current, Views.where(valueFor("visible", Boolean.class), is(true)), query);
     }
 
-    private Model models(String current, Predicate<Second<Model>> predicate) {
-        List<Model> models = modelRepository.
-                find(Predicates.where(MODEL_TYPE, is("view"))).
-                filter(predicate).
-                map(asModel(current)).
-                sortBy(Comparators.comparators(ascending(priority()), ascending(name()))).
-                toList();
-        return model().add("views", models).add("anyExists", !models.isEmpty());
-    }
 
     @GET
     @Path("list")
     public Model list() {
-        return models("", Predicates.<Second<Model>>all());
+        return models("", Predicates.<Second<Model>>all(), "");
     }
 
     @GET
@@ -147,14 +139,24 @@ public class ViewsResource {
         return redirector.seeOther(method(on(getClass()).list()));
     }
 
-    private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current) {
+    private Model models(String current, Predicate<Second<Model>> predicate, String query) {
+        List<Model> models = modelRepository.
+                find(Predicates.where(MODEL_TYPE, is("view"))).
+                filter(predicate).
+                map(asModel(current, query)).
+                sortBy(Comparators.comparators(ascending(priority()), ascending(name()))).
+                toList();
+        return model().add("views", models).add("anyExists", !models.isEmpty());
+    }
+
+    private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current, final String query) {
         return new Callable1<Pair<UUID, Model>, Model>() {
             public Model call(Pair<UUID, Model> pair) throws Exception {
                 Model model = pair.second().get("view");
                 String name = model.get("name", String.class);
                 return model.add("id", pair.first()).
                         add("current", current.equals(name)).
-                        add("itemsTotal", recordsService.count(model.<String>get("records"), model.<String>get("query"))).
+                        add("itemsTotal", recordsService.count(model.<String>get("records"), model.<String>get("query")+" "+query)).
                         add("url", redirector.uriOf(method(on(SearchResource.class).list(name, ""))));
             }
         };
