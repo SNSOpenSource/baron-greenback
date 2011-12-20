@@ -16,6 +16,7 @@ import org.apache.lucene.queryParser.ParseException;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.recordName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -33,50 +34,50 @@ public class RecordsService {
         this.predicateBuilder = predicateBuilder;
     }
 
-    public Number count(String viewName, String query) throws ParseException {
-        Option<Model> optionalView = findView(viewName);
-        if(optionalView.isEmpty()) return 0;
-
-        Model view = optionalView.get();
-        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, Sequences.<Keyword>empty());
-        if(invalidQueryOrPredicate.isLeft()) return 0;
-        return records.get(recordName(view)).filter(invalidQueryOrPredicate.right()).size();
-    }
-
     public void delete(String viewName, String query) {
         Model view = view(viewName);
         Predicate<Record> predicate = predicateBuilder.build(view, query, visibleHeaders(view)).right();
         records.remove(recordName(view), predicate);
     }
 
+    public Number count(String viewName, String query) throws ParseException {
+        Option<Model> optionalView = findView(viewName);
+        if (optionalView.isEmpty()) return 0;
+
+        Model view = optionalView.get();
+        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, Sequences.<Keyword>empty());
+        if (invalidQueryOrPredicate.isLeft()) return 0;
+        return records.get(recordName(view)).filter(invalidQueryOrPredicate.right()).size();
+    }
+
     public Option<Record> findUnique(String viewName, String query) {
         Option<Model> optionalView = findView(viewName);
+        if (optionalView.isEmpty()) return none();
+
         Model view = optionalView.get();
+        Sequence<Keyword> allHeaders = headers(view);
+        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, allHeaders);
+
+        if (invalidQueryOrPredicate.isLeft()) return none();
+
         Keyword recordName = recordName(view);
-        Sequence<Keyword> headers = headers(view);
-        Predicate<Record> predicate = predicateBuilder.build(view, query, headers).right();
-        records.define(recordName, headers.toArray(Keyword.class));
-        return records.get(recordName).filter(predicate).headOption();
+        records.define(recordName, allHeaders.toArray(Keyword.class));
+        return records.get(recordName).filter(invalidQueryOrPredicate.right()).headOption();
     }
 
     public Either<String, Sequence<Record>> findAll(final String viewName, final String query) {
         final Option<Model> optionalView = findView(viewName);
-        if (optionalView.isEmpty()) {
-            return Either.right(Sequences.<Record>empty());
-        } else {
-            final Model view = optionalView.get();
+        if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
-            Sequence<Keyword> allHeaders = headers(view);
-            Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders(allHeaders));
+        final Model view = optionalView.get();
+        Sequence<Keyword> allHeaders = headers(view);
+        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders(allHeaders));
 
-            if (invalidQueryOrPredicate.isLeft()) {
-                return Either.left(invalidQueryOrPredicate.left());
-            } else {
-                Keyword recordName = recordName(view);
-                records.define(recordName, allHeaders.toArray(Keyword.class));
-                return Either.right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
-            }
-        }
+        if (invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
+
+        Keyword recordName = recordName(view);
+        records.define(recordName, allHeaders.toArray(Keyword.class));
+        return Either.right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
     }
 
 
