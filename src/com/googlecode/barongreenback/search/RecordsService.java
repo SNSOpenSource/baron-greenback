@@ -3,6 +3,8 @@ package com.googlecode.barongreenback.search;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
@@ -16,6 +18,8 @@ import org.apache.lucene.queryParser.ParseException;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.recordName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
+import static com.googlecode.totallylazy.Callables.ignoreAndReturn;
+import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
@@ -47,6 +51,7 @@ public class RecordsService {
         Model view = optionalView.get();
         Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, Sequences.<Keyword>empty());
         if (invalidQueryOrPredicate.isLeft()) return 0;
+
         return records.get(recordName(view)).filter(invalidQueryOrPredicate.right()).size();
     }
 
@@ -55,34 +60,33 @@ public class RecordsService {
         if (optionalView.isEmpty()) return none();
 
         Model view = optionalView.get();
-        Sequence<Keyword> allHeaders = headers(view);
-        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, allHeaders);
-
-        if (invalidQueryOrPredicate.isLeft()) return none();
-
-        Keyword recordName = recordName(view);
-        records.define(recordName, allHeaders.toArray(Keyword.class));
-        return records.get(recordName).filter(invalidQueryOrPredicate.right()).headOption();
+        final Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headers(view));
+        return recordsFound.map(ignoreAndReturn(Option.none(Record.class)), firstResult());
     }
 
     public Either<String, Sequence<Record>> findAll(final String viewName, final String query) {
-        final Option<Model> optionalView = findView(viewName);
+        Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
-        final Model view = optionalView.get();
-        Sequence<Keyword> allHeaders = headers(view);
-        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders(allHeaders));
-
-        if (invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
-
-        Keyword recordName = recordName(view);
-        records.define(recordName, allHeaders.toArray(Keyword.class));
-        return Either.right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
+        Model view = optionalView.get();
+        return getRecords(view, query, visibleHeaders(headers(view)));
     }
 
+    private Either<String, Sequence<Record>> getRecords(Model view, String query, Sequence<Keyword> visibleHeaders) {
+        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders);
+        if(invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
+
+        Keyword recordName = recordName(view);
+        records.define(recordName, headers(view).toArray(Keyword.class));
+        return right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
+    }
 
     public Model view(String view) {
         return findView(view).get();
+    }
+
+    private Option<Model> findView(String view) {
+        return Views.find(modelRepository, view);
     }
 
     public Sequence<Keyword> visibleHeaders(final String viewName) {
@@ -93,17 +97,22 @@ public class RecordsService {
         return visibleHeaders(headers(view));
     }
 
-    public static Sequence<Keyword> headers(Model view) {
-        return toKeywords(unwrap(view));
-    }
-
-
     private static Sequence<Keyword> visibleHeaders(Sequence<Keyword> headers) {
         return headers.filter(where(metadata(Views.VISIBLE), is(notNullValue(Boolean.class).and(is(true)))));
     }
 
-    private Option<Model> findView(String view) {
-        return Views.find(modelRepository, view);
+
+    public static Sequence<Keyword> headers(Model view) {
+        return toKeywords(unwrap(view));
+    }
+
+    private static Callable1<Sequence<Record>, Option<Record>> firstResult() {
+        return new Callable1<Sequence<Record>, Option<Record>>() {
+            @Override
+            public Option<Record> call(Sequence<Record> recordSequence) throws Exception {
+                return recordSequence.headOption();
+            }
+        };
     }
 
 }
