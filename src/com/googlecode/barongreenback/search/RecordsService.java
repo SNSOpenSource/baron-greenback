@@ -19,6 +19,7 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.recordName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.totallylazy.Callables.ignoreAndReturn;
+import static com.googlecode.totallylazy.Callables.size;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -44,15 +45,13 @@ public class RecordsService {
         records.remove(recordName(view), predicate);
     }
 
-    public Number count(String viewName, String query) throws ParseException {
+    public Integer count(String viewName, String query) throws ParseException {
         Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return 0;
 
         Model view = optionalView.get();
-        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, Sequences.<Keyword>empty());
-        if (invalidQueryOrPredicate.isLeft()) return 0;
-
-        return records.get(recordName(view)).filter(invalidQueryOrPredicate.right()).size();
+        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, Sequences.<Keyword>empty());
+        return recordsFound.map(Callables.<String, Integer>ignoreAndReturn(0), size());
     }
 
     public Option<Record> findUnique(String viewName, String query) {
@@ -60,7 +59,7 @@ public class RecordsService {
         if (optionalView.isEmpty()) return none();
 
         Model view = optionalView.get();
-        final Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headers(view));
+        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headers(view));
         return recordsFound.map(ignoreAndReturn(Option.none(Record.class)), firstResult());
     }
 
