@@ -76,9 +76,9 @@ public class SearchResource {
     public Object shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
         if (recordsService.count(viewName, query) == 1) {
             final Sequence<Keyword> visibleHeaders = recordsService.visibleHeaders(viewName);
-            final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
+            final Option<Record> optionalRecord = recordsService.findUnique(viewName, query);
             Option<Keyword> unique = uniqueHeader(visibleHeaders);
-            return Responses.seeOther(uniqueUrlOf(errorOrResults.right().head(), unique.get(), viewName));
+            return Responses.seeOther(uniqueUrlOf(optionalRecord.get(), unique.get(), viewName));
         } else {
             return Responses.seeOther(redirector.uriOf(method(on(this.getClass()).list(viewName, query))));
         }
