@@ -4,10 +4,7 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.records.Record;
-import com.googlecode.utterlyidle.HttpMessageParser;
-import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
@@ -31,6 +28,7 @@ import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
+import static com.googlecode.utterlyidle.RequestBuilder.modify;
 
 @Path("jobs")
 @Produces(TEXT_HTML)
@@ -49,7 +47,7 @@ public class JobsResource {
     @POST
     @Path("schedule/{id}/{seconds}")
     public Response schedule(@PathParam("id") UUID id, @PathParam("seconds") Long seconds, @PathParam("$") String endOfUrl) throws Exception {
-        Request scheduledRequest = request.uri(request.uri().path(endOfUrl));
+        Request scheduledRequest = modify(request).uri(request.uri().path(endOfUrl)).build();
 
         scheduler.schedule(Job.job(id).interval(seconds).request(scheduledRequest.toString()));
 
@@ -118,7 +116,7 @@ public class JobsResource {
                 add("raw", requestMessage).
                 add("method", request.method()).
                 add("uri", request.uri()).
-                add("entity", new String(request.input()));
+                add("entity", new String(request.entity()));
     }
 
     public static Model addResponse(Record record) {
