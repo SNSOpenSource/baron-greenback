@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.jobs;
 
-import com.googlecode.totallylazy.records.memory.MemoryRecords;
+import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.totallylazy.time.FixedClock;
 import com.googlecode.utterlyidle.RequestBuilder;

@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.lucene;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.records.lucene.mappings.AbstractStringMapping;
+import com.googlecode.lazyrecords.lucene.mappings.AbstractStringMapping;
 import org.apache.lucene.document.Field;
 
 public class ModelMapping extends AbstractStringMapping<Model> {

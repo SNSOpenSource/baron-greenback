@@ -6,9 +6,9 @@ import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.*;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Keywords;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -31,7 +31,7 @@ import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
-import static com.googlecode.totallylazy.records.Keywords.keywords;
+import static com.googlecode.lazyrecords.Keywords.keywords;
 
 
 @Produces(MediaType.TEXT_HTML)

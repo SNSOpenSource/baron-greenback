@@ -2,10 +2,10 @@ package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.barongreenback.crawler.UniqueRecords;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.RecordMethods;
-import com.googlecode.totallylazy.records.Records;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.RecordMethods;
+import com.googlecode.lazyrecords.Records;
 
 import java.util.UUID;
 
@@ -13,8 +13,8 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.empty;
-import static com.googlecode.totallylazy.records.Keywords.keyword;
-import static com.googlecode.totallylazy.records.Using.using;
+import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Using.using;
 
 public class Jobs {
     public static final Keyword<String> JOBS = keyword("jobs", String.class);

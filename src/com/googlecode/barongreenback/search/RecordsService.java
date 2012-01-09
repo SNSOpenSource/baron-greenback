@@ -10,9 +10,9 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.Records;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.Records;
 import org.apache.lucene.queryParser.ParseException;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
@@ -25,7 +25,7 @@ import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.records.Keywords.metadata;
+import static com.googlecode.lazyrecords.Keywords.metadata;
 
 public class RecordsService {
 

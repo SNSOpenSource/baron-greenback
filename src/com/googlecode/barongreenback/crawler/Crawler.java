@@ -3,9 +3,9 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Keywords;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
@@ -14,7 +14,7 @@ import com.googlecode.utterlyidle.handlers.PrintAuditor;
 
 import java.util.Date;
 
-import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keywords.keyword;
 
 
 public class Crawler {

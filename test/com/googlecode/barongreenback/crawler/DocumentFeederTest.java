@@ -7,7 +7,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.matchers.IterableMatcher;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.AuditHandler;

@@ -2,18 +2,18 @@ package com.googlecode.barongreenback.search.parser;
 
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.lucene.Lucene;
-import com.googlecode.totallylazy.records.lucene.mappings.Mappings;
-import com.googlecode.totallylazy.records.sql.expressions.WhereClause;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.lucene.Lucene;
+import com.googlecode.lazyrecords.lucene.mappings.Mappings;
+import com.googlecode.lazyrecords.sql.expressions.WhereClause;
 import org.junit.Test;
 
 import java.util.Date;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.records.Keywords.keyword;
-import static com.googlecode.totallylazy.records.MapRecord.record;
+import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.MapRecord.record;
 import static com.googlecode.totallylazy.time.Dates.date;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

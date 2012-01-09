@@ -4,12 +4,12 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Keywords;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
-import static com.googlecode.totallylazy.records.SelectCallable.select;
+import static com.googlecode.lazyrecords.SelectCallable.select;
 
 public class DuplicateRemover implements Feeder<Uri> {
     private final Feeder<Uri> feeder;

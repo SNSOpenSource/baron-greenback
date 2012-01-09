@@ -1,11 +1,11 @@
 package com.googlecode.barongreenback.lucene;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.records.Records;
-import com.googlecode.totallylazy.records.lucene.LuceneRecords;
-import com.googlecode.totallylazy.records.lucene.LuceneStorage;
-import com.googlecode.totallylazy.records.lucene.OptimisedStorage;
-import com.googlecode.totallylazy.records.lucene.mappings.Mappings;
+import com.googlecode.lazyrecords.Records;
+import com.googlecode.lazyrecords.lucene.LuceneRecords;
+import com.googlecode.lazyrecords.lucene.LuceneStorage;
+import com.googlecode.lazyrecords.lucene.OptimisedStorage;
+import com.googlecode.lazyrecords.lucene.mappings.Mappings;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;

@@ -1,14 +1,14 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.MapRecord;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.MapRecord;
+import com.googlecode.lazyrecords.Record;
 
 import java.util.Date;
 import java.util.UUID;
 
-import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keywords.keyword;
 
 public class Job {
     public static final Keyword<UUID> JOB_ID = keyword("jobs_id", UUID.class);

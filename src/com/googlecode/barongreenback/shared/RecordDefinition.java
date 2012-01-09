@@ -9,10 +9,10 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.records.AliasedKeyword;
-import com.googlecode.totallylazy.records.ImmutableKeyword;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Keywords;
+import com.googlecode.lazyrecords.AliasedKeyword;
+import com.googlecode.lazyrecords.ImmutableKeyword;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
 
 import java.util.List;
 
@@ -26,9 +26,9 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.Strings.isEmpty;
-import static com.googlecode.totallylazy.records.Keywords.keyword;
-import static com.googlecode.totallylazy.records.Keywords.metadata;
-import static com.googlecode.totallylazy.records.MapRecord.record;
+import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.MapRecord.record;
 import static java.lang.Boolean.TRUE;
 
 public class RecordDefinition {

@@ -3,7 +3,7 @@ package com.googlecode.barongreenback.jobs;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;

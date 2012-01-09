@@ -10,8 +10,8 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Triple;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.totallylazy.time.Seconds;
 
@@ -29,7 +29,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.contains;
 import static com.googlecode.totallylazy.Strings.endsWith;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keywords.keyword;
 
 @SuppressWarnings("unchecked")
 public class Grammar {

@@ -3,7 +3,7 @@ package com.googlecode.barongreenback.jobs;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;

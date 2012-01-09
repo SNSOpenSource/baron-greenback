@@ -6,10 +6,10 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.ImmutableKeyword;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Record;
-import com.googlecode.totallylazy.records.Records;
+import com.googlecode.lazyrecords.ImmutableKeyword;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.waitrest.internal.totallylazy.callables.CountNotNull;
 
 import java.util.UUID;
@@ -20,10 +20,10 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.first;
 import static com.googlecode.totallylazy.Some.some;
 import static com.googlecode.totallylazy.callables.CountNotNull.count;
-import static com.googlecode.totallylazy.records.Keywords.keyword;
-import static com.googlecode.totallylazy.records.MapRecord.record;
-import static com.googlecode.totallylazy.records.RecordMethods.update;
-import static com.googlecode.totallylazy.records.Using.using;
+import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.MapRecord.record;
+import static com.googlecode.lazyrecords.RecordMethods.update;
+import static com.googlecode.lazyrecords.Using.using;
 
 public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUID, Model>> {
     public static final Keyword<Object> MODELS = keyword("models");

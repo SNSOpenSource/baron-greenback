@@ -11,16 +11,16 @@ import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Second;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.numbers.Numbers;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Keywords;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.records.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keywords.keyword;
 
 public class Views {
     public static final Keyword<Boolean> VISIBLE = keyword("visible", Boolean.class);

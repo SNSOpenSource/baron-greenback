@@ -2,8 +2,8 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.records.Keyword;
-import com.googlecode.totallylazy.records.Record;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
 
 import java.util.HashSet;
 import java.util.Set;
