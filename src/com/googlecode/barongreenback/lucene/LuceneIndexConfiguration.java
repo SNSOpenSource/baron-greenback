@@ -4,6 +4,7 @@ import com.googlecode.totallylazy.Files;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.UUID;
 
 public class LuceneIndexConfiguration {
 
@@ -23,7 +24,7 @@ public class LuceneIndexConfiguration {
     }
 
     public LuceneIndexConfiguration(LuceneIndexType indexType, String directory) {
-        this(indexType, new File(directory));
+        this(indexType, "random".equals(directory) ? new File(Files.TEMP_DIR, UUID.randomUUID().toString()): new File(directory));
     }
 
     public LuceneIndexConfiguration(LuceneIndexType indexType, File directory) {
