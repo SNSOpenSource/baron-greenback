@@ -12,6 +12,7 @@ public class LuceneIndexConfiguration {
     public static final String LUCENE_INDEX_DIRECTORY = "baron-greenback.lucene.index.directory";
     public static final LuceneIndexType DEFAULT_TYPE = LuceneIndexType.FILESYSTEM;
     public static String DEFAULT_DIRECTORY = new File(Files.TEMP_DIR, "baron-greenback").getAbsolutePath();
+    public static String RANDOM_DIRECTORY_KEY = "random";
     private final LuceneIndexType indexType;
     private final File directory;
 
@@ -24,7 +25,7 @@ public class LuceneIndexConfiguration {
     }
 
     public LuceneIndexConfiguration(LuceneIndexType indexType, String directory) {
-        this(indexType, "random".equals(directory) ? new File(Files.TEMP_DIR, UUID.randomUUID().toString()): new File(directory));
+        this(indexType, RANDOM_DIRECTORY_KEY.equals(directory) ? new File(Files.TEMP_DIR, UUID.randomUUID().toString()): new File(directory));
     }
 
     public LuceneIndexConfiguration(LuceneIndexType indexType, File directory) {

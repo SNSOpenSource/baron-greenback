@@ -29,7 +29,7 @@ public abstract class ApplicationTests {
         Files.delete(new File(LuceneIndexConfiguration.DEFAULT_DIRECTORY));
         Properties properties = new Properties();
         properties.put(LuceneIndexConfiguration.LUCENE_INDEX_TYPE, LuceneIndexConfiguration.DEFAULT_TYPE.name());
-        properties.put(LuceneIndexConfiguration.LUCENE_INDEX_DIRECTORY, LuceneIndexConfiguration.DEFAULT_DIRECTORY);
+        properties.put(LuceneIndexConfiguration.LUCENE_INDEX_DIRECTORY, LuceneIndexConfiguration.RANDOM_DIRECTORY_KEY);
         application = new WebApplication(BasePath.basePath("/"), properties);
         browser = new RedirectHttpHandler(new RelativeUrlHandler(application));
     }
