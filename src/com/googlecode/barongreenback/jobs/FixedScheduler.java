@@ -1,5 +1,10 @@
 package com.googlecode.barongreenback.jobs;
 
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Runnables;
+
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -7,7 +12,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class FixedScheduler implements Scheduler {
+import static com.googlecode.totallylazy.Sequences.sequence;
+
+public class FixedScheduler implements Scheduler, Closeable {
     private final Map<UUID, Cancellable> jobs = new HashMap<UUID, Cancellable>();
     private final ScheduledExecutorService service;
 
@@ -38,6 +45,13 @@ public class FixedScheduler implements Scheduler {
         Cancellable job = jobs.remove(id);
         if (job != null) {
             job.cancel();
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        while(!jobs.keySet().isEmpty()) {
+            cancel(sequence(jobs.keySet()).first());
         }
     }
 }
