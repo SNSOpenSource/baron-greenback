@@ -13,7 +13,6 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.*;
 
 import java.io.IOException;
@@ -26,6 +25,7 @@ import static com.googlecode.barongreenback.shared.messages.Messages.success;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static java.lang.String.format;
 
 @Path("batch")
 @Produces(MediaType.TEXT_HTML)
@@ -47,6 +47,12 @@ public class BatchResource {
     @Path("operations")
     public Model operations() {
         return model();
+    }
+
+    @GET
+    @Path("operations")
+    public Model operations(@QueryParam("message") String message, @QueryParam("category") Category category) {
+        return Messages.messageModel(message, category);
     }
 
     @GET
@@ -77,27 +83,23 @@ public class BatchResource {
             for (Map.Entry<String, Object> entry : uuidsAndModels.entrySet()) {
                 modelRepository.set(UUID.fromString(entry.getKey()), Model.fromMap((Map<String, Object>) entry.getValue()));
             }
-            return redirectWithMessage(String.format("Imported %s items", uuidsAndModels.size()), Category.SUCCESS);
+            return success(format("Imported %s items", uuidsAndModels.size()));
         } catch (Exception e) {
-            return error(String.format("Import error: %s", e.getMessage())).add("model", batchModel);
+            return error(format("Import error: %s", e.getMessage())).add("model", batchModel);
         }
 
     }
 
     @POST
     @Path("delete")
-    public Model deleteIndex() throws IOException {
+    public Object deleteIndex() throws IOException {
         try {
             scheduler.stop();
             optimisedStorage.deleteAll();
-            return success("Index has been deleted");
+            return redirector.seeOther(method(on(BatchResource.class).operations("Index has been deleted and all pending jobs stopped", Category.SUCCESS)));
         } catch(Exception e) {
-            return error("Error occurred when deleting the index: " + e.getMessage());
+            return redirector.seeOther(method(on(BatchResource.class).operations("Error occurred when deleting the index: " + e.getMessage(), Category.ERROR)));
         }
-    }
-
-    private Response redirectWithMessage(String text, Category category) {
-        return redirector.seeOther(method(on(BatchResource.class).batchImport(text, category)));
     }
 
     private Callable2<? super Map<String, Object>, ? super Pair<UUID, Model>, Map<String, Object>> addUuidAndModel() {

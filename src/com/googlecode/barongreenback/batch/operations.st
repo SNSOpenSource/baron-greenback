@@ -4,6 +4,7 @@
     <title>Batch Operations</title>
 </head>
 <body>
+$message()$
 <div class="actions">
     $get(name="import")$
     $get(name="export")$
