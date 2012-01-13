@@ -1,24 +1,20 @@
 package com.googlecode.barongreenback.batch;
 
+import com.googlecode.barongreenback.jobs.HttpScheduler;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.messages.Category;
 import com.googlecode.barongreenback.shared.messages.Messages;
 import com.googlecode.funclate.Model;
 import com.googlecode.funclate.json.Json;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.lucene.LuceneStorage;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.lucene.LuceneStorage;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.annotations.FormParam;
-import com.googlecode.utterlyidle.annotations.GET;
-import com.googlecode.utterlyidle.annotations.POST;
-import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.Produces;
-import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.utterlyidle.annotations.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,11 +34,13 @@ public class BatchResource {
     private ModelRepository modelRepository;
     private Redirector redirector;
     private final LuceneStorage optimisedStorage;
+    private final HttpScheduler scheduler;
 
-    public BatchResource(ModelRepository modelRepository, Redirector redirector, LuceneStorage storage) {
+    public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final LuceneStorage storage, final HttpScheduler scheduler) {
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.optimisedStorage = storage;
+        this.scheduler = scheduler;
     }
 
     @GET
@@ -90,6 +88,7 @@ public class BatchResource {
     @Path("delete")
     public Model deleteIndex() throws IOException {
         try {
+            scheduler.stop();
             optimisedStorage.deleteAll();
             return success("Index has been deleted");
         } catch(Exception e) {

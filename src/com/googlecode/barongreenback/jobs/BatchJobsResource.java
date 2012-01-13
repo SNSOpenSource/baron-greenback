@@ -49,6 +49,7 @@ public class BatchJobsResource {
     @POST
     @Path("deleteAll")
     public Response deleteAll() throws Exception {
+        scheduler.stop();
         return forAll(ids(), delete());
     }
 
