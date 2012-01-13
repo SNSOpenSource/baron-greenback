@@ -35,10 +35,10 @@ public class RequestPagerTest {
     @Test
     public void paginateShouldReturnSequenceForNthPage() throws Exception {
         Pager pager = new RequestPager(requestForCurrentPageAndRows(4, 20).build());
-        Sequence<Number> sequence = range(1, 101);
+        Sequence<Number> sequence = range(1, 100);
 
         Sequence<Number> paginatedSequence = pager.paginate(sequence);
-        assertThat(paginatedSequence, is(range(61, 81)));
+        assertThat(paginatedSequence, is(range(61, 80)));
         assertThat(pager.getTotalRows(), NumberMatcher.is(100));
     }
 
@@ -58,7 +58,7 @@ public class RequestPagerTest {
     @Test
     public void supportsAllParameter() throws Exception {
         Pager pager = new RequestPager(RequestBuilder.get("/somePage").withQuery(Pager.ROWS_PER_PAGE_PARAM, "ALL").build());
-        Sequence<Number> sequence = range(1, 100001).realise();
+        Sequence<Number> sequence = range(1, 100000).realise();
 
         Sequence<Number> paginatedSequence = pager.paginate(sequence);
         assertThat(paginatedSequence, is(sequence));
@@ -69,7 +69,7 @@ public class RequestPagerTest {
     @Test
     public void ignoredPagesNumbersWhenShowingAllRecords() throws Exception {
         Pager pager = new RequestPager(RequestBuilder.get("/somePage").withQuery(Pager.CURRENT_PAGE_PARAM, 25).withQuery(Pager.ROWS_PER_PAGE_PARAM, "100001").build());
-        Sequence<Number> sequence = range(1, 100001).realise();
+        Sequence<Number> sequence = range(1, 100000).realise();
 
         Sequence<Number> paginatedSequence = pager.paginate(sequence);
         assertThat(paginatedSequence, is(sequence));

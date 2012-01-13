@@ -65,18 +65,18 @@ public class PagerModel {
 
     private Sequence<Number> pageNumbers(Pager pager) {
         if (pager.getNumberOfPages().intValue() < THRESHOLD_NUMBER_OF_PAGES_BEFORE_PARTITIONING + 1) {
-            return Numbers.range(1, pager.getNumberOfPages().intValue() + 1);
+            return Numbers.range(1, pager.getNumberOfPages().intValue());
         }
 
         if (pager.getCurrentPage() < THRESHOLD_NUMBER_OF_PAGES_BEFORE_PARTITIONING) {
-            return range(1, pager.getCurrentPage()+2).join(numbers(pager.getNumberOfPages()));
+            return range(1, pager.getCurrentPage() + 1).join(numbers(pager.getNumberOfPages()));
         }
 
         if (pager.getCurrentPage() > (pager.getNumberOfPages().intValue() - (THRESHOLD_NUMBER_OF_PAGES_BEFORE_PARTITIONING-1))) {
-            return numbers(1).join(range(pager.getCurrentPage() - 1, pager.getNumberOfPages().intValue() + 1));
+            return numbers(1).join(range(pager.getCurrentPage() - 1, pager.getNumberOfPages().intValue()));
         }
 
-        return numbers(1).join(Numbers.range(pager.getCurrentPage() - 1, pager.getCurrentPage() + 2)).join(numbers(pager.getNumberOfPages().intValue()));
+        return numbers(1).join(Numbers.range(pager.getCurrentPage() - 1, pager.getCurrentPage() + 1)).join(numbers(pager.getNumberOfPages().intValue()));
     }
 
     private Page toPage(final Pager pager, Number pageNumber) {

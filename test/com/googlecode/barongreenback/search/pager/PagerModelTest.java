@@ -18,7 +18,7 @@ public class PagerModelTest {
 
     @Test
     public void pagerModelHasNextAndPreviousPages() throws Exception {
-        Pager pager = pagerWithValues(range(1, 101), 2, 20);
+        Pager pager = pagerWithValues(range(1, 100), 2, 20);
 
         Sequence<Page> pages = sequence(new PagerModel().pages(pager));
         assertThat(pages.head(), is(new Page("← Previous", "prev", "QS1")));
@@ -27,7 +27,7 @@ public class PagerModelTest {
 
     @Test
     public void previousButtonIsDisabledWhenNotApplicable() throws Exception {
-        Pager pager = pagerWithValues(range(1, 101), 1, 20);
+        Pager pager = pagerWithValues(range(1, 100), 1, 20);
 
         Page previousPage = sequence(new PagerModel().pages(pager)).head();
         assertThat(previousPage.getCssClass(), containsString("disabled"));
@@ -36,7 +36,7 @@ public class PagerModelTest {
 
     @Test
     public void nextButtonIsDisabledWhenNotApplicable() throws Exception {
-        Pager pager = pagerWithValues(range(1, 101), 5, 20);
+        Pager pager = pagerWithValues(range(1, 100), 5, 20);
 
         Page nextPage = sequence(new PagerModel().pages(pager)).last();
         assertThat(nextPage.getCssClass(), containsString("disabled"));
@@ -45,34 +45,34 @@ public class PagerModelTest {
 
     @Test
     public void showsAllPagesWhenFiveOrFewerPages() throws Exception {
-        Pager pager = pagerWithValues(range(1, 101), 1, 20);
+        Pager pager = pagerWithValues(range(1, 100), 1, 20);
 
         assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pager)).map(asText())), is(sequence("1", "2", "3", "4", "5")));
     }
 
     @Test
     public void showsPageSelectorForAPageInTheMiddle() throws Exception {
-        Pager pager = pagerWithValues(range(1, 101), 50, 1);
+        Pager pager = pagerWithValues(range(1, 100), 50, 1);
 
         assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pager)).map(asText())), is(sequence("1", "...", "49", "50", "51", "...", "100")));
     }
 
     @Test
     public void showsPageSelectorWhenOnLowPageNumber() throws Exception {
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 1, 10))).map(asText())), is(sequence("1", "2", "...", "100")));
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 2, 10))).map(asText())), is(sequence("1", "2", "3", "...", "100")));
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 3, 10))).map(asText())), is(sequence("1", "2", "3", "4", "...", "100")));
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 4, 10))).map(asText())), is(sequence("1", "2", "3", "4", "5", "...", "100")));
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 5, 10))).map(asText())), is(sequence("1", "...", "4", "5", "6", "...", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 1, 10))).map(asText())), is(sequence("1", "2", "...", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 2, 10))).map(asText())), is(sequence("1", "2", "3", "...", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 3, 10))).map(asText())), is(sequence("1", "2", "3", "4", "...", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 4, 10))).map(asText())), is(sequence("1", "2", "3", "4", "5", "...", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 5, 10))).map(asText())), is(sequence("1", "...", "4", "5", "6", "...", "100")));
     }
 
     @Test
     public void showsPageSelectorForLastPage() throws Exception {
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 100, 10))).map(asText())), is(sequence("1", "...", "99", "100")));
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 99, 10))).map(asText())), is(sequence("1", "...", "98", "99", "100")));
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 98, 10))).map(asText())), is(sequence("1", "...", "97", "98", "99", "100")));
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 97, 10))).map(asText())), is(sequence("1", "...", "96", "97", "98", "99", "100")));
-        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1001), 96, 10))).map(asText())), is(sequence("1", "...", "95", "96", "97", "...", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 100, 10))).map(asText())), is(sequence("1", "...", "99", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 99, 10))).map(asText())), is(sequence("1", "...", "98", "99", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 98, 10))).map(asText())), is(sequence("1", "...", "97", "98", "99", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 97, 10))).map(asText())), is(sequence("1", "...", "96", "97", "98", "99", "100")));
+        assertThat(pageNumbersFrom(sequence(new PagerModel().pages(pagerWithValues(range(1, 1000), 96, 10))).map(asText())), is(sequence("1", "...", "95", "96", "97", "...", "100")));
     }
 
 
