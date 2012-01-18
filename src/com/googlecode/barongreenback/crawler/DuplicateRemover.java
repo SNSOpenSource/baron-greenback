@@ -22,9 +22,9 @@ public class DuplicateRemover implements Feeder<Uri> {
         return feeder.get(source, definition).unique(select(uniqueFields(definition).map(ignoreAlias())));
     }
 
-    public static Callable1<Keyword, Keyword> ignoreAlias() {
-        return new Callable1<Keyword, Keyword>() {
-            public Keyword call(Keyword keyword) throws Exception {
+    public static Callable1<Keyword<?>, Keyword<?>> ignoreAlias() {
+        return new Callable1<Keyword<?>, Keyword<?>>() {
+            public Keyword call(Keyword<?> keyword) throws Exception {
                 return Keywords.keyword(keyword.name(), keyword.forClass()).metadata(keyword.metadata());
             }
         };

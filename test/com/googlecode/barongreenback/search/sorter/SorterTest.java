@@ -7,6 +7,7 @@ import com.googlecode.totallylazy.Triple;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.MapRecord;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Unchecked;
 import com.googlecode.utterlyidle.RequestBuilder;
 import org.junit.Test;
 
@@ -67,8 +68,8 @@ public class SorterTest {
         };
     }
 
-    private Sequence<Keyword> keywords() {
-        return Sequences.<Keyword>sequence(keyword("stuCow"), keyword("mooCow"), keyword("blueCow", Date.class));
+    private Sequence<Keyword<?>> keywords() {
+        return Sequences.<Keyword<?>>sequence(keyword("stuCow"), keyword("mooCow"), keyword("blueCow", Date.class));
     }
 
     private Sequence<Record> records() {
@@ -77,9 +78,9 @@ public class SorterTest {
         return baseRecords.map(new Callable1<Triple<String, String, Date>, Record>() {
             public Record call(Triple<String, String, Date> triple) throws Exception {
                 Record record = MapRecord.record();
-                record.set(keywords().first(), triple.first());
-                record.set(keywords().second(), triple.second());
-                record.set(keywords().last(), triple.third());
+                record.set(Unchecked.<Keyword<Object>>cast(keywords().first()), triple.first());
+                record.set(Unchecked.<Keyword<Object>>cast(keywords().second()), triple.second());
+                record.set(Unchecked.<Keyword<Object>>cast(keywords().last()), triple.third());
                 return record;
             }
         });

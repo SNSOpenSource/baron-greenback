@@ -75,19 +75,19 @@ public class SearchResource {
     @Path("shortcut")
     public Object shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
         if (recordsService.count(viewName, query) == 1) {
-            final Sequence<Keyword> visibleHeaders = recordsService.visibleHeaders(viewName);
+            final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
             final Option<Record> optionalRecord = recordsService.findUnique(viewName, query);
-            Option<Keyword> unique = uniqueHeader(visibleHeaders);
+            Option<Keyword<?>> unique = uniqueHeader(visibleHeaders);
             return Responses.seeOther(uniqueUrlOf(optionalRecord.get(), unique.get(), viewName));
         } else {
             return Responses.seeOther(redirector.uriOf(method(on(this.getClass()).list(viewName, query))));
         }
     }
 
-    private Option<Keyword> uniqueHeader(Sequence<Keyword> visibleHeaders) {
-        return visibleHeaders.find(new Predicate<Keyword>() {
+    private Option<Keyword<?>> uniqueHeader(Sequence<Keyword<?>> visibleHeaders) {
+        return visibleHeaders.find(new Predicate<Keyword<?>>() {
             @Override
-            public boolean matches(Keyword other) {
+            public boolean matches(Keyword<?> other) {
                 return Boolean.TRUE.equals(other.metadata().get(Keywords.UNIQUE));
             }
         });
@@ -122,7 +122,7 @@ public class SearchResource {
             public Model call(Sequence<Record> results) throws Exception {
                 if (results.isEmpty()) return baseModel(viewName, query);
 
-                final Sequence<Keyword> visibleHeaders = recordsService.visibleHeaders(viewName);
+                final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
                 return baseModel(viewName, query).
                         add("headers", headers(visibleHeaders, results)).
                         add("pager", pager).
@@ -134,10 +134,10 @@ public class SearchResource {
         };
     }
 
-    private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword> visibleHeaders) {
+    private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword<?>> visibleHeaders) {
         return new Callable1<Record, Model>() {
             public Model call(Record record) throws Exception {
-                Sequence<Keyword> headers = visibleHeaders.isEmpty() ? record.keywords() : visibleHeaders;
+                Sequence<Keyword<?>> headers = visibleHeaders.isEmpty() ? record.keywords() : visibleHeaders;
                 Model model = model();
                 for (Keyword header : headers) {
                     Model field = model().
@@ -160,10 +160,10 @@ public class SearchResource {
                 dropScheme().dropAuthority();
     }
 
-    public static Callable2<Map<String, Map<String, Object>>, Pair<Keyword, Object>, Map<String, Map<String, Object>>> groupBy(final Keyword<String> lookupKeyword) {
-        return new Callable2<Map<String, Map<String, Object>>, Pair<Keyword, Object>, Map<String, Map<String, Object>>>() {
-            public Map<String, Map<String, Object>> call(Map<String, Map<String, Object>> map, Pair<Keyword, Object> pair) throws Exception {
-                Keyword keyword = pair.first();
+    public static Callable2<Map<String, Map<String, Object>>, Pair<Keyword<?>, Object>, Map<String, Map<String, Object>>> groupBy(final Keyword<String> lookupKeyword) {
+        return new Callable2<Map<String, Map<String, Object>>, Pair<Keyword<?>, Object>, Map<String, Map<String, Object>>>() {
+            public Map<String, Map<String, Object>> call(Map<String, Map<String, Object>> map, Pair<Keyword<?>, Object> pair) throws Exception {
+                Keyword<?> keyword = pair.first();
                 Object value = pair.second();
                 String key = keyword.metadata().get(lookupKeyword);
                 if (Strings.isEmpty(key)) key = "Other";
@@ -176,18 +176,18 @@ public class SearchResource {
         };
     }
 
-    private Sequence<Keyword> headers(Model view) {
+    private Sequence<Keyword<?>> headers(Model view) {
         return toKeywords(unwrap(view));
     }
 
-    private List<Map<String, Object>> headers(Sequence<Keyword> headers, Sequence<Record> results) {
+    private List<Map<String, Object>> headers(Sequence<Keyword<?>> headers, Sequence<Record> results) {
         if (headers.isEmpty()) {
             return toModel(keywords(results).realise());
         }
         return toModel(headers);
     }
 
-    private List<Map<String, Object>> toModel(Sequence<Keyword> keywords) {
+    private List<Map<String, Object>> toModel(Sequence<Keyword<?>> keywords) {
         return keywords.map(asHeader()).
                 map(Model.asMap()).
                 toList();

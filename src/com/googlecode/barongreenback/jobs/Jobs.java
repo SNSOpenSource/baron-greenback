@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.barongreenback.crawler.UniqueRecords;
+import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -17,7 +18,7 @@ import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Using.using;
 
 public class Jobs {
-    public static final Keyword<String> JOBS = keyword("jobs", String.class);
+    public static final RecordName JOBS = RecordName.recordName("jobs");
     private final Records records;
 
     public Jobs(final Records records) {

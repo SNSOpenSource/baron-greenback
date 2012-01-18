@@ -33,7 +33,7 @@ public class SubFeeder implements Feeder<Uri> {
     private Callable1<Record, Sequence<Record>> allSubFeeds() {
         return new Callable1<Record, Sequence<Record>>() {
             public Sequence<Record> call(final Record record) throws Exception {
-                Sequence<Keyword> subFeedKeys = record.keywords().
+                Sequence<Keyword<?>> subFeedKeys = record.keywords().
                         filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
                         realise(); // Must Realise so we don't get concurrent modification as we add new fields to the record
                 if (subFeedKeys.isEmpty()) {

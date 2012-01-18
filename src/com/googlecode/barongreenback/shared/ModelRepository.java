@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -26,7 +27,7 @@ import static com.googlecode.lazyrecords.RecordMethods.update;
 import static com.googlecode.lazyrecords.Using.using;
 
 public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUID, Model>> {
-    public static final Keyword<Object> MODELS = keyword("models");
+    public static final RecordName MODELS = RecordName.recordName("models");
     public static final Keyword<UUID> ID = keyword("models_id", UUID.class);
     public static final Keyword<String> MODEL_TYPE = keyword("models_type", String.class);
     public static final Keyword<Model> MODEL = keyword("model", Model.class);

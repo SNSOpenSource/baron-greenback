@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.search;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
@@ -71,11 +72,11 @@ public class RecordsService {
         return getRecords(view, query, visibleHeaders(headers(view)));
     }
 
-    private Either<String, Sequence<Record>> getRecords(Model view, String query, Sequence<Keyword> visibleHeaders) {
+    private Either<String, Sequence<Record>> getRecords(Model view, String query, Sequence<Keyword<?>> visibleHeaders) {
         Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders);
         if(invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
 
-        Keyword recordName = recordName(view);
+        RecordName recordName = recordName(view);
         records.define(recordName, headers(view).toArray(Keyword.class));
         return right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
     }
@@ -88,20 +89,20 @@ public class RecordsService {
         return Views.find(modelRepository, view);
     }
 
-    public Sequence<Keyword> visibleHeaders(final String viewName) {
+    public Sequence<Keyword<?>> visibleHeaders(final String viewName) {
         return visibleHeaders(view(viewName));
     }
 
-    public Sequence<Keyword> visibleHeaders(final Model view) {
+    public Sequence<Keyword<?>> visibleHeaders(final Model view) {
         return visibleHeaders(headers(view));
     }
 
-    private static Sequence<Keyword> visibleHeaders(Sequence<Keyword> headers) {
+    private static Sequence<Keyword<?>> visibleHeaders(Sequence<Keyword<?>> headers) {
         return headers.filter(where(metadata(Views.VISIBLE), is(notNullValue(Boolean.class).and(is(true)))));
     }
 
 
-    public static Sequence<Keyword> headers(Model view) {
+    public static Sequence<Keyword<?>> headers(Model view) {
         return toKeywords(unwrap(view));
     }
 

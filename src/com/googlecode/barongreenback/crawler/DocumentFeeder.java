@@ -20,7 +20,7 @@ public class DocumentFeeder implements Feeder<Document> {
     }
 
     @SuppressWarnings("unchecked")
-    public static Callable1<Record, Record> replaceAlias(final Sequence<Keyword> fields) {
+    public static Callable1<Record, Record> replaceAlias(final Sequence<Keyword<?>> fields) {
         return new Callable1<Record, Record>() {
             public Record call(Record record) throws Exception {
                 Record result = MapRecord.record();

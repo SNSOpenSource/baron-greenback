@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
@@ -31,10 +32,10 @@ public class Views {
         return new ModelCleaner(in("view", "name", "records", "query", "priority", "keywords", "group", "type", "unique", "visible")).clean(root);
     }
 
-    public static Model convertToViewModel(Keyword<Object> recordName, Sequence<Keyword> keywords) {
+    public static Model convertToViewModel(RecordName recordName, Sequence<? extends Keyword<?>> keywords) {
         return model().add(ROOT, model().
-                add("name", recordName.name()).
-                add("records", recordName.name()).
+                add("name", recordName.value()).
+                add("records", recordName.value()).
                 add("query", "").
                 add("visible", true).
                 add("priority", "").
@@ -103,8 +104,8 @@ public class Views {
                         Predicates.where(callable1, predicate)));
     }
 
-    public static Keyword recordName(Model view) {
-        return keyword(unwrap(view).<String>get("records"));
+    public static RecordName recordName(Model view) {
+        return RecordName.recordName(unwrap(view).<String>get("records"));
     }
 
     private static String name(Model model) {

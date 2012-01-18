@@ -18,7 +18,7 @@ public class PredicateBuilder {
         this.queryParser = queryParser;
     }
 
-    public Either<String, Predicate<Record>> build(Model view, String query, Sequence<Keyword> keywords) {
+    public Either<String, Predicate<Record>> build(Model view, String query, Sequence<Keyword<?>> keywords) {
         return parse(prefix(view, query), keywords);
     }
 
@@ -30,7 +30,7 @@ public class PredicateBuilder {
         return model.get("view", Model.class).get("query", String.class);
     }
 
-    private Either<String, Predicate<Record>> parse(String query, Sequence<Keyword> keywords) {
+    private Either<String, Predicate<Record>> parse(String query, Sequence<Keyword<?>> keywords) {
         try {
             Predicate<Record> predicate = queryParser.parse(query, keywords);
             return Either.right(predicate);

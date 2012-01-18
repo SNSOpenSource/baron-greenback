@@ -34,7 +34,7 @@ public class Sorter {
         this.sortDirection = queryParameters.getValue(SORT_DIRECTION_QUERY_PARAM);
     }
 
-    public Sequence<Record> sort(Sequence<Record> results, Sequence<Keyword> allHeaders) {
+    public Sequence<Record> sort(Sequence<Record> results, Sequence<Keyword<?>> allHeaders) {
         Keyword keyword = allHeaders.find(where(name(), is(option(sortColumn).getOrElse(allHeaders.first().name())))).get();
         if (DESCENDING_SORT_DIRECTION.equalsIgnoreCase(sortDirection)) {
             return results.sortBy(descending(keyword));
@@ -42,7 +42,7 @@ public class Sorter {
         return results.sortBy(keyword);
     }
 
-    public String linkFor(Keyword keyword, Sequence<Keyword> visibleHeaders) {
+    public String linkFor(Keyword keyword, Sequence<Keyword<?>> visibleHeaders) {
         Parameters parameters = queryParameters.remove(SORT_COLUMN_QUERY_PARAM).remove(SORT_DIRECTION_QUERY_PARAM).add(SORT_COLUMN_QUERY_PARAM, keyword.name());
         if (keyword.name().equals(option(sortColumn).getOrElse(visibleHeaders.head().name())) && !DESCENDING_SORT_DIRECTION.equals(sortDirection)) {
             parameters.add(SORT_DIRECTION_QUERY_PARAM, DESCENDING_SORT_DIRECTION);
@@ -51,7 +51,7 @@ public class Sorter {
         return parameters.toString();
     }
 
-    public String getSortedColumn(Sequence<Keyword> visibleHeaders) {
+    public String getSortedColumn(Sequence<Keyword<?>> visibleHeaders) {
         return option(sortColumn).getOrElse(visibleHeaders.head().name());
     }
 
@@ -59,11 +59,11 @@ public class Sorter {
         return DESCENDING_SORT_DIRECTION.equalsIgnoreCase(sortDirection);
     }
 
-    public Map<String, String> sortedHeaders(Sequence<Keyword> visibleHeaders) {
+    public Map<String, String> sortedHeaders(Sequence<Keyword<?>> visibleHeaders) {
         return Maps.map(Pair.pair(getSortedColumn(visibleHeaders), isSortedDescending() ? "headerSortUp" : "headerSortDown"));
     }
 
-    public Map<String, String> sortLinks(final Sequence<Keyword> visibleHeaders) {
+    public Map<String, String> sortLinks(final Sequence<Keyword<?>> visibleHeaders) {
         Map<String, String> linkMap = Maps.map();
         return visibleHeaders.fold(linkMap, new Callable2<Map<String, String>, Keyword, Map<String, String>>() {
             public Map<String, String> call(Map<String, String> linkMap, Keyword keyword) throws Exception {

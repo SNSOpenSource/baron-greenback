@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
+import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.lazyrecords.Keyword;
@@ -15,25 +16,26 @@ import java.net.URI;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.MapRecord.record;
+import static com.googlecode.lazyrecords.RecordName.recordName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class CrawlerTest extends CrawlerTests{
-    public static final Keyword<Object> USER = keyword("/user");
+    public static final RecordName USER = recordName("/user");
     public static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
     public static final Keyword<String> FIRST = Keywords.keyword("first", String.class);
     public static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class).as(FIRST);
 
-    public static final RecordDefinition ENTRY_DEFINITION = new RecordDefinition(USER, Sequences.<Keyword>sequence(USER_ID, FIRST_NAME));
+    public static final RecordDefinition ENTRY_DEFINITION = new RecordDefinition(USER, Sequences.<Keyword<?>>sequence(USER_ID, FIRST_NAME));
 
-    public static final Keyword<Object> ENTRIES = keyword("/feed/entry");
+    public static final RecordName ENTRIES = recordName("/feed/entry");
     public static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, true).set(Views.VISIBLE, true));
     public static final Keyword<URI> LINK = keyword("link/@href", URI.class).
             metadata(record().set(Keywords.UNIQUE, true).set(RECORD_DEFINITION, ENTRY_DEFINITION));
     public static final Keyword<String> UPDATED = keyword("updated", String.class).metadata(record().set(Crawler.CHECKPOINT, true));
     public static final Keyword<String> TITLE = keyword("title", String.class);
 
-    public static final RecordDefinition ATOM_DEFINITION = new RecordDefinition(ENTRIES, Sequences.<Keyword>sequence(ID, LINK, UPDATED, TITLE));
+    public static final RecordDefinition ATOM_DEFINITION = new RecordDefinition(ENTRIES, Sequences.<Keyword<?>>sequence(ID, LINK, UPDATED, TITLE));
 
     @Test
     public void shouldGetTheContentsOfAUrlAndExtractContent() throws Exception {

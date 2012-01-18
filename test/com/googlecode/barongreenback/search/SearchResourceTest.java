@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.crawler.CrawlerTests;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
+import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.lazyrecords.Keyword;
@@ -97,7 +98,7 @@ public class SearchResourceTest extends ApplicationTests {
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
                 LuceneRecords luceneRecords = container.get(LuceneRecords.class);
-                Keyword<Object> users = keyword("users");
+                RecordName users = RecordName.recordName("users");
                 luceneRecords.define(users, keywords(recordSequence).toArray(Keyword.class));
                 luceneRecords.add(users, recordSequence);
                 ModelRepository views = container.get(ModelRepository.class);

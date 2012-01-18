@@ -11,14 +11,14 @@ import java.util.Set;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class UniqueRecords implements Predicate<Record> {
-    private final Sequence<Keyword> uniqueFields;
+    private final Sequence<Keyword<?>> uniqueFields;
     private final Set<Sequence<Object>> uniqueValues = new HashSet<Sequence<Object>>();
 
-    public UniqueRecords(Keyword... uniqueFields) {
+    public UniqueRecords(Keyword<?>... uniqueFields) {
         this(sequence(uniqueFields));
     }
 
-    public UniqueRecords(Sequence<Keyword> uniqueFields) {
+    public UniqueRecords(Sequence<Keyword<?>> uniqueFields) {
         this.uniqueFields = uniqueFields;
     }
 

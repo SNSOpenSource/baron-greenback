@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.shared;
 import com.googlecode.barongreenback.crawler.Crawler;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
@@ -29,48 +30,49 @@ import static com.googlecode.totallylazy.Strings.isEmpty;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.lazyrecords.MapRecord.record;
+import static com.googlecode.totallylazy.Unchecked.cast;
 import static java.lang.Boolean.TRUE;
 
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
     public static final Keyword<Boolean> SUBFEED = keyword("subfeed", Boolean.class);
     public static final Predicate<Keyword> UNIQUE_FILTER = Predicates.and(where(metadata(Keywords.UNIQUE), is(notNullValue())), where(metadata(Keywords.UNIQUE), is(true)));
-    private final Keyword<Object> recordName;
-    private final Sequence<Keyword> fields;
+    private final RecordName recordName;
+    private final Sequence<? extends Keyword<?>> fields;
 
-    public RecordDefinition(Keyword<Object> recordName, Sequence<Keyword> fields) {
+    public RecordDefinition(RecordName recordName, Sequence<? extends Keyword<?>> fields) {
         this.recordName = recordName;
         this.fields = fields;
     }
 
-    public RecordDefinition recordDefinition(Keyword<Object> recordName, Sequence<Keyword> fields) {
+    public RecordDefinition recordDefinition(RecordName recordName, Sequence<Keyword<?>> fields) {
         return new RecordDefinition(recordName, fields);
     }
 
-    public Keyword<Object> recordName() {
+    public RecordName recordName() {
         return recordName;
     }
 
-    public Sequence<Keyword> fields() {
-        return fields;
+    public Sequence<Keyword<?>> fields() {
+        return cast(fields);
     }
 
-    public static Sequence<Keyword> uniqueFields(RecordDefinition recordDefinition) {
+    public static Sequence<Keyword<?>> uniqueFields(RecordDefinition recordDefinition) {
         return allFields(recordDefinition).filter(UNIQUE_FILTER);
     }
 
-    public static Sequence<Keyword> allFields(RecordDefinition recordDefinition) {
+    public static Sequence<Keyword<?>> allFields(RecordDefinition recordDefinition) {
         return recordDefinition.fields().flatMap(allFields());
     }
 
-    public static Callable1<? super Keyword, Sequence<Keyword>> allFields() {
-        return new Callable1<Keyword, Sequence<Keyword>>() {
-            public Sequence<Keyword> call(Keyword keyword) throws Exception {
+    public static Callable1<Keyword<?>, Sequence<Keyword<?>>> allFields() {
+        return new Callable1<Keyword<?>, Sequence<Keyword<?>>>() {
+            public Sequence<Keyword<?>> call(Keyword<?> keyword) throws Exception {
                 RecordDefinition recordDefinition = keyword.metadata().get(RecordDefinition.RECORD_DEFINITION);
                 if (recordDefinition != null) {
-                    return sequence(keyword).join(allFields(recordDefinition));
+                    return Sequences.<Keyword<?>>one(keyword).join(allFields(recordDefinition));
                 }
-                return sequence(keyword);
+                return Sequences.<Keyword<?>>one(keyword);
             }
         };
     }
@@ -79,8 +81,8 @@ public class RecordDefinition {
         return toModel(recordName(), fields());
     }
 
-    public static Model toModel(final Keyword<Object> keyword, final Sequence<Keyword> fields) {
-        return recordDefinition(keyword.name(),
+    public static Model toModel(final RecordName keyword, final Sequence<Keyword<?>> fields) {
+        return recordDefinition(keyword.value(),
                 fields.map(asKeywordDefinition()).toArray(Model.class));
     }
 
@@ -163,28 +165,28 @@ public class RecordDefinition {
         if (model == null) {
             return null;
         }
-        return new RecordDefinition(keyword(model.get("name", String.class)), toKeywords(model));
+        return new RecordDefinition(RecordName.recordName(model.get("name", String.class)), toKeywords(model));
     }
 
-    public static Callable1<? super Model, Sequence<Keyword>> asKeywords() {
-        return new Callable1<Model, Sequence<Keyword>>() {
-            public Sequence<Keyword> call(Model model) throws Exception {
+    public static Callable1<? super Model, Sequence<Keyword<?>>> asKeywords() {
+        return new Callable1<Model, Sequence<Keyword<?>>>() {
+            public Sequence<Keyword<?>> call(Model model) throws Exception {
                 return toKeywords(model);
             }
         };
     }
 
-    public static Sequence<Keyword> toKeywords(Model model) {
+    public static Sequence<Keyword<?>> toKeywords(Model model) {
         return toKeywords(model.getValues("keywords", Model.class));
     }
 
-    public static Sequence<Keyword> toKeywords(List<Model> keywords) {
+    public static Sequence<Keyword<?>> toKeywords(List<Model> keywords) {
         return sequence(keywords).filter(where(value("name", String.class), is(not(empty())))).map(asKeyword());
     }
 
-    private static Callable1<Model, Keyword> asKeyword() {
-        return new Callable1<Model, Keyword>() {
-            public Keyword call(Model model) throws Exception {
+    private static Callable1<Model, Keyword<?>> asKeyword() {
+        return new Callable1<Model, Keyword<?>>() {
+            public Keyword<?> call(Model model) throws Exception {
                 Keyword<?> keyword = keyword(model.get("name", String.class),
                         Class.forName(model.get("type", String.class)));
 
