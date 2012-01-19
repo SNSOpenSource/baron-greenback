@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.lucene;
+package com.googlecode.barongreenback.persistence.lucene;
 
 import com.googlecode.totallylazy.Files;
 

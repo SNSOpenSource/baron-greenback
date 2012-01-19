@@ -1,12 +1,12 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 

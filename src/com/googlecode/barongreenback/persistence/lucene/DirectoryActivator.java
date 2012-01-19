@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.lucene;
+package com.googlecode.barongreenback.persistence.lucene;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;

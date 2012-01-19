@@ -5,7 +5,6 @@ import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.time.Dates;
-import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Waitrest;
 import org.junit.Test;
 

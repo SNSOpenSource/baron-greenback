@@ -2,11 +2,11 @@ package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.search.pager.RequestPager;
+import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.lazyrecords.parser.ParametrizedParser;
 import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.lazyrecords.parser.StandardParser;
-import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.ModuleDefiner;
@@ -14,12 +14,11 @@ import com.googlecode.utterlyidle.modules.ModuleDefinitions;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;
-import org.apache.lucene.queryParser.ParseException;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
 public class SearchModule implements ResourcesModule, RequestScopedModule, ModuleDefiner {
-    public Module addResources(Resources resources) throws ParseException {
+    public Module addResources(Resources resources) {
         resources.add(annotatedClass(SearchResource.class));
         return this;
     }

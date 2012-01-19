@@ -3,6 +3,9 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
@@ -12,16 +15,13 @@ import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Second;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.numbers.Numbers;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
-import com.googlecode.lazyrecords.Record;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.lazyrecords.Keywords.keyword;
 
 public class Views {
     public static final Keyword<Boolean> VISIBLE = keyword("visible", Boolean.class);

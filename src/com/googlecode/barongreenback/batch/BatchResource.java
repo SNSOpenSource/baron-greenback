@@ -13,7 +13,12 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.annotations.*;
+import com.googlecode.utterlyidle.annotations.FormParam;
+import com.googlecode.utterlyidle.annotations.GET;
+import com.googlecode.utterlyidle.annotations.POST;
+import com.googlecode.utterlyidle.annotations.Path;
+import com.googlecode.utterlyidle.annotations.Produces;
+import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.io.IOException;
 import java.util.HashMap;

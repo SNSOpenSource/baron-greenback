@@ -2,15 +2,16 @@ package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.crawler.CrawlerTest;
 import com.googlecode.barongreenback.crawler.CrawlerTests;
+import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
-import com.googlecode.lazyrecords.RecordName;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Sequence;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.lucene.LuceneRecords;
+import com.googlecode.lazyrecords.RecordName;
+import com.googlecode.lazyrecords.Records;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -23,12 +24,11 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.lazyrecords.Keywords.keywords;
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
-import static com.googlecode.lazyrecords.Keywords.keyword;
-import static com.googlecode.lazyrecords.Keywords.keywords;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -97,10 +97,10 @@ public class SearchResourceTest extends ApplicationTests {
 
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
-                LuceneRecords luceneRecords = container.get(LuceneRecords.class);
+                Records records = container.get(BaronGreenbackRecords.class).value();
                 RecordName users = RecordName.recordName("users");
-                luceneRecords.define(users, keywords(recordSequence).toArray(Keyword.class));
-                luceneRecords.add(users, recordSequence);
+                records.define(users, keywords(recordSequence).toArray(Keyword.class));
+                records.add(users, recordSequence);
                 ModelRepository views = container.get(ModelRepository.class);
                 views.set(UUID.randomUUID(), Views.convertToViewModel(users, keywords(recordSequence)));
                 return VOID;

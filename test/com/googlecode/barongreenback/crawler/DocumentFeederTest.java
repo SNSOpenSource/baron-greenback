@@ -2,12 +2,12 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.matchers.IterableMatcher;
-import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
@@ -22,7 +22,9 @@ import java.io.File;
 import java.text.ParseException;
 import java.util.Date;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTest.*;
+import static com.googlecode.barongreenback.crawler.CrawlerTest.ATOM_DEFINITION;
+import static com.googlecode.barongreenback.crawler.CrawlerTest.ENTRY_DEFINITION;
+import static com.googlecode.barongreenback.crawler.CrawlerTest.FIRST;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.Xml.document;

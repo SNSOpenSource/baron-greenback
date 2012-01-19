@@ -1,11 +1,9 @@
 package com.googlecode.barongreenback.views;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.RecordName;
-import com.googlecode.totallylazy.Sequences;
-import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Sequences;
 import org.junit.Test;
 
 import static com.googlecode.barongreenback.views.Views.convertToViewModel;

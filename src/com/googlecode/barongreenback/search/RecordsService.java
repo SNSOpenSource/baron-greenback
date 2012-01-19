@@ -1,9 +1,13 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.RecordName;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
@@ -11,14 +15,11 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.Records;
-import org.apache.lucene.queryParser.ParseException;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.recordName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
+import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.totallylazy.Callables.ignoreAndReturn;
 import static com.googlecode.totallylazy.Callables.size;
 import static com.googlecode.totallylazy.Either.right;
@@ -26,7 +27,6 @@ import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.lazyrecords.Keywords.metadata;
 
 public class RecordsService {
 
@@ -34,8 +34,8 @@ public class RecordsService {
     private final ModelRepository modelRepository;
     private final PredicateBuilder predicateBuilder;
 
-    public RecordsService(final Records records, final ModelRepository modelRepository, final PredicateBuilder predicateBuilder) {
-        this.records = records;
+    public RecordsService(final BaronGreenbackRecords records, final ModelRepository modelRepository, final PredicateBuilder predicateBuilder) {
+        this.records = records.value();
         this.modelRepository = modelRepository;
         this.predicateBuilder = predicateBuilder;
     }
@@ -46,7 +46,7 @@ public class RecordsService {
         records.remove(recordName(view), predicate);
     }
 
-    public Integer count(String viewName, String query) throws ParseException {
+    public Integer count(String viewName, String query) {
         Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return 0;
 

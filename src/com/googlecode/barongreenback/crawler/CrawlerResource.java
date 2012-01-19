@@ -1,12 +1,17 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.JobsResource;
+import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.RecordName;
+import com.googlecode.lazyrecords.Records;
+import com.googlecode.lazyrecords.simpledb.mappings.Mappings;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -14,10 +19,6 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.numbers.Numbers;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.Records;
-import com.googlecode.lazyrecords.simpledb.mappings.Mappings;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -27,7 +28,6 @@ import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
-import org.apache.lucene.queryParser.ParseException;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +40,7 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTE
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Callables.toClass;
 import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -47,8 +48,6 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
-import static com.googlecode.lazyrecords.Keywords.keyword;
-import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
@@ -61,8 +60,8 @@ public class CrawlerResource {
     private final Crawler crawler;
     private final Redirector redirector;
 
-    public CrawlerResource(final Records records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector) {
-        this.records = records;
+    public CrawlerResource(final BaronGreenbackRecords records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector) {
+        this.records = records.value();
         this.modelRepository = modelRepository;
         this.crawler = crawler;
         this.redirector = redirector;
@@ -250,7 +249,7 @@ public class CrawlerResource {
     }
 
 
-    private String put(final RecordName recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd) throws ParseException {
+    private String put(final RecordName recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd)  {
         Sequence<Keyword<?>> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
         if (find(modelRepository, recordName.value()).isEmpty()) {
             modelRepository.set(randomUUID(), Views.convertToViewModel(recordName, keywords));

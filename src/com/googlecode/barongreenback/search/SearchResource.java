@@ -5,10 +5,18 @@ import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.*;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -20,7 +28,6 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
-import org.apache.lucene.queryParser.ParseException;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,9 +36,9 @@ import java.util.Map;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.lazyrecords.Keywords.keywords;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
-import static com.googlecode.lazyrecords.Keywords.keywords;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -54,7 +61,7 @@ public class SearchResource {
 
     @POST
     @Path("delete")
-    public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
+    public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query) {
         if (!mode.equals(AdvancedMode.Enable)) {
             return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
         }
@@ -65,7 +72,7 @@ public class SearchResource {
 
     @GET
     @Path("list")
-    public Model list(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
+    public Model list(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
 
         return errorOrResults.map(handleError(viewName, query), listResults(viewName, query));
@@ -73,7 +80,7 @@ public class SearchResource {
 
     @GET
     @Path("shortcut")
-    public Object shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) throws ParseException {
+    public Object shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
         if (recordsService.count(viewName, query) == 1) {
             final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
             final Option<Record> optionalRecord = recordsService.findUnique(viewName, query);
@@ -95,7 +102,7 @@ public class SearchResource {
 
     @GET
     @Path("unique")
-    public Object unique(@PathParam("view") String viewName, @QueryParam("query") String query) throws ParseException {
+    public Object unique(@PathParam("view") String viewName, @QueryParam("query") String query) {
         final Option<Record> record = recordsService.findUnique(viewName, query);
         if (record.isEmpty()) return Responses.response(Status.NOT_FOUND);
 
@@ -154,7 +161,7 @@ public class SearchResource {
         };
     }
 
-    private Uri uniqueUrlOf(Record record, Keyword visibleHeader, String viewName) throws ParseException {
+    private Uri uniqueUrlOf(Record record, Keyword visibleHeader, String viewName) {
         return redirector.uriOf(method(on(SearchResource.class).
                 unique(viewName, String.format("%s:\"%s\"", visibleHeader.name(), record.get(visibleHeader))))).
                 dropScheme().dropAuthority();

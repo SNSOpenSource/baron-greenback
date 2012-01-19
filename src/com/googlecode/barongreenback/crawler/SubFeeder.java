@@ -1,21 +1,21 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.LazyException;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
+import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.RecordMethods.merge;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Uri.uri;
-import static com.googlecode.lazyrecords.Keywords.metadata;
-import static com.googlecode.lazyrecords.RecordMethods.merge;
 import static java.lang.String.format;
 
 public class SubFeeder implements Feeder<Uri> {

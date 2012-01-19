@@ -1,8 +1,5 @@
 package com.googlecode.barongreenback.jobs;
 
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Runnables;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;

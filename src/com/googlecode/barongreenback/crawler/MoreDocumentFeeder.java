@@ -1,10 +1,10 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.lazyrecords.Record;
 import org.w3c.dom.Document;
 
 import java.util.concurrent.Callable;

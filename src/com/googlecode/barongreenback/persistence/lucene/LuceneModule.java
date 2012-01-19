@@ -1,8 +1,7 @@
-package com.googlecode.barongreenback.lucene;
+package com.googlecode.barongreenback.persistence.lucene;
 
+import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.Records;
-import com.googlecode.lazyrecords.lucene.LuceneRecords;
 import com.googlecode.lazyrecords.lucene.LuceneStorage;
 import com.googlecode.lazyrecords.lucene.OptimisedStorage;
 import com.googlecode.lazyrecords.lucene.mappings.Mappings;
@@ -22,11 +21,11 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
         return this;
     }
 
-    public Module addPerRequestObjects(Container container) {
-        container.add(LuceneRecords.class);
-        container.addActivator(Records.class, container.getActivator(LuceneRecords.class));
+    public Module addPerRequestObjects(final Container container) {
+        container.addActivator(BaronGreenbackRecords.class, new LuceneBaronGreenbackRecordsActivator(container));
         container.addInstance(Mappings.class, new Mappings().add(Model.class, new ModelMapping()));
         container.addInstance(PrintStream.class, new StringPrintStream());
         return this;
     }
+
 }

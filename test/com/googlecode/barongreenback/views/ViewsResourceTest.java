@@ -7,7 +7,6 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.yadic.Container;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +19,6 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.util.UUID.randomUUID;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;

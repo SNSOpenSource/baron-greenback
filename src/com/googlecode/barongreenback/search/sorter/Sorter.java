@@ -1,22 +1,22 @@
 package com.googlecode.barongreenback.search.sorter;
 
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
 import com.googlecode.utterlyidle.Parameters;
 import com.googlecode.utterlyidle.QueryParameters;
 import com.googlecode.utterlyidle.Request;
 
 import java.util.Map;
 
+import static com.googlecode.lazyrecords.Keywords.name;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.lazyrecords.Keywords.name;
 
 public class Sorter {
 

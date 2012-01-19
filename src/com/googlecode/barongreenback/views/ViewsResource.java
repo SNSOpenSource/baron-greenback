@@ -20,7 +20,6 @@ import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.Priority;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 

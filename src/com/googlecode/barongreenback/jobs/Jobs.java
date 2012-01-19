@@ -1,29 +1,28 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.barongreenback.crawler.UniqueRecords;
-import com.googlecode.lazyrecords.RecordName;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.RecordMethods;
+import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.lazyrecords.Records;
+import com.googlecode.totallylazy.Sequence;
 
 import java.util.UUID;
 
+import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.empty;
-import static com.googlecode.lazyrecords.Keywords.keyword;
-import static com.googlecode.lazyrecords.Using.using;
 
 public class Jobs {
     public static final RecordName JOBS = RecordName.recordName("jobs");
     private final Records records;
 
-    public Jobs(final Records records) {
-        this.records = records;
-        define(records);
+    public Jobs(final BaronGreenbackRecords records) {
+        this.records = records.value();
+        define(this.records);
     }
 
     private static void define(Records records) {

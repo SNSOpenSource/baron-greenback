@@ -1,12 +1,12 @@
 package com.googlecode.barongreenback.search.sorter;
 
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.MapRecord;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Triple;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.MapRecord;
-import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Unchecked;
 import com.googlecode.utterlyidle.RequestBuilder;
 import org.junit.Test;
@@ -15,9 +15,9 @@ import java.util.Date;
 
 import static com.googlecode.barongreenback.search.sorter.Sorter.SORT_COLUMN_QUERY_PARAM;
 import static com.googlecode.barongreenback.search.sorter.Sorter.SORT_DIRECTION_QUERY_PARAM;
+import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Triple.triple;
-import static com.googlecode.lazyrecords.Keywords.keyword;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 

@@ -1,12 +1,12 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Uri;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Uri;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.lazyrecords.SelectCallable.select;

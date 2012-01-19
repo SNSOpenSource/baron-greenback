@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.lucene;
+package com.googlecode.barongreenback.persistence.lucene;
 
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.index.IndexWriter;

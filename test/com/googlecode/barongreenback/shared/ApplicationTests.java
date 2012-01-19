@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.lucene.LuceneIndexConfiguration;
+import com.googlecode.barongreenback.persistence.lucene.LuceneIndexConfiguration;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;

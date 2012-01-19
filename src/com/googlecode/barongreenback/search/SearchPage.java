@@ -5,7 +5,6 @@ import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
-import org.apache.lucene.queryParser.ParseException;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -32,7 +31,7 @@ public class SearchPage {
         this(httpHandler, httpHandler.handle(url(view, query).query("advanced", advanced).build()));
     }
 
-    private static RequestBuilder url(String view, String query) throws ParseException {
+    private static RequestBuilder url(String view, String query) {
         return get("/" + relativeUriOf(method(on(SearchResource.class).list(view, query))));
     }
 

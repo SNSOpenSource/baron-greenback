@@ -4,7 +4,7 @@ import com.googlecode.barongreenback.batch.BatchModule;
 import com.googlecode.barongreenback.crawler.CrawlerModule;
 import com.googlecode.barongreenback.jobs.JobsModule;
 import com.googlecode.barongreenback.less.LessCssModule;
-import com.googlecode.barongreenback.lucene.LuceneModule;
+import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
 import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
 import com.googlecode.barongreenback.views.ViewsModule;

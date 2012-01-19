@@ -2,12 +2,12 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
-import com.googlecode.lazyrecords.RecordName;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.RecordName;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 

@@ -1,9 +1,9 @@
 package com.googlecode.barongreenback.jobs;
 
-import com.googlecode.totallylazy.Callable1;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.MapRecord;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Callable1;
 
 import java.util.Date;
 import java.util.UUID;

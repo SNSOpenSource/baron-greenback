@@ -1,30 +1,27 @@
 package com.googlecode.barongreenback.shared;
 
+import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.RecordName;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.lazyrecords.ImmutableKeyword;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.Records;
-import com.googlecode.waitrest.internal.totallylazy.callables.CountNotNull;
 
 import java.util.UUID;
 
-import static com.googlecode.totallylazy.Callables.second;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Sequences.first;
-import static com.googlecode.totallylazy.Some.some;
-import static com.googlecode.totallylazy.callables.CountNotNull.count;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.MapRecord.record;
 import static com.googlecode.lazyrecords.RecordMethods.update;
 import static com.googlecode.lazyrecords.Using.using;
+import static com.googlecode.totallylazy.Callables.second;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.first;
 
 public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUID, Model>> {
     public static final RecordName MODELS = RecordName.recordName("models");
@@ -33,9 +30,9 @@ public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUI
     public static final Keyword<Model> MODEL = keyword("model", Model.class);
     private final Records records;
 
-    public ModelRepository(final Records records) {
-        this.records = records;
-        records.define(MODELS, ID, MODEL, MODEL_TYPE);
+    public ModelRepository(final BaronGreenbackRecords records) {
+        this.records = records.value();
+        this.records.define(MODELS, ID, MODEL, MODEL_TYPE);
     }
 
     public Option<Model> get(UUID key) {
