@@ -156,7 +156,7 @@ public class ViewsResource {
                 return model.add("id", pair.first()).
                         add("current", current.equals(name)).
                         add("itemsTotal", recordsService.count(model.<String>get("records"), model.<String>get("query")+" "+query)).
-                        add("url", redirector.uriOf(method(on(SearchResource.class).list(name, ""))));
+                        add("url", redirector.uriOf(method(on(SearchResource.class).list(name, query))));
             }
         };
     }

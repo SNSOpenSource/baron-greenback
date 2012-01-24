@@ -32,7 +32,7 @@
 </div>
 
 <div class="content">
-    $include.({$base$views/menu?current=$meta.view$}).body$
+    $include.({$base$views/menu?current=$meta.view$&query=$meta.query$}).body$
     $body$
 </div>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-1.6.4.js"></script>
