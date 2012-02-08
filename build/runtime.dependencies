@@ -6,12 +6,12 @@ mvn:org.sitemesh:sitemesh:jar:3.0-alpha-2
 mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
-mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:602
+mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:615
 mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:10
-mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:458
-mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:133
-mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:67
-mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:5
+mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:466
+mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:134
+mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:69
+mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:7
 
 
 mvn:rhino:js:jar:1.6R7
