@@ -7,7 +7,7 @@ import com.googlecode.totallylazy.Value;
 import java.io.Closeable;
 import java.io.IOException;
 
-public class BaronGreenbackRecords implements Value<Records>, Closeable {
+public class BaronGreenbackRecords implements Value<Records> {
     private final Records records;
 
     private BaronGreenbackRecords(Records records) {
@@ -21,10 +21,5 @@ public class BaronGreenbackRecords implements Value<Records>, Closeable {
     @Override
     public Records value() {
         return records;
-    }
-
-    @Override
-    public void close() throws IOException {
-        Closeables.close(records);
     }
 }

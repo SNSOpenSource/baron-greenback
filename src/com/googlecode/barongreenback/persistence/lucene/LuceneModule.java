@@ -22,7 +22,7 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
     }
 
     public Module addPerRequestObjects(final Container container) {
-        container.addActivator(BaronGreenbackRecords.class, new LuceneBaronGreenbackRecordsActivator(container));
+        container.addActivator(BaronGreenbackRecords.class, LuceneBaronGreenbackRecordsActivator.class);
         container.addInstance(Mappings.class, new Mappings().add(Model.class, new ModelMapping()));
         container.addInstance(PrintStream.class, new StringPrintStream());
         return this;

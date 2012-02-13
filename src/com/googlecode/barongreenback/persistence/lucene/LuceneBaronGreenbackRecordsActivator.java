@@ -16,7 +16,6 @@ public class LuceneBaronGreenbackRecordsActivator implements Callable<BaronGreen
 
     public LuceneBaronGreenbackRecordsActivator(Resolver resolver) {
         this.resolver = resolver;
-       
     }
 
     @Override
