@@ -1,9 +1,13 @@
 package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.lazyrecords.Records;
+import com.googlecode.totallylazy.Closeables;
 import com.googlecode.totallylazy.Value;
 
-public class BaronGreenbackRecords implements Value<Records> {
+import java.io.Closeable;
+import java.io.IOException;
+
+public class BaronGreenbackRecords implements Value<Records>, Closeable {
     private final Records records;
 
     private BaronGreenbackRecords(Records records) {
@@ -17,5 +21,10 @@ public class BaronGreenbackRecords implements Value<Records> {
     @Override
     public Records value() {
         return records;
+    }
+
+    @Override
+    public void close() throws IOException {
+        Closeables.close(records);
     }
 }
