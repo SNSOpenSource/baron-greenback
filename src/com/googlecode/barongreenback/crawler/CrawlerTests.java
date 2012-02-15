@@ -36,6 +36,7 @@ public abstract class CrawlerTests {
         restClient.handle(put(uri(waitrestURL, "data/prev")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("atom-prev.xml").getBytes()).build());
         restClient.handle(put(uri(waitrestURL, "entry1.xml")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("entry1.xml").getBytes()).build());
         restClient.handle(put(uri(waitrestURL, "entry2.xml")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("entry2.xml").getBytes()).build());
+        restClient.handle(put(uri(waitrestURL, "invalid.xml")).header(CONTENT_TYPE, TEXT_XML).input(contentOf("invalid.xml").getBytes()).build());
         return waitrest;
     }
 

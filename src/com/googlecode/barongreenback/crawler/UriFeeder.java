@@ -12,6 +12,7 @@ import org.w3c.dom.Document;
 
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Xml.document;
+import static java.lang.String.format;
 
 public class UriFeeder implements Feeder<Uri> {
     private final HttpHandler httpClient;
@@ -23,11 +24,16 @@ public class UriFeeder implements Feeder<Uri> {
     }
 
     public Sequence<Record> get(Uri uri, RecordDefinition definition) throws Exception {
-        Response response = httpClient.handle(RequestBuilder.get(uri).build());
-        if (!response.status().equals(Status.OK)) {
+        try {
+            Response response = httpClient.handle(RequestBuilder.get(uri).build());
+            if (!response.status().equals(Status.OK)) {
+                return empty();
+            }
+            Document document = document(new String(response.bytes()));
+            return feeder.get(document, definition);
+        } catch (Exception e) {
+            System.err.println(format("Failed to GET '%s' because of %s", uri, e));
             return empty();
         }
-        Document document = document(new String(response.bytes()));
-        return feeder.get(document, definition);
     }
 }

@@ -13,6 +13,7 @@ import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -32,8 +33,6 @@ import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class DocumentFeederTest extends CrawlerTests {
-    public static final String PILOT_TEST = "http://pilottest-netstream.is.uk.easynet.net:10012/orca/rolo/orderEvents";
-    public static final String PRODUCTION = "http://diamond-quartz.is.uk.easynet.net:10011/orca/rolo/orderEvents";
     private final HttpHandler client = new AuditHandler(new ClientHttpHandler(), new PrintAuditor(System.out));
 
     @Test
@@ -43,6 +42,13 @@ public class DocumentFeederTest extends CrawlerTests {
         Sequence<Record> records = feeder.get(document, ENTRY_DEFINITION);
         Record record = records.head();
         assertThat(record.get(FIRST), Matchers.is("Dan"));
+    }
+
+    @Test
+    public void ignoresInvalidXml() throws Exception {
+        Feeder<Uri> feeder = new UriFeeder(client, "");
+        Sequence<Record> records = feeder.get(uri("http://localhost:9001/invalid.xml"), null);
+        assertThat(records.isEmpty(), CoreMatchers.is(true));
     }
 
     @Test
@@ -79,26 +85,4 @@ public class DocumentFeederTest extends CrawlerTests {
         Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
         assertThat(records.size(), is(2));
     }
-
-    @Test
-    @Ignore
-    public void demo() throws Exception {
-        Feeder<Uri> feeder = new SubFeeder(new DuplicateRemover(new UriFeeder(client, "")));
-        Sequence<Record> records = feeder.get(uri(PILOT_TEST), productionCrawler());
-        for (Record record : records) {
-            System.out.println("record = " + record);
-        }
-    }
-
-    private RecordDefinition productionCrawler() {
-        Model model = Model.parse(Strings.toString(new File("/home/dev/trunk/netstream/penfold/penfold-core/src/main/java/sky/sns/penfold/rest/barongreenback/orderCrawler.json")));
-        Model form = model.get("form", Model.class);
-        Model record = form.get("record", Model.class);
-        return convert(record);
-    }
-
-    private Date date(String value) throws ParseException {
-        return Dates.RFC3339().parse(value);
-    }
-
 }
