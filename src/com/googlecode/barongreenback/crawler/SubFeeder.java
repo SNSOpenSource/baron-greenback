@@ -54,7 +54,11 @@ public class SubFeeder implements Feeder<Uri> {
                 Uri subFeed = uri(value.toString());
                 try {
                     RecordDefinition subFeedDefinition = keyword.metadata().get(RECORD_DEFINITION);
-                    return get(subFeed, subFeedDefinition).
+                    Sequence<Record> records = get(subFeed, subFeedDefinition).memorise();
+                    if(records.isEmpty()){
+                        return one(record);
+                    }
+                    return records.
                             map(merge(record));
                 } catch (LazyException e){
                     return handleError(subFeed, e.getCause(), record);
