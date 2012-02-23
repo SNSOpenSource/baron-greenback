@@ -81,6 +81,6 @@ public class RequestPager implements Pager {
     }
 
     public List<Map.Entry<String, String>> getQueryParametersToUrl() {
-        return sequence(QueryParameters.parse(request.uri().query()).remove(ROWS_PER_PAGE_PARAM)).map(pairToEntry(String.class, String.class)).toList();
+        return sequence(QueryParameters.parse(request.uri().query()).remove(ROWS_PER_PAGE_PARAM).remove(CURRENT_PAGE_PARAM)).map(pairToEntry(String.class, String.class)).toList();
     }
 }
