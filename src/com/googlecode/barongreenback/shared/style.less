@@ -80,8 +80,13 @@ input.delete, input.stop, input.reset, input.resetAll, input.deleteAll {
     .btn.danger;
 }
 
+.fixIE7Overlapping {
+    position: relative;
+}
+
 div.nameValue {
     vertical-align: top;
+    .fixIE7Overlapping;
 }
 
 div.control, div.nameValue {
