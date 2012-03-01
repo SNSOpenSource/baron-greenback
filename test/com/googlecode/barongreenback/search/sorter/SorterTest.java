@@ -77,7 +77,7 @@ public class SorterTest {
 
         return baseRecords.map(new Callable1<Triple<String, String, Date>, Record>() {
             public Record call(Triple<String, String, Date> triple) throws Exception {
-                Record record = MapRecord.record();
+                Record record = Record.constructors.record();
                 record.set(Unchecked.<Keyword<Object>>cast(keywords().first()), triple.first());
                 record.set(Unchecked.<Keyword<Object>>cast(keywords().second()), triple.second());
                 record.set(Unchecked.<Keyword<Object>>cast(keywords().last()), triple.third());

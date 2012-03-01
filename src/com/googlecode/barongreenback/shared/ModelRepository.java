@@ -2,9 +2,9 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
@@ -15,8 +15,8 @@ import com.googlecode.totallylazy.Sequence;
 import java.util.UUID;
 
 import static com.googlecode.lazyrecords.Keywords.keyword;
-import static com.googlecode.lazyrecords.MapRecord.record;
-import static com.googlecode.lazyrecords.RecordMethods.update;
+import static com.googlecode.lazyrecords.Record.constructors.record;
+import static com.googlecode.lazyrecords.Record.methods.update;
 import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -24,15 +24,14 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.first;
 
 public class ModelRepository implements Repository<UUID, Model>, Finder<Pair<UUID, Model>> {
-    public static final RecordName MODELS = RecordName.recordName("models");
     public static final Keyword<UUID> ID = keyword("models_id", UUID.class);
     public static final Keyword<String> MODEL_TYPE = keyword("models_type", String.class);
     public static final Keyword<Model> MODEL = keyword("model", Model.class);
+    private static final Definition MODELS = Definition.constructors.definition("models", ID, MODEL, MODEL_TYPE);
     private final Records records;
 
     public ModelRepository(final BaronGreenbackRecords records) {
         this.records = records.value();
-        this.records.define(MODELS, ID, MODEL, MODEL_TYPE);
     }
 
     public Option<Model> get(UUID key) {

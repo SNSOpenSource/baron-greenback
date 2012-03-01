@@ -3,17 +3,16 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Second;
-import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.numbers.Numbers;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
@@ -32,17 +31,19 @@ public class Views {
         return new ModelCleaner(in("view", "name", "records", "query", "priority", "keywords", "group", "type", "unique", "visible")).clean(root);
     }
 
-    public static Model convertToViewModel(RecordName recordName, Sequence<? extends Keyword<?>> keywords) {
+    public static Model convertToViewModel(Definition definition) {
+        String recordName = definition.name();
         return model().add(ROOT, model().
-                add("name", recordName.value()).
-                add("records", recordName.value()).
+                add("name", recordName).
+                add("records", recordName).
                 add("query", "").
                 add("visible", true).
                 add("priority", "").
-                add("keywords", keywords.map(asModel()).toList()));
+                add("keywords", definition.fields().map(asModel()).toList()));
+
     }
 
-    private static Callable1<? super Keyword, Model> asModel() {
+    public static Callable1<? super Keyword, Model> asModel() {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {
                 Record metadata = keyword.metadata();
@@ -104,8 +105,8 @@ public class Views {
                         Predicates.where(callable1, predicate)));
     }
 
-    public static RecordName recordName(Model view) {
-        return RecordName.recordName(unwrap(view).<String>get("records"));
+    public static String viewName(Model view) {
+        return unwrap(view).get("records");
     }
 
     private static String name(Model model) {

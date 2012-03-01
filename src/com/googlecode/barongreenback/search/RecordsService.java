@@ -4,9 +4,9 @@ import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
@@ -17,7 +17,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
-import static com.googlecode.barongreenback.views.Views.recordName;
+import static com.googlecode.barongreenback.views.Views.viewName;
 import static com.googlecode.barongreenback.views.Views.unwrap;
 import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.totallylazy.Callables.ignoreAndReturn;
@@ -27,6 +27,7 @@ import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class RecordsService {
 
@@ -43,7 +44,7 @@ public class RecordsService {
     public void delete(String viewName, String query) {
         Model view = view(viewName);
         Predicate<Record> predicate = predicateBuilder.build(view, query, visibleHeaders(view)).right();
-        records.remove(recordName(view), predicate);
+        records.remove(Definition.constructors.definition(viewName(view), Sequences.<Keyword<?>>empty()), predicate);
     }
 
     public Integer count(String viewName, String query) {
@@ -76,9 +77,8 @@ public class RecordsService {
         Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(view, query, visibleHeaders);
         if(invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
 
-        RecordName recordName = recordName(view);
-        records.define(recordName, headers(view).toArray(Keyword.class));
-        return right(records.get(recordName).filter(invalidQueryOrPredicate.right()));
+        Definition viewDefinition = Definition.constructors.definition(viewName(view), headers(view));
+        return right(records.get(viewDefinition).filter(invalidQueryOrPredicate.right()));
     }
 
     public Model view(String view) {

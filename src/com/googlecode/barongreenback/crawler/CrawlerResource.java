@@ -7,9 +7,9 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.simpledb.mappings.Mappings;
 import com.googlecode.totallylazy.Callable1;
@@ -173,7 +173,7 @@ public class CrawlerResource {
         }
         Option<Object> firstCheckPoint = getFirstCheckPoint(records);
         modelRepository.set(id, Forms.form(update, from, more, convertToString(firstCheckPoint), getCheckPointType(firstCheckPoint), recordDefinition.toModel()));
-        return put(RecordName.recordName(update), recordDefinition, records);
+        return put(update, recordDefinition, records);
     }
 
     private Sequence<Pair<UUID, Model>> allCrawlerModels() {
@@ -249,17 +249,22 @@ public class CrawlerResource {
     }
 
 
-    private String put(final RecordName recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd)  {
+    private String put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd)  {
         Sequence<Keyword<?>> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
-        if (find(modelRepository, recordName.value()).isEmpty()) {
-            modelRepository.set(randomUUID(), Views.convertToViewModel(recordName, keywords));
+        Definition definition = Definition.constructors.definition(recordName, keywords);
+        if (find(modelRepository, recordName).isEmpty()) {
+            modelRepository.set(randomUUID(), model().add(Views.ROOT, model().
+                    add("name", recordName).
+                    add("records", recordName).
+                    add("query", "").
+                    add("visible", true).
+                    add("priority", "").
+                    add("keywords", keywords.map(Views.asModel()).toList())));
         }
-        Keyword<?>[] fields = keywords.toArray(Keyword.class);
-        records.define(recordName, fields);
         Number updated = 0;
         for (Record record : recordsToAdd) {
             Sequence<Keyword<?>> unique = record.keywords().filter(UNIQUE_FILTER);
-            Number rows = records.put(recordName, pair(using(unique).call(record), record));
+            Number rows = records.put(definition, pair(using(unique).call(record), record));
             updated = Numbers.add(updated, rows);
         }
         return numberOfRecordsUpdated(updated);

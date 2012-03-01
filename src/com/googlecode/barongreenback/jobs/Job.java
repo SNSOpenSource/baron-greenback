@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.MapRecord;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 
@@ -9,6 +8,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Record.constructors.record;
 
 public class Job {
     public static final Keyword<UUID> JOB_ID = keyword("jobs_id", UUID.class);
@@ -27,7 +27,7 @@ public class Job {
     }
 
     public static Job job(UUID id) {
-        return new Job(MapRecord.record().set(JOB_ID, id));
+        return new Job(record().set(JOB_ID, id));
     }
 
     public Job interval(Long interval) {

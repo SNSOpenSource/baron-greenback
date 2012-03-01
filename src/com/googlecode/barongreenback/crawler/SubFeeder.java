@@ -10,7 +10,6 @@ import com.googlecode.totallylazy.Uri;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Keywords.metadata;
-import static com.googlecode.lazyrecords.RecordMethods.merge;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -59,7 +58,7 @@ public class SubFeeder implements Feeder<Uri> {
                         return one(record);
                     }
                     return records.
-                            map(merge(record));
+                            map(Record.functions.merge(record));
                 } catch (LazyException e){
                     return handleError(subFeed, e.getCause(), record);
                 } catch (Exception e){

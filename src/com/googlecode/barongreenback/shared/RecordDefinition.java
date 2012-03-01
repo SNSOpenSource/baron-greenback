@@ -4,10 +4,11 @@ import com.googlecode.barongreenback.crawler.Crawler;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.AliasedKeyword;
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.ImmutableKeyword;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
-import com.googlecode.lazyrecords.RecordName;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
@@ -21,7 +22,6 @@ import static com.googlecode.funclate.Model.model;
 import static com.googlecode.funclate.Model.value;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Keywords.metadata;
-import static com.googlecode.lazyrecords.MapRecord.record;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -30,31 +30,24 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.Strings.isEmpty;
-import static com.googlecode.totallylazy.Unchecked.cast;
 import static java.lang.Boolean.TRUE;
 
 public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
     public static final Keyword<Boolean> SUBFEED = keyword("subfeed", Boolean.class);
     public static final Predicate<Keyword> UNIQUE_FILTER = Predicates.and(where(metadata(Keywords.UNIQUE), is(notNullValue())), where(metadata(Keywords.UNIQUE), is(true)));
-    private final RecordName recordName;
-    private final Sequence<? extends Keyword<?>> fields;
+    private final Definition definition;
 
-    public RecordDefinition(RecordName recordName, Sequence<? extends Keyword<?>> fields) {
-        this.recordName = recordName;
-        this.fields = fields;
+    public RecordDefinition(Definition definition) {
+        this.definition = definition;
     }
 
-    public RecordDefinition recordDefinition(RecordName recordName, Sequence<Keyword<?>> fields) {
-        return new RecordDefinition(recordName, fields);
+    public RecordDefinition recordDefinition(Definition definition) {
+        return new RecordDefinition(definition);
     }
 
-    public RecordName recordName() {
-        return recordName;
-    }
-
-    public Sequence<Keyword<?>> fields() {
-        return cast(fields);
+    public Definition definition() {
+        return definition;
     }
 
     public static Sequence<Keyword<?>> uniqueFields(RecordDefinition recordDefinition) {
@@ -62,7 +55,7 @@ public class RecordDefinition {
     }
 
     public static Sequence<Keyword<?>> allFields(RecordDefinition recordDefinition) {
-        return recordDefinition.fields().flatMap(allFields());
+        return recordDefinition.definition.fields().flatMap(allFields());
     }
 
     public static Callable1<Keyword<?>, Sequence<Keyword<?>>> allFields() {
@@ -78,12 +71,12 @@ public class RecordDefinition {
     }
 
     public Model toModel() {
-        return toModel(recordName(), fields());
+        return toModel(definition());
     }
 
-    public static Model toModel(final RecordName keyword, final Sequence<Keyword<?>> fields) {
-        return recordDefinition(keyword.value(),
-                fields.map(asKeywordDefinition()).toArray(Model.class));
+    public static Model toModel(final Definition definition1) {
+        return recordDefinition(definition1.name(),
+                definition1.fields().map(asKeywordDefinition()).toArray(Model.class));
     }
 
     private static Callable1<Keyword, Model> asKeywordDefinition() {
@@ -165,7 +158,7 @@ public class RecordDefinition {
         if (model == null) {
             return null;
         }
-        return new RecordDefinition(RecordName.recordName(model.get("name", String.class)), toKeywords(model));
+        return new RecordDefinition(Definition.constructors.definition(model.get("name", String.class), toKeywords(model)));
     }
 
     public static Callable1<? super Model, Sequence<Keyword<?>>> asKeywords() {
@@ -194,7 +187,7 @@ public class RecordDefinition {
                 if (!isEmpty(alias)) {
                     keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
                 }
-                return keyword.metadata(record().
+                return keyword.metadata(Record.constructors.record().
                         set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
                         set(Views.VISIBLE, model.get("visible", Boolean.class)).
                         set(Views.GROUP, model.get("group", String.class)).

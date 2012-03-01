@@ -6,9 +6,9 @@ import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.Views;
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.RecordName;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
@@ -98,11 +98,10 @@ public class SearchResourceTest extends ApplicationTests {
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
                 Records records = container.get(BaronGreenbackRecords.class).value();
-                RecordName users = RecordName.recordName("users");
-                records.define(users, keywords(recordSequence).toArray(Keyword.class));
+                Definition users = Definition.constructors.definition("users", keywords(recordSequence));
                 records.add(users, recordSequence);
                 ModelRepository views = container.get(ModelRepository.class);
-                views.set(UUID.randomUUID(), Views.convertToViewModel(users, keywords(recordSequence)));
+                views.set(UUID.randomUUID(), Views.convertToViewModel(users));
                 return VOID;
             }
         });
