@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.persistence.lucene.LuceneIndexConfiguration;
+import com.googlecode.barongreenback.persistence.lucene.LuceneIndexType;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
@@ -26,10 +27,8 @@ public abstract class ApplicationTests {
 
     @Before
     public void deleteIndex() {
-        Files.delete(new File(LuceneIndexConfiguration.DEFAULT_DIRECTORY));
         Properties properties = new Properties();
-        properties.put(LuceneIndexConfiguration.LUCENE_INDEX_TYPE, LuceneIndexConfiguration.DEFAULT_TYPE.name());
-        properties.put(LuceneIndexConfiguration.LUCENE_INDEX_DIRECTORY, LuceneIndexConfiguration.RANDOM_DIRECTORY_KEY);
+        properties.put(LuceneIndexConfiguration.LUCENE_INDEX_TYPE, LuceneIndexType.RAM.name());
         application = new WebApplication(BasePath.basePath("/"), properties);
         browser = new RedirectHttpHandler(new RelativeUrlHandler(application));
     }

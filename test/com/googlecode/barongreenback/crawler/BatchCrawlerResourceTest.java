@@ -8,31 +8,33 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.contentOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
 public class BatchCrawlerResourceTest extends ApplicationTests {
     @Test
     public void canCrawlAll() throws Exception {
         JobsListPage jobsListPage = new JobsListPage(browser);
-        assertThat(jobsListSize(jobsListPage), is(0));
+        assertThat(jobsListPage.numberOfJobs(), is(0));
 
         importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
         CrawlerListPage crawlerListPage = importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
 
-        jobsListPage = crawlAll(crawlerListPage);
-        Thread.sleep(100); // Bad fix as crawl all is async
-        assertThat(jobsListSize(jobsListPage), is(2));
+        crawlerListPage.crawlAll();
+
+        jobsListPage = new JobsListPage(browser);
+        assertThat(jobsListPage.numberOfJobs(), is(greaterThan(0)));
     }
 
     @Test
     public void canDeleteAll() throws Exception {
         importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
         CrawlerListPage crawlerListPage = importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
-        assertThat(crawlerListSize(crawlerListPage), is(2));
+        assertThat(crawlerListPage.numberOfCrawlers(), is(2));
 
-        crawlerListPage = deleteAll(crawlerListPage);
+        crawlerListPage = crawlerListPage.deleteAll();
 
-        assertThat(crawlerListSize(crawlerListPage), is(0));
+        assertThat(crawlerListPage.numberOfCrawlers(), is(0));
     }
 
     private CrawlerListPage importCrawlerWithId(UUID uuid, String crawler) throws Exception {
@@ -40,22 +42,6 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
         importPage.id().value(uuid.toString());
         importPage.model().value(crawler);
         return importPage.importModel();
-    }
-
-    private JobsListPage crawlAll(CrawlerListPage crawlerListPage) throws Exception {
-        return crawlerListPage.crawlAll();
-    }
-
-    private CrawlerListPage deleteAll(CrawlerListPage crawlerListPage) throws Exception {
-        return crawlerListPage.deleteAll();
-    }
-
-    private int jobsListSize(JobsListPage jobsListPage) {
-        return jobsListPage.numberOfJobs();
-    }
-
-    private int crawlerListSize(CrawlerListPage crawlerListPage) {
-        return crawlerListPage.numberOfCrawlers();
     }
 
 }
