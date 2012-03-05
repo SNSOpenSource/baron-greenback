@@ -13,11 +13,14 @@ import static org.hamcrest.Matchers.is;
 public class BatchCrawlerResourceTest extends ApplicationTests {
     @Test
     public void canCrawlAll() throws Exception {
+        JobsListPage jobsListPage = new JobsListPage(browser);
+        assertThat(jobsListSize(jobsListPage), is(0));
+
         importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
         CrawlerListPage crawlerListPage = importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
 
-        JobsListPage jobsListPage = crawlAll(crawlerListPage);
-
+        jobsListPage = crawlAll(crawlerListPage);
+        Thread.sleep(100); // Bad fix as crawl all is async
         assertThat(jobsListSize(jobsListPage), is(2));
     }
 
