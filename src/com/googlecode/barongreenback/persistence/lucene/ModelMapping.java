@@ -1,21 +1,16 @@
 package com.googlecode.barongreenback.persistence.lucene;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.lucene.mappings.AbstractStringMapping;
-import org.apache.lucene.document.Field;
+import com.googlecode.lazyrecords.mappings.StringMapping;
 
-public class ModelMapping extends AbstractStringMapping<Model> {
-    public ModelMapping() {
-        super(Field.Index.NOT_ANALYZED);
-    }
-
+public class ModelMapping implements StringMapping<Model> {
     @Override
-    protected String toString(Model value) throws Exception {
+    public String toString(Model value) throws Exception {
         return value.toString();
     }
 
     @Override
-    protected Model fromString(String value) throws Exception {
+    public Model toValue(String value) throws Exception {
         return Model.parse(value);
     }
 }

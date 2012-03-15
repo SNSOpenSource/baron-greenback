@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.batch.BatchModule;
 import com.googlecode.barongreenback.crawler.CrawlerModule;
 import com.googlecode.barongreenback.jobs.JobsModule;
 import com.googlecode.barongreenback.less.LessCssModule;
+import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
 import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
@@ -47,6 +48,7 @@ public class WebApplication extends RestApplication {
 
     public static void addModules(Application application) {
         application.add(new LessCssModule());
+        application.add(new PersistenceModule());
         application.add(new LuceneModule());
         application.add(new SharedModule());
         application.add(new CrawlerModule());

@@ -11,7 +11,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.lazyrecords.simpledb.mappings.Mappings;
+import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -59,8 +59,10 @@ public class CrawlerResource {
     private final ModelRepository modelRepository;
     private final Crawler crawler;
     private final Redirector redirector;
+    private final StringMappings mappings;
 
-    public CrawlerResource(final BaronGreenbackRecords records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector) {
+    public CrawlerResource(final BaronGreenbackRecords records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector, StringMappings stringMappings) {
+        mappings = stringMappings;
         this.records = records.value();
         this.modelRepository = modelRepository;
         this.crawler = crawler;
@@ -194,7 +196,6 @@ public class CrawlerResource {
         };
     }
 
-    private final Mappings mappings = new Mappings();
 
     private Object convertFromString(String checkpoint, String checkpointType) throws Exception {
         Class<?> aClass = checkpointType == null ? String.class : Class.forName(checkpointType);
