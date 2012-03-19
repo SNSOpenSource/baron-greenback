@@ -28,5 +28,4 @@ public class QueuesResourceTest extends ApplicationTests {
         queues = new QueuesPage(browser);
         assertThat(queues.numberOfCompletedJobs(), is(1));
     }
-
 }

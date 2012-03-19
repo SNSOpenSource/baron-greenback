@@ -7,15 +7,33 @@ import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 
-import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class RequestQueues implements Queues {
-    private final LinkedBlockingQueue<CompletedJob> completed = new LinkedBlockingQueue<CompletedJob>();
+    private final LinkedBlockingQueue<CompletedJob> completed = new CappedLinkedBlockingQueue<CompletedJob>(20);
+    public static class CappedLinkedBlockingQueue<T> extends LinkedBlockingQueue<T> {
+        public CappedLinkedBlockingQueue(int initialCapacity) {
+            super(initialCapacity);
+        }
+
+        @Override
+        public boolean add(T t) {
+            if (remainingCapacity() == 0) {
+                try {
+                    take();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            return super.add(t);
+        }
+    }
+
     private final Application application;
     private final Clock clock;
     private final Completer completer;
@@ -36,11 +54,11 @@ public class RequestQueues implements Queues {
         completer.complete(handle(request), add(completed));
     }
 
-    public static <T> Callable1<T, Boolean> add(final Collection<T> collection) {
+    public static <T> Callable1<T, Boolean> add(final BlockingQueue<T> queue) {
         return new Callable1<T, Boolean>() {
             @Override
-            public Boolean call(T instance) throws Exception {
-                return collection.add(instance);
+            public Boolean call(T instance) {
+                return queue.add(instance);
             }
         };
     }
@@ -60,4 +78,5 @@ public class RequestQueues implements Queues {
         Date completed = clock.now();
         return new CompletedJob(request, response, started, completed);
     }
+
 }
