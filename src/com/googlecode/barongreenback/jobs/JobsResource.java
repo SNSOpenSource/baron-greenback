@@ -36,7 +36,7 @@ import static com.googlecode.utterlyidle.RequestBuilder.modify;
 @Path("jobs")
 @Produces(TEXT_HTML)
 public class JobsResource {
-    public static final Long DEFAULT_INTERVAL = 600L;
+    public static final Long DEFAULT_INTERVAL = 10L;
     private final HttpScheduler scheduler;
     private final Request request;
     private final Redirector redirector;
@@ -115,8 +115,12 @@ public class JobsResource {
             return null;
         }
         Request request = HttpMessageParser.parseRequest(requestMessage);
+        return asModel(request);
+    }
+
+    public static Model asModel(Request request) {
         return model().
-                add("raw", requestMessage).
+                add("raw", request.toString()).
                 add("method", request.method()).
                 add("uri", request.uri()).
                 add("entity", request.entity().toString());
@@ -128,8 +132,12 @@ public class JobsResource {
             return null;
         }
         Response response = HttpMessageParser.parseResponse(responseMessage);
+        return asModel(response);
+    }
+
+    public static Model asModel(Response response) {
         return model().
-                add("raw", responseMessage).
+                add("raw", response.toString()).
                 add("code", response.status().code()).
                 add("status", response.status().description()).
                 add("entity", response.entity().toString());

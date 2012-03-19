@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import com.googlecode.barongreenback.queues.QueuesResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
@@ -19,6 +20,9 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.numbers.Numbers;
+import com.googlecode.totallylazy.proxy.Invocation;
+import com.googlecode.utterlyidle.BaseUri;
+import com.googlecode.utterlyidle.BaseUriRedirector;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -241,8 +245,18 @@ public class CrawlerResource {
     }
 
     private Uri jobUrl(UUID uuid) throws Exception {
-        Uri uri = relativeUriOf(method(on(CrawlerResource.class).crawl(null)));
-        return redirector.uriOf(method(on(JobsResource.class).schedule(uuid, DEFAULT_INTERVAL, "/" + uri.toString())));
+        Uri scheduled = scheduleAQueuedCrawl(null, uuid);
+        return redirector.absoluteUriOf(scheduled);
+    }
+
+    public static Uri scheduleAQueuedCrawl(UUID crawlerId, UUID schedulerId) throws Exception {
+        String crawlerJob = absolutePathOf(method(on(CrawlerResource.class).crawl(crawlerId)));
+        String queued = absolutePathOf(method(on(QueuesResource.class).queue(null, crawlerJob)));
+        return relativeUriOf(method(on(JobsResource.class).schedule(schedulerId, DEFAULT_INTERVAL, queued)));
+    }
+
+    private static String absolutePathOf(Invocation<?, ?> method) {
+        return "/" + relativeUriOf(method);
     }
 
     private Response redirectToCrawlerList() {

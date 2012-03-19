@@ -18,19 +18,19 @@ public class CountDownScheduler implements Scheduler {
     }
 
     public Cancellable schedule(UUID id, Callable<?> command, long numberOfSeconds) {
-        return scheduler.schedule(id, decorate(command), numberOfSeconds);
+        return scheduler.schedule(id, decorate(latch, command), numberOfSeconds);
     }
 
     public void cancel(UUID id) {
         scheduler.cancel(id);
     }
 
-    private Callable<Void> decorate(final Callable<?> command) {
-        return new Callable<Void>() {
-            public Void call() throws Exception {
-                command.call();
+    public static <T> Callable<T> decorate(final CountDownLatch latch, final Callable<T> command) {
+        return new Callable<T>() {
+            public T call() throws Exception {
+                T result = command.call();
                 latch.countDown();
-                return Runnables.VOID;
+                return result;
             }
         };
     }

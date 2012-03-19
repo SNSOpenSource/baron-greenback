@@ -19,7 +19,7 @@ $(document).ready(function() {
         var newKeyword = $(html).hide().insertBefore(template);
         newKeyword.show().css({display:'list-item'});
     });
-    $("table.results.unpaged").tablesorter({ sortList: [
+    $("table.results:not(.paged)").tablesorter({ sortList: [
         [0,1]
     ] });
 

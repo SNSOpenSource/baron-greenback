@@ -1,6 +1,8 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.Scheduler;
+import com.googlecode.barongreenback.queues.Completer;
+import com.googlecode.barongreenback.queues.CountDownCompleter;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
@@ -106,9 +108,10 @@ public class CrawlerResourceTest extends ApplicationTests {
     private ViewSearchPage crawlFeedsWithPaginationAndCheckpoint(final Date checkpointValue) throws Exception {
         return using(setupServerWithDataFeed(), new Callable1<Waitrest, ViewSearchPage>() {
             public ViewSearchPage call(Waitrest restServer) throws Exception {
-                CountDownLatch latch = new CountDownLatch(1);
+                CountDownLatch latch = new CountDownLatch(2);
                 application.applicationScope().addInstance(CountDownLatch.class, latch).
-                        decorate(Scheduler.class, CountDownScheduler.class);
+                        decorate(Scheduler.class, CountDownScheduler.class).
+                        decorate(Completer.class, CountDownCompleter.class);
 
                 CrawlerPage newPage = new CrawlerPage(browser);
                 newPage.update().value("newsfeed");

@@ -21,7 +21,10 @@
                     <a href="$base$crawler/list">Crawler Admin</a>
                 </li>
                 <li class="menu">
-                    <a href="$base$jobs/list">Jobs Admin</a>
+                <a href="$base$jobs/list">Jobs Admin</a>
+                </li>
+                <li class="menu">
+                    <a href="$base$queues/list">Queues Admin</a>
                 </li>
                 <li class="menu">
                     <a href="$base$batch/operations">Batch Operations</a>

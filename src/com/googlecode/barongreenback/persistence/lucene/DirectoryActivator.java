@@ -17,12 +17,10 @@ public class DirectoryActivator implements Callable<Directory>, Closeable{
     }
 
     public Directory call() throws Exception {
-        if (luceneIndexConfiguration.getIndexType() == LuceneIndexType.RAM) {
-            directory = new RAMDirectory();
-            return directory;
+        if (luceneIndexConfiguration.getIndexType() == LuceneIndexType.FILESYSTEM) {
+            return directory = new NIOFSDirectory(luceneIndexConfiguration.getDirectory());
         } else {
-            directory = new NIOFSDirectory(luceneIndexConfiguration.getDirectory());
-            return directory;
+            return directory = new RAMDirectory();
         }
     }
 

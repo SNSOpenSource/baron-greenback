@@ -18,6 +18,7 @@ import com.googlecode.utterlyidle.annotations.Produces;
 
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.CrawlerResource.scheduleAQueuedCrawl;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -72,9 +73,7 @@ public class BatchCrawlerResource {
     public Callable1<UUID, Response> crawl() {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
-                Uri crawlerUri = redirector.uriOf(method(on(CrawlerResource.class).crawl(uuid)));
-                Uri jobsUri = redirector.uriOf(method(on(JobsResource.class).schedule(uuid, JobsResource.DEFAULT_INTERVAL, crawlerUri.path())));
-                return application.handle(post(jobsUri).form("id", uuid).build());
+                return application.handle(post(scheduleAQueuedCrawl(uuid, uuid)).form("id", uuid).build());
             }
         };
     }
