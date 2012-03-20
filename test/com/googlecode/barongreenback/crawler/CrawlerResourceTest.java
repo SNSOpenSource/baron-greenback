@@ -106,13 +106,13 @@ public class CrawlerResourceTest extends ApplicationTests {
     }
 
     private ViewSearchPage crawlFeedsWithPaginationAndCheckpoint(final Date checkpointValue) throws Exception {
+        final CountDownLatch latch = new CountDownLatch(2);
+        application.applicationScope().addInstance(CountDownLatch.class, latch).
+                decorate(Scheduler.class, CountDownScheduler.class).
+                decorate(Completer.class, CountDownCompleter.class);
+
         return using(setupServerWithDataFeed(), new Callable1<Waitrest, ViewSearchPage>() {
             public ViewSearchPage call(Waitrest restServer) throws Exception {
-                CountDownLatch latch = new CountDownLatch(2);
-                application.applicationScope().addInstance(CountDownLatch.class, latch).
-                        decorate(Scheduler.class, CountDownScheduler.class).
-                        decorate(Completer.class, CountDownCompleter.class);
-
                 CrawlerPage newPage = new CrawlerPage(browser);
                 newPage.update().value("newsfeed");
                 newPage.from().value("http://localhost:9001/data");
