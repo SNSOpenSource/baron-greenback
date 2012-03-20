@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.queues;
 import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
-import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.ResponseBuilder;
@@ -15,6 +14,7 @@ import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 
 import static com.googlecode.barongreenback.queues.CompletedJob.completed;
+import static com.googlecode.barongreenback.queues.RunningJob.started;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
@@ -33,14 +33,32 @@ public class QueuesResource {
     @GET
     @Path("list")
     public Model list() {
-        return model().add("completed", queues.completed().sortBy(descending(completed())).map(asModel()).toList());
+        return model().
+                add("running", queues.running().sortBy(descending(started())).map(asRunningModel()).toList()).
+                add("completed", queues.completed().sortBy(descending(completed())).map(asCompletedModel()).toList());
     }
 
-    private Function1<CompletedJob, Model> asModel() {
+    private Function1<RunningJob, Model> asRunningModel() {
+        return new Function1<RunningJob, Model>() {
+            @Override
+            public Model call(RunningJob runningJob) throws Exception {
+                return model().
+                        add("status", "running").
+                        add("started", runningJob.started).
+                        add("completed", "").
+                        add("duration", runningJob.duration()).
+                        add("request", JobsResource.asModel(runningJob.request)).
+                        add("response", "");
+            }
+        };
+    }
+
+    private Function1<CompletedJob, Model> asCompletedModel() {
         return new Function1<CompletedJob, Model>() {
             @Override
             public Model call(CompletedJob completedJob) throws Exception {
                 return model().
+                        add("status", "idle").
                         add("started", completedJob.started).
                         add("completed", completedJob.completed).
                         add("duration", completedJob.duration()).

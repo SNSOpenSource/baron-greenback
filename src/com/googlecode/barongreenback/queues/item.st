@@ -1,4 +1,5 @@
 <tr class="completed">
+    <td><span class="jobstatus $item.status$">$item.status$</span></td>
     <td>
         <div class="request">
             <span class="method">$item.request.method$</span> <span class="uri">$item.request.uri$</span>

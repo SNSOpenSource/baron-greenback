@@ -7,4 +7,6 @@ public interface Queues {
     Sequence<CompletedJob> completed();
 
     void queue(Request request);
+
+    Sequence<RunningJob> running();
 }

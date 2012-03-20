@@ -18,7 +18,7 @@ public class Job {
     public static final Keyword<Long> DURATION = keyword("duration", Long.class);
     public static final Keyword<Date> STARTED = keyword("started", Date.class);
     public static final Keyword<Date> COMPLETED = keyword("completed", Date.class);
-    public static final Keyword<Boolean> RUNNING = keyword("runing", Boolean.class);
+    public static final Keyword<Boolean> RUNNING = keyword("running", Boolean.class);
 
     private final Record record;
 

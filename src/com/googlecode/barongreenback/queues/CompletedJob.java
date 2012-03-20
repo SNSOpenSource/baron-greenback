@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.queues;
 
-import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;

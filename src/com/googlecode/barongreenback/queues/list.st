@@ -9,14 +9,16 @@
 <table class="results zebra-striped">
     <thead>
     <tr>
-        $th(class="blue", header="Request")$
-        $th(class="green", header="Response")$
-        $th(class="orange", header="Started")$
-        $th(class="blue", header="Completed")$
-        $th(class="green", header="Duration (Seconds)")$
+        $th(class="blue", header="Status")$
+        $th(class="green", header="Request")$
+        $th(class="orange", header="Response")$
+        $th(class="blue", header="Started")$
+        $th(class="green", header="Completed")$
+        $th(class="orange", header="Duration (Seconds)")$
     </tr>
     </thead>
     <tbody>
+    $running:item(item=it)$
     $completed:item(item=it)$
     </tbody>
 </table>
