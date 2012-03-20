@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.queues;
 
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Application;
@@ -12,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class RequestQueues implements Queues {
@@ -51,32 +53,24 @@ public class RequestQueues implements Queues {
 
     @Override
     public void queue(final Request request) {
-        completer.complete(handle(request), add(completed));
+        completer.complete(handle(request));
     }
 
-    public static <T> Callable1<T, Boolean> add(final BlockingQueue<T> queue) {
-        return new Callable1<T, Boolean>() {
+    private Callable<Void> handle(final Request request) {
+        return new Callable<Void>() {
             @Override
-            public Boolean call(T instance) {
-                return queue.add(instance);
+            public Void call() throws Exception {
+                complete(request);
+                return VOID;
             }
         };
     }
 
-    private Callable<CompletedJob> handle(final Request request) {
-        return new Callable<CompletedJob>() {
-            @Override
-            public CompletedJob call() throws Exception {
-                return complete(request);
-            }
-        };
-    }
-
-    private CompletedJob complete(Request request) throws Exception {
+    private void complete(Request request) throws Exception {
         Date started = clock.now();
         Response response = application.handle(request);
-        Date completed = clock.now();
-        return new CompletedJob(request, response, started, completed);
+        Date completedDate = clock.now();
+        completed.add(new CompletedJob(request, response, started, completedDate));
     }
 
 }
