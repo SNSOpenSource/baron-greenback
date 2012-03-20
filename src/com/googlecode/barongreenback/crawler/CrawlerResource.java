@@ -203,8 +203,7 @@ public class CrawlerResource {
 
     private Object convertFromString(String checkpoint, String checkpointType) throws Exception {
         Class<?> aClass = checkpointType == null ? String.class : Class.forName(checkpointType);
-        Object value = mappings.get(aClass).toValue(checkpoint);
-        return value;
+        return mappings.get(aClass).toValue(checkpoint);
     }
 
     private String convertToString(Option<Object> checkPoint) {

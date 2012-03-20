@@ -6,13 +6,7 @@
 <body class="list">
 
 <table class="results zebra-striped">
-    <thead>
-    <tr>
-        $th(class="blue", header="updates")$
-        $th(class="green", header="from")$
-        $th(class="orange", header="action")$
-    </tr>
-    </thead>
+    $thead(headers=["updates", "from", "action" ])$
     <tbody>
     $items:item(item=it)$
     </tbody>

@@ -6,12 +6,7 @@
 <body class="list views">
 
 <table class="results zebra-striped">
-    <thead>
-    <tr>
-        $th(class="blue", header="Name")$
-        $th(class="orange", header="action")$
-    </tr>
-    </thead>
+    $thead(headers=["Name", "action" ])$
     <tbody>
     $views:item(item=it)$
     </tbody>

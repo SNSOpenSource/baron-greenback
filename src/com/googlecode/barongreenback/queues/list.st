@@ -7,16 +7,7 @@
 <body class="list">
 
 <table class="results zebra-striped">
-    <thead>
-    <tr>
-        $th(class="blue", header="Status")$
-        $th(class="green", header="Request")$
-        $th(class="orange", header="Response")$
-        $th(class="blue", header="Started")$
-        $th(class="green", header="Completed")$
-        $th(class="orange", header="Duration (Seconds)")$
-    </tr>
-    </thead>
+    $thead(headers=["Status", "Request", "Response", "Started", "Completed", "Duration (Seconds)" ])$
     <tbody>
     $running:item(item=it)$
     $completed:item(item=it)$
