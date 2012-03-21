@@ -9,10 +9,17 @@
 <table class="results zebra-striped">
     $thead(headers=["Status", "Request", "Response", "Started", "Completed", "Duration (Seconds)" ])$
     <tbody>
-    $running:item(item=it)$
-    $completed:item(item=it)$
+    $items:item(item=it)$
     </tbody>
 </table>
+
+<div class="actions">
+$if(anyExists)$
+    $post(name="deleteAll", value="Delete All")$
+$else$
+    $post(name="deleteAll", value="Delete All", disabled="true")$
+$endif$
+</div>
 
 </body>
 </html>

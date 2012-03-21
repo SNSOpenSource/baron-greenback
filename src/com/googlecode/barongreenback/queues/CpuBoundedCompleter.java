@@ -9,7 +9,11 @@ import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class CpuBoundedCompleter implements Completer {
-    private final ExecutorService executors = cpuBoundExecutorService();
+    private ExecutorService executors;
+
+    public CpuBoundedCompleter() {
+        start();
+    }
 
     public static ExecutorService cpuBoundExecutorService() {
         return newFixedThreadPool(max(1, getRuntime().availableProcessors() - 1));
@@ -18,5 +22,15 @@ public class CpuBoundedCompleter implements Completer {
     @Override
     public void complete(Callable<?> task) {
         executors.execute(function(task));
+    }
+
+    @Override
+    public void restart() {
+        executors.shutdownNow();
+        start();
+    }
+
+    private void start() {
+        executors = cpuBoundExecutorService();
     }
 }

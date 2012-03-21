@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.queues;
 import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.ResponseBuilder;
@@ -13,10 +14,14 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 
+import java.util.List;
+
 import static com.googlecode.barongreenback.queues.CompletedJob.completed;
 import static com.googlecode.barongreenback.queues.RunningJob.started;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.descending;
+import static com.googlecode.totallylazy.proxy.Call.method;
+import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 import static com.googlecode.utterlyidle.MediaType.TEXT_PLAIN;
 import static com.googlecode.utterlyidle.RequestBuilder.modify;
@@ -25,17 +30,26 @@ import static com.googlecode.utterlyidle.RequestBuilder.modify;
 @Produces(TEXT_HTML)
 public class QueuesResource {
     private final Queues queues;
+    private final Redirector redirector;
 
-    public QueuesResource(Queues queues) {
+    public QueuesResource(Queues queues, Redirector redirector) {
         this.queues = queues;
+        this.redirector = redirector;
     }
 
     @GET
     @Path("list")
     public Model list() {
+        List<Model> items = items();
         return model().
-                add("running", queues.running().sortBy(descending(started())).map(asRunningModel()).toList()).
-                add("completed", queues.completed().sortBy(descending(completed())).map(asCompletedModel()).toList());
+                add("anyExists", !items.isEmpty()).
+                add("items", items);
+    }
+
+    private List<Model> items() {
+        return queues.running().sortBy(descending(started())).map(asRunningModel()).
+                join(queues.completed().sortBy(descending(completed())).map(asCompletedModel())).
+                toList();
     }
 
     private Function1<RunningJob, Model> asRunningModel() {
@@ -75,5 +89,12 @@ public class QueuesResource {
         Request requestToQueue = modify(request).uri(request.uri().path(endOfUrl)).build();
         queues.queue(requestToQueue);
         return ResponseBuilder.response(Status.ACCEPTED.description("Queued Job")).entity("You Job has been accepted and is now in the queue").build();
+    }
+
+    @POST
+    @Path("deleteAll")
+    public Response deleteAll() throws Exception {
+        queues.deleteAll();
+        return redirector.seeOther(method(on(QueuesResource.class).list()));
     }
 }

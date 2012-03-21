@@ -28,4 +28,20 @@ public class QueuesResourceTest extends ApplicationTests {
         queues = new QueuesPage(browser);
         assertThat(queues.numberOfCompletedJobs(), is(1));
     }
+
+    @Test
+    public void canDeleteAllRunningJobs() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        application.applicationScope().addInstance(CountDownLatch.class, latch).
+                decorate(Completer.class, CountDownCompleter.class);
+
+        new QueuesPage(browser).queue(post("some/url").build());
+
+        latch.await();
+        QueuesPage queues = new QueuesPage(browser);
+        assertThat(queues.numberOfCompletedJobs(), is(1));
+
+        QueuesPage queuesPage = queues.deleteAll();
+        assertThat(queuesPage.numberOfCompletedJobs(), is(0));
+    }
 }

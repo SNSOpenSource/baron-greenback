@@ -9,4 +9,6 @@ public interface Queues {
     void queue(Request request);
 
     Sequence<RunningJob> running();
+
+    void deleteAll();
 }

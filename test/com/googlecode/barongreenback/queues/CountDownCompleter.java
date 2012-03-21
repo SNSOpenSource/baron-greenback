@@ -18,4 +18,9 @@ public class CountDownCompleter implements Completer {
     public void complete(Callable<?> task) {
         delegate.complete(decorate(latch, task));
     }
+
+    @Override
+    public void restart() {
+        delegate.restart();
+    }
 }

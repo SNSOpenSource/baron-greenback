@@ -43,6 +43,13 @@ public class RequestQueues implements Queues {
         return sequence(running);
     }
 
+    @Override
+    public void deleteAll() {
+        completer.restart();
+        running.clear();
+        completed.clear();
+    }
+
     private void complete(Request request) throws Exception {
         Date started = clock.now();
         RunningJob runningJob = new RunningJob(request, started, clock);

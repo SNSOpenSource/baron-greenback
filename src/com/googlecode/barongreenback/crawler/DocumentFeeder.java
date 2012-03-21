@@ -10,6 +10,6 @@ import org.w3c.dom.Document;
 public class DocumentFeeder implements Feeder<Document> {
     public Sequence<Record> get(final Document document, RecordDefinition definition) {
         Records records = new XmlRecords(document);
-        return records.get(definition.definition());
+        return records.get(definition.definition()).interruptable();
     }
 }
