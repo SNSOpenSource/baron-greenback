@@ -175,15 +175,14 @@ public class CrawlerResource {
         final Model record = form.get("record", Model.class);
         final RecordDefinition recordDefinition = convert(record);
 
-        StringPrintStream log = new StringPrintStream();
+        PrintStream log = new StringPrintStream();
         Sequence<Record> records = new Crawler(httpClient, log).crawl(uri(from), more, convertFromString(checkpoint, checkpointType), recordDefinition);
         if (records.isEmpty()) {
-            log.println(numberOfRecordsUpdated(0));
+            return numberOfRecordsUpdated(0, log);
         }
         Option<Object> firstCheckPoint = getFirstCheckPoint(records);
         modelRepository.set(id, Forms.form(update, from, more, convertToString(firstCheckPoint), getCheckPointType(firstCheckPoint), recordDefinition.toModel()));
-        log.println(put(update, recordDefinition, records));
-        return log.toString();
+        return put(update, recordDefinition, records, log);
     }
 
     private Sequence<Pair<UUID, Model>> allCrawlerModels() {
@@ -267,7 +266,7 @@ public class CrawlerResource {
     }
 
 
-    private String put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd) {
+    private String put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd, PrintStream log) {
         Sequence<Keyword<?>> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
         Definition definition = Definition.constructors.definition(recordName, keywords);
         if (find(modelRepository, recordName).isEmpty()) {
@@ -285,10 +284,11 @@ public class CrawlerResource {
             Number rows = records.put(definition, pair(using(unique).call(record), record));
             updated = Numbers.add(updated, rows);
         }
-        return numberOfRecordsUpdated(updated);
+        return numberOfRecordsUpdated(updated, log);
     }
 
-    private String numberOfRecordsUpdated(Number updated) {
-        return format("%s Records updated", updated);
+    private String numberOfRecordsUpdated(Number updated, PrintStream log) {
+        log.println(format("%s Records updated", updated));
+        return log.toString();
     }
 }

@@ -9,7 +9,7 @@
 <table class="results zebra-striped">
     $thead(headers=["Status", "Request", "Response", "Started", "Completed", "Duration (Seconds)" ])$
     <tbody>
-    $items:item(item=it)$
+$items:item(item=it)$
     </tbody>
 </table>
 
