@@ -1,4 +1,5 @@
-@import "twitter/bootstrap.less";
+@import "/baron-greenback/shared/expander/expander.less";
+@import "/baron-greenback/shared/twitter/bootstrap.less";
 
 @grayDark:          lighten(@black, 15%);
 @gray:              lighten(@black, 30%);
@@ -306,5 +307,21 @@ div.rowsPerPage {
     }
     select.rowsPerPage {
         width: 60px;
+    }
+}
+
+body.queues {
+    table.results {
+        table-layout: fixed;
+        td {
+            overflow: hidden;
+        }
+        div.entity {
+            height: 2em;
+        }
+    }
+
+    div.entity {
+        white-space: pre;
     }
 }

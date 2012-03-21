@@ -12,6 +12,7 @@ import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
 
+import java.io.PrintStream;
 import java.util.Date;
 
 import static com.googlecode.lazyrecords.Keywords.keyword;
@@ -25,11 +26,11 @@ public class Crawler {
     private final HttpHandler client;
 
     public Crawler() {
-        this(new ClientHttpHandler());
+        this(new ClientHttpHandler(), System.out);
     }
 
-    public Crawler(HttpClient client) {
-        this.client = new AuditHandler(client, new PrintAuditor(System.out));
+    public Crawler(HttpClient client, PrintStream log) {
+        this.client = new AuditHandler(client, new PrintAuditor(log));
     }
 
     public Sequence<Record> crawl(Uri uri, String more, Object checkpoint, RecordDefinition recordDefinition) throws Exception {

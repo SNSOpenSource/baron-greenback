@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import com.googlecode.barongreenback.persistence.lucene.StringPrintStream;
 import com.googlecode.barongreenback.queues.QueuesResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
@@ -21,8 +22,6 @@ import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.totallylazy.proxy.Invocation;
-import com.googlecode.utterlyidle.BaseUri;
-import com.googlecode.utterlyidle.BaseUriRedirector;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -32,7 +31,9 @@ import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.utterlyidle.handlers.HttpClient;
 
+import java.io.PrintStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,15 +62,15 @@ import static java.util.UUID.randomUUID;
 public class CrawlerResource {
     private final Records records;
     private final ModelRepository modelRepository;
-    private final Crawler crawler;
     private final Redirector redirector;
+    private final HttpClient httpClient;
     private final StringMappings mappings;
 
-    public CrawlerResource(final BaronGreenbackRecords records, final ModelRepository modelRepository, Crawler crawler, Redirector redirector, StringMappings stringMappings) {
-        mappings = stringMappings;
+    public CrawlerResource(final BaronGreenbackRecords records, final ModelRepository modelRepository, HttpClient httpClient, Redirector redirector, StringMappings mappings) {
+        this.httpClient = httpClient;
+        this.mappings = mappings;
         this.records = records.value();
         this.modelRepository = modelRepository;
-        this.crawler = crawler;
         this.redirector = redirector;
     }
 
@@ -163,23 +164,26 @@ public class CrawlerResource {
     @POST
     @Path("crawl")
     @Produces(MediaType.TEXT_PLAIN)
-    public String crawl(@FormParam("id") UUID id) throws Exception {
-        Model model = modelFor(id);
-        Model form = model.get("form", Model.class);
-        String from = form.get("from", String.class);
-        String update = form.get("update", String.class);
-        String more = form.get("more", String.class);
-        String checkpoint = form.get("checkpoint", String.class);
-        String checkpointType = form.get("checkpointType", String.class);
-        Model record = form.get("record", Model.class);
-        RecordDefinition recordDefinition = convert(record);
-        Sequence<Record> records = crawler.crawl(uri(from), more, convertFromString(checkpoint, checkpointType), recordDefinition);
+    public String crawl(@FormParam("id") final UUID id) throws Exception {
+        final Model model = modelFor(id);
+        final Model form = model.get("form", Model.class);
+        final String from = form.get("from", String.class);
+        final String update = form.get("update", String.class);
+        final String more = form.get("more", String.class);
+        final String checkpoint = form.get("checkpoint", String.class);
+        final String checkpointType = form.get("checkpointType", String.class);
+        final Model record = form.get("record", Model.class);
+        final RecordDefinition recordDefinition = convert(record);
+
+        StringPrintStream log = new StringPrintStream();
+        Sequence<Record> records = new Crawler(httpClient, log).crawl(uri(from), more, convertFromString(checkpoint, checkpointType), recordDefinition);
         if (records.isEmpty()) {
-            return numberOfRecordsUpdated(0);
+            log.println(numberOfRecordsUpdated(0));
         }
         Option<Object> firstCheckPoint = getFirstCheckPoint(records);
         modelRepository.set(id, Forms.form(update, from, more, convertToString(firstCheckPoint), getCheckPointType(firstCheckPoint), recordDefinition.toModel()));
-        return put(update, recordDefinition, records);
+        log.println(put(update, recordDefinition, records));
+        return log.toString();
     }
 
     private Sequence<Pair<UUID, Model>> allCrawlerModels() {
@@ -263,7 +267,7 @@ public class CrawlerResource {
     }
 
 
-    private String put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd)  {
+    private String put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd) {
         Sequence<Keyword<?>> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
         Definition definition = Definition.constructors.definition(recordName, keywords);
         if (find(modelRepository, recordName).isEmpty()) {
