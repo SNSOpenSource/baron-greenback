@@ -52,19 +52,11 @@ public class HttpSchedulerTest {
     private static class StubScheduler implements Scheduler {
         public long delay;
 
-        public Cancellable schedule(UUID id, Callable<?> command, final long numberOfSeconds) {
+        public void schedule(UUID id, Callable<?> command, final long numberOfSeconds) {
             this.delay = numberOfSeconds;
-            return doNothingJob();
         }
 
         public void cancel(UUID id) {
-        }
-
-        private Cancellable doNothingJob() {
-            return new Cancellable() {
-                public void cancel() {
-                }
-            };
         }
     }
 

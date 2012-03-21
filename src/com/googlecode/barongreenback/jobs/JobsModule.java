@@ -8,9 +8,6 @@ import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.modules.StartupModule;
 import com.googlecode.yadic.Container;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
 public class JobsModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, StartupModule {
@@ -28,7 +25,6 @@ public class JobsModule implements ResourcesModule, ApplicationScopedModule, Req
     }
 
     public Module addPerApplicationObjects(Container container) throws Exception {
-        container.addInstance(ScheduledExecutorService.class, Executors.newScheduledThreadPool(5));
         container.add(Scheduler.class, FixedScheduler.class);
         return this;
     }
