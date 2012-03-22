@@ -2,7 +2,7 @@ jQuery(document).ready(function (event) {
     var expander = $("<div class='expander'></div>");
     $("body").append(expander);
 
-    $(".results td").each(function (i, node) {
+    $(".shouldExpand td").each(function (i, node) {
         var elem = $(node);
 
         if (hasScrollBars(elem)) {
@@ -33,10 +33,7 @@ jQuery(document).ready(function (event) {
     }
 
     function hasScrollBars(elem) {
-        var hasScrollBar = false;
-        if ((elem[0].clientHeight < elem[0].scrollHeight) || (elem[0].clientWidth < elem[0].scrollWidth)) {
-            hasScrollBar = true;
-        }
-        return hasScrollBar;
+        var cell = elem[0];
+        return (cell.clientHeight < cell.scrollHeight) || (cell.clientWidth < cell.scrollWidth);
     }
 });

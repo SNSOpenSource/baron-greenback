@@ -6,7 +6,7 @@
 </head>
 <body class="queues">
 
-<table class="results zebra-striped">
+<table class="shouldExpand results zebra-striped">
     $thead(headers=["Status", "Request", "Response", "Started", "Completed", "Duration (Seconds)" ])$
     <tbody>
 $items:item(item=it)$
