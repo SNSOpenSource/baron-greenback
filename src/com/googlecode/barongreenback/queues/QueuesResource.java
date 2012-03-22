@@ -62,7 +62,7 @@ public class QueuesResource {
                         add("completed", "").
                         add("duration", runningJob.duration()).
                         add("request", JobsResource.asModel(runningJob.request)).
-                        add("response", "");
+                        add("response", model());
             }
         };
     }

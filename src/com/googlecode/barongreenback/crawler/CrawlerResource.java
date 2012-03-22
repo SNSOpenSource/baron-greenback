@@ -25,6 +25,7 @@ import com.googlecode.totallylazy.proxy.Invocation;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
@@ -53,6 +54,7 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
@@ -164,7 +166,7 @@ public class CrawlerResource {
     @POST
     @Path("crawl")
     @Produces(MediaType.TEXT_PLAIN)
-    public String crawl(@FormParam("id") final UUID id) throws Exception {
+    public Response crawl(@FormParam("id") final UUID id) throws Exception {
         final Model model = modelFor(id);
         final Model form = model.get("form", Model.class);
         final String from = form.get("from", String.class);
@@ -266,7 +268,7 @@ public class CrawlerResource {
     }
 
 
-    private String put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd, PrintStream log) {
+    private Response put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd, PrintStream log) {
         Sequence<Keyword<?>> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
         Definition definition = Definition.constructors.definition(recordName, keywords);
         if (find(modelRepository, recordName).isEmpty()) {
@@ -287,8 +289,9 @@ public class CrawlerResource {
         return numberOfRecordsUpdated(updated, log);
     }
 
-    private String numberOfRecordsUpdated(Number updated, PrintStream log) {
-        log.println(format("%s Records updated", updated));
-        return log.toString();
+    private Response numberOfRecordsUpdated(Number updated, PrintStream log) {
+        return response(Status.OK.description(format("OK - Updated %s Records", updated))).
+                entity(log).
+                build();
     }
 }

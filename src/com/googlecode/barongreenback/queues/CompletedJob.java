@@ -1,12 +1,12 @@
 package com.googlecode.barongreenback.queues;
 
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.time.Seconds;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 
 import java.util.Date;
 
-import static com.googlecode.barongreenback.jobs.HttpScheduler.calculateSeconds;
 
 public class CompletedJob {
     public final Request request;
@@ -22,7 +22,7 @@ public class CompletedJob {
     }
 
     public long duration() {
-        return calculateSeconds(started, completed);
+        return Seconds.between(started, completed);
     }
 
     public static Function1<CompletedJob, Date> completed() {

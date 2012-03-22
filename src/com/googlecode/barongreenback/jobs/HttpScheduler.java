@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.time.Clock;
+import com.googlecode.totallylazy.time.Seconds;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
@@ -14,7 +15,6 @@ import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 import com.googlecode.yadic.Container;
 
 import java.util.Date;
-import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -25,7 +25,6 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.utterlyidle.HttpMessageParser.parseRequest;
-import static com.googlecode.utterlyidle.Responses.response;
 
 public class HttpScheduler {
     private final Jobs jobs;
@@ -80,13 +79,13 @@ public class HttpScheduler {
                     final Response response = application.handle(request);
                     Date completed = clock.now();
                     return application.usingRequestScope(updateJob(
-                            Job.job(id).response(response.toString()).duration(calculateSeconds(started, completed)).completed(completed).running(false)));
+                            Job.job(id).response(response.toString()).duration(Seconds.between(started, completed)).completed(completed).running(false)));
                 } catch (Exception e) {
                     Date completed = clock.now();
                     return application.usingRequestScope(updateJob(
                             Job.job(id).response(ResponseBuilder.response(Status.INTERNAL_SERVER_ERROR).
                                     entity(ExceptionRenderer.toString(e)).toString()).
-                                    duration(calculateSeconds(started, completed)).
+                                    duration(Seconds.between(started, completed)).
                                     completed(completed).running(false)));
                 }
             }
@@ -101,10 +100,6 @@ public class HttpScheduler {
                 return VOID;
             }
         };
-    }
-
-    public static Long calculateSeconds(Date start, Date end) {
-        return (end.getTime() - start.getTime()) / 1000L;
     }
 
     private Callable1<Record, Void> cancel() {
