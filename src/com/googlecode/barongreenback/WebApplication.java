@@ -29,6 +29,7 @@ import static com.googlecode.utterlyidle.dsl.StaticBindingBuilder.in;
 import static com.googlecode.utterlyidle.modules.Modules.bindingsModule;
 import static com.googlecode.utterlyidle.sitemesh.ContentTypePredicate.contentType;
 import static com.googlecode.utterlyidle.sitemesh.MetaTagRule.metaTagRule;
+import static com.googlecode.utterlyidle.sitemesh.QueryParamRule.queryParamRule;
 import static com.googlecode.utterlyidle.sitemesh.StaticDecoratorRule.staticRule;
 import static com.googlecode.utterlyidle.sitemesh.StringTemplateDecorators.stringTemplateDecorators;
 import static com.googlecode.utterlyidle.sitemesh.TemplateName.templateName;
@@ -40,6 +41,7 @@ public class WebApplication extends RestApplication {
         add(Modules.applicationInstance(properties));
         addModules(this);
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
+                queryParamRule("decorator"),
                 metaTagRule("decorator"),
                 staticRule(contentType(TEXT_HTML), templateName("decorator"))));
         add(new ProfilingModule());

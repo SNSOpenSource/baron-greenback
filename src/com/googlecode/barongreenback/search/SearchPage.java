@@ -32,7 +32,7 @@ public class SearchPage {
     }
 
     private static RequestBuilder url(String view, String query) {
-        return get("/" + relativeUriOf(method(on(SearchResource.class).list(view, query))));
+        return get("/" + relativeUriOf(method(on(SearchResource.class).list(view, query)))).query("decorator", "none");
     }
 
     public Number numberOfResults() {
