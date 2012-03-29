@@ -1,0 +1,21 @@
+package com.googlecode.barongreenback.persistence.sql;
+
+import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import com.googlecode.barongreenback.persistence.Persistence;
+import com.googlecode.lazyrecords.SchemaGeneratingRecords;
+import com.googlecode.lazyrecords.sql.SqlRecords;
+
+import static com.googlecode.lazyrecords.sql.expressions.Expressions.textOnly;
+
+public class SqlPersistence implements Persistence{
+    private final SqlRecords sqlRecords;
+
+    public SqlPersistence(SqlRecords sqlRecords) {
+        this.sqlRecords = sqlRecords;
+    }
+
+    @Override
+    public void deleteAll() throws Exception {
+        sqlRecords.update(textOnly("DROP ALL OBJECTS"));
+    }
+}

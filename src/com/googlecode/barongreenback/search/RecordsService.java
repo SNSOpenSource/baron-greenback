@@ -47,13 +47,22 @@ public class RecordsService {
         records.remove(Definition.constructors.definition(viewName(view), Sequences.<Keyword<?>>empty()), predicate);
     }
 
-    public Integer count(String viewName, String query) {
+    public Number count(String viewName, String query) {
         Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return 0;
 
         Model view = optionalView.get();
         Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headers(view));
-        return recordsFound.map(Callables.<String, Integer>ignoreAndReturn(0), size());
+        return recordsFound.map(Callables.<String, Number>ignoreAndReturn(0), size());
+    }
+
+    private Callable1<Sequence<Record>, Number> size() {
+        return new Callable1<Sequence<Record>, Number>() {
+            @Override
+            public Number call(Sequence<Record> records) throws Exception {
+                return records.size();
+            }
+        };
     }
 
     public Option<Record> findUnique(String viewName, String query) {
@@ -66,7 +75,7 @@ public class RecordsService {
     }
 
     public Either<String, Sequence<Record>> findAll(final String viewName, final String query) {
-        Option<Model> optionalView = findView(viewName);
+        Option<Model> optionalView = findView( viewName);
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
         Model view = optionalView.get();

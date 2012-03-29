@@ -81,7 +81,7 @@ public class SearchResource {
     @GET
     @Path("shortcut")
     public Object shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
-        if (recordsService.count(viewName, query) == 1) {
+        if (recordsService.count(viewName, query).intValue() == 1) {
             final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
             final Option<Record> optionalRecord = recordsService.findUnique(viewName, query);
             Option<Keyword<?>> unique = uniqueHeader(visibleHeaders);

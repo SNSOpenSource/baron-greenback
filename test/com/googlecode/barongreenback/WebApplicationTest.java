@@ -25,8 +25,7 @@ public class WebApplicationTest {
     public static void main(String[] args) throws Exception {
         System.setProperty("baron-greenback.lucene.index.directory", Files.TEMP_DIR + "/" + WebApplicationTest.class.getSimpleName());
         new Waitrest("/", 8899);
-        Application application = new WebApplication(BasePath.basePath("/"), System.getProperties()).
-                add(logRecordsTo(System.out));
+        Application application = new WebApplication(BasePath.basePath("/"), System.getProperties());
         new RestServer(
                 application,
                 defaultConfiguration().port(9000));
@@ -37,16 +36,5 @@ public class WebApplicationTest {
             throw new RuntimeException(String.format("Problem importing BBC.json definition \n%s", response));
         }
 
-    }
-
-    private static RequestScopedModule logRecordsTo(final PrintStream out) {
-        return new RequestScopedModule() {
-            @Override
-            public Module addPerRequestObjects(Container container) throws Exception {
-                container.remove(Logger.class);
-                container.addInstance(Logger.class, new PrintStreamLogger(out));
-                return null;
-            }
-        };
     }
 }

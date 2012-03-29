@@ -1,6 +1,8 @@
 package com.googlecode.barongreenback.batch;
 
 import com.googlecode.barongreenback.jobs.HttpScheduler;
+import com.googlecode.barongreenback.persistence.Persistence;
+import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.queues.Queues;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.messages.Category;
@@ -39,14 +41,14 @@ public class BatchResource {
 
     private ModelRepository modelRepository;
     private Redirector redirector;
-    private final LuceneStorage optimisedStorage;
+    private final Persistence persistence;
     private final HttpScheduler scheduler;
     private final Queues queues;
 
-    public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final LuceneStorage storage, final HttpScheduler scheduler, final Queues queues) {
+    public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final Persistence persistence, final HttpScheduler scheduler, final Queues queues) {
         this.modelRepository = modelRepository;
         this.redirector = redirector;
-        this.optimisedStorage = storage;
+        this.persistence = persistence;
         this.scheduler = scheduler;
         this.queues = queues;
     }
@@ -103,7 +105,7 @@ public class BatchResource {
     public Object deleteIndex() throws IOException {
         try {
             scheduler.stop();
-            optimisedStorage.deleteAll();
+            persistence.deleteAll();
             queues.deleteAll();
             return redirector.seeOther(method(on(BatchResource.class).operations("Index has been deleted and all pending jobs stopped", Category.SUCCESS)));
         } catch(Exception e) {
