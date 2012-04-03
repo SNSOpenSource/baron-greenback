@@ -5,7 +5,7 @@ jQuery(document).ready(function (event) {
     $(".shouldExpand td").each(function (i, node) {
         var elem = $(node);
 
-        if (hasScrollBars(elem)) {
+        if (hasHiddenContent(elem)) {
             elem.addClass("expandable");
         }
 
@@ -32,8 +32,18 @@ jQuery(document).ready(function (event) {
         return elem.offset().left - (expander.outerWidth() / 2) + (elem.outerWidth() / 2);
     }
 
-    function hasScrollBars(elem) {
+    function hasHiddenContent(elem) {
+        if ($.browser.mozilla) {
+            elem.css("display", "block");
+        }
+
         var cell = elem[0];
-        return (cell.clientHeight < cell.scrollHeight) || (cell.clientWidth < cell.scrollWidth);
+        var hasHiddenContent = (cell.clientHeight < cell.scrollHeight) || (cell.clientWidth < cell.scrollWidth);
+
+        if ($.browser.mozilla) {
+            elem.css("display", "");
+        }
+        return hasHiddenContent;
     }
 });
+
