@@ -10,6 +10,7 @@ import java.util.Map;
 
 import static com.googlecode.totallylazy.Maps.pairToEntry;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.utterlyidle.Requests.query;
 
 public class RequestPager implements Pager {
     private static final String DEFAULT_ROWS_PER_PAGE = "20";
@@ -23,7 +24,7 @@ public class RequestPager implements Pager {
 
     public RequestPager(Request request) {
         this.request = request;
-        final QueryParameters queryParameters = QueryParameters.parse(request.uri().query());
+        final QueryParameters queryParameters = query(request);
 
         currentPage = Integer.parseInt(Option.option(queryParameters.getValue(CURRENT_PAGE_PARAM)).getOrElse(DEFAULT_PAGE));
         numberOfRowsPerPage = Option.option(queryParameters.getValue(ROWS_PER_PAGE_PARAM)).getOrElse(DEFAULT_ROWS_PER_PAGE);
@@ -73,7 +74,7 @@ public class RequestPager implements Pager {
     }
 
     public String getQueryStringForPage(int pageNumber) {
-        return QueryParameters.parse(request.uri().query()).remove(CURRENT_PAGE_PARAM).add(CURRENT_PAGE_PARAM, String.valueOf(pageNumber)).toString();
+        return query(request).remove(CURRENT_PAGE_PARAM).add(CURRENT_PAGE_PARAM, String.valueOf(pageNumber)).toString();
     }
 
     public boolean isPaged() {
@@ -81,6 +82,6 @@ public class RequestPager implements Pager {
     }
 
     public List<Map.Entry<String, String>> getQueryParametersToUrl() {
-        return sequence(QueryParameters.parse(request.uri().query()).remove(ROWS_PER_PAGE_PARAM).remove(CURRENT_PAGE_PARAM)).map(pairToEntry(String.class, String.class)).toList();
+        return sequence(query(request).remove(ROWS_PER_PAGE_PARAM).remove(CURRENT_PAGE_PARAM)).map(pairToEntry(String.class, String.class)).toList();
     }
 }

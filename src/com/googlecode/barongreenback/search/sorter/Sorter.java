@@ -9,6 +9,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Parameters;
 import com.googlecode.utterlyidle.QueryParameters;
 import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.Requests;
 
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class Sorter {
     private QueryParameters queryParameters;
 
     public Sorter(Request request) {
-        queryParameters = QueryParameters.parse(request.uri().query());
+        queryParameters = Requests.query(request);
         this.sortColumn = queryParameters.getValue(SORT_COLUMN_QUERY_PARAM);
         this.sortDirection = queryParameters.getValue(SORT_DIRECTION_QUERY_PARAM);
     }
@@ -43,9 +44,9 @@ public class Sorter {
     }
 
     public String linkFor(Keyword keyword, Sequence<Keyword<?>> visibleHeaders) {
-        Parameters parameters = queryParameters.remove(SORT_COLUMN_QUERY_PARAM).remove(SORT_DIRECTION_QUERY_PARAM).add(SORT_COLUMN_QUERY_PARAM, keyword.name());
+        QueryParameters parameters = queryParameters.remove(SORT_COLUMN_QUERY_PARAM).remove(SORT_DIRECTION_QUERY_PARAM).add(SORT_COLUMN_QUERY_PARAM, keyword.name());
         if (keyword.name().equals(option(sortColumn).getOrElse(visibleHeaders.head().name())) && !DESCENDING_SORT_DIRECTION.equals(sortDirection)) {
-            parameters.add(SORT_DIRECTION_QUERY_PARAM, DESCENDING_SORT_DIRECTION);
+            parameters = parameters.add(SORT_DIRECTION_QUERY_PARAM, DESCENDING_SORT_DIRECTION);
         }
 
         return parameters.toString();
