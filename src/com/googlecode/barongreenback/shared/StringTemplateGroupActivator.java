@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.search.pager.PagerRenderer;
 import com.googlecode.barongreenback.search.pager.RequestPager;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.URLs;
 import com.googlecode.totallylazy.Xml;
 import com.googlecode.utterlyidle.Request;
@@ -34,6 +35,9 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
 
     public StringTemplateGroup call() throws Exception {
         EnhancedStringTemplateGroup shared = new EnhancedStringTemplateGroup(URLs.packageUrl(SharedModule.class));
+        shared.enableFormatsAsFunctions();
+        shared.registerRenderer("underscores", instanceOf(String.class), underscores());
+        shared.registerRenderer("dashes", instanceOf(String.class), dashes());
         shared.registerRenderer(always(), Xml.escape());
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
@@ -41,7 +45,24 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         return new EnhancedStringTemplateGroup(baseUrl, shared);
     }
 
-    private URL append(URL url, String path) {
+    public static Function1<String, String> underscores() {
+        return new Function1<String, String>(){
+            @Override
+            public String call(String s) throws Exception {
+                return s.replace(' ', '_');
+            }
+        };
+    }
+    public static Function1<String, String> dashes() {
+        return new Function1<String, String>(){
+            @Override
+            public String call(String s) throws Exception {
+                return s.replace(' ', '-');
+            }
+        };
+    }
+
+    static URL append(URL url, String path) {
         return url(url.toString() + path);
     }
 
