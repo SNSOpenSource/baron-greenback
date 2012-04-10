@@ -14,7 +14,7 @@ public class AdvancedModeActivator implements Callable<AdvancedMode>{
     }
 
     public AdvancedMode call() throws Exception {
-        if("true".equals(query(request).getValue("advanced"))){
+        if(query(request).contains("advanced")){
             return AdvancedMode.Enable;
         }
         return AdvancedMode.Disable;

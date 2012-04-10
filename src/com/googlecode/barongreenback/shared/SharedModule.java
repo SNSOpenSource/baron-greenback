@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.shared;
 import com.googlecode.funclate.Model;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.handlers.ResponseHandlers;
+import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.ArgumentScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
@@ -19,7 +20,7 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 import static com.googlecode.utterlyidle.handlers.HandlerRule.entity;
 import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.renderer;
 
-public class SharedModule implements ResponseHandlersModule, RequestScopedModule, ResourcesModule, ArgumentScopedModule {
+public class SharedModule implements ApplicationScopedModule, ResponseHandlersModule, RequestScopedModule, ResourcesModule, ArgumentScopedModule {
     public Module addResponseHandlers(ResponseHandlers handlers) {
         handlers.add(where(entity(), is(instanceOf(Model.class))), renderer(ModelRenderer.class));
         return this;
@@ -41,6 +42,12 @@ public class SharedModule implements ResponseHandlersModule, RequestScopedModule
 
     public Module addPerArgumentObjects(Container container) throws Exception {
         container.addActivator(Model.class, ModelActivator.class);
+        return this;
+    }
+
+    @Override
+    public Module addPerApplicationObjects(Container container) throws Exception {
+        container.add(BaronGreenbackProperties.class);
         return this;
     }
 }

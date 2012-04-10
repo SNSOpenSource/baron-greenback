@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback;
 
+import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.lazyrecords.Logger;
 import com.googlecode.lazyrecords.PrintStreamLogger;
 import com.googlecode.totallylazy.Files;
@@ -23,7 +24,7 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 @Ignore
 public class WebApplicationTest {
     public static void main(String[] args) throws Exception {
-        System.setProperty("baron-greenback.lucene.index.directory", Files.TEMP_DIR + "/" + WebApplicationTest.class.getSimpleName());
+        System.setProperty(BaronGreenbackProperties.PREFIX + ".lucene.index.directory", Files.TEMP_DIR + "/" + WebApplicationTest.class.getSimpleName());
         new Waitrest("/", 8899);
         Application application = new WebApplication(BasePath.basePath("/"), System.getProperties());
         new RestServer(
