@@ -51,9 +51,9 @@ public class WebApplication extends RestApplication {
     }
 
     public static void addModules(Application application) {
+        application.add(new SharedModule());
         PersistenceModule.configure(application);
         application.add(new LessCssModule());
-        application.add(new SharedModule());
         application.add(new CrawlerModule());
         application.add(new SearchModule());
         application.add(new ViewsModule());

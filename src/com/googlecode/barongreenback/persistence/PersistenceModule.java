@@ -1,14 +1,11 @@
 package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
-import com.googlecode.barongreenback.persistence.lucene.ModelMapping;
 import com.googlecode.barongreenback.persistence.sql.SqlModule;
-import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.IgnoreLogger;
 import com.googlecode.lazyrecords.Logger;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.PrefixProperties;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
@@ -16,10 +13,10 @@ import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule {
+
     public Module addPerRequestObjects(final Container container) throws Exception {
         container.addInstance(StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
         container.add(Logger.class, IgnoreLogger.class);
@@ -39,9 +36,14 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         return this;
     }
 
+    // TODO: Make reflective so we don't need lucene deps
+
+    public static final String JDBC = "jdbc";
+    public static final String LUCENE = "lucene";
+
     public static final Map<String, Module> modules = new ConcurrentHashMap<String, Module>(){{
-        put("lucene", new LuceneModule());
-        put("jdbc", new SqlModule());
+        put(LUCENE, new LuceneModule());
+        put(JDBC, new SqlModule());
     }};
 
     public static Application configure(Application application) {

@@ -4,7 +4,7 @@ import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.PrefixProperties;
 
 public class PersistenceProperties extends PrefixProperties {
-    private static final String PREFIX = "persistence";
+    public static final String PREFIX = "persistence";
 
     public PersistenceProperties() {
         super(PREFIX);

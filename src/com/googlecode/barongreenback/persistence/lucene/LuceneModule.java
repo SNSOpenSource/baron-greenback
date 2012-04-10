@@ -1,13 +1,9 @@
 package com.googlecode.barongreenback.persistence.lucene;
 
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecordsActivator;
 import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.persistence.PersistenceApplicationScope;
 import com.googlecode.barongreenback.persistence.PersistenceRequestScope;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.lazyrecords.Schema;
-import com.googlecode.lazyrecords.Schemaless;
 import com.googlecode.lazyrecords.lucene.LuceneRecords;
 import com.googlecode.lazyrecords.lucene.LuceneStorage;
 import com.googlecode.lazyrecords.lucene.OptimisedStorage;

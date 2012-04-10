@@ -2,7 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.barongreenback.persistence.lucene.StringPrintStream;
+import com.googlecode.barongreenback.persistence.StringPrintStream;
 import com.googlecode.barongreenback.queues.QueuesResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
