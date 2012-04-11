@@ -14,17 +14,22 @@ import com.googlecode.yadic.Container;
 
 import java.sql.Connection;
 
+import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
+import static com.googlecode.yadic.Containers.addIfAbsent;
+
 public class SqlModule implements RequestScopedModule {
     @Override
     public Module addPerRequestObjects(Container requestScope) throws Exception {
         final Container container = requestScope.get(PersistenceRequestScope.class).value();
-        container.addActivator(Connection.class, ConnectionActivator.class);
-        container.add(Persistence.class, SqlPersistence.class);
-        container.add(SqlMappings.class);
-        container.add(Schema.class, SqlSchema.class);
-        container.add(SqlRecords.class);
-        container.addActivator(Records.class, container.getActivator(SqlRecords.class));
-        container.decorate(Records.class, SchemaGeneratingRecords.class);
+        addActivatorIfAbsent(container, Connection.class, ConnectionActivator.class);
+        addIfAbsent(container, Persistence.class, SqlPersistence.class);
+        addIfAbsent(container, SqlMappings.class);
+        addIfAbsent(container, Schema.class, SqlSchema.class);
+        addIfAbsent(container, SqlRecords.class);
+        if (!container.contains(Records.class)) {
+            container.addActivator(Records.class, container.getActivator(SqlRecords.class));
+            container.decorate(Records.class, SchemaGeneratingRecords.class);
+        }
         return this;
     }
 }

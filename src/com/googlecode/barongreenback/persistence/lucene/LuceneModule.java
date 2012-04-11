@@ -14,19 +14,24 @@ import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 import org.apache.lucene.store.Directory;
 
+import java.util.concurrent.Callable;
+
+import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
+import static com.googlecode.yadic.Containers.addIfAbsent;
+
 public class LuceneModule implements ApplicationScopedModule, RequestScopedModule {
     public Module addPerApplicationObjects(Container applicationScope) {
         final Container container = applicationScope.get(PersistenceApplicationScope.class).value();
-        container.addActivator(Directory.class, DirectoryActivator.class);
-        container.add(LuceneStorage.class, OptimisedStorage.class);
+        addActivatorIfAbsent(container, Directory.class, DirectoryActivator.class);
+        addIfAbsent(container, LuceneStorage.class, OptimisedStorage.class);
         return this;
     }
 
     public Module addPerRequestObjects(final Container requestScope) {
         final Container container = requestScope.get(PersistenceRequestScope.class).value();
-        container.add(Persistence.class, LucenePersistence.class);
-        container.add(LuceneMappings.class);
-        container.add(Records.class, LuceneRecords.class);
+        addIfAbsent(container, Persistence.class, LucenePersistence.class);
+        addIfAbsent(container, LuceneMappings.class);
+        addIfAbsent(container, Records.class, LuceneRecords.class);
         return this;
     }
 

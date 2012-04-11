@@ -13,35 +13,39 @@ import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
+import static com.googlecode.yadic.Containers.addIfAbsent;
+import static com.googlecode.yadic.Containers.addInstanceIfAbsent;
 
 public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule {
 
     public Module addPerRequestObjects(final Container container) throws Exception {
-        container.addInstance(StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
-        container.add(Logger.class, IgnoreLogger.class);
-        container.add(PersistenceRequestScope.class);
-        container.addActivator(Persistence.class, PersistenceActivator.class);
-        container.addActivator(BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
+        addInstanceIfAbsent(container, StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
+        addIfAbsent(container, Logger.class, IgnoreLogger.class);
+        addIfAbsent(container, PersistenceRequestScope.class);
+        addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
+        addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
         return this;
     }
 
     @Override
     public Module addPerApplicationObjects(Container container) throws Exception {
-        container.add(PersistenceProperties.class);
-        container.add(PersistenceUri.class);
-        container.add(PersistenceUser.class);
-        container.add(PersistencePassword.class);
-        container.add(PersistenceApplicationScope.class);
+        addIfAbsent(container, PersistenceProperties.class);
+        addIfAbsent(container, PersistenceUri.class);
+        addIfAbsent(container, PersistenceUser.class);
+        addIfAbsent(container, PersistencePassword.class);
+        addIfAbsent(container, PersistenceApplicationScope.class);
         return this;
     }
 
     // TODO: Make reflective so we don't need lucene deps
-
     public static final String JDBC = "jdbc";
     public static final String LUCENE = "lucene";
 
-    public static final Map<String, Module> modules = new ConcurrentHashMap<String, Module>(){{
+    public static final Map<String, Module> modules = new ConcurrentHashMap<String, Module>() {{
         put(LUCENE, new LuceneModule());
         put(JDBC, new SqlModule());
     }};
