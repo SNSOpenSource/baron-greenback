@@ -2,7 +2,7 @@ package com.googlecode.barongreenback.less;
 
 import com.googlecode.totallylazy.Uri;
 
-interface LessCssCache {
+public interface LessCssCache {
 
     boolean containsKey(Uri uri);
 
