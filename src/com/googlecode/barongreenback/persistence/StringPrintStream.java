@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.persistence.lucene;
+package com.googlecode.barongreenback.persistence;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

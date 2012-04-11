@@ -31,6 +31,6 @@ public class FileLessCssCache implements LessCssCache {
     }
 
     private String fileNameFor(Uri uri) {
-        return "cache-" + String.valueOf(uri.hashCode());
+        return "cache-" + String.valueOf(uri.hashCode()) + ".css";
     }
 }

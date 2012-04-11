@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.persistence.lucene;
+package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.mappings.StringMapping;

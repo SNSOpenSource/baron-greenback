@@ -1,19 +1,59 @@
 package com.googlecode.barongreenback.persistence;
 
-import com.googlecode.barongreenback.persistence.lucene.ModelMapping;
+import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
+import com.googlecode.barongreenback.persistence.sql.SqlModule;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.IgnoreLogger;
 import com.googlecode.lazyrecords.Logger;
 import com.googlecode.lazyrecords.mappings.StringMappings;
+import com.googlecode.utterlyidle.Application;
+import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 
-public class PersistenceModule implements RequestScopedModule {
-    public Module addPerRequestObjects(final Container container) {
-        container.addInstance(StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
-        container.add(Logger.class, IgnoreLogger.class);
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
+import static com.googlecode.yadic.Containers.addIfAbsent;
+import static com.googlecode.yadic.Containers.addInstanceIfAbsent;
+
+public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule {
+
+    public Module addPerRequestObjects(final Container container) throws Exception {
+        addInstanceIfAbsent(container, StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
+        addIfAbsent(container, Logger.class, IgnoreLogger.class);
+        addIfAbsent(container, PersistenceRequestScope.class);
+        addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
+        addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
         return this;
     }
 
+    @Override
+    public Module addPerApplicationObjects(Container container) throws Exception {
+        addIfAbsent(container, PersistenceProperties.class);
+        addIfAbsent(container, PersistenceUri.class);
+        addIfAbsent(container, PersistenceUser.class);
+        addIfAbsent(container, PersistencePassword.class);
+        addIfAbsent(container, PersistenceApplicationScope.class);
+        return this;
+    }
+
+    // TODO: Make reflective so we don't need lucene deps
+    public static final String JDBC = "jdbc";
+    public static final String LUCENE = "lucene";
+
+    public static final Map<String, Module> modules = new ConcurrentHashMap<String, Module>() {{
+        put(LUCENE, new LuceneModule());
+        put(JDBC, new SqlModule());
+    }};
+
+    public static Application configure(Application application) {
+        application.add(new PersistenceModule());
+        PersistenceUri persistenceUri = application.applicationScope().get(PersistenceUri.class);
+        application.add(modules.get(persistenceUri.scheme()));
+        return application;
+    }
 }

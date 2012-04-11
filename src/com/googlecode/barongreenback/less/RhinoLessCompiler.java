@@ -12,7 +12,7 @@ public class RhinoLessCompiler implements LessCompiler {
     private Scriptable scope;
     private Function parseLess;
 
-    private void init() throws IOException {
+    synchronized private void init() throws IOException {
         if (scope == null) {
             Context context = Context.enter();
             context.setOptimizationLevel(9);
