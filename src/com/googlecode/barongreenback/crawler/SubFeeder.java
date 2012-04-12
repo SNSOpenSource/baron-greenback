@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.LazyException;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
@@ -58,7 +59,7 @@ public class SubFeeder implements Feeder<Uri> {
                         return one(record);
                     }
                     return records.
-                            map(Record.functions.merge(record));
+                            map(mergeWith(record));
                 } catch (LazyException e){
                     return handleError(subFeed, e.getCause(), record);
                 } catch (Exception e){
@@ -66,6 +67,24 @@ public class SubFeeder implements Feeder<Uri> {
                 }
             }
         };
+    }
+
+    private Function1<Record, Record> mergeWith(final Record parentRecord) {
+        return new Function1<Record, Record>() {
+            @Override
+            public Record call(Record subFeedRecord) throws Exception {
+                return copyMissingFieldsFromParent(parentRecord, subFeedRecord);
+            }
+        };
+    }
+
+    static Record copyMissingFieldsFromParent(Record parentRecord, Record subFeedRecord) {
+        for (Keyword<Object> keyword : parentRecord.keywords().<Keyword<Object>>unsafeCast()) {
+            if(!subFeedRecord.keywords().contains(keyword)){
+                subFeedRecord.set(keyword, parentRecord.get(keyword));
+            }
+        }
+        return subFeedRecord;
     }
 
     private Sequence<Record> handleError(Uri subFeed, Throwable e, Record record) {
