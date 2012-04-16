@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryLessCssCache implements LessCssCache {
     
-    private Map<Uri, String> cache = new ConcurrentHashMap<Uri, String>();
+    static private Map<Uri, String> cache = new ConcurrentHashMap<Uri, String>();
     
     @Override
     public boolean containsKey(Uri uri) {
