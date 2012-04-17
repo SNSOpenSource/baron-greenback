@@ -70,21 +70,4 @@ public class RequestQueues implements Queues {
         };
     }
 
-    private static class CappedLinkedBlockingQueue<T> extends LinkedBlockingQueue<T> {
-        public CappedLinkedBlockingQueue(int initialCapacity) {
-            super(initialCapacity);
-        }
-
-        @Override
-        public boolean add(T t) {
-            if (remainingCapacity() == 0) {
-                try {
-                    take();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            return super.add(t);
-        }
-    }
 }
