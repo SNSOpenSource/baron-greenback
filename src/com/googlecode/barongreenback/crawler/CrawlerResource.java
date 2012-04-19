@@ -40,7 +40,6 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CheckPointStopper.extractCheckpoint;
 import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
-import static com.googlecode.barongreenback.jobs.JobsResource.DEFAULT_INTERVAL;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
@@ -67,10 +66,12 @@ public class CrawlerResource {
     private final Redirector redirector;
     private final HttpClient httpClient;
     private final StringMappings mappings;
+    private final CrawlInterval interval;
 
-    public CrawlerResource(final BaronGreenbackRecords records, final ModelRepository modelRepository, HttpClient httpClient, Redirector redirector, StringMappings mappings) {
+    public CrawlerResource(final BaronGreenbackRecords records, final ModelRepository modelRepository, HttpClient httpClient, Redirector redirector, StringMappings mappings, CrawlInterval interval) {
         this.httpClient = httpClient;
         this.mappings = mappings;
+        this.interval = interval;
         this.records = records.value();
         this.modelRepository = modelRepository;
         this.redirector = redirector;
@@ -249,14 +250,14 @@ public class CrawlerResource {
     }
 
     private Uri jobUrl(UUID uuid) throws Exception {
-        Uri scheduled = scheduleAQueuedCrawl(null, uuid);
+        Uri scheduled = scheduleAQueuedCrawl(null, uuid, interval.value());
         return redirector.absoluteUriOf(scheduled);
     }
 
-    public static Uri scheduleAQueuedCrawl(UUID crawlerId, UUID schedulerId) throws Exception {
+    public static Uri scheduleAQueuedCrawl(UUID crawlerId, UUID schedulerId, Long interval) throws Exception {
         String crawlerJob = absolutePathOf(method(on(CrawlerResource.class).crawl(crawlerId)));
         String queued = absolutePathOf(method(on(QueuesResource.class).queue(null, crawlerJob)));
-        return relativeUriOf(method(on(JobsResource.class).schedule(schedulerId, DEFAULT_INTERVAL, queued)));
+        return relativeUriOf(method(on(JobsResource.class).schedule(schedulerId, interval, queued)));
     }
 
     private static String absolutePathOf(Invocation<?, ?> method) {

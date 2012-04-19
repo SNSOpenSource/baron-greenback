@@ -36,7 +36,6 @@ import static com.googlecode.utterlyidle.RequestBuilder.modify;
 @Path("jobs")
 @Produces(TEXT_HTML)
 public class JobsResource {
-    public static final Long DEFAULT_INTERVAL = 300L;
     private final HttpScheduler scheduler;
     private final Request request;
     private final Redirector redirector;

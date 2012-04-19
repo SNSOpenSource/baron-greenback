@@ -35,12 +35,14 @@ public class BatchCrawlerResource {
     private final ModelRepository modelRepository;
     private final Redirector redirector;
     private Application application;
+    private final CrawlInterval interval;
 
-    public BatchCrawlerResource(final InvocationHandler invocationHandler, final ModelRepository modelRepository, final Redirector redirector, final Application application) {
+    public BatchCrawlerResource(final InvocationHandler invocationHandler, final ModelRepository modelRepository, final Redirector redirector, final Application application, final CrawlInterval interval) {
         this.invocationHandler = invocationHandler;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.application = application;
+        this.interval = interval;
     }
 
 
@@ -73,7 +75,7 @@ public class BatchCrawlerResource {
     public Callable1<UUID, Response> crawl() {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
-                return application.handle(post(scheduleAQueuedCrawl(uuid, uuid)).form("id", uuid).build());
+                return application.handle(post(scheduleAQueuedCrawl(uuid, uuid, interval.value())).form("id", uuid).build());
             }
         };
     }
