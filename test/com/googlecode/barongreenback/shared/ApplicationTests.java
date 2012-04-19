@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.persistence.Persistence;
+import com.googlecode.lazyrecords.lucene.SimplePool;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;

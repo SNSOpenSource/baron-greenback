@@ -4,9 +4,7 @@ import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.persistence.PersistenceApplicationScope;
 import com.googlecode.barongreenback.persistence.PersistenceRequestScope;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.lazyrecords.lucene.LuceneRecords;
-import com.googlecode.lazyrecords.lucene.LuceneStorage;
-import com.googlecode.lazyrecords.lucene.OptimisedStorage;
+import com.googlecode.lazyrecords.lucene.*;
 import com.googlecode.lazyrecords.lucene.mappings.LuceneMappings;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
@@ -24,6 +22,7 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
         final Container container = applicationScope.get(PersistenceApplicationScope.class).value();
         addActivatorIfAbsent(container, Directory.class, DirectoryActivator.class);
         addIfAbsent(container, LuceneStorage.class, OptimisedStorage.class);
+        addIfAbsent(container, SearcherPool.class, LucenePool.class);
         return this;
     }
 
