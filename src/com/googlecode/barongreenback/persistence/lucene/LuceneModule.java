@@ -12,6 +12,8 @@ import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 import org.apache.lucene.store.Directory;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
@@ -30,8 +32,26 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
         final Container container = requestScope.get(PersistenceRequestScope.class).value();
         addIfAbsent(container, Persistence.class, LucenePersistence.class);
         addIfAbsent(container, LuceneMappings.class);
-        addIfAbsent(container, Records.class, LuceneRecords.class);
+        addActivatorIfAbsent(container, Records.class, RecordsActivator.class);
         return this;
     }
 
+    public static class RecordsActivator implements Callable<Records>, Closeable {
+        private final Container container;
+        private LuceneRecords records;
+
+        public RecordsActivator(Container container) {
+            this.container = container;
+        }
+
+        @Override
+        public Records call() throws Exception {
+            return records = container.create(LuceneRecords.class);
+        }
+
+        @Override
+        public void close() throws IOException {
+            records.close();
+        }
+    }
 }
