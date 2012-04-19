@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.totallylazy.Value;
 import com.googlecode.yadic.Container;
+import com.googlecode.yadic.Containers;
 import com.googlecode.yadic.Resolver;
 import com.googlecode.yadic.closeable.CloseableContainer;
 
@@ -13,6 +14,8 @@ public class PersistenceApplicationScope implements Value<Container>, Closeable 
 
     public PersistenceApplicationScope(Resolver applicationScope) {
         this.value = CloseableContainer.closeableContainer(applicationScope);
+        this.value.addInstance(Resolver.class, this.value);
+        this.value.addInstance(Container.class, this.value);
     }
 
     @Override
