@@ -30,4 +30,8 @@ public class ViewSearchPage {
         return html.selectContent(format("//td[@class='%s']", cssClass)).contains(value);
     }
 
+    public Number resultsSize() {
+        return html.count("//table[contains(@class, 'results')]/tbody/tr");
+    }
+
 }

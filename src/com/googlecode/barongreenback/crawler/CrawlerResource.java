@@ -180,12 +180,14 @@ public class CrawlerResource {
 
         PrintStream log = new StringPrintStream();
         Sequence<Record> records = new Crawler(httpClient, log).crawl(uri(from), more, convertFromString(checkpoint, checkpointType), recordDefinition);
-        if (records.isEmpty()) {
+        Option<Record> head = records.headOption();
+        if (head.isEmpty()) {
             return numberOfRecordsUpdated(0, log);
         }
-        Option<Object> firstCheckPoint = getFirstCheckPoint(records);
+
+        Option<Object> firstCheckPoint = getFirstCheckPoint(head.get());
         modelRepository.set(id, Forms.form(update, from, more, convertToString(firstCheckPoint), getCheckPointType(firstCheckPoint), recordDefinition.toModel()));
-        return put(update, recordDefinition, records, log);
+        return put(update, recordDefinition, records.cons(head.get()), log);
     }
 
     private Sequence<Pair<UUID, Model>> allCrawlerModels() {
@@ -225,8 +227,8 @@ public class CrawlerResource {
         };
     }
 
-    private Option<Object> getFirstCheckPoint(Sequence<Record> records) {
-        return extractCheckpoint(records.head());
+    private Option<Object> getFirstCheckPoint(Record record) {
+        return extractCheckpoint(record);
     }
 
     private Model modelFor(UUID id) {

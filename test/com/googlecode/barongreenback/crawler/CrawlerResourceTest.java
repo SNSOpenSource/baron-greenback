@@ -6,6 +6,7 @@ import com.googlecode.barongreenback.queues.CountDownCompleter;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.waitrest.Waitrest;
 import org.junit.Test;
@@ -89,6 +90,8 @@ public class CrawlerResourceTest extends ApplicationTests {
     public void canCrawlFeedsWithPaginationAndCheckpoint() throws Exception {
         ViewSearchPage viewSearchPage = crawlFeedsWithPaginationAndCheckpoint(Dates.RFC3339().parse("2011-07-19T12:43:20Z"));
 
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(3));
+
         assertThat(viewSearchPage.containsCell("Added user", "title"), is(true));
         assertThat(viewSearchPage.containsCell("Deleted user", "title"), is(true));
         assertThat(viewSearchPage.containsCell("Updated user", "title"), is(true));
@@ -98,6 +101,8 @@ public class CrawlerResourceTest extends ApplicationTests {
     @Test
     public void canCrawlFeedsWithPaginationAndWithoutCheckpoint() throws Exception {
         ViewSearchPage viewSearchPage = crawlFeedsWithPaginationAndCheckpoint(null);
+
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(4));
 
         assertThat(viewSearchPage.containsCell("Added user", "title"), is(true));
         assertThat(viewSearchPage.containsCell("Deleted user", "title"), is(true));

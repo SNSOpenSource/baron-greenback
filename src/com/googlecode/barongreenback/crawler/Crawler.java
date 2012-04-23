@@ -33,9 +33,8 @@ public class Crawler {
         this.client = new AuditHandler(client, new PrintAuditor(log));
     }
 
-    public Sequence<Record> crawl(Uri uri, String more, Object checkpoint, RecordDefinition recordDefinition) throws Exception {
+    public Sequence<Record>  crawl(Uri uri, String more, Object checkpoint, RecordDefinition recordDefinition) throws Exception {
         Feeder<Uri> feeder = new SubFeeder(new DuplicateRemover(new CheckPointStopper(checkpoint, new UriFeeder(client, more))));
-        return feeder.get(uri, recordDefinition).
-                memorise();
+        return feeder.get(uri, recordDefinition);
     }
 }
