@@ -30,7 +30,7 @@ public class CheckPointStopper implements Feeder<Uri> {
 
     public static Option<Object> extractCheckpoint(Record record) {
         return record.keywords().
-                find(where(metadata(Crawler.CHECKPOINT), is(true))).
+                find(where(metadata(CompositeCrawler.CHECKPOINT), is(true))).
                 map(checkpoint(record));
     }
 

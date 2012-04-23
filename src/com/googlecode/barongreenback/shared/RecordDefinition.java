@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.shared;
 
-import com.googlecode.barongreenback.crawler.Crawler;
+import com.googlecode.barongreenback.crawler.CompositeCrawler;
 import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.AliasedKeyword;
@@ -104,7 +104,7 @@ public class RecordDefinition {
     }
 
     private static boolean checkpoint(Keyword keyword) {
-        return booleanValueOf(keyword, Crawler.CHECKPOINT);
+        return booleanValueOf(keyword, CompositeCrawler.CHECKPOINT);
     }
 
     private static boolean booleanValueOf(Keyword keyword, Keyword<Boolean> metaKeyword) {
@@ -191,7 +191,7 @@ public class RecordDefinition {
                         set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
                         set(Views.VISIBLE, model.get("visible", Boolean.class)).
                         set(Views.GROUP, model.get("group", String.class)).
-                        set(Crawler.CHECKPOINT, model.get("checkpoint", Boolean.class)).
+                        set(CompositeCrawler.CHECKPOINT, model.get("checkpoint", Boolean.class)).
                         set(RecordDefinition.SUBFEED, model.get("subfeed", Boolean.class)).
                         set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
             }

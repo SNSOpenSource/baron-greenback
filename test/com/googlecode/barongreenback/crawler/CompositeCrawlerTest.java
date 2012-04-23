@@ -19,7 +19,7 @@ import static com.googlecode.lazyrecords.Record.constructors.record;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class CrawlerTest extends CrawlerTests{
+public class CompositeCrawlerTest extends CrawlerTests{
     public static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(record().set(Keywords.UNIQUE, true));
     public static final Keyword<String> FIRST = Keywords.keyword("first", String.class);
     public static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class).as(FIRST);
@@ -30,7 +30,7 @@ public class CrawlerTest extends CrawlerTests{
     public static final Keyword<String> ID = keyword("id", String.class).metadata(record().set(Keywords.UNIQUE, true).set(Views.VISIBLE, true));
     public static final Keyword<URI> LINK = keyword("link/@href", URI.class).
             metadata(record().set(Keywords.UNIQUE, true).set(RECORD_DEFINITION, ENTRY_DEFINITION));
-    public static final Keyword<String> UPDATED = keyword("updated", String.class).metadata(record().set(Crawler.CHECKPOINT, true));
+    public static final Keyword<String> UPDATED = keyword("updated", String.class).metadata(record().set(CompositeCrawler.CHECKPOINT, true));
     public static final Keyword<String> TITLE = keyword("title", String.class);
     
     public static final Definition ENTRIES = definition("/feed/entry", ID, LINK, UPDATED, TITLE);
@@ -58,11 +58,11 @@ public class CrawlerTest extends CrawlerTests{
     }
 
     public static Sequence<Record> crawlOnePageOnly() throws Exception {
-        return new Crawler().crawl(atomXml, "", null, ATOM_DEFINITION);
+        return new CompositeCrawler().crawl(atomXml, "", null, ATOM_DEFINITION);
     }
 
     public static Sequence<Record> crawl(Object checkpoint) throws Exception {
-        return new Crawler().crawl(atomXml, "/feed/link/@href", checkpoint, ATOM_DEFINITION);
+        return new CompositeCrawler().crawl(atomXml, "/feed/link/@href", checkpoint, ATOM_DEFINITION);
     }
 
 

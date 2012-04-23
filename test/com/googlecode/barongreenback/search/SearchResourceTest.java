@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.crawler.CrawlerTest;
+import com.googlecode.barongreenback.crawler.CompositeCrawlerTest;
 import com.googlecode.barongreenback.crawler.CrawlerTests;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ApplicationTests;
@@ -92,7 +92,7 @@ public class SearchResourceTest extends ApplicationTests {
     public void addSomeData() throws Exception {
         Waitrest waitrest = CrawlerTests.setupServerWithDataFeed();
 
-        final Sequence<Record> recordSequence = CrawlerTest.crawlOnePageOnly().realise();
+        final Sequence<Record> recordSequence = CompositeCrawlerTest.crawlOnePageOnly().realise();
 
         application.usingRequestScope(new Callable1<Container, Void>() {
             public Void call(Container container) throws Exception {
