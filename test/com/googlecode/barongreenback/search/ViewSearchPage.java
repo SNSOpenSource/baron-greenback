@@ -26,12 +26,22 @@ public class ViewSearchPage {
         assertThat(html.title(), containsString("Search"));
     }
 
-    public boolean containsCell(String value, String cssClass) {
-        return html.selectContent(format("//td[@class='%s']", cssClass)).contains(value);
+    public boolean containsCell(String name, String value) {
+        return html.selectContent(format("//td[@class='%s']", name)).contains(value);
+    }
+
+    public boolean containsCell(String name, int index, String value) {
+        String xpath = format("//tbody/tr[%s]/td[@class='%s']", index + 1, name);
+        String result = html.selectContent(xpath);
+        return result.contains(value);
     }
 
     public Number resultsSize() {
         return html.count("//table[contains(@class, 'results')]/tbody/tr");
     }
 
+    @Override
+    public String toString() {
+        return html.toString();
+    }
 }

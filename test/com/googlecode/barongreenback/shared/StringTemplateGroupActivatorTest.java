@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.shared;
 
+import com.googlecode.barongreenback.ShowAndTell;
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.WebApplicationTest;
 import org.antlr.stringtemplate.StringTemplate;
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ public class StringTemplateGroupActivatorTest {
 
     @Test
     public void shouldReplaceSpacesWithUnderscores() throws Exception {
-        StringTemplateGroupActivator activator = new StringTemplateGroupActivator(append(packageUrl(WebApplicationTest.class), "shared"));
+        StringTemplateGroupActivator activator = new StringTemplateGroupActivator(append(packageUrl(ShowAndTell.class), "shared"));
         StringTemplate template = activator.call().getInstanceOf("replaceWithUnderscores");
         template.setAttribute("name", "string with spaces");
         assertThat(template.toString(), containsString("string_with_spaces"));
@@ -29,7 +29,7 @@ public class StringTemplateGroupActivatorTest {
 
     @Test
     public void shouldReplaceSpacesWithDashes() throws Exception {
-        StringTemplateGroupActivator activator = new StringTemplateGroupActivator(append(packageUrl(WebApplicationTest.class), "shared"));
+        StringTemplateGroupActivator activator = new StringTemplateGroupActivator(append(packageUrl(ShowAndTell.class), "shared"));
         StringTemplate template = activator.call().getInstanceOf("replaceWithDashes");
         template.setAttribute("name", "string with spaces");
         assertThat(template.toString(), containsString("string-with-spaces"));

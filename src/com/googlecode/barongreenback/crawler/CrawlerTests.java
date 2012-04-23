@@ -20,7 +20,7 @@ public abstract class CrawlerTests {
 
     @Before
     public void startWaitrest() throws Exception {
-        waitrest = setupServerWithDataFeed();
+        waitrest = serverWithDataFeed();
     }
 
     @After
@@ -28,7 +28,7 @@ public abstract class CrawlerTests {
         waitrest.close();
     }
 
-    public static Waitrest setupServerWithDataFeed() throws Exception {
+    public static Waitrest serverWithDataFeed() throws Exception {
         Waitrest waitrest = new Waitrest("/", 9001);
         ClientHttpHandler restClient = new ClientHttpHandler();
         final URL waitrestURL = waitrest.getURL();

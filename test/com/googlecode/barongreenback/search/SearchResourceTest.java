@@ -90,7 +90,7 @@ public class SearchResourceTest extends ApplicationTests {
 
     @Before
     public void addSomeData() throws Exception {
-        Waitrest waitrest = CrawlerTests.setupServerWithDataFeed();
+        Waitrest waitrest = CrawlerTests.serverWithDataFeed();
 
         final Sequence<Record> recordSequence = CompositeCrawlerTest.crawlOnePageOnly().realise();
 

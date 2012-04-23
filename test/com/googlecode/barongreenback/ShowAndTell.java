@@ -7,20 +7,17 @@ import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Waitrest;
-import org.junit.Ignore;
 
 import java.util.Properties;
 
 import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneTemporaryDirectory;
-import static com.googlecode.barongreenback.persistence.sql.SqlPersistence.h2Mem;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 
-@Ignore
-public class WebApplicationTest {
+public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        PersistenceUri.set(properties, luceneTemporaryDirectory(WebApplicationTest.class.getSimpleName()));
+        PersistenceUri.set(properties, luceneTemporaryDirectory(ShowAndTell.class.getSimpleName()));
         new Waitrest("/", 8899);
         Application application = new WebApplication(BasePath.basePath("/"), properties);
         new RestServer(
