@@ -61,4 +61,12 @@ public class CheckPointStopper implements Feeder<Uri> {
         };
     }
 
+    public static Callable1<Record, Object> extractCheckPoint() {
+        return new Callable1<Record, Object>() {
+            @Override
+            public Object call(Record record) throws Exception {
+                return extractCheckpoint(record);
+            }
+        };
+    }
 }
