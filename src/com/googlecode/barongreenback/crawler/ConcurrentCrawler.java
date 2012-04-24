@@ -83,31 +83,42 @@ public class ConcurrentCrawler implements Crawler {
         public Pair<Number, Option<Object>> crawl(Uri uri, RecordDefinition recordDefinition, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) throws Exception {
             try {
                 Feeder<Uri> feeder = new DuplicateRemover(new CheckPointStopper(lastCheckPoint, new UriFeeder(client, more)));
-                Sequence<Sequence<Record>> chunks = feeder.get(uri, recordDefinition).recursive(Sequences.<Record>splitAt(20));
-                Number updated = 0;
-                Option<Record> head = Option.none();
-                for (Sequence<Record> lazyRecords : chunks) {
-                    Sequence<Record> crawledRecords = lazyRecords.realise();
-                    if (head.isEmpty()) {
-                        head = crawledRecords.headOption();
-                    }
+                Sequence<Record> crawledRecords = feeder.get(uri, recordDefinition);
 
-                    crawledRecords.flatMapConcurrently(processAllSubFeeds()).realise();
-
-                    for (Record currentRecord : crawledRecords.cons(head.get()).map(Record.functions.merge(uniqueKeys))) {
-                        Sequence<Keyword<?>> unique = extractUniqueKeys(currentRecord);
-                        Number rows = records.put(definition, pair(using(unique).call(currentRecord), currentRecord));
-                        updated = Numbers.add(updated, rows);
-                    }
-
+                Option<Record> head = crawledRecords.headOption();
+                if (head.isEmpty()) {
+                    return nothing();
                 }
 
-                return pair(updated, head.map(CheckPointStopper.extractCheckPoint()));
+                Number updated = 0;
+                for (Record currentRecord : crawledRecords.cons(head.get())) {
+                    Number rows = putRecord(uniqueKeys, currentRecord);
+                    updated = Numbers.add(updated, rows);
+
+                    Sequence<Pair<Keyword<?>, Object>> accumulatedUniqueKeys = uniqueKeysAndValues(currentRecord).join(uniqueKeys);
+                    Sequence<Pair<Number, Option<Object>>> result = processSubFeeds(currentRecord, accumulatedUniqueKeys);
+                }
+
+                Pair<Number, Option<Object>> pair = pair(updated, CheckPointStopper.extractCheckpoint(head.get()));
+                System.out.printf("Feed %s returned %s\n", uri, pair.first());
+                return pair;
             } catch (LazyException e) {
                 return handleError(uri, e.getCause());
             } catch (Exception e) {
                 return handleError(uri, e);
             }
+        }
+
+        private Number putRecord(Sequence<Pair<Keyword<?>, Object>> uniqueKeys, Record currentRecord) {
+            return records.put(definition, Record.methods.update(using(uniqueKeys.map(Callables.<Keyword<?>>first())), addUniqueKeysTo(currentRecord, uniqueKeys)));
+        }
+
+        private Record addUniqueKeysTo(Record currentRecord, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
+            return Record.constructors.record(uniqueKeys.join(currentRecord.fields()));
+        }
+
+        private Sequence<Pair<Keyword<?>, Object>> uniqueKeysAndValues(Record currentRecord) {
+            return currentRecord.fields().filter(where(Callables.<Keyword<?>>first(), UNIQUE_FILTER));
         }
 
         private Pair<Number, Option<Object>> handleError(Uri subFeed, Throwable e) {
@@ -123,37 +134,33 @@ public class ConcurrentCrawler implements Crawler {
             return currentRecord.keywords().filter(UNIQUE_FILTER);
         }
 
-        private Callable1<Record, Sequence<Pair<Number, Option<Object>>>> processAllSubFeeds() {
-            return new Callable1<Record, Sequence<Pair<Number, Option<Object>>>>() {
-                @Override
-                public Sequence<Pair<Number, Option<Object>>> call(Record record) throws Exception {
-                    Sequence<Keyword<?>> subFeedKeys = record.keywords().
-                            filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
-                            realise(); // Must Realise so we don't get concurrent modification as we add new fields to the record
-                    if (subFeedKeys.isEmpty()) {
-                        return one(nothing());
-                    }
-                    return subFeedKeys.mapConcurrently(eachSubFeedWith(record)).realise();
+        private Sequence<Pair<Number, Option<Object>>> processSubFeeds(Record record, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
+            Sequence<Keyword<?>> subFeedKeys = record.keywords().
+                    filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
+                    realise(); // Must Realise so we don't get concurrent modification as we add new fields to the record
+            if (subFeedKeys.isEmpty()) {
+                return one(nothing());
+            }
+            return subFeedKeys.mapConcurrently(processSubFeed(record, uniqueKeys)).realise();
+        }
+
+        private Callable1<Keyword, Pair<Number, Option<Object>>> processSubFeed(final Record record, final Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
+            return new Callable1<Keyword, Pair<Number, Option<Object>>>() {
+                public Pair<Number, Option<Object>> call(Keyword keyword) throws Exception {
+                    return processSubFeed(keyword, record, uniqueKeys);
                 }
             };
         }
 
-        private Callable1<Keyword, Pair<Number, Option<Object>>> eachSubFeedWith(final Record record) {
-            return new Callable1<Keyword, Pair<Number, Option<Object>>>() {
-                public Pair<Number, Option<Object>> call(Keyword keyword) throws Exception {
-                    Object value = record.get(keyword);
-                    if (value == null) {
-                        return nothing();
-                    }
-                    Uri subFeed = uri(value.toString());
-                    Sequence<Keyword<?>> uniqueKeys = extractUniqueKeys(record);
-                    Sequence<Object> values = record.getValuesFor(uniqueKeys);
-                    Sequence<Pair<Keyword<?>, Object>> uniqueKeysAndValues = uniqueKeys.zip(values);
+        private Pair<Number, Option<Object>> processSubFeed(Keyword keyword, Record record, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) throws Exception {
+            Object value = record.get(keyword);
+            if (value == null) {
+                return nothing();
+            }
+            Uri subFeed = uri(value.toString());
 
-                    RecordDefinition subFeedDefinition = keyword.metadata().get(RECORD_DEFINITION);
-                    return crawl(subFeed, subFeedDefinition, uniqueKeysAndValues);
-                }
-            };
+            RecordDefinition subFeedDefinition = keyword.metadata().get(RECORD_DEFINITION);
+            return crawl(subFeed, subFeedDefinition, uniqueKeys);
         }
     }
 

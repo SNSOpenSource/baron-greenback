@@ -23,7 +23,7 @@
                 "alias":"",
                 "group":"",
                 "type":"java.net.URI",
-                "unique":false,
+                "unique":true,
                 "visible":true,
                 "subfeed":true,
                 "record":{
@@ -61,6 +61,43 @@
                             "subfeed":false,
                             "record":null,
                             "checkpoint":false
+                        },
+                        {
+                            "name":"pony/@href",
+                            "alias":"",
+                            "group":"",
+                            "type":"java.net.URI",
+                            "unique":false,
+                            "visible":true,
+                            "subfeed":true,
+                            "record":{
+                                "name":"/pony",
+                                "keywords":[
+                                    {
+                                        "name":"shiny",
+                                        "alias":"",
+                                        "group":"",
+                                        "type":"java.lang.String",
+                                        "unique":false,
+                                        "visible":true,
+                                        "subfeed":false,
+                                        "record":null,
+                                        "checkpoint":false
+                                    },
+                                    {
+                                        "name":"mane",
+                                        "alias":"",
+                                        "group":"",
+                                        "type":"java.lang.String",
+                                        "unique":false,
+                                        "visible":true,
+                                        "subfeed":false,
+                                        "record":null,
+                                        "checkpoint":false
+                                    }
+                                ]
+                            },
+                            "checkpoint":false
                         }
                     ]
                 },
@@ -71,7 +108,7 @@
                 "alias":"",
                 "group":"",
                 "type":"java.lang.String",
-                "unique":true,
+                "unique":false,
                 "visible":true,
                 "subfeed":false,
                 "record":null,

@@ -14,6 +14,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.numbers.Numbers;
+import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 
 import java.io.PrintStream;
@@ -37,10 +38,10 @@ public class SequentialCrawler implements Crawler {
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
 
-    public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records) {
+    public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, BaronGreenbackRecords records) {
         this.modelRepository = modelRepository;
         this.mappings = mappings;
-        this.httpClient = httpClient;
+        this.httpClient = new ClientHttpHandler(1000);
         this.records = records;
     }
 
@@ -88,7 +89,7 @@ public class SequentialCrawler implements Crawler {
         Number updated = 0;
         for (Record record : recordsToAdd) {
             Sequence<Keyword<?>> unique = record.keywords().filter(UNIQUE_FILTER);
-            Number rows = records.value().put(definition, pair(using(unique).call(record), record));
+            Number rows = records.value().put(definition, Record.methods.update(using(unique), record));
             updated = Numbers.add(updated, rows);
         }
         return updated;

@@ -31,7 +31,6 @@ public class EndToEndTest extends ApplicationTests {
         crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:20Z")), "newsfeed");
         ViewSearchPage viewSearchPage = view("newsfeed");
 
-        System.out.println(viewSearchPage);
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(3));
 
         assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
@@ -45,7 +44,6 @@ public class EndToEndTest extends ApplicationTests {
         crawlSampleData(createCrawler(null), "newsfeed");
         ViewSearchPage viewSearchPage = view("newsfeed");
 
-        System.out.println(viewSearchPage);
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(4));
 
         assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
@@ -59,10 +57,12 @@ public class EndToEndTest extends ApplicationTests {
         crawlSampleData(importCrawler("testCrawler.json"), "test");
         ViewSearchPage viewSearchPage = view("test");
 
-        System.out.println(viewSearchPage);
+//        System.out.println(viewSearchPage);
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));
 
         assertThat(viewSearchPage.containsCell("firstName", 0, "Dan"), is(true));
+        assertThat(viewSearchPage.containsCell("mane", 0, "pink"), is(true));
+        assertThat(viewSearchPage.containsCell("shiny", 0, "very"), is(true));
         assertThat(viewSearchPage.containsCell("firstName", 1, "Matt"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Deleted user"), is(true));
