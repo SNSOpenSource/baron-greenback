@@ -14,7 +14,6 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.numbers.Numbers;
-import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 
 import java.io.PrintStream;
@@ -37,12 +36,14 @@ public class SequentialCrawler implements Crawler {
     private final StringMappings mappings;
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
+    private final CheckPointHandler checkPointHandler;
 
-    public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, BaronGreenbackRecords records) {
+    public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records) {
         this.modelRepository = modelRepository;
         this.mappings = mappings;
-        this.httpClient = new ClientHttpHandler(1000);
+        this.httpClient = httpClient;
         this.records = records;
+        this.checkPointHandler = new CheckPointHandler(mappings, modelRepository);
     }
 
     @Override
@@ -66,11 +67,8 @@ public class SequentialCrawler implements Crawler {
             return 0;
         }
 
-        Option<Object> firstCheckPoint = getFirstCheckPoint(head.get());
-        String newCheckPointType = getCheckPointType(firstCheckPoint);
-        String newCheckPointValue = convertToString(firstCheckPoint);
+        checkPointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head.get()));
 
-        modelRepository.set(id, model().set("form", crawler.set("checkpoint", newCheckPointValue).set("checkpointType", newCheckPointType)));
         return put(update, recordDefinition, records.cons(head.get()));
     }
 

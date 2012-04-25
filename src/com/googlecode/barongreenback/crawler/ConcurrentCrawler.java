@@ -32,7 +32,6 @@ import static com.googlecode.totallylazy.Uri.uri;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
-// Work in progress, does not support sub feeds yet
 public class ConcurrentCrawler implements Crawler {
     private final ModelRepository modelRepository;
     private final CheckPointHandler checkPointHandler;
@@ -41,7 +40,7 @@ public class ConcurrentCrawler implements Crawler {
 
     public ConcurrentCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records) {
         this.modelRepository = modelRepository;
-        this.checkPointHandler = new CheckPointHandler(mappings);
+        this.checkPointHandler = new CheckPointHandler(mappings, modelRepository);
         this.httpClient = httpClient;
         this.records = records;
     }
@@ -57,7 +56,7 @@ public class ConcurrentCrawler implements Crawler {
         final Uri uri = uri(crawler.get("from", String.class));
         Pair<Number, Option<Object>> result = subFeedCrawler.crawl(uri, recordDefinition, Sequences.<Pair<Keyword<?>, Object>>empty());
 
-        updateCheckPoint(id, crawler, result.second());
+        checkPointHandler.updateCheckPoint(id, crawler, result.second());
 
         return result.first();
 
@@ -177,12 +176,6 @@ public class ConcurrentCrawler implements Crawler {
 
     private static Definition definition(Model crawler, RecordDefinition recordDefinition) {
         return Definition.constructors.definition(update(crawler), keywords(recordDefinition));
-    }
-
-    private void updateCheckPoint(UUID id, Model crawler, Option<Object> checkpoint) {
-        if (checkpoint.isEmpty()) {
-            modelRepository.set(id, checkPointHandler.addCheckpoint(crawler, checkpoint.value()));
-        }
     }
 
     private static Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {
