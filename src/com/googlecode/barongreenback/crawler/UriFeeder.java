@@ -8,6 +8,7 @@ import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
+import com.googlecode.utterlyidle.profiling.ProfilingClient;
 import org.w3c.dom.Document;
 
 import static com.googlecode.totallylazy.Sequences.empty;
@@ -25,7 +26,7 @@ public class UriFeeder implements Feeder<Uri> {
 
     public Sequence<Record> get(Uri uri, RecordDefinition definition) throws Exception {
         try {
-            Response response = httpClient.handle(RequestBuilder.get(uri).build());
+            Response response = httpClient.handle(RequestBuilder.get(uri).header(ProfilingClient.NO_PROFILE_HEADER, true).build());
             if (!response.status().equals(Status.OK)) {
                 return empty();
             }

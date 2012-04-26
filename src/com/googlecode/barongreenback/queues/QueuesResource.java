@@ -13,6 +13,7 @@ import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
+import com.googlecode.utterlyidle.profiling.ProfilingClient;
 
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class QueuesResource {
     @Path("queue")
     @Produces(TEXT_PLAIN)
     public Response queue(Request request, @PathParam("$") String endOfUrl) throws Exception {
-        Request requestToQueue = modify(request).uri(request.uri().path(endOfUrl)).build();
+        Request requestToQueue = modify(request).uri(request.uri().path(endOfUrl)).header(ProfilingClient.NO_PROFILE_HEADER, "true").build();
         queues.queue(requestToQueue);
         return ResponseBuilder.response(Status.ACCEPTED.description("Queued Job")).entity("You Job has been accepted and is now in the queue").build();
     }
