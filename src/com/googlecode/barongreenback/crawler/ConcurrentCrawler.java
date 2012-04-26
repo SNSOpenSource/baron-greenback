@@ -8,13 +8,10 @@ import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.numbers.Numbers;
-import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
@@ -22,63 +19,171 @@ import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import java.io.PrintStream;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CheckPointStopper.extractCheckpoint;
 import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
-import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
-import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
+import static com.googlecode.barongreenback.shared.RecordDefinition.*;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.lazyrecords.Using.using;
-import static com.googlecode.totallylazy.Callables.toClass;
 import static com.googlecode.totallylazy.Pair.pair;
+import static com.googlecode.totallylazy.Predicates.*;
+import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Uri.uri;
+import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
-// Work in progress, does not support sub feeds yet
 public class ConcurrentCrawler implements Crawler {
     private final ModelRepository modelRepository;
-    private final StringMappings mappings;
+    private final CheckPointHandler checkPointHandler;
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
 
     public ConcurrentCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records) {
         this.modelRepository = modelRepository;
-        this.mappings = mappings;
+        this.checkPointHandler = new CheckPointHandler(mappings, modelRepository);
         this.httpClient = httpClient;
         this.records = records;
     }
 
     @Override
     public Number crawl(UUID id, PrintStream log) throws Exception {
-        final Model model = modelRepository.get(id).get();
-        final Model crawler = model.get("form", Model.class);
-        final String from = crawler.get("from", String.class);
-        final String update = crawler.get("update", String.class);
-        final String more = crawler.get("more", String.class);
-        final String checkpoint = crawler.get("checkpoint", String.class);
-        final String checkpointType = crawler.get("checkpointType", String.class);
-        final Model record = crawler.get("record", Model.class);
-        final RecordDefinition recordDefinition = convert(record);
+        final Model crawler = crawlerFor(id);
+        final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
+        updateView(crawler, keywords(recordDefinition));
 
-        Uri uri = uri(from);
-        Object lastCheckPoint = convertFromString(checkpoint, checkpointType);
+        SubFeedCrawler subFeedCrawler = new SubFeedCrawler(records.value(), httpClient, crawler, checkPointHandler, log, definition(crawler, recordDefinition));
 
+        final Uri uri = uri(crawler.get("from", String.class));
+        Pair<Number, Option<Object>> result = subFeedCrawler.crawl(uri, recordDefinition, Sequences.<Pair<Keyword<?>, Object>>empty());
 
-        HttpHandler client = new AuditHandler(httpClient, new PrintAuditor(log));
-        DuplicateRemover duplicateRemover = new DuplicateRemover(new CheckPointStopper(lastCheckPoint, new UriFeeder(client, more)));
-        Sequence<Record> records = duplicateRemover.get(uri, recordDefinition);
-        Option<Record> head = records.headOption();
-        if (head.isEmpty()) {
-            return 0;
+        checkPointHandler.updateCheckPoint(id, crawler, result.second());
+
+        return result.first();
+
+    }
+
+    public static class SubFeedCrawler {
+        private final Records records;
+        private final Object lastCheckPoint;
+        private final String more;
+        private final HttpClient client;
+        private final PrintStream log;
+        private final Definition definition;
+
+        public SubFeedCrawler(Records records, HttpClient httpClient, Model crawler, CheckPointHandler checkPointExtractor, PrintStream log, Definition definition) throws Exception {
+            this.records = records;
+            this.log = log;
+            this.definition = definition;
+            this.more = crawler.get("more", String.class);
+            this.lastCheckPoint = checkPointExtractor.lastCheckPointFor(crawler);
+            this.client = new AuditHandler(httpClient, new PrintAuditor(log));
         }
 
-        Option<Object> firstCheckPoint = getFirstCheckPoint(head.get());
-        String newCheckPointType = getCheckPointType(firstCheckPoint);
-        String newCheckPointValue = convertToString(firstCheckPoint);
+        public Pair<Number, Option<Object>> crawl(Uri uri, RecordDefinition recordDefinition, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) throws Exception {
+            try {
+                Feeder<Uri> feeder = new DuplicateRemover(new CheckPointStopper(lastCheckPoint, new UriFeeder(client, more)));
+                Sequence<Record> crawledRecords = feeder.get(uri, recordDefinition);
 
-        modelRepository.set(id, model().set("form", crawler.set("checkpoint", newCheckPointValue).set("checkpointType", newCheckPointType)));
-        Sequence<Keyword<?>> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
-        Definition definition = Definition.constructors.definition(update, keywords);
+                Option<Record> head = crawledRecords.headOption();
+                if (head.isEmpty()) {
+                    return nothing();
+                }
+
+                Number updated = 0;
+                for (Record currentRecord : crawledRecords.cons(head.get())) {
+                    Number rows = putRecord(uniqueKeys, currentRecord);
+                    updated = Numbers.add(updated, rows);
+
+                    Sequence<Pair<Keyword<?>, Object>> accumulatedUniqueKeys = uniqueKeysAndValues(currentRecord).join(uniqueKeys);
+                    Sequence<Pair<Number, Option<Object>>> result = processSubFeeds(currentRecord, accumulatedUniqueKeys);
+                }
+
+                Pair<Number, Option<Object>> pair = pair(updated, CheckPointStopper.extractCheckpoint(head.get()));
+                System.out.printf("Feed %s returned %s\n", uri, pair.first());
+                return pair;
+            } catch (LazyException e) {
+                return handleError(uri, e.getCause());
+            } catch (Exception e) {
+                return handleError(uri, e);
+            }
+        }
+
+        private Number putRecord(Sequence<Pair<Keyword<?>, Object>> uniqueKeys, Record currentRecord) {
+            return records.put(definition, Record.methods.update(using(uniqueKeys.map(Callables.<Keyword<?>>first())), addUniqueKeysTo(currentRecord, uniqueKeys)));
+        }
+
+        private Record addUniqueKeysTo(Record currentRecord, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
+            return Record.constructors.record(uniqueKeys.join(currentRecord.fields()));
+        }
+
+        private Sequence<Pair<Keyword<?>, Object>> uniqueKeysAndValues(Record currentRecord) {
+            return currentRecord.fields().filter(where(Callables.<Keyword<?>>first(), UNIQUE_FILTER));
+        }
+
+        private Pair<Number, Option<Object>> handleError(Uri subFeed, Throwable e) {
+            log.println(format("Failed to GET %s because of %s", subFeed, e));
+            return nothing();
+        }
+
+        private Pair<Number, Option<Object>> nothing() {
+            return pair((Number) 0, Option.none());
+        }
+
+        private Sequence<Keyword<?>> extractUniqueKeys(Record currentRecord) {
+            return currentRecord.keywords().filter(UNIQUE_FILTER);
+        }
+
+        private Sequence<Pair<Number, Option<Object>>> processSubFeeds(Record record, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
+            Sequence<Keyword<?>> subFeedKeys = record.keywords().
+                    filter(where(metadata(RECORD_DEFINITION), is(notNullValue()))).
+                    realise(); // Must Realise so we don't get concurrent modification as we add new fields to the record
+            if (subFeedKeys.isEmpty()) {
+                return one(nothing());
+            }
+            return subFeedKeys.mapConcurrently(processSubFeed(record, uniqueKeys)).realise();
+        }
+
+        private Callable1<Keyword, Pair<Number, Option<Object>>> processSubFeed(final Record record, final Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
+            return new Callable1<Keyword, Pair<Number, Option<Object>>>() {
+                public Pair<Number, Option<Object>> call(Keyword keyword) throws Exception {
+                    return processSubFeed(keyword, record, uniqueKeys);
+                }
+            };
+        }
+
+        private Pair<Number, Option<Object>> processSubFeed(Keyword keyword, Record record, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) throws Exception {
+            Object value = record.get(keyword);
+            if (value == null) {
+                return nothing();
+            }
+            Uri subFeed = uri(value.toString());
+
+            RecordDefinition subFeedDefinition = keyword.metadata().get(RECORD_DEFINITION);
+            return crawl(subFeed, subFeedDefinition, uniqueKeys);
+        }
+    }
+
+
+    private RecordDefinition extractRecordDefinition(Model crawler) {
+        final Model record = crawler.get("record", Model.class);
+        return convert(record);
+    }
+
+
+    private Model crawlerFor(UUID id) {
+        return modelRepository.get(id).get().get("form", Model.class);
+    }
+
+    private static Definition definition(Model crawler, RecordDefinition recordDefinition) {
+        return Definition.constructors.definition(update(crawler), keywords(recordDefinition));
+    }
+
+    private static Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {
+        return RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
+    }
+
+    private void updateView(Model crawler, Sequence<Keyword<?>> keywords) {
+        final String update = update(crawler);
         if (find(modelRepository, update).isEmpty()) {
             modelRepository.set(randomUUID(), model().add(Views.ROOT, model().
                     add("name", update).
@@ -88,51 +193,11 @@ public class ConcurrentCrawler implements Crawler {
                     add("priority", "").
                     add("keywords", keywords.map(Views.asModel()).toList())));
         }
-        Number updated = 0;
-        for (Record record1 : records.cons(head.get())) {
-            Sequence<Keyword<?>> unique = record1.keywords().filter(UNIQUE_FILTER);
-            Number rows = this.records.value().put(definition, pair(using(unique).call(record1), record1));
-            updated = Numbers.add(updated, rows);
-        }
-        return updated;
     }
 
-    private Object convertFromString(String checkpoint, String checkpointType) throws Exception {
-        Class<?> aClass = checkpointType == null ? String.class : Class.forName(checkpointType);
-        return mappings.get(aClass).toValue(checkpoint);
+    private static String update(Model crawler) {
+        return crawler.get("update", String.class);
     }
-
-    private Option<Object> getFirstCheckPoint(Record record) {
-        return extractCheckpoint(record);
-    }
-
-    private Callable1<? super Object, String> mapAsString() {
-        return new Callable1<Object, String>() {
-            public String call(Object instance) throws Exception {
-                return mappings.toString(instance.getClass(), instance);
-            }
-        };
-    }
-
-    private String convertToString(Option<Object> checkPoint) {
-
-        return checkPoint.map(mapAsString()).getOrElse("");
-    }
-
-    private String getCheckPointType(Option<Object> checkpoint) {
-        return checkpoint.map(toClass()).
-                map(className()).
-                getOrElse(String.class.getName());
-    }
-
-    private static Callable1<? super Class, String> className() {
-        return new Callable1<Class, String>() {
-            public String call(Class aClass) throws Exception {
-                return aClass.getName();
-            }
-        };
-    }
-
 
 
 }

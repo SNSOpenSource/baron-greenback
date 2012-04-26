@@ -30,9 +30,9 @@ public class MoreDocumentFeeder implements Feeder<Document> {
     }
 
     private Sequence<Record> more(final Document document, final RecordDefinition definition) {
+        final String uri = selectContents(document, moreXpath);
         return one(new Callable<Sequence<Record>>() {
             public Sequence<Record> call() throws Exception {
-                String uri = selectContents(document, moreXpath);
                 if (isEmpty(uri)) {
                     return empty();
                 }

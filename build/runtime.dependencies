@@ -16,3 +16,6 @@ mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:7
 
 
 mvn:rhino:js:jar:1.6R7
+
+mvn:xom:xom:jar:1.0
+mvn://repository.jboss.org/nexus/content/groups/public-jboss/nux:nux:jar:1.6

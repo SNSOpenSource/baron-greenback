@@ -8,8 +8,11 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import com.googlecode.waitrest.Waitrest;
 
+import java.io.File;
 import java.util.Properties;
 
+import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
+import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneDirectory;
 import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneTemporaryDirectory;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
@@ -17,8 +20,8 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        PersistenceUri.set(properties, luceneTemporaryDirectory(ShowAndTell.class.getSimpleName()));
-        new Waitrest("/", 8899);
+        PersistenceUri.set(properties, luceneDirectory(new File("/dev/shm/bazza")));
+        Waitrest waitrest = serverWithDataFeed();
         Application application = new WebApplication(BasePath.basePath("/"), properties);
         new RestServer(
                 application,

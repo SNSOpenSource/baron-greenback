@@ -36,12 +36,14 @@ public class SequentialCrawler implements Crawler {
     private final StringMappings mappings;
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
+    private final CheckPointHandler checkPointHandler;
 
     public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records) {
         this.modelRepository = modelRepository;
         this.mappings = mappings;
         this.httpClient = httpClient;
         this.records = records;
+        this.checkPointHandler = new CheckPointHandler(mappings, modelRepository);
     }
 
     @Override
@@ -65,11 +67,8 @@ public class SequentialCrawler implements Crawler {
             return 0;
         }
 
-        Option<Object> firstCheckPoint = getFirstCheckPoint(head.get());
-        String newCheckPointType = getCheckPointType(firstCheckPoint);
-        String newCheckPointValue = convertToString(firstCheckPoint);
+        checkPointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head.get()));
 
-        modelRepository.set(id, model().set("form", crawler.set("checkpoint", newCheckPointValue).set("checkpointType", newCheckPointType)));
         return put(update, recordDefinition, records.cons(head.get()));
     }
 
@@ -88,7 +87,7 @@ public class SequentialCrawler implements Crawler {
         Number updated = 0;
         for (Record record : recordsToAdd) {
             Sequence<Keyword<?>> unique = record.keywords().filter(UNIQUE_FILTER);
-            Number rows = records.value().put(definition, pair(using(unique).call(record), record));
+            Number rows = records.value().put(definition, Record.methods.update(using(unique), record));
             updated = Numbers.add(updated, rows);
         }
         return updated;
