@@ -26,7 +26,7 @@ public class UriFeeder implements Feeder<Uri> {
 
     public Sequence<Record> get(Uri uri, RecordDefinition definition) throws Exception {
         try {
-            Response response = httpClient.handle(RequestBuilder.get(uri).header(ProfilingClient.NO_PROFILE_HEADER, true).build());
+            Response response = httpClient.handle(RequestBuilder.get(uri).build());
             if (!response.status().equals(Status.OK)) {
                 return empty();
             }
