@@ -42,28 +42,5 @@ public class ShowAndTell {
         if (response.status().code() >= 400) {
             throw new RuntimeException(String.format("Problem importing BBC.json definition \n%s", response));
         }
-
     }
-
-    @Test
-    public void deleteMe() throws Exception {
-        ClientHttpHandler handler = new ClientHttpHandler();
-        Request request = get("http://localhost:9000/news/search/list?query=").build();
-
-        Sequence<Response> responses = repeat(request).mapConcurrently(getResponse(handler), Executors.newFixedThreadPool(50)).realise();
-    }
-
-    private Callable1<Request, Response> getResponse(final HttpHandler handler) {
-        return new Callable1<Request, Response>() {
-            @Override
-            public Response call(Request request) throws Exception {
-                Response response = handler.handle(request);
-                System.out.println("response.status() = " + response.status());
-                return response
-                        ;
-            }
-        };
-    }
-
-
 }

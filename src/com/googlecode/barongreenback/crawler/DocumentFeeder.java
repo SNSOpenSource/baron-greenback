@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.RecordsReader;
+import com.googlecode.lazyrecords.xml.ForwardOnlyXmlRecordsReader;
 import com.googlecode.totallylazy.Sequence;
 import org.w3c.dom.Document;
 
