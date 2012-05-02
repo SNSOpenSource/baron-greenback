@@ -29,12 +29,24 @@ public class RecordsModelRepository implements ModelRepository {
         this.records = records.value();
     }
 
+    public Sequence<Pair<UUID, Model>> find(Predicate<? super Record> predicate) {
+        return records.get(MODELS).filter(predicate).map(asPair());
+    }
+
     public Option<Model> get(UUID key) {
         return find(where(ID, is(key))).map(second(Model.class)).headOption();
     }
 
-    public Sequence<Pair<UUID, Model>> find(Predicate<? super Record> predicate) {
-        return records.get(MODELS).filter(predicate).map(asPair());
+    public void set(UUID key, Model value) {
+        records.put(MODELS, update(using(ID), toRecord(key, value)));
+    }
+
+    public void remove(UUID key) {
+        records.remove(MODELS, where(ID, is(key)));
+    }
+
+    public static Record toRecord(UUID key, Model value) {
+        return record().set(ID, key).set(MODEL_TYPE, modelType(value)).set(MODEL, value);
     }
 
     private Callable1<Record, Pair<UUID, Model>> asPair() {
@@ -45,15 +57,7 @@ public class RecordsModelRepository implements ModelRepository {
         };
     }
 
-    public void set(UUID key, Model value) {
-        records.put(MODELS, update(using(ID), record().set(ID, key).set(MODEL_TYPE, modelType(value)).set(MODEL, value)));
-    }
-
-    private String modelType(Model model) {
+    private static String modelType(Model model) {
         return first(model.entries()).getKey();
-    }
-
-    public void remove(UUID key) {
-        records.remove(MODELS, where(ID, is(key)));
     }
 }

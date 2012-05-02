@@ -56,14 +56,14 @@ public class ViewsResource {
     @GET
     @Path("menu")
     public Model menu(@QueryParam("current") @DefaultValue("") String current, @QueryParam("query") @DefaultValue("") String query) {
-        return models(current, Views.where(valueFor("visible", Boolean.class), is(true)), query);
+        return modelsWithViewData(current, Views.where(valueFor("visible", Boolean.class), is(true)), query);
     }
 
 
     @GET
     @Path("list")
     public Model list() {
-        return models("", Predicates.<Second<Model>>all(), "");
+        return modelsWithViewData("", Predicates.<Second<Model>>all(), "");
     }
 
     @GET
@@ -138,7 +138,7 @@ public class ViewsResource {
         return redirector.seeOther(method(on(getClass()).list()));
     }
 
-    private Model models(String current, Predicate<Second<Model>> predicate, String query) {
+    private Model modelsWithViewData(String current, Predicate<Second<Model>> predicate, String query) {
         List<Model> models = modelRepository.
                 find(Predicates.where(MODEL_TYPE, is("view"))).
                 filter(predicate).
@@ -151,13 +151,17 @@ public class ViewsResource {
     private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current, final String query) {
         return new Callable1<Pair<UUID, Model>, Model>() {
             public Model call(Pair<UUID, Model> pair) throws Exception {
-                Model model = pair.second().get("view");
-                String name = model.get("name", String.class);
-                return model.add("id", pair.first()).
-                        add("current", current.equals(name)).
-                        add("itemsTotal", recordsService.count(model.<String>get("records"), model.<String>get("query")+" "+query)).
-                        add("url", redirector.uriOf(method(on(SearchResource.class).list(name, query))));
+                return copyModelAndAddViewData(pair.first(), pair.second(), current, query);
             }
         };
+    }
+
+    private Model copyModelAndAddViewData(UUID key, Model modelFromRepository, String current, String query) {
+        Model model = modelFromRepository.get("view", Model.class).copy();
+        String name = model.get("name", String.class);
+        return model.set("id", key).
+                set("current", current.equals(name)).
+                set("itemsTotal", recordsService.count(model.<String>get("records"), model.<String>get("query") + " " + query)).
+                set("url", redirector.uriOf(method(on(SearchResource.class).list(name, query))));
     }
 }

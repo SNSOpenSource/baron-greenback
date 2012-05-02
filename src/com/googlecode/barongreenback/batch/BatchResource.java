@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.jobs.HttpScheduler;
 import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.queues.Queues;
+import com.googlecode.barongreenback.shared.ModelCache;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.messages.Category;
 import com.googlecode.barongreenback.shared.messages.Messages;
@@ -44,13 +45,15 @@ public class BatchResource {
     private final Persistence persistence;
     private final HttpScheduler scheduler;
     private final Queues queues;
+    private final ModelCache cache;
 
-    public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final Persistence persistence, final HttpScheduler scheduler, final Queues queues) {
+    public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final Persistence persistence, final HttpScheduler scheduler, final Queues queues, final ModelCache cache) {
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.persistence = persistence;
         this.scheduler = scheduler;
         this.queues = queues;
+        this.cache = cache;
     }
 
     @GET
@@ -104,6 +107,7 @@ public class BatchResource {
     @Path("delete")
     public Object deleteIndex() throws IOException {
         try {
+            cache.clear();
             scheduler.stop();
             persistence.deleteAll();
             queues.deleteAll();

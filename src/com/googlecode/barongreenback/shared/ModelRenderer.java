@@ -7,6 +7,8 @@ import com.googlecode.utterlyidle.sitemesh.TemplateName;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
+import static com.googlecode.totallylazy.Debug.inDebug;
+
 public class ModelRenderer implements Renderer<Model> {
     private final StringTemplateGroup group;
     private final BasePath basePath;
@@ -24,6 +26,7 @@ public class ModelRenderer implements Renderer<Model> {
         StringTemplate template = group.getInstanceOf(templateName.value(), value.toMap());
         template.setAttribute("base", basePath);
         template.setAttribute("advanced", mode.equals(AdvancedMode.Enable));
+        template.setAttribute("debug", inDebug());
         return template.toString();
     }
 }

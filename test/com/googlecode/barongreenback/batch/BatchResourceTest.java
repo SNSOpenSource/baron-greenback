@@ -14,9 +14,7 @@ public class BatchResourceTest extends ApplicationTests {
     @Test
     public void canDeleteTheIndex() throws Exception {
         indexHasCrawlerDefinition();
-
         deleteTheIndex();
-
         noCrawlersExist();
     }
 

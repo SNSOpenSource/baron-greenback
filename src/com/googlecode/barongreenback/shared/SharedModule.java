@@ -30,6 +30,7 @@ public class SharedModule implements ApplicationScopedModule, ResponseHandlersMo
         container.addActivator(TemplateName.class, TemplateNameActivator.class);
         container.addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class);
         container.add(ModelRepository.class, RecordsModelRepository.class);
+        container.decorate(ModelRepository.class, CachingModelRepository.class);
         container.addActivator(AdvancedMode.class, AdvancedModeActivator.class);
         container.add(InvocationHandler.class, InternalInvocationHandler.class);
         return this;
@@ -48,6 +49,7 @@ public class SharedModule implements ApplicationScopedModule, ResponseHandlersMo
     @Override
     public Module addPerApplicationObjects(Container container) throws Exception {
         container.add(BaronGreenbackProperties.class);
+        container.add(ModelCache.class);
         return this;
     }
 }
