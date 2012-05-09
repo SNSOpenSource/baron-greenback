@@ -2,26 +2,11 @@ jQuery(document).ready(function (event) {
     var expander = $("<div class='expander'></div>");
     $("body").append(expander);
 
+
     $(".shouldExpand td").each(function (i, node) {
         var elem = $(node);
-
-        if (hasHiddenContent(elem)) {
-            elem.addClass("expandable");
-        }
-
-        if (elem.hasClass("expandable")) {
-            elem.click(function (clickEvt) {
-                expander.html(elem.html());
-                expander.fadeIn();
-                expander.css("top", expanderTopPosition(expander, elem));
-                expander.css("left", expanderLeftPosition(expander, elem));
-
-                $("html").one("click", function () {
-                    expander.fadeOut();
-                });
-                return false;
-            });
-        }
+        elem.click(buildExpanderClickHandler(elem));
+        elem.hover(buildExpanderHoverOver(elem), buildExpanderHoverOut(elem));
     });
 
     function expanderTopPosition(expander, elem) {
@@ -38,12 +23,43 @@ jQuery(document).ready(function (event) {
         }
 
         var cell = elem[0];
+
         var hasHiddenContent = (cell.clientHeight < cell.scrollHeight) || (cell.clientWidth < cell.scrollWidth);
 
         if ($.browser.mozilla) {
             elem.css("display", "");
         }
+
         return hasHiddenContent;
     }
+    function buildExpanderClickHandler(elem) {
+        return function (clickEvt) {
+            if(hasHiddenContent(elem)) {
+                expander.html(elem.html());
+                expander.fadeIn();
+                expander.css("top", expanderTopPosition(expander, elem));
+                expander.css("left", expanderLeftPosition(expander, elem));
+
+                $("html").one("click", function () {
+                    expander.fadeOut();
+                });
+                return false;
+            }
+        }
+    }
+    function buildExpanderHoverOver(elem) {
+        return function() {
+            if(hasHiddenContent(elem)) {
+                elem.addClass("expandable");
+            }
+        }
+    }
+    function buildExpanderHoverOut(elem) {
+        return function() {
+            elem.removeClass("expandable");
+        }
+    }
 });
+
+
 
