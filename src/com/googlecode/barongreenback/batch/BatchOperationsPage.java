@@ -27,7 +27,11 @@ public class BatchOperationsPage {
     }
 
     public void delete() throws Exception {
-        final Request request = html.form("//form[contains(@class, 'delete')]").submit("descendant::input[contains(@class, 'delete')]");
-        httpHandler.handle(request);
+        httpHandler.handle(html.form("//form[contains(@class, 'delete')]").submit("descendant::input[contains(@class, 'delete')]"));
+    }
+
+    public void backup(String location) throws Exception {
+        html.input("descendant::input[contains(@class, 'location')]").value(location);
+        httpHandler.handle(html.form("//form[contains(@class, 'backup')]").submit("descendant::input[contains(@class, 'backup')]"));
     }
 }

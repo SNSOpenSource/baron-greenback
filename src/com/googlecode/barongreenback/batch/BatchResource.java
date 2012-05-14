@@ -24,6 +24,7 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -114,6 +115,17 @@ public class BatchResource {
             return redirector.seeOther(method(on(BatchResource.class).operations("Index has been deleted and all pending jobs stopped", Category.SUCCESS)));
         } catch(Exception e) {
             return redirector.seeOther(method(on(BatchResource.class).operations("Error occurred when deleting the index: " + e.getMessage(), Category.ERROR)));
+        }
+    }
+
+    @POST
+    @Path("backup")
+    public Object backup(@FormParam("location") String location) throws IOException {
+        try {
+            persistence.backup(new File(location));
+            return redirector.seeOther(method(on(BatchResource.class).operations(String.format("Index has been backed up to '%s'", location), Category.SUCCESS)));
+        } catch(Exception e) {
+            return redirector.seeOther(method(on(BatchResource.class).operations(String.format("Error occurred when backing up the index: '%s'", e.getMessage()), Category.ERROR)));
         }
     }
 

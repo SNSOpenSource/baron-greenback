@@ -9,6 +9,9 @@ $message()$
     $get(name="import")$
     $get(name="export")$
     $post(name="delete")$
+    $post(name="backup", content={
+        $input(name="location", placeholder="location", message="")$
+    })$
 </div>
 </body>
 </html>

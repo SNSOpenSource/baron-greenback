@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.barongreenback.persistence.PersistenceUri;
+import com.googlecode.barongreenback.persistence.sql.SqlPersistence;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
