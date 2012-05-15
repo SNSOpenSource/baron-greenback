@@ -25,7 +25,18 @@ public class LucenePersistence implements Persistence {
     }
 
     public static String luceneDirectory(File file) {
-        return String.format("%s:%s://%s", PersistenceModule.LUCENE, DirectoryActivator.FILE, file);
+        return String.format("%s:%s://%s", PersistenceModule.LUCENE, DirectoryActivator.FILE, toStandardFilename(file));
+    }
+
+    private static String toStandardFilename(File file) {
+        String filename = file.toString();
+        if (filename.contains("\\")) {
+            filename = filename.replaceAll("\\\\", "/");
+        }
+        if (!filename.startsWith("/")) {
+            filename = "/" + filename;
+        }
+        return filename;
     }
 
     public static String luceneRam() {
