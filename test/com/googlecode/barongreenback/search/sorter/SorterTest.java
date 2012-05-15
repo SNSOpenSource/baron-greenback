@@ -25,17 +25,17 @@ public class SorterTest {
 
     @Test
     public void readsKeywordToSortFromRequest() throws Exception {
-        Sorter secondSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "mooCow").build());
+        Sorter secondSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "mooCow").query(SORT_DIRECTION_QUERY_PARAM, "asc").build());
         assertThat(secondSorter.sort(records(), keywords()).map(asSecondKeyword()).safeCast(String.class), is(sequence("1", "2", "3")));
 
         Sorter thirdSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "blueCow").build());
-        assertThat(thirdSorter.sort(records(), keywords()).map(asThirdKeyword()).safeCast(Date.class), is(sequence(new Date(1), new Date(10000), new Date(100000))));
+        assertThat(thirdSorter.sort(records(), keywords()).map(asThirdKeyword()).safeCast(Date.class), is(sequence(new Date(100000), new Date(10000), new Date(1))));
     }
 
     @Test
     public void defaultsToFirstColumnWhenKeywordMissing() throws Exception {
         Sorter sorterWithNoParam = new Sorter(RequestBuilder.get("/somePath").build());
-        assertThat(sorterWithNoParam.sort(records(), keywords()).map(asFirstKeyword()).safeCast(String.class), is(sequence("A", "B", "C")));
+        assertThat(sorterWithNoParam.sort(records(), keywords()).map(asFirstKeyword()).safeCast(String.class), is(sequence("C", "B", "A")));
     }
 
     @Test

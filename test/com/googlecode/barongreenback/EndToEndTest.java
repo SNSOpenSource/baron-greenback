@@ -60,10 +60,10 @@ public class EndToEndTest extends ApplicationTests {
 //        System.out.println(viewSearchPage);
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));
 
-        assertThat(viewSearchPage.containsCell("firstName", 0, "Dan"), is(true));
-        assertThat(viewSearchPage.containsCell("mane", 0, "pink"), is(true));
-        assertThat(viewSearchPage.containsCell("shiny", 0, "very"), is(true));
-        assertThat(viewSearchPage.containsCell("firstName", 1, "Matt"), is(true));
+        assertThat(viewSearchPage.containsCell("firstName", 0, "Matt"), is(true));
+        assertThat(viewSearchPage.containsCell("firstName", 1, "Dan"), is(true));
+        assertThat(viewSearchPage.containsCell("mane", 1, "pink"), is(true));
+        assertThat(viewSearchPage.containsCell("shiny", 1, "very"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Deleted user"), is(true));
     }
