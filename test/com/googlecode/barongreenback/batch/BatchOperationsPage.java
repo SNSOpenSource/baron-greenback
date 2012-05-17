@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.batch;
 
+import com.googlecode.barongreenback.shared.messages.Category;
 import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
 
@@ -26,8 +26,8 @@ public class BatchOperationsPage {
         assertThat(html.title(), containsString("Batch Operations"));
     }
 
-    public BatchOperationsPage delete() throws Exception {
-        Response response = httpHandler.handle(html.form("//form[contains(@class, 'delete')]").submit("descendant::input[contains(@class, 'delete')]"));
+    public BatchOperationsPage deleteAll() throws Exception {
+        Response response = httpHandler.handle(html.form("//form[contains(@class, 'deleteAll')]").submit("descendant::input[contains(@class, 'deleteAll')]"));
         return new BatchOperationsPage(httpHandler, response);
     }
 
@@ -41,5 +41,11 @@ public class BatchOperationsPage {
         html.input("//form[contains(@class, 'restore')]/descendant::input[contains(@class, 'location')]").value(location);
         Response response = httpHandler.handle(html.form("//form[contains(@class, 'restore')]").submit("descendant::input[contains(@class, 'restore')]"));
         return new BatchOperationsPage(httpHandler, response);
+    }
+
+    public Message message() {
+        String message = html.selectContent("//div[contains(@class, 'alert-message')]/span[contains(@class, 'message')]");
+        String category = html.selectContent("//div[contains(@class, 'alert-message')]/@class");
+        return new Message(message, category.contains(Category.SUCCESS.toString())? Category.SUCCESS : Category.ERROR);
     }
 }

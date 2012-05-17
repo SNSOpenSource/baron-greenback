@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.batch;
 import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.ImportCrawlerPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
+import com.googlecode.barongreenback.shared.messages.Category;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -38,8 +39,8 @@ public class BatchResourceTest extends ApplicationTests {
         delete(backupLocation);
     }
 
-    private void restoreFrom(File backupLocation) throws Exception {
-        new BatchOperationsPage(browser).restore(backupLocation.getAbsolutePath());
+    private BatchOperationsPage restoreFrom(File backupLocation) throws Exception {
+        return verifySuccess(new BatchOperationsPage(browser).restore(backupLocation.getAbsolutePath()));
     }
 
     private File newBackupLocation() {
@@ -48,7 +49,7 @@ public class BatchResourceTest extends ApplicationTests {
 
     private BatchOperationsPage backupDataTo(File backupLocation) throws Exception {
         assertThat(backupLocation.exists(), Matchers.is(false));
-        BatchOperationsPage page = new BatchOperationsPage(browser).backup(backupLocation.getAbsolutePath());
+        BatchOperationsPage page = verifySuccess(new BatchOperationsPage(browser).backup(backupLocation.getAbsolutePath()));
         assertThat(backupLocation.exists(), Matchers.is(true));
         return page;
     }
@@ -61,12 +62,17 @@ public class BatchResourceTest extends ApplicationTests {
         return crawlerListPage;
     }
 
-    private void deleteTheIndex() throws Exception {
-        BatchOperationsPage batchOperationsPage = new BatchOperationsPage(browser);
-        batchOperationsPage.delete();
+    private BatchOperationsPage deleteTheIndex() throws Exception {
+        return verifySuccess(new BatchOperationsPage(browser).deleteAll());
     }
 
     private int numberOfCrawlers() throws Exception {
         return new CrawlerListPage(browser).numberOfCrawlers();
+    }
+
+    private BatchOperationsPage verifySuccess(BatchOperationsPage page) {
+        Message message = page.message();
+        assertThat(message.message(), message.category(), Matchers.is(Category.SUCCESS));
+        return page;
     }
 }
