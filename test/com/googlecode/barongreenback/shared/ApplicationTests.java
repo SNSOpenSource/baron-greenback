@@ -30,7 +30,7 @@ public abstract class ApplicationTests {
         application.usingRequestScope(new Callable1<Container, Object>() {
             @Override
             public Object call(Container container) throws Exception {
-                container.get(Persistence.class).deleteAll();
+                container.get(Persistence.class).delete();
                 return null;
             }
         });

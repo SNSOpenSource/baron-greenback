@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.batch;
 import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.ImportCrawlerPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
-import com.googlecode.totallylazy.Files;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -19,27 +18,47 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class BatchResourceTest extends ApplicationTests {
     @Test
     public void canDeleteTheIndex() throws Exception {
-        indexHasCrawlerDefinition();
+        importOneCrawler();
         deleteTheIndex();
-        noCrawlersExist();
+        assertThat(numberOfCrawlers(), is(0));
     }
 
     @Test
-    public void canBackupStore() throws Exception {
-        BatchOperationsPage batchOperationsPage = new BatchOperationsPage(browser);
-        File backupLocation = new File(temporaryDirectory(), randomFilename());
+    public void canBackupAndRestore() throws Exception {
+        File backupLocation = newBackupLocation();
+        importOneCrawler();
 
-        assertThat(backupLocation.exists(), Matchers.is(false));
-        batchOperationsPage.backup(backupLocation.getAbsolutePath());
-        assertThat(backupLocation.exists(), Matchers.is(true));
+        backupDataTo(backupLocation);
+        deleteTheIndex();
+        assertThat(numberOfCrawlers(), is(0));
+
+        restoreFrom(backupLocation);
+        assertThat(numberOfCrawlers(), is(1));
 
         delete(backupLocation);
     }
 
-    private void indexHasCrawlerDefinition() throws Exception {
-        ImportCrawlerPage importPage = new ImportCrawlerPage(browser);
-        importPage.model().value(contentOf("crawler.json"));
-        importPage.importModel();
+    private void restoreFrom(File backupLocation) throws Exception {
+        new BatchOperationsPage(browser).restore(backupLocation.getAbsolutePath());
+    }
+
+    private File newBackupLocation() {
+        return new File(temporaryDirectory(), randomFilename());
+    }
+
+    private BatchOperationsPage backupDataTo(File backupLocation) throws Exception {
+        assertThat(backupLocation.exists(), Matchers.is(false));
+        BatchOperationsPage page = new BatchOperationsPage(browser).backup(backupLocation.getAbsolutePath());
+        assertThat(backupLocation.exists(), Matchers.is(true));
+        return page;
+    }
+
+    private CrawlerListPage importOneCrawler() throws Exception {
+        ImportCrawlerPage page = new ImportCrawlerPage(browser);
+        page.model().value(contentOf("crawler.json"));
+        CrawlerListPage crawlerListPage = page.importModel();
+        assertThat(numberOfCrawlers(), is(1));
+        return crawlerListPage;
     }
 
     private void deleteTheIndex() throws Exception {
@@ -47,8 +66,7 @@ public class BatchResourceTest extends ApplicationTests {
         batchOperationsPage.delete();
     }
 
-    private void noCrawlersExist() throws Exception {
-        CrawlerListPage crawlerListPage = new CrawlerListPage(browser);
-        assertThat(crawlerListPage.numberOfCrawlers(), is(0));
+    private int numberOfCrawlers() throws Exception {
+        return new CrawlerListPage(browser).numberOfCrawlers();
     }
 }

@@ -26,12 +26,20 @@ public class BatchOperationsPage {
         assertThat(html.title(), containsString("Batch Operations"));
     }
 
-    public void delete() throws Exception {
-        httpHandler.handle(html.form("//form[contains(@class, 'delete')]").submit("descendant::input[contains(@class, 'delete')]"));
+    public BatchOperationsPage delete() throws Exception {
+        Response response = httpHandler.handle(html.form("//form[contains(@class, 'delete')]").submit("descendant::input[contains(@class, 'delete')]"));
+        return new BatchOperationsPage(httpHandler, response);
     }
 
-    public void backup(String location) throws Exception {
-        html.input("descendant::input[contains(@class, 'location')]").value(location);
-        httpHandler.handle(html.form("//form[contains(@class, 'backup')]").submit("descendant::input[contains(@class, 'backup')]"));
+    public BatchOperationsPage backup(String location) throws Exception {
+        html.input("//form[contains(@class, 'backup')]/descendant::input[contains(@class, 'location')]").value(location);
+        Response response = httpHandler.handle(html.form("//form[contains(@class, 'backup')]").submit("descendant::input[contains(@class, 'backup')]"));
+        return new BatchOperationsPage(httpHandler, response);
+    }
+
+    public BatchOperationsPage restore(String location) throws Exception {
+        html.input("//form[contains(@class, 'restore')]/descendant::input[contains(@class, 'location')]").value(location);
+        Response response = httpHandler.handle(html.form("//form[contains(@class, 'restore')]").submit("descendant::input[contains(@class, 'restore')]"));
+        return new BatchOperationsPage(httpHandler, response);
     }
 }

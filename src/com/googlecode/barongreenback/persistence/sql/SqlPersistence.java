@@ -20,7 +20,7 @@ public class SqlPersistence implements Persistence{
     }
 
     @Override
-    public void deleteAll() throws Exception {
+    public void delete() throws Exception {
         sqlRecords.update(textOnly("drop all objects"));
     }
 
@@ -28,6 +28,11 @@ public class SqlPersistence implements Persistence{
     public void backup(File destination) throws Exception {
         Files.delete(destination);
         sqlRecords.update(expression("backup to ?", destination));
+    }
+
+    @Override
+    public void restore(File file) throws Exception {
+        throw new UnsupportedOperationException();
     }
 
     public static String h2Mem() {
