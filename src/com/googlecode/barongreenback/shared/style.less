@@ -67,12 +67,12 @@ input[type="submit"] {
     .btn;
 }
 
-input.crawl, input.search, a.new, input.import, input.save, input.start, body.views a.edit {
+input.crawl, input.search, a.new, input.import, input.save, input.start, body.views a.edit, input.backup, input.restore {
     .btn;
     .btn.primary;
 }
 
-input.more, a.export, a.import, a.edit, a.cancel {
+input.more, a.export, a.import, a.edit, a.cancel, a.download {
     .btn;
 }
 
@@ -181,7 +181,7 @@ form.search {
     }
 }
 
-form.delete, form.crawl, form.start, form.stop, form.copy, form.reset, form.crawlAll, form.resetAll, form.deleteAll {
+form.delete, form.crawl, form.start, form.stop, form.copy, form.reset, form.crawlAll, form.resetAll, form.deleteAll, form.restore, form.backup {
     margin: 0;
     padding: 0;
     .inlineBlock;
@@ -221,6 +221,9 @@ table.results {
     }
     span.jobstatus.idle {
             background: url(idle.gif) no-repeat;
+    }
+    tfoot tr td {
+        border-top: 1px solid #ddd;
     }
 }
 

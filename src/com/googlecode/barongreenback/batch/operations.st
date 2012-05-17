@@ -6,23 +6,31 @@
 <body>
 $message()$
 
-    $group(name="Backup", content={
-        $post(name="backup", content={
-            $input(name="location", value=backupLocation, message="")$
-        })$
-    })$
-
-    $group(name="Restore", content={
-        $post(name="restore", content={
-            $input(name="location", value=restoreLocation, message="")$
-        })$
-    })$
+<table class="results zebra-striped">
+    $thead(headers=["Name", "Size", "Date", "action" ])$
+    <tbody>
+    $backups:items(item=it)$
+    </tbody>
+    <tfoot>
+    <tr class="backup">
+        <td colspan="4">
+            $post(name="restore", content={
+            $input(name="location", message="")$
+            })$
+        </td>
+    </tr>
+    </tfoot>
+</table>
 
 <div class="actions">
+    $post(name="backup", content={
+        $input(name="location", value=backupLocation, message="")$
+    })$
     $get(name="import")$
     $get(name="export")$
-    $post(name="delete")$
+    $post(name="deleteAll", value="Delete All")$
 </div>
+
 <script>
     //<![CDATA[
     if (window.location.hostname != 'localhost') {
