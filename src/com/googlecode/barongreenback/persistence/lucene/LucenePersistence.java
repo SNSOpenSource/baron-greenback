@@ -4,7 +4,8 @@ import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.lazyrecords.lucene.LuceneStorage;
 import com.googlecode.lazyrecords.lucene.SearcherPool;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Files;
+import com.googlecode.totallylazy.Function2;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
 
@@ -13,7 +14,9 @@ import java.io.IOException;
 
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Runnables.VOID;
+import static com.googlecode.totallylazy.Zip.unzip;
+import static com.googlecode.totallylazy.Zip.zip;
 
 public class LucenePersistence implements Persistence {
     private final LuceneStorage luceneStorage;
@@ -44,20 +47,31 @@ public class LucenePersistence implements Persistence {
     }
 
     @Override
-    public void backup(File destination) throws Exception {
-        Files.delete(destination);
-        using(directoryFor(destination), copy().apply(directory));
+    public void backup(File file) throws Exception {
+        File folder = unzippedName(file);
+        Files.delete(folder);
+        using(directoryFor(folder), copy().apply(directory));
+        zip(folder, file);
+        Files.delete(folder);
     }
 
     @Override
     public void restore(File source) throws Exception {
+        luceneStorage.deleteAll();
         deleteAllSegments(directory);
-        using(directoryFor(source), copy().flip().apply(directory));
-        searcherPool.markAsDirty();
+        using(directoryFor(unzipIfNeeded(source)), copy().flip().apply(directory));
+    }
+
+    private File unzipIfNeeded(File source) throws IOException {
+        if (source.isFile()) {
+            File unzipped = unzippedName(source);
+            unzip(source, unzipped);
+            return unzipped;
+        }
+        return source;
     }
 
     private void deleteAllSegments(Directory directory) throws IOException {
-        luceneStorage.deleteAll();
         for (String segment : directory.listAll()) {
             directory.deleteFile(segment);
         }
@@ -72,7 +86,7 @@ public class LucenePersistence implements Persistence {
             @Override
             public Void call(Directory source, Directory destination) throws Exception {
                 copy(source, destination);
-                return Runnables.VOID;
+                return VOID;
             }
         };
     }
@@ -82,4 +96,9 @@ public class LucenePersistence implements Persistence {
             source.copy(destination, segment, segment);
         }
     }
+
+    private File unzippedName(File file) {
+        return new File(file.toString() + ".unzipped");
+    }
+
 }

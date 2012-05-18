@@ -6,11 +6,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.totallylazy.time.Seconds;
-import com.googlecode.utterlyidle.Application;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.ResponseBuilder;
-import com.googlecode.utterlyidle.Status;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 import com.googlecode.yadic.Container;
 
@@ -18,9 +14,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.barongreenback.jobs.Job.INTERVAL;
-import static com.googlecode.barongreenback.jobs.Job.JOB_ID;
-import static com.googlecode.barongreenback.jobs.Job.REQUEST;
+import static com.googlecode.barongreenback.jobs.Job.*;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Runnables.VOID;
@@ -53,7 +47,10 @@ public class HttpScheduler {
     }
 
     public void stop() {
-        jobs().each(cancel());
+        try {
+            jobs().each(cancel());
+        } catch (Exception ignored) {
+        }
     }
 
     public void remove(UUID id) {

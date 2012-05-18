@@ -10,16 +10,28 @@ import com.googlecode.barongreenback.shared.messages.Messages;
 import com.googlecode.funclate.Model;
 import com.googlecode.funclate.json.Json;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Files;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.annotations.*;
+import com.googlecode.utterlyidle.StreamingOutput;
+import com.googlecode.utterlyidle.annotations.FormParam;
+import com.googlecode.utterlyidle.annotations.GET;
+import com.googlecode.utterlyidle.annotations.POST;
+import com.googlecode.utterlyidle.annotations.Path;
+import com.googlecode.utterlyidle.annotations.Produces;
+import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +42,11 @@ import static com.googlecode.barongreenback.shared.messages.Messages.success;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Files.files;
 import static com.googlecode.totallylazy.Files.hasSuffix;
+import static com.googlecode.totallylazy.Streams.copy;
+import static com.googlecode.totallylazy.Zip.zip;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static java.lang.String.format;
 
 @Path("batch")
@@ -140,6 +155,25 @@ public class BatchResource {
         } catch (Exception e) {
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Error occurred when deleting backup: '%s'", e.getMessage()), Category.ERROR)));
         }
+    }
+
+    @GET
+    @Path("download")
+    @Produces("application/zip")
+    public Response download(@QueryParam("id") String id) {
+        final File file = new File(BACKUP_LOCATION, id);
+        if (!file.exists()) {
+            return redirector.seeOther(method(on(BatchResource.class).operations(format("File not found: '%s'", id), Category.ERROR)));
+        }
+        return response().header("Content-Disposition", String.format("filename=%s", id)).entity(new StreamingOutput() {
+            @Override
+            public void write(OutputStream outputStream) throws IOException {
+                if (file.isDirectory()) {
+                    zip(file, outputStream);
+                }
+                copy(new FileInputStream(file), outputStream);
+            }
+        }).build();
     }
 
     @POST
