@@ -15,9 +15,12 @@ import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.ServerConfiguration;
+import com.googlecode.utterlyidle.handlers.GZipPolicy;
+import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.Modules;
 import com.googlecode.utterlyidle.modules.PerformanceModule;
 import com.googlecode.utterlyidle.profiling.ProfilingModule;
+import com.googlecode.yadic.Container;
 
 import java.util.Properties;
 
@@ -47,7 +50,14 @@ public class WebApplication extends RestApplication {
                 staticRule(contentType(TEXT_HTML), templateName("decorator"))));
         add(new ProfilingModule());
         // must come after sitemesh
-        add(new PerformanceModule());
+        add(new PerformanceModule() {
+            @Override
+            public Module addPerRequestObjects(Container container) throws Exception {
+                super.addPerRequestObjects(container);
+                container.get(GZipPolicy.class).add(contentType(TEXT_HTML));
+                return this;
+            }
+        });
     }
 
     public static void addModules(Application application) {
