@@ -2,6 +2,8 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -30,22 +32,37 @@ public class CachingModelRepository implements ModelRepository {
             for (Pair<UUID, Model> pair : pairs) {
                 cache.put(pair.first(), pair.second());
             }
-            return pairs;
+            return pairs.map(Callables.<UUID, Model, Model>second(copy()));
         }
-        return results;
+        return results.map(Callables.<UUID, Model, Model>second(copy()));
     }
 
     @Override
     public Option<Model> get(UUID key) {
         Option<Model> option = option(cache.get(key));
         if(option.isEmpty()) {
-            Option<Model> models = modelRepository.get(key);
-            for (Model model : models) {
-                cache.put(key, model);
-            }
-            return models;
+            return modelRepository.get(key).map(updateCache(key)).map(copy());
         }
-        return option;
+        return option.map(copy());
+    }
+
+    private Function1<Model, Model> updateCache(final UUID key) {
+        return new Function1<Model, Model>() {
+            @Override
+            public Model call(Model model) throws Exception {
+                cache.put(key, model);
+                return model;
+            }
+        };
+    }
+
+    public static Function1<Model, Model> copy() {
+        return new Function1<Model, Model>() {
+            @Override
+            public Model call(Model model) throws Exception {
+                return model.copy();
+            }
+        };
     }
 
     @Override

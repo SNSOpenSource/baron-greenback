@@ -16,6 +16,8 @@ import java.util.UUID;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 
 public class CachingModelRepositoryTest {
 
@@ -32,6 +34,13 @@ public class CachingModelRepositoryTest {
         cachingModelRepository = new CachingModelRepository(new RecordsModelRepository(BaronGreenbackRecords.records(records)), cache);
         model = Model.model().add("key", "someValue");
         key = UUID.randomUUID();
+    }
+
+    @Test
+    public void shouldAlwaysReturnACopyOfTheModel() throws Exception {
+        cachingModelRepository.set(key, model);
+        assertThat(cachingModelRepository.get(key).get(), not(sameInstance(model)));
+        assertThat(cachingModelRepository.find(where(ModelRepository.MODEL, Predicates.is(model))).head().second(), not(sameInstance(model)));
     }
 
     @Test
