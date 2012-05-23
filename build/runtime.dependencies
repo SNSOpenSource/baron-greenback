@@ -7,11 +7,11 @@ mvn:org.sitemesh:sitemesh:jar:3.0-alpha-2
 mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
-mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:675
-mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:54
-mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:499
-mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:144
-mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:70
-mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:7
+mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.totallylazy:totallylazy:jar|sources:675
+mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:54
+mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:499
+mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.yadic:yadic:jar|sources:144
+mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.funclate:funclate:jar|sources:70
+mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:7
 
 mvn:rhino:js:jar:1.6R7
