@@ -33,14 +33,13 @@ import static com.googlecode.totallylazy.Uri.uri;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
-public class ConcurrentCrawler implements Crawler {
-    private final ModelRepository modelRepository;
+public class ConcurrentCrawler extends AbstractCrawler {
     private final CheckPointHandler checkPointHandler;
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
 
     public ConcurrentCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records) {
-        this.modelRepository = modelRepository;
+        super(modelRepository);
         this.checkPointHandler = new CheckPointHandler(mappings, modelRepository);
         this.httpClient = httpClient;
         this.records = records;
@@ -62,7 +61,7 @@ public class ConcurrentCrawler implements Crawler {
 
         SubFeedCrawler subFeedCrawler = new SubFeedCrawler(records.value(), httpClient, crawler, checkPointHandler, updateCheckpoint, log, definition(crawler, recordDefinition));
 
-        final Uri uri = uri(crawler.get("from", String.class));
+        final Uri uri = from(crawler);
 
 
         return subFeedCrawler.crawl(uri, recordDefinition, Sequences.<Pair<Keyword<?>, Object>>empty());
@@ -193,40 +192,6 @@ public class ConcurrentCrawler implements Crawler {
             RecordDefinition subFeedDefinition = keyword.metadata().get(RECORD_DEFINITION);
             return crawl(subFeed, subFeedDefinition, uniqueKeys);
         }
-    }
-
-
-    private RecordDefinition extractRecordDefinition(Model crawler) {
-        return convert(crawler.get("record", Model.class));
-    }
-
-    private Model crawlerFor(UUID id) {
-        return modelRepository.get(id).get().get("form", Model.class);
-    }
-
-    private static Definition definition(Model crawler, RecordDefinition recordDefinition) {
-        return Definition.constructors.definition(update(crawler), keywords(recordDefinition));
-    }
-
-    private static Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {
-        return RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
-    }
-
-    private void updateView(Model crawler, Sequence<Keyword<?>> keywords) {
-        final String update = update(crawler);
-        if (find(modelRepository, update).isEmpty()) {
-            modelRepository.set(randomUUID(), model().add(Views.ROOT, model().
-                    add("name", update).
-                    add("records", update).
-                    add("query", "").
-                    add("visible", true).
-                    add("priority", "").
-                    add("keywords", keywords.map(Views.asModel()).toList())));
-        }
-    }
-
-    private static String update(Model crawler) {
-        return crawler.get("update", String.class);
     }
 
 

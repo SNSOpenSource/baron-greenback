@@ -31,15 +31,14 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Uri.uri;
 import static java.util.UUID.randomUUID;
 
-public class SequentialCrawler implements Crawler {
-    private final ModelRepository modelRepository;
+public class SequentialCrawler extends AbstractCrawler {
     private final StringMappings mappings;
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
     private final CheckPointHandler checkPointHandler;
 
     public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records) {
-        this.modelRepository = modelRepository;
+        super(modelRepository);
         this.mappings = mappings;
         this.httpClient = httpClient;
         this.records = records;
@@ -59,15 +58,9 @@ public class SequentialCrawler implements Crawler {
         Record head = recordIterator.next();
         checkPointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head));
 
-        final String recordsToUpdate = update(crawler);
         Sequence<Keyword<?>> keywords = keywords(recordDefinition);
-
-        updateView(recordsToUpdate, keywords);
-        return put(recordsToUpdate, sequence(head).join(forwardOnly(recordIterator)), keywords);
-    }
-
-    private String update(Model crawler) {
-        return crawler.get("update", String.class);
+        updateView(crawler, keywords);
+        return put(update(crawler), sequence(head).join(forwardOnly(recordIterator)), keywords);
     }
 
     private Iterator<Record> startCrawl(PrintStream log, Model crawler, RecordDefinition recordDefinition) throws Exception {
@@ -75,10 +68,6 @@ public class SequentialCrawler implements Crawler {
         final String more = more(crawler);
         final Object lastCheckPoint = lastCheckPoint(crawler);
         return new CompositeCrawler(httpClient, log).crawl(from, more, lastCheckPoint, recordDefinition).iterator();
-    }
-
-    private Uri from(Model crawler) {
-        return uri(crawler.get("from", String.class));
     }
 
     private String more(Model crawler) {
@@ -91,14 +80,6 @@ public class SequentialCrawler implements Crawler {
         return convertFromString(checkpoint, checkpointType);
     }
 
-    private RecordDefinition extractRecordDefinition(Model crawler) {
-        return convert(crawler.get("record", Model.class));
-    }
-
-    private Model crawlerFor(UUID id) {
-        return modelRepository.get(id).get().get("form", Model.class);
-    }
-
     private Number put(final String recordName, final Sequence<Record> recordsToAdd, final Sequence<Keyword<?>> keywords1) {
         Definition definition = Definition.constructors.definition(recordName, keywords1);
         Number updated = 0;
@@ -108,22 +89,6 @@ public class SequentialCrawler implements Crawler {
             updated = Numbers.add(updated, rows);
         }
         return updated;
-    }
-
-    private Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {
-        return RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
-    }
-
-    private void updateView(final String recordName, Sequence<Keyword<?>> keywords) {
-        if (find(modelRepository, recordName).isEmpty()) {
-            modelRepository.set(randomUUID(), model().add(Views.ROOT, model().
-                    add("name", recordName).
-                    add("records", recordName).
-                    add("query", "").
-                    add("visible", true).
-                    add("priority", "").
-                    add("keywords", keywords.map(Views.asModel()).toList())));
-        }
     }
 
     private Object convertFromString(String checkpoint, String checkpointType) throws Exception {
