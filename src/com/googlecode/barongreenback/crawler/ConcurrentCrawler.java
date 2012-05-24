@@ -65,9 +65,7 @@ public class ConcurrentCrawler implements Crawler {
         final Uri uri = uri(crawler.get("from", String.class));
 
 
-        Number result = subFeedCrawler.crawl(uri, recordDefinition, Sequences.<Pair<Keyword<?>, Object>>empty());
-
-        return result;
+        return subFeedCrawler.crawl(uri, recordDefinition, Sequences.<Pair<Keyword<?>, Object>>empty());
 
     }
 
@@ -199,10 +197,8 @@ public class ConcurrentCrawler implements Crawler {
 
 
     private RecordDefinition extractRecordDefinition(Model crawler) {
-        final Model record = crawler.get("record", Model.class);
-        return convert(record);
+        return convert(crawler.get("record", Model.class));
     }
-
 
     private Model crawlerFor(UUID id) {
         return modelRepository.get(id).get().get("form", Model.class);

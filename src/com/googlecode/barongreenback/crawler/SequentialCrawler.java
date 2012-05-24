@@ -48,34 +48,73 @@ public class SequentialCrawler implements Crawler {
 
     @Override
     public Number crawl(UUID id, PrintStream log) throws Exception {
-        final Model model = modelRepository.get(id).get();
-        final Model crawler = model.get("form", Model.class);
-        final String from = crawler.get("from", String.class);
-        final String update = crawler.get("update", String.class);
-        final String more = crawler.get("more", String.class);
-        final String checkpoint = crawler.get("checkpoint", String.class);
-        final String checkpointType = crawler.get("checkpointType", String.class);
-        final Model record = crawler.get("record", Model.class);
-        final RecordDefinition recordDefinition = convert(record);
+        final Model crawler = crawlerFor(id);
+        final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
 
-        Uri uri = uri(from);
-        Object lastCheckPoint = convertFromString(checkpoint, checkpointType);
-
-        Iterator<Record> recordIterator = new CompositeCrawler(httpClient, log).crawl(uri, more, lastCheckPoint, recordDefinition).iterator();
+        Iterator<Record> recordIterator = startCrawl(log, crawler, recordDefinition);
         if (!recordIterator.hasNext()) {
             return 0;
         }
 
         Record head = recordIterator.next();
-
         checkPointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head));
 
-        return put(update, recordDefinition, sequence(head).join(forwardOnly(recordIterator)));
+        final String recordsToUpdate = update(crawler);
+        Sequence<Keyword<?>> keywords = keywords(recordDefinition);
+
+        updateView(recordsToUpdate, keywords);
+        return put(recordsToUpdate, sequence(head).join(forwardOnly(recordIterator)), keywords);
     }
 
-    private Number put(final String recordName, RecordDefinition recordDefinition, final Sequence<Record> recordsToAdd) {
-        Sequence<Keyword<?>> keywords = RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
-        Definition definition = Definition.constructors.definition(recordName, keywords);
+    private String update(Model crawler) {
+        return crawler.get("update", String.class);
+    }
+
+    private Iterator<Record> startCrawl(PrintStream log, Model crawler, RecordDefinition recordDefinition) throws Exception {
+        final Uri from = from(crawler);
+        final String more = more(crawler);
+        final Object lastCheckPoint = lastCheckPoint(crawler);
+        return new CompositeCrawler(httpClient, log).crawl(from, more, lastCheckPoint, recordDefinition).iterator();
+    }
+
+    private Uri from(Model crawler) {
+        return uri(crawler.get("from", String.class));
+    }
+
+    private String more(Model crawler) {
+        return crawler.get("more", String.class);
+    }
+
+    private Object lastCheckPoint(Model crawler) throws Exception {
+        final String checkpoint = crawler.get("checkpoint", String.class);
+        final String checkpointType = crawler.get("checkpointType", String.class);
+        return convertFromString(checkpoint, checkpointType);
+    }
+
+    private RecordDefinition extractRecordDefinition(Model crawler) {
+        return convert(crawler.get("record", Model.class));
+    }
+
+    private Model crawlerFor(UUID id) {
+        return modelRepository.get(id).get().get("form", Model.class);
+    }
+
+    private Number put(final String recordName, final Sequence<Record> recordsToAdd, final Sequence<Keyword<?>> keywords1) {
+        Definition definition = Definition.constructors.definition(recordName, keywords1);
+        Number updated = 0;
+        for (Record record : recordsToAdd) {
+            Sequence<Keyword<?>> unique = record.keywords().filter(UNIQUE_FILTER);
+            Number rows = records.value().put(definition, Record.methods.update(using(unique), record));
+            updated = Numbers.add(updated, rows);
+        }
+        return updated;
+    }
+
+    private Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {
+        return RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
+    }
+
+    private void updateView(final String recordName, Sequence<Keyword<?>> keywords) {
         if (find(modelRepository, recordName).isEmpty()) {
             modelRepository.set(randomUUID(), model().add(Views.ROOT, model().
                     add("name", recordName).
@@ -85,13 +124,6 @@ public class SequentialCrawler implements Crawler {
                     add("priority", "").
                     add("keywords", keywords.map(Views.asModel()).toList())));
         }
-        Number updated = 0;
-        for (Record record : recordsToAdd) {
-            Sequence<Keyword<?>> unique = record.keywords().filter(UNIQUE_FILTER);
-            Number rows = records.value().put(definition, Record.methods.update(using(unique), record));
-            updated = Numbers.add(updated, rows);
-        }
-        return updated;
     }
 
     private Object convertFromString(String checkpoint, String checkpointType) throws Exception {
