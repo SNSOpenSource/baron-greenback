@@ -51,11 +51,19 @@ public class RecordDefinition {
     }
 
     public static Sequence<Keyword<?>> uniqueFields(RecordDefinition recordDefinition) {
-        return allFields(recordDefinition).filter(UNIQUE_FILTER);
+        return uniqueFields(recordDefinition.definition());
+    }
+
+    public static Sequence<Keyword<?>> uniqueFields(Definition definition1) {
+        return allFields(definition1).filter(UNIQUE_FILTER);
     }
 
     public static Sequence<Keyword<?>> allFields(RecordDefinition recordDefinition) {
-        return recordDefinition.definition.fields().flatMap(allFields());
+        return allFields(recordDefinition.definition());
+    }
+
+    public static Sequence<Keyword<?>> allFields(Definition definition) {
+        return definition.fields().flatMap(allFields());
     }
 
     public static Callable1<Keyword<?>, Sequence<Keyword<?>>> allFields() {

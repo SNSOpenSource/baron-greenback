@@ -6,15 +6,20 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
+import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Uri.uri;
 import static java.util.UUID.randomUUID;
 
@@ -23,22 +28,6 @@ public abstract class AbstractCrawler implements Crawler {
 
     public AbstractCrawler(ModelRepository modelRepository) {
         this.modelRepository = modelRepository;
-    }
-
-    protected static Definition definition(Model crawler, RecordDefinition recordDefinition) {
-        return Definition.constructors.definition(update(crawler), keywords(recordDefinition));
-    }
-
-    protected static Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {
-        return RecordDefinition.allFields(recordDefinition).map(ignoreAlias());
-    }
-
-    protected static String update(Model crawler) {
-        return crawler.get("update", String.class);
-    }
-
-    protected RecordDefinition extractRecordDefinition(Model crawler) {
-        return convert(crawler.get("record", Model.class));
     }
 
     protected Model crawlerFor(UUID id) {
@@ -58,7 +47,43 @@ public abstract class AbstractCrawler implements Crawler {
         }
     }
 
-    protected Uri from(Model crawler) {
+    public static Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {
+        return keywords(recordDefinition.definition());
+    }
+
+    public static Sequence<Keyword<?>> keywords(Definition definition) {
+        return RecordDefinition.allFields(definition).map(ignoreAlias());
+    }
+
+    public static Definition definition(Model crawler, RecordDefinition recordDefinition) {
+        return definition(crawler, recordDefinition.definition());
+    }
+
+    public static Definition definition(Model crawler, Definition definition) {
+        return Definition.constructors.definition(update(crawler), keywords(definition));
+    }
+
+    public static RecordDefinition extractRecordDefinition(Model crawler) {
+        return convert(crawler.get("record", Model.class));
+    }
+
+    public static String update(Model crawler) {
+        return crawler.get("update", String.class);
+    }
+
+    public static Uri from(Model crawler) {
         return uri(crawler.get("from", String.class));
+    }
+
+    public static String more(Model crawler) {
+        return crawler.get("more", String.class);
+    }
+
+    public static Definition sourceDefinition(Model crawler) {
+        return extractRecordDefinition(crawler).definition();
+    }
+
+    public static Definition destinationDefinition(Model crawler) {
+        return definition(crawler, extractRecordDefinition(crawler));
     }
 }

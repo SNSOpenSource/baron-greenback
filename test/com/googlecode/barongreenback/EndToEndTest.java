@@ -15,6 +15,8 @@ import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.waitrest.Waitrest;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
@@ -26,6 +28,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class EndToEndTest extends ApplicationTests {
+    private Waitrest waitrest;
+
+    @Test
+    public void createCrawlerViaUiWithCheckpointOnFirstPage() throws Exception {
+        crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:25Z")), "newsfeed");
+        ViewSearchPage viewSearchPage = view("newsfeed");
+
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(1));
+
+        assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
+        assertThat(viewSearchPage.containsCell("title", "Deleted user"), is(false));
+        assertThat(viewSearchPage.containsCell("title", "Updated user"), is(false));
+        assertThat(viewSearchPage.containsCell("title", "Created user"), is(false));
+    }
+
     @Test
     public void createCrawlerViaUiWithPaginationAndCheckpointAndCrawlAndThenViewAllRecords() throws Exception {
         crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:20Z")), "newsfeed");
@@ -57,7 +74,6 @@ public class EndToEndTest extends ApplicationTests {
         crawlSampleData(importCrawler("testCrawler.json"), "test");
         ViewSearchPage viewSearchPage = view("test");
 
-//        System.out.println(viewSearchPage);
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));
 
         assertThat(viewSearchPage.containsCell("firstName", 0, "Matt"), is(true));
@@ -66,6 +82,16 @@ public class EndToEndTest extends ApplicationTests {
         assertThat(viewSearchPage.containsCell("shiny", 1, "very"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Added user"), is(true));
         assertThat(viewSearchPage.containsCell("title", "Deleted user"), is(true));
+    }
+
+    @Before
+    public void setupFeed() throws Exception {
+        waitrest = serverWithDataFeed();
+    }
+
+    @After
+    public void shutDownFeed() throws Exception {
+        waitrest.close();
     }
 
     private ViewSearchPage view(String name) throws Exception {
@@ -83,18 +109,10 @@ public class EndToEndTest extends ApplicationTests {
                 decorate(Scheduler.class, CountDownScheduler.class).
                 decorate(Completer.class, CountDownCompleter.class);
 
-        return using(serverWithDataFeed(), crawlAndWait(latch, listPage, name));
-
-    }
-
-    private static Callable1<Waitrest, JobsListPage> crawlAndWait(final CountDownLatch latch, final CrawlerListPage listPage, final String name) {
-        return new Callable1<Waitrest, JobsListPage>() {
-            public JobsListPage call(Waitrest restServer) throws Exception {
-                JobsListPage jobs = listPage.crawl(name);
-                latch.await();
-                return jobs;
-            }
-        };
+        JobsListPage jobs = listPage.crawl(name);
+        latch.await();
+        Thread.sleep(100);
+        return jobs;
     }
 
     private CrawlerListPage createCrawler(Date checkpointValue) throws Exception {

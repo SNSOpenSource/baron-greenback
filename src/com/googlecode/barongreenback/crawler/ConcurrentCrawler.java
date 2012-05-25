@@ -3,13 +3,11 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
-import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
@@ -19,10 +17,7 @@ import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import java.io.PrintStream;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
 import static com.googlecode.barongreenback.shared.RecordDefinition.*;
-import static com.googlecode.barongreenback.views.Views.find;
-import static com.googlecode.funclate.Model.model;
 import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Pair.pair;
@@ -31,16 +26,15 @@ import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Uri.uri;
 import static java.lang.String.format;
-import static java.util.UUID.randomUUID;
 
 public class ConcurrentCrawler extends AbstractCrawler {
     private final CheckPointHandler checkPointHandler;
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
 
-    public ConcurrentCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records) {
+    public ConcurrentCrawler(ModelRepository modelRepository, HttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler) {
         super(modelRepository);
-        this.checkPointHandler = new CheckPointHandler(mappings, modelRepository);
+        this.checkPointHandler = checkPointHandler;
         this.httpClient = httpClient;
         this.records = records;
     }
@@ -83,7 +77,7 @@ public class ConcurrentCrawler extends AbstractCrawler {
             this.updateCheckpoint = updateCheckpoint;
             this.log = log;
             this.definition = definition;
-            this.more = crawler.get("more", String.class);
+            this.more = AbstractCrawler.more(crawler);
             this.lastCheckPoint = checkPointExtractor.lastCheckPointFor(crawler);
             this.client = new AuditHandler(httpClient, new PrintAuditor(log));
         }
@@ -143,13 +137,14 @@ public class ConcurrentCrawler extends AbstractCrawler {
             };
         }
 
-        private Record addUniqueKeysTo(Record currentRecord, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
+        public static Record addUniqueKeysTo(Record currentRecord, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
             return Record.constructors.record(uniqueKeys.join(currentRecord.fields()));
         }
 
-        private Sequence<Pair<Keyword<?>, Object>> uniqueKeysAndValues(Record currentRecord) {
+        public static Sequence<Pair<Keyword<?>, Object>> uniqueKeysAndValues(Record currentRecord) {
             return currentRecord.fields().filter(where(Callables.<Keyword<?>>first(), UNIQUE_FILTER));
         }
+
 
         private Number handleError(Uri subFeed, Throwable e) {
             log.println(format("Failed to GET %s because of %s", subFeed, e));

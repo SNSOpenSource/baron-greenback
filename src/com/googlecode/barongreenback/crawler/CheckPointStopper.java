@@ -25,7 +25,7 @@ public class CheckPointStopper implements Feeder<Uri> {
 
     public Sequence<Record> get(Uri source, RecordDefinition definition) throws Exception {
         return feeder.get(source, definition).
-                takeWhile(not(checkpointReached()));
+                takeWhile(not(checkpointReached(currentCheckPoint)));
     }
 
     public static Option<Object> extractCheckpoint(Record record) {
@@ -34,17 +34,17 @@ public class CheckPointStopper implements Feeder<Uri> {
                 map(checkpoint(record));
     }
 
-    private Predicate<? super Record> checkpointReached() {
+    public static Predicate<? super Record> checkpointReached(final Object currentCheckPoint) {
         return new Predicate<Record>() {
             public boolean matches(Record record) {
                 return extractCheckpoint(record).
-                        map(matchesCurrentCheckPoint()).
+                        map(matchesCurrentCheckPoint(currentCheckPoint)).
                         getOrElse(false);
             }
         };
     }
 
-    private Callable1<Object, Boolean> matchesCurrentCheckPoint() {
+    public static  Callable1<Object, Boolean> matchesCurrentCheckPoint(final Object currentCheckPoint) {
         return new Callable1<Object, Boolean>() {
             public Boolean call(Object instance) throws Exception {
                 return currentCheckPoint != null && currentCheckPoint.equals(instance);
