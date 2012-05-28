@@ -63,7 +63,7 @@ public abstract class AbstractCrawler implements Crawler {
         return Definition.constructors.definition(update(crawler), keywords(definition));
     }
 
-    public static RecordDefinition extractRecordDefinition(Model crawler) {
+    public static RecordDefinition   extractRecordDefinition(Model crawler) {
         return convert(crawler.get("record", Model.class));
     }
 

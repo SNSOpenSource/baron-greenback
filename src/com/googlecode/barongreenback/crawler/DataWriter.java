@@ -11,17 +11,17 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTE
 import static com.googlecode.lazyrecords.Using.using;
 
 public class DataWriter {
-    public static Function1<Sequence<Record>, Number> simpleWrite(final Definition destination, final Records records) {
+    public static Number writeUnique(Records records, Definition destination, Sequence<Record> newData) {
+        Sequence<Keyword<?>> unique = destination.fields().filter(UNIQUE_FILTER);
+        return records.put(destination, Record.methods.update(using(unique), newData));
+    }
+
+    public static Function1<Sequence<Record>, Number> writeUnique(final Records records, final Definition destination) {
         return new Function1<Sequence<Record>, Number>() {
             @Override
             public Number call(Sequence<Record> newData) throws Exception {
-                return simpleWrite(newData, destination, records);
+                return writeUnique(records, destination, newData);
             }
         };
-    }
-
-    private static Number simpleWrite(Sequence<Record> newData, Definition destination, Records records) {
-        Sequence<Keyword<?>> unique = destination.fields().filter(UNIQUE_FILTER);
-        return records.put(destination, Record.methods.update(using(unique), newData));
     }
 }

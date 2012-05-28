@@ -10,8 +10,8 @@ import org.w3c.dom.Document;
 
 import static com.googlecode.totallylazy.Xml.document;
 
-public class DataExtractor {
-    public static Sequence<Record> extractData(Response response, Definition source) {
+public class DataTransformer {
+    public static Sequence<Record> transformData(Response response, Definition source) {
         String entity = response.entity().toString();
         if (entity.isEmpty()) {
             return Sequences.empty();
@@ -33,11 +33,11 @@ public class DataExtractor {
         };
     }
 
-    public static Function1<Response, Sequence<Record>> extractData(final Definition source) {
+    public static Function1<Response, Sequence<Record>> transformData(final Definition source) {
         return new Function1<Response, Sequence<Record>>() {
             @Override
             public Sequence<Record> call(Response response) throws Exception {
-                return extractData(response, source);
+                return transformData(response, source);
             }
         };
     }
