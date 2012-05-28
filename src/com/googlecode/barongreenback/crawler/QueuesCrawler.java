@@ -5,10 +5,11 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Records;
+import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
@@ -21,9 +22,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import static com.googlecode.barongreenback.crawler.CheckPointStopper2.stopAt;
+import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
-import static com.googlecode.barongreenback.crawler.DataWriter.writeUnique;
-import static com.googlecode.barongreenback.crawler.FailureHandler.captureFailures;
 import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 
 public class QueuesCrawler extends AbstractCrawler {
@@ -31,18 +32,20 @@ public class QueuesCrawler extends AbstractCrawler {
     private final ExecutorService dataMappers;
     private final ExecutorService writers;
     private final Function1<Request, Response> httpHandler;
-    private final Records records;
-    private final LinkedBlockingDeque<Pair<Request, Response>> retryQueue = new LinkedBlockingDeque<Pair<Request, Response>>();
+    private final FailureHandler failureHandler = new FailureHandler(new LinkedBlockingDeque<Pair<Request, Response>>());
+    private final DataWriter dataWriter;
     private final CheckPointHandler checkPointHandler;
+    private final MoreDataCrawler moreDataCrawler;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final HttpClient httpClient, final BaronGreenbackRecords records, CheckPointHandler checkPointHandler) {
+    public QueuesCrawler(final ModelRepository modelRepository, final HttpClient httpClient, final BaronGreenbackRecords records, CheckPointHandler checkPointHandler, StringMappings mappings) {
         super(modelRepository);
         this.checkPointHandler = checkPointHandler;
         httpHandler = asFunction(httpClient);
         httpHandlers = Executors.newFixedThreadPool(50);
         dataMappers = Executors.newCachedThreadPool();
         writers = Executors.newSingleThreadExecutor();
-        this.records = records.value();
+        this.dataWriter = new DataWriter(records);
+        this.moreDataCrawler = new MoreDataCrawler(mappings, this);
     }
 
     @Override
@@ -51,21 +54,27 @@ public class QueuesCrawler extends AbstractCrawler {
         Definition source = sourceDefinition(crawler);
         Definition destination = destinationDefinition(crawler);
 
-        final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
-        updateView(crawler, keywords(recordDefinition));
+        updateView(crawler, keywords(destination));
 
-        crawl(requestFor(crawler), source, destination, checkPointHandler.lastCheckPointFor(crawler));
+        crawl(requestFor(crawler), source, destination, checkPointHandler.lastCheckPointFor(crawler), more(crawler));
         return -1;
     }
 
-    private Request requestFor(Model crawler) {
-        return RequestBuilder.get(from(crawler)).build();
+    public static Request requestFor(Model crawler) {
+        return requestFor(from(crawler));
     }
 
-    private Future<?> crawl(Request request, Definition source, Definition destination, Object checkpoint) {
-        return submit(httpHandlers, get(request).then(captureFailures(request, retryQueue).then(
-               submit(dataMappers, transformData(source).then(CheckPointStopper2.stopAt(checkpoint)).then(
-                       submit(writers, writeUnique(records, destination)))))));
+    public static Request requestFor(Uri from) {
+        return RequestBuilder.get(from).build();
+    }
+
+    public Future<?> crawl(Request request, Definition source, Definition destination, Object checkpoint, String more) {
+        return submit(httpHandlers, get(request).then(
+                failureHandler.captureFailures(request).then(
+                submit(dataMappers, loadDocument().then(
+                moreDataCrawler.getMoreIfNeeded(source, destination, checkpoint, more)).then(
+                transformData(source).then(stopAt(checkpoint)).then(
+                submit(writers, dataWriter.writeUnique(destination))))))));
     }
 
     private Future<?> submit(ExecutorService executorService, Runnable runnable) {

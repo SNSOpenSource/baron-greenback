@@ -2,16 +2,16 @@
 <feed>
     <title>A title</title>
     <id>urn:uuid:d199d2c5-8975-f344-4bc8-a698158c6ef1</id>
-    <updated>2011-05-19T12:43:26Z</updated>
+    <updated>2011-05-19T12:43:26.000Z</updated>
     <link rel="prev-archive" href=""/>
     <entry>
         <id>urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6eee</id>
         <title>Updated user</title>
-        <updated>2011-07-19T12:43:22Z</updated>
+        <updated>2011-07-19T12:43:22.000Z</updated>
     </entry>
     <entry>
         <id>urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6fff</id>
         <title>Created user</title>
-        <updated>2011-07-19T12:43:20Z</updated>
+        <updated>2011-07-19T12:43:20.000Z</updated>
     </entry>
 </feed>

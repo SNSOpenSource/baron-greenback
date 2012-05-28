@@ -3,12 +3,15 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Xml;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.utterlyidle.Response;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.totallylazy.Xml.document;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -17,8 +20,8 @@ public class DataTransformerTest {
     @Test
     public void shouldConvertSimpleXml() throws Exception {
         Keyword<String> childName = keyword("name", String.class);
-        Response response = response().entity("<root><child><name>bob</name></child><child><name>sue</name></child></root>").build();
-        Sequence<Record> records = DataTransformer.transformData(response, definition("/root/child", childName));
+        Document document = document("<root><child><name>bob</name></child><child><name>sue</name></child></root>");
+        Sequence<Record> records = DataTransformer.transformData(document, definition("/root/child", childName));
         assertThat(records.size(), NumberMatcher.is(2));
         assertThat(records.head().get(childName), is("bob"));
         assertThat(records.second().get(childName), is("sue"));
@@ -27,16 +30,15 @@ public class DataTransformerTest {
     @Test
     public void shouldIgnoreUnrelatedXml() throws Exception {
         Keyword<String> childName = keyword("name", String.class);
-        Response response = response().entity("<someOtherXml/>").build();
-        Sequence<Record> records = DataTransformer.transformData(response, definition("/root/child", childName));
+        Document document = document("<someOtherXml/>");
+        Sequence<Record> records = DataTransformer.transformData(document, definition("/root/child", childName));
         assertThat(records.size(), NumberMatcher.is(0));
     }
 
     @Test
-    public void shouldIgnoreEmptyResponse() throws Exception {
-        Keyword<String> childName = keyword("name", String.class);
+    public void shouldCreateEmptyDocumentForEmptyResponse() throws Exception {
         Response emptyResponse = response().entity("").build();
-        Sequence<Record> records = DataTransformer.transformData(emptyResponse, definition("/root/child", childName));
-        assertThat(records.size(), NumberMatcher.is(0));
+        Document document = DataTransformer.loadDocument(emptyResponse);
+        assertThat(Xml.format(document), is(Xml.format(document("<empty/>"))));
     }
 }

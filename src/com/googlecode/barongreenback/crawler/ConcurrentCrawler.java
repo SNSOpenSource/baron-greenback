@@ -77,7 +77,7 @@ public class ConcurrentCrawler extends AbstractCrawler {
             this.updateCheckpoint = updateCheckpoint;
             this.log = log;
             this.definition = definition;
-            this.more = AbstractCrawler.more(crawler);
+            this.more = more(crawler);
             this.lastCheckPoint = checkPointExtractor.lastCheckPointFor(crawler);
             this.client = new AuditHandler(httpClient, new PrintAuditor(log));
         }

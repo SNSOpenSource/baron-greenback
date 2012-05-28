@@ -11,13 +11,25 @@ import org.w3c.dom.Document;
 import static com.googlecode.totallylazy.Xml.document;
 
 public class DataTransformer {
-    public static Sequence<Record> transformData(Response response, Definition source) {
+    public static Sequence<Record> transformData(Document document, Definition source) {
+        return new DocumentFeeder().get(document, source).map(copy()).realise();
+    }
+
+    public static Document loadDocument(Response response) {
         String entity = response.entity().toString();
         if (entity.isEmpty()) {
-            return Sequences.empty();
+            return document("<empty/>");
         }
-        Document document = document(entity);
-        return new DocumentFeeder().get(document, source).map(copy()).realise();
+        return document(entity);
+    }
+
+    public static Function1<Response, Document> loadDocument() {
+        return new Function1<Response, Document>() {
+            @Override
+            public Document call(Response response) throws Exception {
+                return loadDocument(response);
+            }
+        };
     }
 
     public static Record copy(Record record) {
@@ -33,11 +45,11 @@ public class DataTransformer {
         };
     }
 
-    public static Function1<Response, Sequence<Record>> transformData(final Definition source) {
-        return new Function1<Response, Sequence<Record>>() {
+    public static Function1<Document, Sequence<Record>> transformData(final Definition source) {
+        return new Function1<Document, Sequence<Record>>() {
             @Override
-            public Sequence<Record> call(Response response) throws Exception {
-                return transformData(response, source);
+            public Sequence<Record> call(Document document) throws Exception {
+                return transformData(document, source);
             }
         };
     }

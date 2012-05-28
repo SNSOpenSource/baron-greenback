@@ -50,7 +50,7 @@ public class DocumentFeederTest extends CrawlerTests {
 
     @Test
     public void supportsStoppingWhenCheckpointIsReached() throws Exception {
-        Feeder<Uri> feeder = new CheckPointStopper("2011-07-19T12:43:25Z", new UriFeeder(client, ""));
+        Feeder<Uri> feeder = new CheckPointStopper("2011-07-19T12:43:25.000Z", new UriFeeder(client, ""));
         Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
         assertThat(records.size(), is(1));
     }
