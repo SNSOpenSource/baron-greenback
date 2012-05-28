@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
+import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -14,17 +15,13 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.RequestBuilder;
-import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.w3c.dom.Document;
 
 import java.io.PrintStream;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import static com.googlecode.barongreenback.crawler.CheckPointStopper.checkpointReached;
 import static com.googlecode.barongreenback.crawler.ConcurrentCrawler.SubFeedCrawler.addUniqueKeysTo;
@@ -40,6 +37,8 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.Xml.document;
 import static com.googlecode.totallylazy.Xml.selectContents;
+import static com.googlecode.utterlyidle.RequestBuilder.get;
+import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 
 public class QueuesCrawler extends AbstractCrawler {
@@ -49,6 +48,7 @@ public class QueuesCrawler extends AbstractCrawler {
     private final Function1<Request, Response> httpHandler;
     private final Records records;
     private final CheckPointHandler checkPointExtractor;
+    private final LinkedBlockingDeque<Pair<Request,Response>> retryQueue = new LinkedBlockingDeque<Pair<Request, Response>>();
 
     public QueuesCrawler(final ModelRepository modelRepository, final HttpClient httpClient, final BaronGreenbackRecords records, final CheckPointHandler checkPointExtractor) {
         super(modelRepository);
@@ -66,18 +66,60 @@ public class QueuesCrawler extends AbstractCrawler {
         Definition source = sourceDefinition(crawler);
         Definition destination = destinationDefinition(crawler);
 
-        updateView(crawler, keywords(destination));
+        final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
+        updateView(crawler, keywords(recordDefinition));
 
         Object lastCheckPoint = checkPointExtractor.lastCheckPointFor(crawler);
 
-        crawl(from(crawler), source, destination, more(crawler), lastCheckPoint, Sequences.<Pair<Keyword<?>, Object>>empty());
+        crawl(requestFor(crawler), source, destination, more(crawler), lastCheckPoint, Sequences.<Pair<Keyword<?>, Object>>empty());
         return -1;
     }
 
-    private Future<?> crawl(Uri uri, Definition source, Definition destination, String moreXpath, Object lastCheckPoint, final Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
-        return submit(httpHandlers, get(uri).then(
-                submit(dataMappers, extractData(source, destination, moreXpath, lastCheckPoint, uniqueKeys).then(queueSubFeeds(destination)).then(
-                        submit(writers, write(destination, uniqueKeys))))));
+    private Request requestFor(Model crawler) {
+        return RequestBuilder.get(from(crawler)).build();
+    }
+
+    private Future<?> crawl(Request request, Definition source, Definition destination, String moreXpath, Object lastCheckPoint, final Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
+        return submit(httpHandlers, get(request).then(queueIfFailed(request, retryQueue).then(
+                submit(dataMappers, simpleExtractData(source).then(submit(writers, simpleWrite(destination)))))));
+
+        //extractData(source, destination, moreXpath, lastCheckPoint, uniqueKeys).then(queueSubFeeds(destination)
+    }
+
+    public static Function1<Response, Response> queueIfFailed(final Request request, final BlockingQueue<Pair<Request, Response>> retryQueue) {
+        return new Function1<Response, Response>() {
+            @Override
+            public Response call(Response response) throws Exception {
+                if(!response.status().equals(Status.OK)) {
+                    retryQueue.add(Pair.pair(request, response));
+                    return response(Status.NO_CONTENT).build();
+                }
+                return response;
+            }
+        };
+    }
+
+    public static Function1<Response, Sequence<Record>> simpleExtractData(final Definition source) {
+        return new Function1<Response, Sequence<Record>>() {
+            @Override
+            public Sequence<Record> call(Response response) throws Exception {
+                String entity = response.entity().toString();
+                if(entity.isEmpty()) {
+                    return Sequences.empty();
+                }
+                Document document = document(entity);
+                return new DocumentFeeder().get(document, source).map(copy()).realise();
+            }
+        };
+    }
+
+    private Function1<Sequence<Record>, Number> simpleWrite(final Definition destination) {
+        return new Function1<Sequence<Record>, Number>() {
+            @Override
+            public Number call(Sequence<Record> newData) throws Exception {
+                return records.add(destination, newData);
+            }
+        };
     }
 
     private void queueSubFeeds(Sequence<Record> records, Definition destination) {
@@ -94,7 +136,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
                 Uri subFeed = uri(value.toString());
                 Definition newSource = subFeedKey.metadata().get(RECORD_DEFINITION).definition();
-                crawl(subFeed, newSource, destination, null, null, uniqueKeysAndValues(record));
+                crawl(RequestBuilder.get(subFeed).build(), newSource, destination, null, null, uniqueKeysAndValues(record));
             }
         }
     }
@@ -103,8 +145,8 @@ public class QueuesCrawler extends AbstractCrawler {
         return executorService.submit(runnable);
     }
 
-    private Function<Response> get(Uri uri) {
-        return httpHandler.deferApply(RequestBuilder.get(uri).build());
+    private Function<Response> get(Request request) {
+        return httpHandler.deferApply(request);
     }
 
     private Sequence<Record> extractData(Response response, final Definition source, final Definition destination, final String moreXpath, final Object lastCheckPoint, Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
@@ -129,7 +171,7 @@ public class QueuesCrawler extends AbstractCrawler {
         if (Strings.isEmpty(moreXpath)) return;
         String uri = selectContents(document, moreXpath);
         if (Strings.isEmpty(uri)) return;
-        crawl(uri(uri), source, destination, moreXpath, lastCheckPoint, uniqueKeys);
+        crawl(RequestBuilder.get(uri(uri)).build(), source, destination, moreXpath, lastCheckPoint, uniqueKeys);
     }
 
     private static Record copy(Record record) {

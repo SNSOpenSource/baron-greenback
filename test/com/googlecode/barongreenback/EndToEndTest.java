@@ -73,6 +73,7 @@ public class EndToEndTest extends ApplicationTests {
     public void createCrawlerViaImportWithSubfeedAndThenViewAllRecords() throws Exception {
         crawlSampleData(importCrawler("testCrawler.json"), "test");
         ViewSearchPage viewSearchPage = view("test");
+        System.out.println("viewSearchPage = " + viewSearchPage);
 
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));
 

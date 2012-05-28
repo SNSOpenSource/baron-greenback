@@ -34,7 +34,7 @@ public class CheckPointStopper implements Feeder<Uri> {
                 map(checkpoint(record));
     }
 
-    public static Predicate<? super Record> checkpointReached(final Object currentCheckPoint) {
+    public static Predicate<Record> checkpointReached(final Object currentCheckPoint) {
         return new Predicate<Record>() {
             public boolean matches(Record record) {
                 return extractCheckpoint(record).

@@ -34,7 +34,7 @@
                             "alias":"",
                             "group":"",
                             "type":"java.lang.String",
-                            "unique":true,
+                            "unique":false,
                             "visible":true,
                             "subfeed":false,
                             "record":null,
