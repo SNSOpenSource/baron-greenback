@@ -29,6 +29,7 @@ import static com.googlecode.barongreenback.crawler.ConcurrentCrawler.SubFeedCra
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
 import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.Keywords.name;
 import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -81,7 +82,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
     private Future<?> crawl(Request request, Definition source, Definition destination, String moreXpath, Object lastCheckPoint, final Sequence<Pair<Keyword<?>, Object>> uniqueKeys) {
         return submit(httpHandlers, get(request).then(queueIfFailed(request, retryQueue).then(
-                submit(dataMappers, simpleExtractData(source).then(submit(writers, simpleWrite(destination)))))));
+                submit(dataMappers, simpleExtractData(source).then(submit(writers, simpleWrite(destination, records)))))));
 
         //extractData(source, destination, moreXpath, lastCheckPoint, uniqueKeys).then(queueSubFeeds(destination)
     }
@@ -113,11 +114,12 @@ public class QueuesCrawler extends AbstractCrawler {
         };
     }
 
-    private Function1<Sequence<Record>, Number> simpleWrite(final Definition destination) {
+    public static Function1<Sequence<Record>, Number> simpleWrite(final Definition destination, final Records records) {
         return new Function1<Sequence<Record>, Number>() {
             @Override
             public Number call(Sequence<Record> newData) throws Exception {
-                return records.add(destination, newData);
+                Sequence<Keyword<?>> unique = destination.fields().filter(UNIQUE_FILTER);
+                return records.put(destination, Record.methods.update(using(unique), newData));
             }
         };
     }
