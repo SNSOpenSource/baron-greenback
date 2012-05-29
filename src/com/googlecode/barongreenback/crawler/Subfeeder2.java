@@ -38,7 +38,7 @@ public class Subfeeder2 {
             public Job call(Keyword<?> keyword) throws Exception {
                 Object value = record.get(keyword);
                 Uri uri = Uri.uri(value.toString());
-                return Job.job(DataSource.dataSource(uri, keyword.metadata().get(RECORD_DEFINITION).definition(), null, null, null), destination);
+                return Job.job(HttpDataSource.dataSource(uri, keyword.metadata().get(RECORD_DEFINITION).definition()), destination);
             }
         };
     }

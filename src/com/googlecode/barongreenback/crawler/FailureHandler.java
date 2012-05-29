@@ -11,27 +11,27 @@ import java.util.concurrent.BlockingQueue;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 
 public class FailureHandler {
-    private final BlockingQueue<Pair<Request, Response>> retryQueue;
+    private final BlockingQueue<Pair<HttpDataSource, Response>> retryQueue;
 
-    public FailureHandler(BlockingQueue<Pair<Request, Response>> retryQueue) {
+    public FailureHandler(BlockingQueue<Pair<HttpDataSource, Response>> retryQueue) {
         this.retryQueue = retryQueue;
     }
 
-    public Function1<Response, Response> captureFailures(final Request request) {
+    public Function1<Response, Response> captureFailures(final HttpDataSource dataSource) {
         return new Function1<Response, Response>() {
             @Override
             public Response call(Response response) throws Exception {
-                return captureFailures(request, response);
+                return captureFailures(dataSource, response);
             }
         };
     }
 
-    public Response captureFailures(Request request, Response response) {
+    public Response captureFailures(HttpDataSource request, Response response) {
         return captureFailures(request, retryQueue, response);
     }
 
 
-    public static Response captureFailures(Request originalRequest, BlockingQueue<Pair<Request, Response>> retryQueue, Response response) {
+    public static Response captureFailures(HttpDataSource originalRequest, BlockingQueue<Pair<HttpDataSource, Response>> retryQueue, Response response) {
         if(!response.status().equals(Status.OK)) {
             retryQueue.add(Pair.pair(originalRequest, response));
             return response(Status.NO_CONTENT).build();
@@ -39,7 +39,7 @@ public class FailureHandler {
         return response;
     }
 
-    public static Function1<Response, Response> captureFailures(final Request originalRequest, final BlockingQueue<Pair<Request, Response>> retryQueue) {
+    public static Function1<Response, Response> captureFailures(final HttpDataSource originalRequest, final BlockingQueue<Pair<HttpDataSource, Response>> retryQueue) {
         return new Function1<Response, Response>() {
             @Override
             public Response call(Response response) throws Exception {

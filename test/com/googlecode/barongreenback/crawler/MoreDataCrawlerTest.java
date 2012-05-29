@@ -12,15 +12,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class MoreDataCrawlerTest {
     @Test
     public void ifCheckpointFoundReturnNone() throws Exception {
-        MoreDataCrawler crawler = new MoreDataCrawler();
-        Option<Job> more = crawler.getMoreIfNeeded(Job.job(DataSource.dataSource(null, null, null, "/root/more", "Today", "/root/date"), null), document("<root><date>Today</date></root>"));
+        PaginatedHttpDataSource dataSource = PaginatedHttpDataSource.dataSource(null, null, null, "/root/more", "Today", "/root/date");
+        Option<Job> more = dataSource.getMoreIfNeeded(document("<root><date>Today</date></root>"), null);
         assertThat(more, is(none(Job.class)));
     }
 
     @Test
     public void ifCheckpointNotFoundReturnNextJob() throws Exception {
-        MoreDataCrawler crawler = new MoreDataCrawler();
-        Option<Job> more = crawler.getMoreIfNeeded(Job.job(DataSource.dataSource(null, null, null, "/root/more", "Today", "/root/date"), null), document("<root><date>Yesterday</date><more>next</more></root>"));
-        assertThat(more.get().dataSource().request().uri(), is(Uri.uri("next")));
+        PaginatedHttpDataSource dataSource = PaginatedHttpDataSource.dataSource(null, null, null, "/root/more", "Today", "/root/date");
+        Option<Job> more = dataSource.getMoreIfNeeded(document("<root><date>Yesterday</date><more>next</more></root>"), null);
+        assertThat(more.get().dataSource().uri(), is(Uri.uri("next")));
     }
 }

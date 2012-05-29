@@ -19,7 +19,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.googlecode.barongreenback.crawler.CheckPointStopper2.stopAt;
-import static com.googlecode.barongreenback.crawler.DataSource.dataSource;
+import static com.googlecode.barongreenback.crawler.PaginatedHttpDataSource.dataSource;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.barongreenback.crawler.Job.job;
@@ -30,11 +30,10 @@ public class QueuesCrawler extends AbstractCrawler {
     private final ExecutorService dataMappers;
     private final ExecutorService writers;
     private final Function1<Request, Response> httpHandler;
-    private final FailureHandler failureHandler = new FailureHandler(new LinkedBlockingDeque<Pair<Request, Response>>());
+    private final FailureHandler failureHandler = new FailureHandler(new LinkedBlockingDeque<Pair<HttpDataSource, Response>>());
     private final DataWriter dataWriter;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
-    private MoreDataCrawler moreDataCrawler;
 
     public QueuesCrawler(final ModelRepository modelRepository, final HttpClient httpClient, final BaronGreenbackRecords records, CheckPointHandler checkpointHandler, StringMappings mappings) {
         super(modelRepository);
@@ -49,14 +48,13 @@ public class QueuesCrawler extends AbstractCrawler {
 
     @Override
     public Number crawl(UUID id, PrintStream log) throws Exception {
-        moreDataCrawler = new MoreDataCrawler();
         Model crawler = crawlerFor(id);
         Definition source = sourceDefinition(crawler);
         Definition destination = destinationDefinition(crawler);
 
         updateView(crawler, keywords(destination));
 
-        DataSource dataSource = dataSource(requestFor(crawler), source, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings);
+        PaginatedHttpDataSource dataSource = dataSource(requestFor(crawler), source, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings);
         crawl(job(dataSource, destination));
         return -1;
     }
@@ -70,12 +68,12 @@ public class QueuesCrawler extends AbstractCrawler {
     }
 
     public Future<?> crawl(Job job) {
-        return submit(httpHandlers, get(job.dataSource().request()).then(
-                failureHandler.captureFailures(job.dataSource().request()).then(
+        return submit(httpHandlers, get(job.dataSource().uri()).then(
+                failureHandler.captureFailures(job.dataSource()).then(
                         submit(dataMappers, loadDocument().then(
-//                                processJobs(moreDataCrawler.getMoreIfNeeded(job))).then(
+                                processJobs(job.dataSource().additionalWork(job.destination()))).then(
                                 transformData(job.dataSource().definition()).then(
-//                                        stopAt(job.dataSource().checkpoint())).then(
+                                        job.dataSource().filter()).then(
                                         processJobs(Subfeeder2.subfeeds(job.destination())).then(
                                                 submit(writers, dataWriter.writeUnique(job.destination())))))))));
     }
@@ -84,8 +82,8 @@ public class QueuesCrawler extends AbstractCrawler {
         return executorService.submit(runnable);
     }
 
-    private Function<Response> get(Request request) {
-        return httpHandler.deferApply(request);
+    private Function<Response> get(Uri uri) {
+        return httpHandler.deferApply(requestFor(uri));
     }
 
     private <T> Function1<T, Future<?>> submit(final ExecutorService executorService, final Function1<T, ?> then) {
