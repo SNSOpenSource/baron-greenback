@@ -50,7 +50,7 @@ public class SubFeedQueuer {
 
                 Uri subFeed = uri(value.toString());
                 Definition newSource = subFeedKey.metadata().get(RECORD_DEFINITION).definition();
-//                crawler.crawl(Job.job(PaginatedHttpDataSource.dataSource(requestFor(subFeed), newSource, null, null), destination));
+//                crawler.crawl(HttpJob.job(PaginatedHttpDataSource.dataSource(requestFor(subFeed), newSource, null, null), destination));
             }
         }
         return records;

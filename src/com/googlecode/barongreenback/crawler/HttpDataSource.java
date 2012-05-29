@@ -2,9 +2,8 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Request;
@@ -42,16 +41,21 @@ public class HttpDataSource {
         return new HttpDataSource(uri, source);
     }
 
-    public Function1<Document, Iterable<Job>> additionalWork(Definition destination) {
-        return new Function1<Document, Iterable<Job>>() {
+    public Function1<Document, Iterable<HttpJob>> additionalWork(final Definition destination) {
+        return new Function1<Document, Iterable<HttpJob>>() {
             @Override
-            public Iterable<Job> call(Document document) throws Exception {
-                return none();
+            public Iterable<HttpJob> call(Document document) throws Exception {
+                return additionalWork(destination, document);
             }
         };
+    }
+
+    public Option<HttpJob> additionalWork(final Definition destination, Document document) {
+        return none();
     }
 
     public Function1<Sequence<Record>, Sequence<Record>> filter() {
         return Function1.identity();
     }
+
 }

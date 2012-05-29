@@ -13,14 +13,14 @@ public class MoreDataCrawlerTest {
     @Test
     public void ifCheckpointFoundReturnNone() throws Exception {
         PaginatedHttpDataSource dataSource = PaginatedHttpDataSource.dataSource(null, null, null, "/root/more", "Today", "/root/date");
-        Option<Job> more = dataSource.getMoreIfNeeded(document("<root><date>Today</date></root>"), null);
-        assertThat(more, is(none(Job.class)));
+        Option<HttpJob> more = dataSource.additionalWork(null, document("<root><date>Today</date></root>"));
+        assertThat(more, is(none(HttpJob.class)));
     }
 
     @Test
     public void ifCheckpointNotFoundReturnNextJob() throws Exception {
         PaginatedHttpDataSource dataSource = PaginatedHttpDataSource.dataSource(null, null, null, "/root/more", "Today", "/root/date");
-        Option<Job> more = dataSource.getMoreIfNeeded(document("<root><date>Yesterday</date><more>next</more></root>"), null);
+        Option<HttpJob> more = dataSource.additionalWork(null, document("<root><date>Yesterday</date><more>next</more></root>"));
         assertThat(more.get().dataSource().uri(), is(Uri.uri("next")));
     }
 }

@@ -10,35 +10,35 @@ import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.totallylazy.Predicates.*;
 
 public class Subfeeder2 {
-    public static Function1<Sequence<Record>, Sequence<Job>> subfeeds(final Definition destination) {
-        return new Function1<Sequence<Record>, Sequence<Job>>() {
+    public static Function1<Sequence<Record>, Sequence<HttpJob>> subfeeds(final Definition destination) {
+        return new Function1<Sequence<Record>, Sequence<HttpJob>>() {
             @Override
-            public Sequence<Job> call(Sequence<Record> records) throws Exception {
+            public Sequence<HttpJob> call(Sequence<Record> records) throws Exception {
                 return subfeeds(records, destination);
             }
         };
     }
 
-    public static Sequence<Job> subfeeds(Sequence<Record> records, Definition destination) {
+    public static Sequence<HttpJob> subfeeds(Sequence<Record> records, Definition destination) {
         return records.flatMap(subfeedsKeywords(destination));
     }
 
-    private static Callable1<Record, Sequence<Job>> subfeedsKeywords(final Definition destination) {
-        return new Callable1<Record, Sequence<Job>>() {
-            public Sequence<Job> call(final Record record) throws Exception {
+    private static Callable1<Record, Sequence<HttpJob>> subfeedsKeywords(final Definition destination) {
+        return new Callable1<Record, Sequence<HttpJob>>() {
+            public Sequence<HttpJob> call(final Record record) throws Exception {
                 Sequence<Keyword<?>> subfeedKeywords = record.keywords().filter(where(metadata(RECORD_DEFINITION), is(Predicates.notNullValue()))).realise();
                 return subfeedKeywords.map(toJob(record, destination));
             }
         };
     }
 
-    private static Callable1<Keyword<?>, Job> toJob(final Record record, final Definition destination) {
-        return new Callable1<Keyword<?>, Job>() {
+    private static Callable1<Keyword<?>, HttpJob> toJob(final Record record, final Definition destination) {
+        return new Callable1<Keyword<?>, HttpJob>() {
             @Override
-            public Job call(Keyword<?> keyword) throws Exception {
+            public HttpJob call(Keyword<?> keyword) throws Exception {
                 Object value = record.get(keyword);
                 Uri uri = Uri.uri(value.toString());
-                return Job.job(HttpDataSource.dataSource(uri, keyword.metadata().get(RECORD_DEFINITION).definition()), destination);
+                return HttpJob.job(HttpDataSource.dataSource(uri, keyword.metadata().get(RECORD_DEFINITION).definition()), destination);
             }
         };
     }

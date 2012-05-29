@@ -35,12 +35,13 @@ public class PaginatedHttpDataSource extends HttpDataSource {
         return new PaginatedHttpDataSource(uri, source, checkpoint, moreXPath, checkpointAsString, checkpointXPath);
     }
 
-    public Option<Job> getMoreIfNeeded(Document document, Definition destination) {
+    @Override
+    public Option<HttpJob> additionalWork(Definition destination, Document document) {
         Uri moreUri = Uri.uri(selectContents(document, moreXPath()));
 
         if (!containsCheckpoint(document)) {
             PaginatedHttpDataSource newDataSource = request(moreUri);
-            return Option.some(Job.job(newDataSource, destination));
+            return Option.some(HttpJob.job(newDataSource, destination));
         }
         return none();
     }
@@ -71,11 +72,11 @@ public class PaginatedHttpDataSource extends HttpDataSource {
         return dataSource(uri, source, checkpoint, moreXPath, checkpointAsString, checkpointXPath);
     }
 
-    public Function1<Document, Iterable<Job>> additionalWork(final Definition destination) {
-        return new Function1<Document, Iterable<Job>>() {
+    public Function1<Document, Iterable<HttpJob>> additionalWork(final Definition destination) {
+        return new Function1<Document, Iterable<HttpJob>>() {
             @Override
-            public Iterable<Job> call(Document document) throws Exception {
-                return getMoreIfNeeded(document, destination);
+            public Iterable<HttpJob> call(Document document) throws Exception {
+                return additionalWork(destination, document);
             }
         };
     }

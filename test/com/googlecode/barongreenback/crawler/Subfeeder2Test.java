@@ -25,7 +25,7 @@ public class Subfeeder2Test {
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {
         Definition destination = Definition.constructors.definition(null, null);
         Uri expectedUri = Uri.uri("http://domain/somewhere");
-        Sequence<Job> jobs = Subfeeder2.subfeeds(one(record().set(LINK, expectedUri)), destination);
+        Sequence<HttpJob> jobs = Subfeeder2.subfeeds(one(record().set(LINK, expectedUri)), destination);
         assertThat(jobs.size(), NumberMatcher.is(1));
         assertThat(jobs.head().destination(), is(destination));
         assertThat(jobs.head().dataSource().uri(), is(expectedUri));

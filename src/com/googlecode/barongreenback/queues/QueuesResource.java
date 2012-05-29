@@ -89,7 +89,7 @@ public class QueuesResource {
     public Response queue(Request request, @PathParam("$") String endOfUrl) throws Exception {
         Request requestToQueue = modify(request).uri(request.uri().path(endOfUrl)).build();
         queues.queue(requestToQueue);
-        return ResponseBuilder.response(Status.ACCEPTED.description("Queued Job")).entity("You Job has been accepted and is now in the queue").build();
+        return ResponseBuilder.response(Status.ACCEPTED.description("Queued HttpJob")).entity("You HttpJob has been accepted and is now in the queue").build();
     }
 
     @POST
