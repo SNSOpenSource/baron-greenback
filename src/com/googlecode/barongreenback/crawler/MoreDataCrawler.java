@@ -6,15 +6,11 @@ import org.w3c.dom.Document;
 import static com.googlecode.totallylazy.Xml.selectContents;
 
 public class MoreDataCrawler {
-    public Function1<Document, Document> getMoreIfNeeded(final Job job, final QueuesCrawler crawler) {
-        return new Function1<Document, Document>() {
+    public Function1<Document, Option<Job>> getMoreIfNeeded(final Job job) {
+        return new Function1<Document, Option<Job>>() {
             @Override
-            public Document call(Document document) throws Exception {
-                for (Job moreWork : getMoreIfNeeded(job, document)) {
-                    crawler.crawl(moreWork);
-                }
-
-                return document;
+            public Option<Job> call(Document document) throws Exception {
+                return getMoreIfNeeded(job, document);
             }
         };
     }
@@ -24,7 +20,7 @@ public class MoreDataCrawler {
         Uri moreUri = Uri.uri(selectContents(document, original.moreXPath()));
 
         if (!original.containsCheckpoint(document)) {
-            DataSource dataSource = original.request(QueuesCrawler.requestFor(moreUri));
+            DataSource dataSource = original.request(moreUri);
             return Option.some(Job.job(dataSource, job.destination()));
         }
         return Option.none();

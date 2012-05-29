@@ -5,10 +5,7 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.Function;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
@@ -64,8 +61,8 @@ public class QueuesCrawler extends AbstractCrawler {
         return -1;
     }
 
-    public static Request requestFor(Model crawler) {
-        return requestFor(from(crawler));
+    public static Uri requestFor(Model crawler) {
+        return from(crawler);
     }
 
     public static Request requestFor(Uri from) {
@@ -76,12 +73,12 @@ public class QueuesCrawler extends AbstractCrawler {
         return submit(httpHandlers, get(job.dataSource().request()).then(
                 failureHandler.captureFailures(job.dataSource().request()).then(
                         submit(dataMappers, loadDocument().then(
-                                moreDataCrawler.getMoreIfNeeded(job, this)).then(
+//                                processJobs(moreDataCrawler.getMoreIfNeeded(job))).then(
                                 transformData(job.dataSource().definition()).then(
-                                        stopAt(job.dataSource().checkpoint())).then(
-                                        submit(writers, dataWriter.writeUnique(job.destination()))))))));
+//                                        stopAt(job.dataSource().checkpoint())).then(
+                                        processJobs(Subfeeder2.subfeeds(job.destination())).then(
+                                                submit(writers, dataWriter.writeUnique(job.destination())))))))));
     }
-
 
     private Future<?> submit(ExecutorService executorService, Runnable runnable) {
         return executorService.submit(runnable);
@@ -96,6 +93,18 @@ public class QueuesCrawler extends AbstractCrawler {
             @Override
             public Future<?> call(T result) throws Exception {
                 return executorService.submit((Runnable) then.deferApply(result));
+            }
+        };
+    }
+
+    private <T> Function1<T, T> processJobs(final Function1<T, ? extends Iterable<Job>> function) {
+        return new Function1<T, T>() {
+            @Override
+            public T call(T t) throws Exception {
+                for (Job job : function.call(t)) {
+                    crawl(job);
+                }
+                return t;
             }
         };
     }

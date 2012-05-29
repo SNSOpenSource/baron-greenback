@@ -17,6 +17,6 @@ public class CheckPointStopper2 {
     }
 
     public static Sequence<Record> stopAt(Object checkpoint, Sequence<Record> records) {
-        return records.takeWhile(not(CheckPointStopper.checkpointReached(checkpoint)));
+        return records.takeWhile(not(CheckPointStopper.checkpointReached(checkpoint))).realise();
     }
 }
