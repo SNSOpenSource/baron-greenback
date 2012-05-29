@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
-import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.mappings.StringMappings;
@@ -23,8 +22,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.googlecode.barongreenback.crawler.CheckPointStopper2.stopAt;
+import static com.googlecode.barongreenback.crawler.DataSource.dataSource;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
+import static com.googlecode.barongreenback.crawler.Job.job;
 import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 
 public class QueuesCrawler extends AbstractCrawler {
@@ -34,29 +35,32 @@ public class QueuesCrawler extends AbstractCrawler {
     private final Function1<Request, Response> httpHandler;
     private final FailureHandler failureHandler = new FailureHandler(new LinkedBlockingDeque<Pair<Request, Response>>());
     private final DataWriter dataWriter;
-    private final CheckPointHandler checkPointHandler;
-    private final MoreDataCrawler moreDataCrawler;
+    private final CheckPointHandler checkpointHandler;
+    private final StringMappings mappings;
+    private MoreDataCrawler moreDataCrawler;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final HttpClient httpClient, final BaronGreenbackRecords records, CheckPointHandler checkPointHandler, StringMappings mappings) {
+    public QueuesCrawler(final ModelRepository modelRepository, final HttpClient httpClient, final BaronGreenbackRecords records, CheckPointHandler checkpointHandler, StringMappings mappings) {
         super(modelRepository);
-        this.checkPointHandler = checkPointHandler;
+        this.checkpointHandler = checkpointHandler;
+        this.mappings = mappings;
         httpHandler = asFunction(httpClient);
         httpHandlers = Executors.newFixedThreadPool(50);
         dataMappers = Executors.newCachedThreadPool();
         writers = Executors.newSingleThreadExecutor();
         this.dataWriter = new DataWriter(records);
-        this.moreDataCrawler = new MoreDataCrawler(mappings, this);
     }
 
     @Override
     public Number crawl(UUID id, PrintStream log) throws Exception {
+        moreDataCrawler = new MoreDataCrawler();
         Model crawler = crawlerFor(id);
         Definition source = sourceDefinition(crawler);
         Definition destination = destinationDefinition(crawler);
 
         updateView(crawler, keywords(destination));
 
-        crawl(requestFor(crawler), source, destination, checkPointHandler.lastCheckPointFor(crawler), more(crawler));
+        DataSource dataSource = dataSource(requestFor(crawler), source, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings);
+        crawl(job(dataSource, destination));
         return -1;
     }
 
@@ -68,14 +72,16 @@ public class QueuesCrawler extends AbstractCrawler {
         return RequestBuilder.get(from).build();
     }
 
-    public Future<?> crawl(Request request, Definition source, Definition destination, Object checkpoint, String more) {
-        return submit(httpHandlers, get(request).then(
-                failureHandler.captureFailures(request).then(
-                submit(dataMappers, loadDocument().then(
-                moreDataCrawler.getMoreIfNeeded(source, destination, checkpoint, more)).then(
-                transformData(source).then(stopAt(checkpoint)).then(
-                submit(writers, dataWriter.writeUnique(destination))))))));
+    public Future<?> crawl(Job job) {
+        return submit(httpHandlers, get(job.dataSource().request()).then(
+                failureHandler.captureFailures(job.dataSource().request()).then(
+                        submit(dataMappers, loadDocument().then(
+                                moreDataCrawler.getMoreIfNeeded(job, this)).then(
+                                transformData(job.dataSource().definition()).then(
+                                        stopAt(job.dataSource().checkpoint())).then(
+                                        submit(writers, dataWriter.writeUnique(job.destination()))))))));
     }
+
 
     private Future<?> submit(ExecutorService executorService, Runnable runnable) {
         return executorService.submit(runnable);
