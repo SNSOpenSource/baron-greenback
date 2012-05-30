@@ -6,7 +6,9 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.*;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
+import static com.googlecode.lazyrecords.Keywords.UNIQUE;
 import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Predicates.*;
 
 public class Subfeeder2 {
@@ -36,10 +38,29 @@ public class Subfeeder2 {
         return new Callable1<Keyword<?>, HttpJob>() {
             @Override
             public HttpJob call(Keyword<?> keyword) throws Exception {
-                Object value = record.get(keyword);
-                Uri uri = Uri.uri(value.toString());
-                return HttpJob.job(HttpDataSource.dataSource(uri, keyword.metadata().get(RECORD_DEFINITION).definition()), destination);
+                return job(keyword, record, destination);
             }
         };
     }
+
+    public static HttpJob job(Keyword<?> subfeedKeyword, Record record, Definition destination) {
+        Object value = record.get(subfeedKeyword);
+        Uri uri = Uri.uri(value.toString());
+
+        Sequence<Pair<Keyword<?>, Object>> keysAndValues = record.fields().filter(where(Callables.<Keyword<?>>first(), where(metadata(UNIQUE), is(true)))).realise();
+
+        return HttpJob.job(SubfeedDatasource.dataSource(uri, subfeedKeyword.metadata().get(RECORD_DEFINITION).definition(), keysAndValues), destination);
+    }
+
+    public static Sequence<Record> mergePreviousUniqueIdentifiers(Sequence<Record> records, final HttpDataSource dataSource) {
+        if(dataSource instanceof SubfeedDatasource){
+            return records.map(new Callable1<Record, Record>() {
+                @Override
+                public Record call(Record record) throws Exception {
+                    return record(record.fields().join(((SubfeedDatasource) dataSource).uniqueIdentifiers()));
+                }
+            });
+        }
+        return records;
+   }
 }

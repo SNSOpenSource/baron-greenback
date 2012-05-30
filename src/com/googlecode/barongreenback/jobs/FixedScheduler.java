@@ -1,9 +1,5 @@
 package com.googlecode.barongreenback.jobs;
 
-import com.googlecode.totallylazy.Function;
-import com.googlecode.totallylazy.Value;
-import com.googlecode.waitrest.internal.totallylazy.callables.TimeCallable;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;

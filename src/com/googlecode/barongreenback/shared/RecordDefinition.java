@@ -166,7 +166,15 @@ public class RecordDefinition {
         if (model == null) {
             return null;
         }
-        return new RecordDefinition(Definition.constructors.definition(model.get("name", String.class), toKeywords(model)));
+        return new RecordDefinition(convertToDefinition(model));
+    }
+
+    public static Definition convertToDefinition(Model model) {
+        return convertToDefinition(model.get("name", String.class), model.getValues("keywords", Model.class));
+    }
+
+    public static Definition convertToDefinition(String name, List<Model> keywords) {
+        return Definition.constructors.definition(name, toKeywords(keywords));
     }
 
     public static Callable1<? super Model, Sequence<Keyword<?>>> asKeywords() {

@@ -14,9 +14,9 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import static com.googlecode.barongreenback.crawler.CompositeCrawlerTest.ATOM_DEFINITION;
-import static com.googlecode.barongreenback.crawler.CompositeCrawlerTest.ENTRY_DEFINITION;
-import static com.googlecode.barongreenback.crawler.CompositeCrawlerTest.FIRST;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ATOM_DEFINITION;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ENTRY_DEFINITION;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.FIRST;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.Xml.document;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;

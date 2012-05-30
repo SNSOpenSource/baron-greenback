@@ -37,6 +37,7 @@ public class PaginatedHttpDataSource extends HttpDataSource {
 
     @Override
     public Option<HttpJob> additionalWork(Definition destination, Document document) {
+        if(Strings.isEmpty(moreXPath)) return none();
         Uri moreUri = Uri.uri(selectContents(document, moreXPath()));
 
         if (!containsCheckpoint(document)) {

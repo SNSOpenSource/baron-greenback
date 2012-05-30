@@ -52,7 +52,8 @@ public class HttpJob {
                 Sequence<Record> records = transformData(document, dataSource.definition());
                 Sequence<Record> filtered = dataSource.filter().apply(records);
                 Sequence<HttpJob> moreJobs = Subfeeder2.subfeeds(filtered, destination);
-                return Pair.pair(filtered, moreJobs.join(jobs));
+                Sequence<Record> merged = Subfeeder2.mergePreviousUniqueIdentifiers(filtered, dataSource);
+                return Pair.pair(merged, moreJobs.join(jobs));
             }
         };
     }

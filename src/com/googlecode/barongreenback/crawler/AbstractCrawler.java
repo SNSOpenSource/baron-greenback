@@ -6,20 +6,16 @@ import com.googlecode.barongreenback.views.Views;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
-import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.views.Views.find;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Uri.uri;
 import static java.util.UUID.randomUUID;
 
@@ -63,7 +59,7 @@ public abstract class AbstractCrawler implements Crawler {
         return Definition.constructors.definition(update(crawler), keywords(definition));
     }
 
-    public static RecordDefinition   extractRecordDefinition(Model crawler) {
+    public static RecordDefinition extractRecordDefinition(Model crawler) {
         return convert(crawler.get("record", Model.class));
     }
 
@@ -84,6 +80,8 @@ public abstract class AbstractCrawler implements Crawler {
     }
 
     public static Definition destinationDefinition(Model crawler) {
-        return definition(crawler, extractRecordDefinition(crawler));
+        String name = crawler.get("update", String.class);
+        List<Model> keywords = crawler.get("record", Model.class).getValues("keywords", Model.class);
+        return RecordDefinition.convertToDefinition(name, keywords);
     }
 }
