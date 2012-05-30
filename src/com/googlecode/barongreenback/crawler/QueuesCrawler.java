@@ -2,13 +2,14 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
-import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.*;
-import com.googlecode.utterlyidle.handlers.HttpClient;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Uri;
 
 import java.io.PrintStream;
 import java.util.UUID;
@@ -16,12 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static com.googlecode.barongreenback.crawler.CheckPointStopper2.stopAt;
-import static com.googlecode.barongreenback.crawler.PaginatedHttpDataSource.dataSource;
-import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
-import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.barongreenback.crawler.HttpJob.job;
-import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
+import static com.googlecode.barongreenback.crawler.PaginatedHttpDataSource.dataSource;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final ExecutorService inputHandlers;
@@ -35,7 +32,7 @@ public class QueuesCrawler extends AbstractCrawler {
         super(modelRepository);
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
-        inputHandlers = Executors.newFixedThreadPool(50);
+        inputHandlers = Executors.newFixedThreadPool(10);
         dataMappers = Executors.newCachedThreadPool();
         writers = Executors.newSingleThreadExecutor();
         this.dataWriter = new DataWriter(records);
@@ -50,7 +47,7 @@ public class QueuesCrawler extends AbstractCrawler {
         updateView(crawler, keywords(destination));
 
         PaginatedHttpDataSource dataSource = dataSource(requestFor(crawler), source, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings);
-        crawl(job(dataSource, destination));
+        crawl(job(dataSource, destination), log);
         return -1;
     }
 
@@ -58,14 +55,24 @@ public class QueuesCrawler extends AbstractCrawler {
         return from(crawler);
     }
 
-    public Future<?> crawl(HttpJob job) {
-        return submit(inputHandlers, job.getInput().then(
-                        submit(dataMappers, processJobs(job.process()).then(
-                                submit(writers, dataWriter.writeUnique(job.destination()))))));
+    public Future<?> crawl(HttpJob job, PrintStream log) {
+        return submit(inputHandlers, job.getInput(log).then(
+                submit(dataMappers, processJobs(job.process(), log).then(
+                        submit(writers, dataWriter.writeUnique(job.destination()))))), log);
     }
 
-    private Future<?> submit(ExecutorService executorService, Runnable runnable) {
-        return executorService.submit(runnable);
+    private Future<?> submit(ExecutorService executorService, final Runnable runnable, final PrintStream log) {
+        return executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (RuntimeException e) {
+                    e.printStackTrace(log);
+                    throw e;
+                }
+            }
+        });
     }
 
 
@@ -78,13 +85,13 @@ public class QueuesCrawler extends AbstractCrawler {
         };
     }
 
-    private <T> Function1<T, Sequence<Record>> processJobs(final Function1<T, Pair<Sequence<Record>, Sequence<HttpJob>>> function) {
+    private <T> Function1<T, Sequence<Record>> processJobs(final Function1<T, Pair<Sequence<Record>, Sequence<HttpJob>>> function, final PrintStream log) {
         return new Function1<T, Sequence<Record>>() {
             @Override
             public Sequence<Record> call(T t) throws Exception {
                 Pair<Sequence<Record>, Sequence<HttpJob>> pair = function.call(t);
                 for (HttpJob job : pair.second()) {
-                    crawl(job);
+                    crawl(job, log);
                 }
                 return pair.first();
             }

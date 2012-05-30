@@ -5,9 +5,12 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.handlers.AuditHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
+import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import org.w3c.dom.Document;
 
+import java.io.PrintStream;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
@@ -39,8 +42,8 @@ public class HttpJob {
         return destination;
     }
 
-    public Function<Response> getInput() {
-        return asFunction(httpHandler).deferApply(RequestBuilder.get(dataSource.uri).build()).then(failureHandler.captureFailures(dataSource));
+    public Function<Response> getInput(PrintStream log) {
+        return asFunction(new AuditHandler(httpHandler, new PrintAuditor(log))).deferApply(RequestBuilder.get(dataSource.uri).build()).then(failureHandler.captureFailures(dataSource));
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<HttpJob>>> process() {
