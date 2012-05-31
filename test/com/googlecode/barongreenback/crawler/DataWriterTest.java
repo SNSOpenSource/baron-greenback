@@ -19,7 +19,7 @@ public class DataWriterTest {
         Keyword<String> name = Keywords.keyword("name", String.class);
         Definition children = definition("children", name);
         Record expected = record().set(name, "Dan");
-        DataWriter.writeUnique(records, children, one(expected));
+        new DataWriter(records).writeUnique(children, one(expected));
         Sequence<Record> result = records.get(children);
         assertThat(result.size(), NumberMatcher.is(1));
         assertThat(result.head(), is(expected));
@@ -31,8 +31,9 @@ public class DataWriterTest {
         Keyword<String> name = Keywords.keyword("name", String.class).metadata(record().set(Keywords.UNIQUE, true));
         Definition children = definition("children", name);
         Record expected = record().set(name, "Dan");
-        DataWriter.writeUnique(records, children, one(expected));
-        DataWriter.writeUnique(records, children, one(expected));
+        DataWriter dataWriter = new DataWriter(records);
+        dataWriter.writeUnique(children, one(expected));
+        dataWriter.writeUnique(children, one(expected));
         Sequence<Record> result = records.get(children);
         assertThat(result.size(), NumberMatcher.is(1));
         assertThat(result.head(), is(expected));

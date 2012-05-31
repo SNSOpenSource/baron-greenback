@@ -37,25 +37,8 @@ public class HttpDataSource {
         return source;
     }
 
-    public HttpDataSource request(Uri uri) {
+    public HttpDataSource uri(Uri uri) {
         return new HttpDataSource(uri, source);
-    }
-
-    public Function1<Document, Iterable<HttpJob>> additionalWork(final Definition destination) {
-        return new Function1<Document, Iterable<HttpJob>>() {
-            @Override
-            public Iterable<HttpJob> call(Document document) throws Exception {
-                return additionalWork(destination, document);
-            }
-        };
-    }
-
-    public Option<HttpJob> additionalWork(final Definition destination, Document document) {
-        return none();
-    }
-
-    public Function1<Sequence<Record>, Sequence<Record>> filter() {
-        return Function1.identity();
     }
 
 }

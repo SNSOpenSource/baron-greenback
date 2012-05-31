@@ -30,21 +30,11 @@ public class FailureHandler {
         return captureFailures(request, retryQueue, response);
     }
 
-
     public static Response captureFailures(HttpDataSource originalRequest, BlockingQueue<Pair<HttpDataSource, Response>> retryQueue, Response response) {
         if(!response.status().equals(Status.OK)) {
             retryQueue.add(Pair.pair(originalRequest, response));
             return response(Status.NO_CONTENT).build();
         }
         return response;
-    }
-
-    public static Function1<Response, Response> captureFailures(final HttpDataSource originalRequest, final BlockingQueue<Pair<HttpDataSource, Response>> retryQueue) {
-        return new Function1<Response, Response>() {
-            @Override
-            public Response call(Response response) throws Exception {
-                return captureFailures(originalRequest, retryQueue, response);
-            }
-        };
     }
 }

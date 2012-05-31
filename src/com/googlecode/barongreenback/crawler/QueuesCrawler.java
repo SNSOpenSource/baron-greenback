@@ -10,15 +10,13 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 
 import java.io.PrintStream;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import static com.googlecode.barongreenback.crawler.HttpJob.job;
-import static com.googlecode.barongreenback.crawler.PaginatedHttpDataSource.dataSource;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final ExecutorService inputHandlers;
@@ -32,9 +30,9 @@ public class QueuesCrawler extends AbstractCrawler {
         super(modelRepository);
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
-        inputHandlers = Executors.newFixedThreadPool(10);
-        dataMappers = Executors.newCachedThreadPool();
-        writers = Executors.newSingleThreadExecutor();
+        this.inputHandlers = Executors.newFixedThreadPool(10);
+        this.dataMappers = Executors.newCachedThreadPool();
+        this.writers = Executors.newSingleThreadExecutor();
         this.dataWriter = new DataWriter(records);
     }
 
@@ -46,8 +44,8 @@ public class QueuesCrawler extends AbstractCrawler {
 
         updateView(crawler, keywords(destination));
 
-        PaginatedHttpDataSource dataSource = dataSource(requestFor(crawler), source, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings);
-        crawl(job(dataSource, destination), log);
+        HttpDataSource dataSource = HttpDataSource.dataSource(requestFor(crawler), source);
+        crawl(PaginatedHttpJob.paginatedHttpJob(dataSource, destination, new ClientHttpHandler(), checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), log);
         return -1;
     }
 
