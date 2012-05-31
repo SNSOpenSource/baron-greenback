@@ -10,13 +10,12 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 
 import java.io.PrintStream;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final ExecutorService inputHandlers;
@@ -25,6 +24,7 @@ public class QueuesCrawler extends AbstractCrawler {
     private final DataWriter dataWriter;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
+    private final BlockingDeque<Pair<HttpDataSource,Response>> retry;
 
     public QueuesCrawler(final ModelRepository modelRepository, final BaronGreenbackRecords records, CheckPointHandler checkpointHandler, StringMappings mappings) {
         super(modelRepository);
@@ -34,6 +34,7 @@ public class QueuesCrawler extends AbstractCrawler {
         this.dataMappers = Executors.newCachedThreadPool();
         this.writers = Executors.newSingleThreadExecutor();
         this.dataWriter = new DataWriter(records);
+        retry = new LinkedBlockingDeque<Pair<HttpDataSource, Response>>();
     }
 
     @Override
@@ -45,7 +46,7 @@ public class QueuesCrawler extends AbstractCrawler {
         updateView(crawler, keywords(destination));
 
         HttpDataSource dataSource = HttpDataSource.dataSource(requestFor(crawler), source);
-        crawl(PaginatedHttpJob.paginatedHttpJob(dataSource, destination, new ClientHttpHandler(), checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), log);
+        crawl(PaginatedHttpJob.paginatedHttpJob(dataSource, destination, new ClientHttpHandler(), checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings, retry), log);
         return -1;
     }
 
