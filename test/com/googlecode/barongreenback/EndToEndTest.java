@@ -11,9 +11,12 @@ import com.googlecode.barongreenback.queues.CountDownCompleter;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.matchers.Matchers;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;
+import com.googlecode.utterlyidle.Request;
 import com.googlecode.waitrest.Waitrest;
 import org.junit.After;
 import org.junit.Before;
@@ -24,15 +27,21 @@ import java.util.concurrent.CountDownLatch;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
 import static com.googlecode.totallylazy.Closeables.using;
+import static com.googlecode.totallylazy.Predicates.*;
+import static com.googlecode.totallylazy.Strings.empty;
+import static com.googlecode.totallylazy.matchers.Matchers.matcher;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class EndToEndTest extends ApplicationTests {
     private Waitrest waitrest;
 
     @Test
     public void createCrawlerViaUiWithCheckpointOnFirstPage() throws Exception {
-        crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:25Z")), "newsfeed");
+        final CrawlerListPage crawler = createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:25Z"));
+        crawlSampleData(crawler, "newsfeed");
         ViewSearchPage viewSearchPage = view("newsfeed");
 
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(1));
@@ -85,6 +94,14 @@ public class EndToEndTest extends ApplicationTests {
         assertThat(viewSearchPage.containsCell("title", "Deleted user"), is(true));
     }
 
+    @Test
+    public void createCrawlerViaUiWithoutCheckpointAndCrawlThenViewCheckpoint() throws Exception {
+        final CrawlerListPage crawler = createCrawler(null);
+        assertThat(checkpointValue(), matcher(empty()));
+        crawlSampleData(crawler, "newsfeed");
+        assertThat(checkpointValue(), matcher(Predicates.not(empty())));
+    }
+
     @Before
     public void setupFeed() throws Exception {
         waitrest = serverWithDataFeed();
@@ -93,6 +110,13 @@ public class EndToEndTest extends ApplicationTests {
     @After
     public void shutDownFeed() throws Exception {
         waitrest.close();
+    }
+
+    private String checkpointValue() throws Exception {
+        CrawlerListPage crawlerListPage = new CrawlerListPage(browser);
+        final Request request = crawlerListPage.linkFor("newsfeed").click();
+        final CrawlerPage crawlerPage = new CrawlerPage(browser, browser.handle(request));
+        return crawlerPage.checkpoint().value();
     }
 
     private ViewSearchPage view(String name) throws Exception {
@@ -111,7 +135,6 @@ public class EndToEndTest extends ApplicationTests {
                 decorate(Completer.class, CountDownCompleter.class);
 
         JobsListPage jobs = listPage.crawl(name);
-        listPage.crawl(name);
         latch.await();
         Thread.sleep(1000);
         return jobs;
@@ -145,8 +168,6 @@ public class EndToEndTest extends ApplicationTests {
         newPage.subfeed(2).uncheck();
         newPage.checkpoint(2).check();
 
-
         return newPage.save();
     }
-
 }

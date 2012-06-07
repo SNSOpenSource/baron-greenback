@@ -5,13 +5,10 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.handlers.AuditHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
-import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
-import java.io.PrintStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -52,7 +49,7 @@ public class HttpJob implements StagedJob<Response> {
     }
 
     @Override
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process() {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process(Container container) {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {

@@ -6,8 +6,10 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,15 +24,20 @@ import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.Xml.selectContents;
 
 public class PaginatedHttpJob extends HttpJob {
-    private PaginatedHttpJob(Map<String, Object> context) {
+    private static StringMappings mappings;
+    private final boolean master;
+
+    private PaginatedHttpJob(Map<String, Object> context, boolean master) {
         super(context);
+        this.master = master;
     }
 
     public static PaginatedHttpJob paginatedHttpJob(Map<String, Object> context) {
-        return new PaginatedHttpJob(context);
+        return new PaginatedHttpJob(context, false);
     }
 
     public static PaginatedHttpJob paginatedHttpJob(HttpDataSource dataSource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+        PaginatedHttpJob.mappings = mappings;
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("dataSource", dataSource);
         context.put("destination", destination);
@@ -40,12 +47,27 @@ public class PaginatedHttpJob extends HttpJob {
         context.put("checkpointXPath", checkpointXPath(dataSource.definition()));
         context.put("checkpointAsString", checkpointAsString(mappings, checkpoint));
 
-        return paginatedHttpJob(context);
+        return new PaginatedHttpJob(context, true);
     }
 
-    public static String checkpointXPath(Definition source) {
-        Keyword<?> keyword = source.fields().find(where(metadata(CompositeCrawler.CHECKPOINT), is(true))).get();
-        return String.format("%s/%s", source.name(), keyword.name());
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process(final Container container) {
+        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
+            @Override
+            public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
+                Document document = loadDocument(response);
+                if(master) {
+                    final CheckpointUpdater checkpointUpdater = container.get(CheckpointUpdater.class);
+                    final Date checkpoint = mappings.toValue(Date.class, selectCheckpoints(document).head());
+                    checkpointUpdater.update(Option.<Object>some(checkpoint));
+                }
+                Option<PaginatedHttpJob> nextPageJob = additionalWork(document);
+                Sequence<Record> records = transformData(document, dataSource().definition());
+                Sequence<Record> filtered = CheckPointStopper2.stopAt(checkpoint(), records);
+                Sequence<HttpJob> subfeedJobs = Subfeeder2.subfeeds(filtered, destination());
+                Sequence<Record> merged = Subfeeder2.mergePreviousUniqueIdentifiers(filtered, dataSource());
+                return cast(Pair.pair(merged, subfeedJobs.join(nextPageJob)));
+            }
+        };
     }
 
     public Option<PaginatedHttpJob> additionalWork(Document document) {
@@ -53,20 +75,33 @@ public class PaginatedHttpJob extends HttpJob {
         Uri moreUri = Uri.uri(selectContents(document, moreXPath()));
 
         if (!containsCheckpoint(document)) {
-            HttpDataSource newDataSource = dataSource().uri(moreUri);
-            return Option.some(this.datasource(newDataSource));
+            return Option.some(datasource(dataSource().uri(moreUri)));
         }
         return none();
+    }
+
+    private boolean containsCheckpoint(Document document) {
+        return selectCheckpoints(document).contains(checkpointAsString());
+    }
+
+    private String moreXPath() {
+        return (String) context.get("moreXPath");
+    }
+
+    private static String checkpointXPath(Definition source) {
+        Keyword<?> keyword = source.fields().find(where(metadata(CompositeCrawler.CHECKPOINT), is(true))).get();
+        return String.format("%s/%s", source.name(), keyword.name());
+    }
+
+    private static String checkpointAsString(StringMappings mappings, Object checkpoint) {
+        if (checkpoint == null) return null;
+        return mappings.toString(checkpoint.getClass(), checkpoint);
     }
 
     private PaginatedHttpJob datasource(HttpDataSource dataSource) {
         ConcurrentHashMap<String, Object> newContext = new ConcurrentHashMap<String, Object>(context);
         newContext.put("dataSource", dataSource);
         return paginatedHttpJob(newContext);
-    }
-
-    public boolean containsCheckpoint(Document document) {
-        return selectCheckpoints(document).contains(checkpointAsString());
     }
 
     private Sequence<String> selectCheckpoints(Document document) {
@@ -84,39 +119,4 @@ public class PaginatedHttpJob extends HttpJob {
     private String checkpointAsString() {
         return (String) context.get("checkpointAsString");
     }
-
-    public String moreXPath() {
-        return (String) context.get("moreXPath");
-    }
-
-    public static String checkpointAsString(StringMappings mappings, Object checkpoint) {
-        if (checkpoint == null) return null;
-        return mappings.toString(checkpoint.getClass(), checkpoint);
-    }
-
-    public Function1<Sequence<Record>, Sequence<Record>> filter() {
-        return new Function1<Sequence<Record>, Sequence<Record>>() {
-            @Override
-            public Sequence<Record> call(Sequence<Record> records) throws Exception {
-                return CheckPointStopper2.stopAt(checkpoint(), records);
-            }
-        };
-    }
-
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process() {
-        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
-            @Override
-            public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
-                Document document = loadDocument(response);
-                Option<PaginatedHttpJob> jobs = additionalWork(document);
-                Sequence<Record> records = transformData(document, dataSource().definition());
-                Sequence<Record> filtered = filter().apply(records);
-                Sequence<HttpJob> moreJobs = Subfeeder2.subfeeds(filtered, destination());
-                Sequence<Record> merged = Subfeeder2.mergePreviousUniqueIdentifiers(filtered, dataSource());
-                return cast(Pair.pair(merged, moreJobs.join(jobs)));
-            }
-        };
-    }
-
-
 }

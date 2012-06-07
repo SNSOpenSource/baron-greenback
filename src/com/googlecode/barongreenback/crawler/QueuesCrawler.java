@@ -7,10 +7,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.*;
@@ -23,6 +20,9 @@ import java.io.PrintStream;
 import java.lang.reflect.Type;
 import java.util.UUID;
 import java.util.concurrent.*;
+
+import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
+import static com.googlecode.totallylazy.Runnables.VOID;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final ExecutorService inputHandlers;
@@ -45,8 +45,8 @@ public class QueuesCrawler extends AbstractCrawler {
     }
 
     @Override
-    public Number crawl(UUID id, PrintStream log) throws Exception {
-        Model crawler = crawlerFor(id);
+    public Number crawl(final UUID id, PrintStream log) throws Exception {
+        final Model crawler = crawlerFor(id);
         Definition source = sourceDefinition(crawler);
         Definition destination = destinationDefinition(crawler);
 
@@ -54,15 +54,22 @@ public class QueuesCrawler extends AbstractCrawler {
 
         HttpDataSource dataSource = HttpDataSource.dataSource(requestFor(crawler), source);
 
-        Container jobsContainer = new SimpleContainer();
-        jobsContainer.addInstance(PrintStream.class, log);
-        jobsContainer.add(Auditor.class, PrintAuditor.class);
-        jobsContainer.add(HttpHandler.class, ClientHttpHandler.class);
-        jobsContainer.add(HttpClient.class, AuditHandler.class);
-        jobsContainer.addType(new TypeFor<BlockingQueue<Pair<HttpDataSource, Response>>>(){}.get(), returns(retry));
-        jobsContainer.add(FailureHandler.class);
+        Container container = new SimpleContainer();
+        container.addInstance(PrintStream.class, log);
+        container.add(Auditor.class, PrintAuditor.class);
+        container.add(HttpHandler.class, ClientHttpHandler.class);
+        container.add(HttpClient.class, AuditHandler.class);
+        container.addType(new TypeFor<BlockingQueue<Pair<HttpDataSource, Response>>>(){}.get(), returns(retry));
+        container.add(FailureHandler.class);
+        container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(new Function1<Option<Object>, Void>() {
+            @Override
+            public Void call(Option<Object> checkpoint) throws Exception {
+                checkpointHandler.updateCheckPoint(id, crawler, checkpoint);
+                return VOID;
+            }
+        }));
 
-        crawl(PaginatedHttpJob.paginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), jobsContainer);
+        crawl(paginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), container);
         return -1;
     }
 
@@ -81,7 +88,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
     public Future<?> crawl(StagedJob<Response> job, Container container) {
         return submit(inputHandlers, job.getInput(container).then(
-                submit(dataMappers, processJobs(job.process(), container).then(
+                submit(dataMappers, processJobs(job.process(container), container).then(
                         submit(writers, job.write(records))))), container);
     }
 
@@ -98,7 +105,6 @@ public class QueuesCrawler extends AbstractCrawler {
             }
         });
     }
-
 
     private <T> Function1<T, Future<?>> submit(final ExecutorService executorService, final Function1<T, ?> then) {
         return new Function1<T, Future<?>>() {
