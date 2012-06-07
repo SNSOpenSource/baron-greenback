@@ -2,45 +2,38 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
-import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
+import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
 import java.io.PrintStream;
-import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
-import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 import static java.util.Collections.unmodifiableMap;
 
-public class HttpJob {
+public class HttpJob implements StagedJob<Response> {
     protected final Map<String, Object> context;
-    protected final HttpClient httpClient;
-    protected final BlockingDeque<Pair<HttpDataSource, Response>> retry;
 
-    protected HttpJob(Map<String, Object> context, HttpClient httpClient, BlockingDeque<Pair<HttpDataSource, Response>> retry) {
+    protected HttpJob(Map<String, Object> context) {
         this.context = unmodifiableMap(context);
-        this.httpClient = httpClient;
-        this.retry = retry;
     }
 
     public static HttpJob job(HttpDataSource dataSource, Definition destination) {
         ConcurrentMap<String, Object> context = new ConcurrentHashMap<String, Object>();
         context.put("dataSource", dataSource);
         context.put("destination", destination);
-        return new HttpJob(context, new ClientHttpHandler(), new LinkedBlockingDeque<Pair<HttpDataSource, Response>>());
+        return new HttpJob(context);
     }
 
     public HttpDataSource dataSource() {
@@ -51,32 +44,34 @@ public class HttpJob {
         return (Definition) context.get("destination");
     }
 
-    public Function<Response> getInput(PrintStream log) {
-        return asFunction(new AuditHandler(httpClient, new PrintAuditor(log))).deferApply(
+    @Override
+    public Function<Response> getInput(Container container) {
+        return asFunction(container.get(HttpClient.class)).deferApply(
                 get(dataSource().uri()).build()).then(
-                new FailureHandler(retry).captureFailures(dataSource()));
+                container.get(FailureHandler.class).captureFailures(dataSource()));
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<HttpJob>>> process() {
-        return new Function1<Response, Pair<Sequence<Record>, Sequence<HttpJob>>>() {
+    @Override
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process() {
+        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
-            public Pair<Sequence<Record>, Sequence<HttpJob>> call(Response response) throws Exception {
+            public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
                 Document document = loadDocument(response);
-                Option<PaginatedHttpJob> jobs = additionalWork(destination(), document);
                 Sequence<Record> records = transformData(document, dataSource().definition());
-                Sequence<Record> filtered = filter().apply(records);
-                Sequence<HttpJob> moreJobs = Subfeeder2.subfeeds(filtered, destination());
-                Sequence<Record> merged = Subfeeder2.mergePreviousUniqueIdentifiers(filtered, dataSource());
-                return Pair.pair(merged, moreJobs.join(jobs));
+                Sequence<HttpJob> moreJobs = Subfeeder2.subfeeds(records, destination());
+                Sequence<Record> merged = Subfeeder2.mergePreviousUniqueIdentifiers(records, dataSource());
+                return Unchecked.cast(Pair.pair(merged, moreJobs));
             }
         };
     }
 
-    public Option<PaginatedHttpJob> additionalWork(final Definition destination, Document document) {
-        return none();
-    }
-
-    public Function1<Sequence<Record>, Sequence<Record>> filter() {
-        return Function1.identity();
+    @Override
+    public Function1<Sequence<Record>, Number> write(final Records records) {
+        return new Function1<Sequence<Record>, Number>() {
+            @Override
+            public Number call(Sequence<Record> newData) throws Exception {
+                return new DataWriter(records).writeUnique(destination(), newData);
+            }
+        };
     }
 }

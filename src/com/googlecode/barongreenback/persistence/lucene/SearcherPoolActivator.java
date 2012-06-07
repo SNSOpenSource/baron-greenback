@@ -5,6 +5,7 @@ import com.googlecode.lazyrecords.lucene.OptimisedPool;
 import com.googlecode.lazyrecords.lucene.SearcherPool;
 import com.googlecode.yadic.Container;
 
+import java.util.Properties;
 import java.util.concurrent.Callable;
 
 public class SearcherPoolActivator implements Callable<SearcherPool> {
@@ -25,5 +26,9 @@ public class SearcherPoolActivator implements Callable<SearcherPool> {
         } catch (Exception e) {
             return container.create(OptimisedPool.class);
         }
+    }
+
+    public static void setSearchPool(Properties properties, Class<? extends SearcherPool> aClass){
+        new BaronGreenbackProperties(properties).setProperty(PROPERTY_NAME, aClass.getName());
     }
 }

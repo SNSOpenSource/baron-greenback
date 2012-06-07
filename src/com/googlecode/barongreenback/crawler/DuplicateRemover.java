@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
@@ -19,7 +20,14 @@ public class DuplicateRemover implements Feeder<Uri> {
     }
 
     public Sequence<Record> get(Uri source, RecordDefinition definition) throws Exception {
-        return feeder.get(source, definition).unique(select(uniqueFields(definition).map(ignoreAlias())));
+        final Sequence<Record> records = feeder.get(source, definition);
+        return filterDuplicates(definition.definition(), records);
+    }
+
+    public static Sequence<Record> filterDuplicates(Definition definition, Sequence<Record> records) {
+        final Sequence<Keyword<?>> unique = uniqueFields(definition);
+        if(unique.isEmpty()) return records;
+        return records.unique(select(unique.map(ignoreAlias())));
     }
 
     public static Callable1<Keyword<?>, Keyword<?>> ignoreAlias() {

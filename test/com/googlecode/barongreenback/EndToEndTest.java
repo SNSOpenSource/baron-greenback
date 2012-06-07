@@ -111,6 +111,7 @@ public class EndToEndTest extends ApplicationTests {
                 decorate(Completer.class, CountDownCompleter.class);
 
         JobsListPage jobs = listPage.crawl(name);
+        listPage.crawl(name);
         latch.await();
         Thread.sleep(1000);
         return jobs;
