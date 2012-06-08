@@ -61,16 +61,20 @@ public class QueuesCrawler extends AbstractCrawler {
         container.add(HttpClient.class, AuditHandler.class);
         container.addType(new TypeFor<BlockingQueue<Pair<HttpDataSource, Response>>>(){}.get(), returns(retry));
         container.add(FailureHandler.class);
-        container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(new Function1<Option, Void>() {
-            @Override
-            public Void call(Option checkpoint) throws Exception {
-                checkpointHandler.updateCheckPoint(id, crawler, checkpoint);
-                return VOID;
-            }
-        }));
+        container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(checkpointUpdater(id, crawler)));
 
         crawl(paginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), container);
         return -1;
+    }
+
+    private Function1<Option<?>, Void> checkpointUpdater(final UUID id, final Model crawler) {
+        return new Function1<Option<?>, Void>() {
+            @Override
+            public Void call(Option<?> checkpoint) throws Exception {
+                checkpointHandler.updateCheckPoint(id, crawler, checkpoint);
+                return VOID;
+            }
+        };
     }
 
     private <T> Resolver<T> returns(final T instance) {

@@ -24,7 +24,7 @@ public class CheckPointHandler {
         return convertFromString(checkpoint, checkpointType);
     }
 
-    public void updateCheckPoint(UUID id, Model crawler, Option checkpoint) {
+    public void updateCheckPoint(UUID id, Model crawler, Option<?> checkpoint) {
         if (!checkpoint.isEmpty()) {
             modelRepository.set(id, addCheckpoint(crawler, checkpoint.value()));
         }
