@@ -55,10 +55,10 @@ public class PaginatedHttpJob extends HttpJob {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
                 Document document = loadDocument(response);
-                if(master) {
-                    final CheckpointUpdater checkpointUpdater = container.get(CheckpointUpdater.class);
-                    final Date checkpoint = mappings.toValue(Date.class, selectCheckpoints(document).head());
-                    checkpointUpdater.update(Option.<Object>some(checkpoint));
+                if (master) {
+                    container.get(CheckpointUpdater.class).update(
+                            selectCheckpoints(document).headOption().map(toDateValue())
+                    );
                 }
                 Option<PaginatedHttpJob> nextPageJob = additionalWork(document);
                 Sequence<Record> records = transformData(document, dataSource().definition());
@@ -66,6 +66,15 @@ public class PaginatedHttpJob extends HttpJob {
                 Sequence<HttpJob> subfeedJobs = Subfeeder2.subfeeds(filtered, destination());
                 Sequence<Record> merged = Subfeeder2.mergePreviousUniqueIdentifiers(filtered, dataSource());
                 return cast(Pair.pair(merged, subfeedJobs.join(nextPageJob)));
+            }
+        };
+    }
+
+    public static Callable1<String, Date> toDateValue() {
+        return new Callable1<String, Date>() {
+            @Override
+            public Date call(String value) throws Exception {
+                return mappings.toValue(Date.class, value);
             }
         };
     }
