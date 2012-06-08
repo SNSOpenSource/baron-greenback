@@ -53,11 +53,8 @@ public class HttpJob implements StagedJob<Response> {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
-                Document document = loadDocument(response);
-                Sequence<Record> records = transformData(document, dataSource().definition());
-                Sequence<HttpJob> subfeedJobs = Subfeeder2.subfeeds(records, destination());
-                Sequence<Record> merged = Subfeeder2.mergePreviousUniqueIdentifiers(records, dataSource());
-                return Unchecked.cast(Pair.pair(merged, subfeedJobs));
+                final DocumentProcessor processed = new DocumentProcessor(loadDocument(response), dataSource(), destination(), Predicates.<Record>always()).execute();
+                return Unchecked.cast(Pair.pair(processed.merged(), processed.subfeedJobs()));
             }
         };
     }

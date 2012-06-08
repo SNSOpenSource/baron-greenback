@@ -21,7 +21,6 @@ import java.lang.reflect.Type;
 import java.util.UUID;
 import java.util.concurrent.*;
 
-import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
 import static com.googlecode.totallylazy.Runnables.VOID;
 
 public class QueuesCrawler extends AbstractCrawler {
@@ -63,7 +62,7 @@ public class QueuesCrawler extends AbstractCrawler {
         container.add(FailureHandler.class);
         container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(checkpointUpdater(id, crawler)));
 
-        crawl(paginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), container);
+        crawl(MasterPaginatedHttpJob.masterPaginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), container);
         return -1;
     }
 
