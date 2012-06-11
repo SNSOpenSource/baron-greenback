@@ -13,30 +13,18 @@ import static com.googlecode.barongreenback.crawler.Subfeeder2.mergePreviousUniq
 import static com.googlecode.barongreenback.crawler.Subfeeder2.subfeeds;
 
 public class DocumentProcessor {
-    private Document document;
-    private final HttpDataSource dataSource;
-    private final Definition destination;
-    private Sequence<Record> merged;
-    private Sequence<HttpJob> subfeedJobs;
-    private final LogicalPredicate<Record> filter;
+    private final Sequence<Record> merged;
+    private final Sequence<HttpJob> subfeedJobs;
 
     public DocumentProcessor(Document document, HttpDataSource dataSource, Definition destination, LogicalPredicate<Record> filter) {
-        this.document = document;
-        this.dataSource = dataSource;
-        this.destination = destination;
-        this.filter = filter;
-    }
-
-    public DocumentProcessor(Document document, HttpDataSource dataSource, Definition destination, Object checkpoint) {
-        this(document, dataSource, destination, Predicates.<Record>not(checkpointReached(checkpoint)));
-    }
-
-    public DocumentProcessor execute() {
         Sequence<Record> records = transformData(document, dataSource.definition());
         Sequence<Record> filtered = records.takeWhile(filter).realise();
         merged = mergePreviousUniqueIdentifiers(filtered, dataSource);
         subfeedJobs = subfeeds(filtered, destination);
-        return this;
+    }
+
+    public DocumentProcessor(Document document, HttpDataSource dataSource, Definition destination, Object checkpoint) {
+        this(document, dataSource, destination, Predicates.<Record>not(checkpointReached(checkpoint)));
     }
 
     public Sequence<Record> merged() {

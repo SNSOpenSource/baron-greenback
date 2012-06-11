@@ -214,8 +214,8 @@ public class BatchResource {
     private void deleteAllData() throws Exception {
         cache.clear();
         scheduler.stop();
-        persistence.delete();
         queues.deleteAll();
+        persistence.delete();
     }
 
     private Callable1<File, Model> asModel() {

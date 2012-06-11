@@ -25,20 +25,19 @@ public class HttpDataSource {
         return new HttpDataSource(uri, source);
     }
 
-    public Request request() {
-        return RequestBuilder.get(uri).build();
+    public HttpDataSource uri(Uri uri) {
+        return new HttpDataSource(uri, source);
     }
 
     public Uri uri() {
         return uri;
     }
 
+    public Request request() {
+        return RequestBuilder.get(uri).build();
+    }
+
     public Definition definition() {
         return source;
     }
-
-    public HttpDataSource uri(Uri uri) {
-        return new HttpDataSource(uri, source);
-    }
-
 }

@@ -48,8 +48,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
                 container.get(CheckpointUpdater.class).update(
                         selectCheckpoints(document).headOption().map(toDateValue())
                 );
-                DocumentProcessor processed = new DocumentProcessor(loadDocument(response), dataSource(), destination(), checkpoint()).execute();
-                return cast(Pair.pair(processed.merged(), processed.subfeedJobs().join(nextPageJob(document))));
+                return process(document);
             }
         };
     }

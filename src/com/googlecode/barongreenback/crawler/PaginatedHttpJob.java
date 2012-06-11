@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.googlecode.barongreenback.crawler.CheckPointStopper.checkpointReached;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -34,10 +33,14 @@ public class PaginatedHttpJob extends HttpJob {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
-                DocumentProcessor processed = new DocumentProcessor(loadDocument(response), dataSource(), destination(), checkpoint()).execute();
-                return cast(Pair.pair(processed.merged(), processed.subfeedJobs().join(nextPageJob(loadDocument(response)))));
+                return process(loadDocument(response));
             }
         };
+    }
+
+    protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> process(Document document) {
+        DocumentProcessor processed = new DocumentProcessor(document, dataSource(), destination(), checkpoint());
+        return cast(Pair.pair(processed.merged(), processed.subfeedJobs().join(nextPageJob(document))));
     }
 
     public Callable1<String, Date> toDateValue() {
@@ -54,7 +57,7 @@ public class PaginatedHttpJob extends HttpJob {
         Uri moreUri = Uri.uri(selectContents(document, moreXPath()));
 
         if (!containsCheckpoint(document)) {
-            return Option.some(datasource(dataSource().uri(moreUri)));
+            return Option.some(job(dataSource().uri(moreUri)));
         }
         return none();
     }
@@ -63,7 +66,7 @@ public class PaginatedHttpJob extends HttpJob {
         return selectCheckpoints(document).contains(checkpointAsString());
     }
 
-    private PaginatedHttpJob datasource(HttpDataSource dataSource) {
+    private PaginatedHttpJob job(HttpDataSource dataSource) {
         ConcurrentHashMap<String, Object> newContext = new ConcurrentHashMap<String, Object>(context);
         newContext.put("dataSource", dataSource);
         return paginatedHttpJob(newContext, mappings);

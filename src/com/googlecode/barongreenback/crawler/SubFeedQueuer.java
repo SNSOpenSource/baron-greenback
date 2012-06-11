@@ -9,7 +9,6 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
 import static com.googlecode.barongreenback.crawler.ConcurrentCrawler.SubFeedCrawler.uniqueKeysAndValues;
-import static com.googlecode.barongreenback.crawler.QueuesCrawler.requestFor;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.totallylazy.Predicates.is;

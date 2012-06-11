@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
-import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 
@@ -32,6 +31,9 @@ public class FailureHandler {
 
     public static Response captureFailures(HttpDataSource originalRequest, BlockingQueue<Pair<HttpDataSource, Response>> retryQueue, Response response) {
         if(!response.status().equals(Status.OK)) {
+            System.out.println(
+                    "FAILED REQUEST: " + originalRequest.request() + "\n"
+                    + "RESPONSE: " + response);
             retryQueue.add(Pair.pair(originalRequest, response));
             return response(Status.NO_CONTENT).build();
         }

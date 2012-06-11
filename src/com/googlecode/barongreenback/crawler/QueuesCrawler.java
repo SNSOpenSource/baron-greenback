@@ -51,7 +51,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
         updateView(crawler, keywords(destination));
 
-        HttpDataSource dataSource = HttpDataSource.dataSource(requestFor(crawler), source);
+        HttpDataSource dataSource = HttpDataSource.dataSource(from(crawler), source);
 
         Container container = new SimpleContainer();
         container.addInstance(PrintStream.class, log);
@@ -83,10 +83,6 @@ public class QueuesCrawler extends AbstractCrawler {
                 return instance;
             }
         };
-    }
-
-    public static Uri requestFor(Model crawler) {
-        return from(crawler);
     }
 
     public Future<?> crawl(StagedJob<Response> job, Container container) {
