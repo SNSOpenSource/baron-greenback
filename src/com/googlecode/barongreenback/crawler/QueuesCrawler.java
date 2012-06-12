@@ -21,22 +21,22 @@ import java.util.concurrent.*;
 import static com.googlecode.totallylazy.Runnables.VOID;
 
 public class QueuesCrawler extends AbstractCrawler {
-    private final ExecutorService inputHandlers;
-    private final ExecutorService dataMappers;
-    private final ExecutorService writers;
+    private final JobExecutor<InputHandler> inputHandlers;
+    private final JobExecutor<DataMapper> dataMappers;
+    private final JobExecutor<PersistentDataWriter> writers;
     private final Records records;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
     private final RetryQueue retry;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final BaronGreenbackRecords records, CheckPointHandler checkpointHandler, StringMappings mappings, RetryQueue retry) {
+    public QueuesCrawler(final ModelRepository modelRepository, final BaronGreenbackRecords records, JobExecutor<InputHandler> inputHandlers, JobExecutor<DataMapper> dataMappers, JobExecutor<PersistentDataWriter> writers, CheckPointHandler checkpointHandler, StringMappings mappings, RetryQueue retry) {
         super(modelRepository);
+        this.inputHandlers = inputHandlers;
+        this.dataMappers = dataMappers;
+        this.writers = writers;
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
         this.retry = retry;
-        this.inputHandlers = Executors.newFixedThreadPool(20);
-        this.dataMappers = Executors.newCachedThreadPool();
-        this.writers = Executors.newSingleThreadExecutor();
         this.records = records.value();
     }
 
@@ -79,8 +79,8 @@ public class QueuesCrawler extends AbstractCrawler {
                         submit(writers, job.write(records))))), container);
     }
 
-    private Future<?> submit(ExecutorService executorService, final Runnable runnable, final Container container) {
-        return executorService.submit(new Runnable() {
+    private Future<?> submit(JobExecutor<?> jobExecutor, final Runnable runnable, final Container container) {
+        return jobExecutor.executor.submit(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -94,11 +94,11 @@ public class QueuesCrawler extends AbstractCrawler {
     }
 
 
-    private <T> Function1<T, Future<?>> submit(final ExecutorService executorService, final Function1<T, ?> then) {
+    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> then) {
         return new Function1<T, Future<?>>() {
             @Override
             public Future<?> call(T result) throws Exception {
-                return executorService.submit((Runnable) then.deferApply(result));
+                return jobExecutor.executor.submit((Runnable) then.deferApply(result));
             }
         };
     }
