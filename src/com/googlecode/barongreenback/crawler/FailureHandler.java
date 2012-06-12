@@ -10,9 +10,9 @@ import java.util.concurrent.BlockingQueue;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 
 public class FailureHandler {
-    private final BlockingQueue<Pair<HttpDataSource, Response>> retryQueue;
+    private final RetryQueue retryQueue;
 
-    public FailureHandler(BlockingQueue<Pair<HttpDataSource, Response>> retryQueue) {
+    public FailureHandler(RetryQueue retryQueue) {
         this.retryQueue = retryQueue;
     }
 
@@ -29,12 +29,12 @@ public class FailureHandler {
         return captureFailures(request, retryQueue, response);
     }
 
-    public static Response captureFailures(HttpDataSource originalRequest, BlockingQueue<Pair<HttpDataSource, Response>> retryQueue, Response response) {
+    public static Response captureFailures(HttpDataSource originalRequest, RetryQueue retryQueue, Response response) {
         if(!response.status().equals(Status.OK)) {
             System.out.println(
                     "FAILED REQUEST: " + originalRequest.request() + "\n"
                     + "RESPONSE: " + response);
-            retryQueue.add(Pair.pair(originalRequest, response));
+            retryQueue.value.add(Pair.pair(originalRequest, response));
             return response(Status.NO_CONTENT).build();
         }
         return response;

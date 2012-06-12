@@ -12,12 +12,9 @@ import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.*;
 import com.googlecode.yadic.Container;
-import com.googlecode.yadic.Resolver;
 import com.googlecode.yadic.SimpleContainer;
-import com.googlecode.yadic.generics.TypeFor;
 
 import java.io.PrintStream;
-import java.lang.reflect.Type;
 import java.util.UUID;
 import java.util.concurrent.*;
 
@@ -30,17 +27,17 @@ public class QueuesCrawler extends AbstractCrawler {
     private final Records records;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
-    private final BlockingDeque<Pair<HttpDataSource,Response>> retry;
+    private final RetryQueue retry;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final BaronGreenbackRecords records, CheckPointHandler checkpointHandler, StringMappings mappings) {
+    public QueuesCrawler(final ModelRepository modelRepository, final BaronGreenbackRecords records, CheckPointHandler checkpointHandler, StringMappings mappings, RetryQueue retry) {
         super(modelRepository);
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
+        this.retry = retry;
         this.inputHandlers = Executors.newFixedThreadPool(20);
         this.dataMappers = Executors.newCachedThreadPool();
         this.writers = Executors.newSingleThreadExecutor();
         this.records = records.value();
-        this.retry = new LinkedBlockingDeque<Pair<HttpDataSource, Response>>();
     }
 
     @Override
@@ -58,7 +55,7 @@ public class QueuesCrawler extends AbstractCrawler {
         container.add(Auditor.class, PrintAuditor.class);
         container.add(HttpHandler.class, ClientHttpHandler.class);
         container.add(HttpClient.class, AuditHandler.class);
-        container.addType(new TypeFor<BlockingQueue<Pair<HttpDataSource, Response>>>(){}.get(), returns(retry));
+        container.addInstance(RetryQueue.class, retry);
         container.add(FailureHandler.class);
         container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(checkpointUpdater(id, crawler)));
 
@@ -72,15 +69,6 @@ public class QueuesCrawler extends AbstractCrawler {
             public Void call(Option<?> checkpoint) throws Exception {
                 checkpointHandler.updateCheckPoint(id, crawler, checkpoint);
                 return VOID;
-            }
-        };
-    }
-
-    private <T> Resolver<T> returns(final T instance) {
-        return new Resolver<T>() {
-            @Override
-            public T resolve(Type type) throws Exception {
-                return instance;
             }
         };
     }

@@ -3,15 +3,12 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.RecordDefinitionActivator;
 import com.googlecode.utterlyidle.Resources;
-import com.googlecode.utterlyidle.modules.ArgumentScopedModule;
-import com.googlecode.utterlyidle.modules.Module;
-import com.googlecode.utterlyidle.modules.RequestScopedModule;
-import com.googlecode.utterlyidle.modules.ResourcesModule;
+import com.googlecode.utterlyidle.modules.*;
 import com.googlecode.yadic.Container;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
-public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, RequestScopedModule {
+public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, RequestScopedModule, ApplicationScopedModule {
     public Module addResources(Resources resources) throws Exception {
         resources.add(annotatedClass(CrawlerResource.class));
         resources.add(annotatedClass(BatchCrawlerResource.class));
@@ -26,8 +23,14 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(CompositeCrawler.class);
         container.add(CheckPointHandler.class);
-        container.add(Crawler.class, SequentialCrawler.class);
+        container.add(Crawler.class, QueuesCrawler.class);
         container.add(CrawlInterval.class);
+        return this;
+    }
+
+    @Override
+    public Module addPerApplicationObjects(Container container) throws Exception {
+        container.add(RetryQueue.class);
         return this;
     }
 }
