@@ -7,10 +7,20 @@ import org.junit.Test;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-public class RetryQueue {
+public class RetryQueue implements StatusMonitor {
     public final BlockingQueue<Pair<HttpDataSource, Response>> value;
 
     public RetryQueue() {
         this.value = new LinkedBlockingDeque<Pair<HttpDataSource, Response>>();
+    }
+
+    @Override
+    public String name() {
+        return "Retry Queue";
+    }
+
+    @Override
+    public int size() {
+        return value.size();
     }
 }

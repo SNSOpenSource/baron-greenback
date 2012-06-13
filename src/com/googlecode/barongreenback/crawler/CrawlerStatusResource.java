@@ -20,27 +20,28 @@ public class CrawlerStatusResource {
     private final DataMapper mapperExecutor;
     private final PersistentDataWriter writerExecutor;
 
-    public CrawlerStatusResource(InputHandler inputExecutor, DataMapper mapperExecutor, PersistentDataWriter writerExecutor) {
+    private final RetryQueue retryQueue;
+
+    public CrawlerStatusResource(InputHandler inputExecutor, DataMapper mapperExecutor, PersistentDataWriter writerExecutor, RetryQueue retryQueue) {
         this.inputExecutor = inputExecutor;
         this.mapperExecutor = mapperExecutor;
         this.writerExecutor = writerExecutor;
+        this.retryQueue = retryQueue;
     }
 
     @GET
     @Path("status")
     public Model status() {
-        List<Model> executors = sequence(inputExecutor, mapperExecutor,  writerExecutor).safeCast(JobExecutor.class).map(toModel()).toList();
+        List<Model> executors = sequence(inputExecutor, mapperExecutor,  writerExecutor, retryQueue).safeCast(StatusMonitor.class).map(toModel()).toList();
         return model().add("executors", executors);
     }
 
-    private Callable1<JobExecutor, Model> toModel() {
-        return new Callable1<JobExecutor, Model>() {
+    private Callable1<StatusMonitor, Model> toModel() {
+        return new Callable1<StatusMonitor, Model>() {
             @Override
-            public Model call(JobExecutor executor) throws Exception {
-                return model().add("name", executor.name()).add("size", executor.size());
+            public Model call(StatusMonitor statusMonitor) throws Exception {
+                return model().add("name", statusMonitor.name()).add("size", statusMonitor.size());
             }
         };
     }
-
-
 }
