@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -8,7 +9,8 @@ public class BlockingRetryRejectedExecutionHandler implements RejectedExecutionH
     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
         try {
             executor.getQueue().put(r);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            throw new RejectedExecutionException(e);
         }
     }
 }
