@@ -1,4 +1,9 @@
 package com.googlecode.barongreenback.crawler;
 
-public interface InputHandler extends IExecutor {
+import java.util.concurrent.ExecutorService;
+
+public class InputHandler extends JobExecutor {
+    public InputHandler(ExecutorService executorService) {
+        super(executorService);
+    }
 }

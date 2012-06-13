@@ -21,17 +21,17 @@ import java.util.concurrent.*;
 import static com.googlecode.totallylazy.Runnables.VOID;
 
 public class QueuesCrawler extends AbstractCrawler {
-    private final JobExecutor<InputHandler> inputHandlers;
-    private final JobExecutor<DataMapper> dataMappers;
-    private final JobExecutor<PersistentDataWriter> writers;
+    private final InputHandler inputHandler;
+    private final DataMapper dataMappers;
+    private final PersistentDataWriter writers;
     private final Records records;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
     private final RetryQueue retry;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final BaronGreenbackRecords records, JobExecutor<InputHandler> inputHandlers, JobExecutor<DataMapper> dataMappers, JobExecutor<PersistentDataWriter> writers, CheckPointHandler checkpointHandler, StringMappings mappings, RetryQueue retry) {
+    public QueuesCrawler(final ModelRepository modelRepository, final BaronGreenbackRecords records, InputHandler inputHandler, DataMapper dataMappers, PersistentDataWriter writers, CheckPointHandler checkpointHandler, StringMappings mappings, RetryQueue retry) {
         super(modelRepository);
-        this.inputHandlers = inputHandlers;
+        this.inputHandler = inputHandler;
         this.dataMappers = dataMappers;
         this.writers = writers;
         this.checkpointHandler = checkpointHandler;
@@ -74,12 +74,12 @@ public class QueuesCrawler extends AbstractCrawler {
     }
 
     public Future<?> crawl(StagedJob<Response> job, Container container) {
-        return submit(inputHandlers, job.getInput(container).then(
+        return submit(inputHandler, job.getInput(container).then(
                 submit(dataMappers, processJobs(job.process(container), container).then(
                         submit(writers, job.write(records))))), container);
     }
 
-    private Future<?> submit(JobExecutor<?> jobExecutor, final Runnable runnable, final Container container) {
+    private Future<?> submit(JobExecutor jobExecutor, final Runnable runnable, final Container container) {
         return jobExecutor.executor.submit(new Runnable() {
             @Override
             public void run() {

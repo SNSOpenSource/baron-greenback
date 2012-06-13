@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.persistence.lucene;
 
 import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
+import com.googlecode.lazyrecords.lucene.LucenePool;
 import com.googlecode.lazyrecords.lucene.OptimisedPool;
 import com.googlecode.lazyrecords.lucene.SearcherPool;
 import com.googlecode.yadic.Container;
@@ -20,6 +21,7 @@ public class SearcherPoolActivator implements Callable<SearcherPool> {
 
     @Override
     public SearcherPool call() throws Exception {
+//        return container.create(LucenePool.class);
         try {
             String className = properties.getProperty(PROPERTY_NAME, OptimisedPool.class.getName());
             return container.create(Class.forName(className));

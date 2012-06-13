@@ -1,4 +1,9 @@
 package com.googlecode.barongreenback.crawler;
 
-public interface DataMapper {
+import java.util.concurrent.ExecutorService;
+
+public class DataMapper extends JobExecutor {
+    public DataMapper(ExecutorService executor) {
+        super(executor);
+    }
 }
