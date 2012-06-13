@@ -26,7 +26,7 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(CompositeCrawler.class);
         container.add(CheckPointHandler.class);
-        container.add(Crawler.class, SequentialCrawler.class);
+        container.add(Crawler.class, QueuesCrawler.class);
         container.add(CrawlInterval.class);
         return this;
     }
@@ -36,7 +36,7 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
         container.add(RetryQueue.class);
         container.addInstance(InputHandler.class, new InputHandler(executor(20, 100)));
         container.addInstance(DataMapper.class, new DataMapper(executor(100, 100)));
-        container.addInstance(PersistentDataWriter.class, new PersistentDataWriter(executor(1, new SynchronousQueue<Runnable>(), new ThreadPoolExecutor.AbortPolicy())));
+        container.addInstance(PersistentDataWriter.class, new PersistentDataWriter(executor(1, new SynchronousQueue<Runnable>(true), new BlockingRetryRejectedExecutionHandler())));
         return this;
     }
 
@@ -50,4 +50,5 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
                 0L, TimeUnit.MILLISECONDS,
                 workQueue, policy);
     }
+
 }
