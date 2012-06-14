@@ -1,20 +1,19 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.*;
+import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.yadic.Container;
-import org.w3c.dom.Document;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
-import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 import static java.util.Collections.unmodifiableMap;
@@ -60,11 +59,16 @@ public class HttpJob implements StagedJob<Response> {
     }
 
     @Override
-    public Function1<Sequence<Record>, Number> write(final Records records) {
+    public Function1<Sequence<Record>, Number> write(final Application application) {
         return new Function1<Sequence<Record>, Number>() {
             @Override
-            public Number call(Sequence<Record> newData) throws Exception {
-                return new DataWriter(records).writeUnique(destination(), newData);
+            public Number call(final Sequence<Record> newData) throws Exception {
+                return application.usingRequestScope(new Callable1<Container, Number>() {
+                    @Override
+                    public Number call(Container container) throws Exception {
+                        return new DataWriter(container.get(BaronGreenbackRecords.class).value()).writeUnique(destination(), newData);
+                    }
+                });
             }
         };
     }

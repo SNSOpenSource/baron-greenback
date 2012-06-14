@@ -8,6 +8,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.*;
+import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.*;
@@ -24,12 +25,14 @@ public class QueuesCrawler extends AbstractCrawler {
     private final InputHandler inputHandler;
     private final DataMapper dataMappers;
     private final PersistentDataWriter writers;
-    private final Records records;
+    private final Application application;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
     private final RetryQueue retry;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final BaronGreenbackRecords records, InputHandler inputHandler, DataMapper dataMappers, PersistentDataWriter writers, CheckPointHandler checkpointHandler, StringMappings mappings, RetryQueue retry) {
+    public QueuesCrawler(final ModelRepository modelRepository, final Application application, InputHandler inputHandler,
+                         DataMapper dataMappers, PersistentDataWriter writers, CheckPointHandler checkpointHandler,
+                         StringMappings mappings, RetryQueue retry) {
         super(modelRepository);
         this.inputHandler = inputHandler;
         this.dataMappers = dataMappers;
@@ -37,7 +40,7 @@ public class QueuesCrawler extends AbstractCrawler {
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
         this.retry = retry;
-        this.records = records.value();
+        this.application = application;
     }
 
     @Override
@@ -76,7 +79,7 @@ public class QueuesCrawler extends AbstractCrawler {
     public Future<?> crawl(StagedJob<Response> job, Container container) {
         return submit(inputHandler, job.getInput(container).then(
                 submit(dataMappers, processJobs(job.process(container), container).then(
-                        submit(writers, job.write(records))))), container);
+                        submit(writers, job.write(application))))), container);
     }
 
     private Future<?> submit(JobExecutor jobExecutor, final Runnable runnable, final Container container) {
