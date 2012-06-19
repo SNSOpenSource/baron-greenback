@@ -20,7 +20,7 @@ public class DocumentProcessor {
         Sequence<Record> records = transformData(document, dataSource.definition());
         Sequence<Record> filtered = records.takeWhile(filter).realise();
         merged = mergePreviousUniqueIdentifiers(filtered, dataSource);
-        subfeedJobs = subfeeds(filtered, destination);
+        subfeedJobs = subfeeds(filtered, destination, merged);
     }
 
     public DocumentProcessor(Document document, HttpDataSource dataSource, Definition destination, Object checkpoint) {

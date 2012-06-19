@@ -3,6 +3,7 @@ package com.googlecode.barongreenback;
 import com.googlecode.barongreenback.persistence.PersistenceUri;
 import com.googlecode.barongreenback.persistence.lucene.SearcherPoolActivator;
 import com.googlecode.lazyrecords.lucene.LucenePool;
+import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
@@ -19,7 +20,9 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        PersistenceUri.set(properties, luceneDirectory(new File("/dev/shm/bgb")));
+        File dir = new File("/dev/shm/bgb");
+        Files.delete(dir);
+        PersistenceUri.set(properties, luceneDirectory(dir));
         SearcherPoolActivator.setSearchPool(properties, LucenePool.class);
 //        Waitrest waitrest = serverWithDataFeed();
         Application application = new WebApplication(BasePath.basePath("/"), properties);
@@ -28,9 +31,11 @@ public class ShowAndTell {
                 defaultConfiguration().port(9000));
 
         String definition = Strings.toString(WebApplication.class.getResourceAsStream("BBC.json"));
-        Response response = application.handle(post("crawler/import").form("model", definition).form("action", "Import").build());
+        Response response = application.handle(post("batch/import").form("model", definition).form("action", "Import").build());
         if (response.status().code() >= 400) {
             throw new RuntimeException(String.format("Problem importing BBC.json definition \n%s", response));
         }
+        application.handle(post("crawler/resetAll").build());
+        application.handle(post("crawler/crawlAll").build());
     }
 }

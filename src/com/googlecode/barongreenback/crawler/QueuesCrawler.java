@@ -1,11 +1,9 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Application;
@@ -23,20 +21,20 @@ import static com.googlecode.totallylazy.Runnables.VOID;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final InputHandler inputHandler;
-    private final DataMapper dataMappers;
-    private final PersistentDataWriter writers;
+    private final ProcessHandler processHandler;
+    private final OutputHandler outputHandler;
     private final Application application;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
     private final RetryQueue retry;
 
     public QueuesCrawler(final ModelRepository modelRepository, final Application application, InputHandler inputHandler,
-                         DataMapper dataMappers, PersistentDataWriter writers, CheckPointHandler checkpointHandler,
+                         ProcessHandler processHandler, OutputHandler outputHandler, CheckPointHandler checkpointHandler,
                          StringMappings mappings, RetryQueue retry) {
         super(modelRepository);
         this.inputHandler = inputHandler;
-        this.dataMappers = dataMappers;
-        this.writers = writers;
+        this.processHandler = processHandler;
+        this.outputHandler = outputHandler;
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
         this.retry = retry;
@@ -66,6 +64,12 @@ public class QueuesCrawler extends AbstractCrawler {
         return -1;
     }
 
+    public Future<?> crawl(StagedJob<Response> job, Container container) {
+        return submit(inputHandler, job.getInput(container).then(
+                submit(processHandler, processJobs(job.process(container), container).then(
+                        submit(outputHandler, job.write(application))))), container);
+    }
+
     private Function1<Option<?>, Void> checkpointUpdater(final UUID id, final Model crawler) {
         return new Function1<Option<?>, Void>() {
             @Override
@@ -74,12 +78,6 @@ public class QueuesCrawler extends AbstractCrawler {
                 return VOID;
             }
         };
-    }
-
-    public Future<?> crawl(StagedJob<Response> job, Container container) {
-        return submit(inputHandler, job.getInput(container).then(
-                submit(dataMappers, processJobs(job.process(container), container).then(
-                        submit(writers, job.write(application))))), container);
     }
 
     private Future<?> submit(JobExecutor jobExecutor, final Runnable runnable, final Container container) {
@@ -95,7 +93,6 @@ public class QueuesCrawler extends AbstractCrawler {
             }
         });
     }
-
 
     private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> then) {
         return new Function1<T, Future<?>>() {

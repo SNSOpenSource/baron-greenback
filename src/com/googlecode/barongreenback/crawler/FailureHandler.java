@@ -31,9 +31,9 @@ public class FailureHandler {
 
     public static Response captureFailures(HttpDataSource originalRequest, RetryQueue retryQueue, Response response) {
         if(!response.status().equals(Status.OK)) {
-            System.out.println(
-                    "FAILED REQUEST: " + originalRequest.request() + "\n"
-                    + "RESPONSE: " + response);
+//            System.out.println(
+//                    "FAILED REQUEST: " + originalRequest.request() + "\n"
+//                    + "RESPONSE: " + response);
             retryQueue.value.add(Pair.pair(originalRequest, response));
             return response(Status.NO_CONTENT).build();
         }

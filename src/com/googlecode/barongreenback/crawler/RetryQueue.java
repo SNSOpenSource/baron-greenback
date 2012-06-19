@@ -20,6 +20,11 @@ public class RetryQueue implements StatusMonitor {
     }
 
     @Override
+    public int activeThreads() {
+        return 0;
+    }
+
+    @Override
     public int size() {
         return value.size();
     }

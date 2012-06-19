@@ -66,7 +66,12 @@ public class HttpJob implements StagedJob<Response> {
                 return application.usingRequestScope(new Callable1<Container, Number>() {
                     @Override
                     public Number call(Container container) throws Exception {
-                        return new DataWriter(container.get(BaronGreenbackRecords.class).value()).writeUnique(destination(), newData);
+                        try {
+                            return new DataWriter(container.get(BaronGreenbackRecords.class).value()).writeUnique(destination(), newData);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
             }

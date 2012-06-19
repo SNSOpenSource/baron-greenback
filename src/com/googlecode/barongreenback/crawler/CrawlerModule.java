@@ -26,29 +26,25 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(CompositeCrawler.class);
         container.add(CheckPointHandler.class);
-        container.add(Crawler.class, SequentialCrawler.class);
+        container.add(Crawler.class, QueuesCrawler.class);
         container.add(CrawlInterval.class);
         return this;
     }
 
     @Override
-    public Module addPerApplicationObjects(Container container) throws Exception {
+    public Module addPerApplicationObjects(Container container) throws   Exception {
         container.add(RetryQueue.class);
-        container.addInstance(InputHandler.class, new InputHandler(executor(20, 100)));
-        container.addInstance(DataMapper.class, new DataMapper(executor(100, 100)));
-        container.addInstance(PersistentDataWriter.class, new PersistentDataWriter(executor(1, new SynchronousQueue<Runnable>(true), new BlockingRetryRejectedExecutionHandler())));
+        container.addInstance(InputHandler.class, new InputHandler(executor(200, new LinkedBlockingQueue<Runnable>(100))));
+        container.addInstance(ProcessHandler.class, new ProcessHandler(executor(100, new LinkedBlockingQueue<Runnable>(50))));
+        container.addInstance(OutputHandler.class, new OutputHandler(executor(1, new LinkedBlockingQueue<Runnable>())));
         return this;
     }
 
-    private ThreadPoolExecutor executor(int threads, int capacity) {
-        LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(capacity);
-        return executor(threads, workQueue, new ThreadPoolExecutor.CallerRunsPolicy());
-    }
-
-    private ThreadPoolExecutor executor(int threads, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler policy) {
+    private ThreadPoolExecutor executor(int threads, LinkedBlockingQueue<Runnable> workQueue) {
         return new ThreadPoolExecutor(threads, threads,
                 0L, TimeUnit.MILLISECONDS,
-                workQueue, policy);
+                workQueue,
+                new BlockingRetryRejectedExecutionHandler());
     }
 
 }

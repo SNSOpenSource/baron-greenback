@@ -16,6 +16,15 @@ public class JobExecutor implements StatusMonitor {
     }
 
     @Override
+    public int activeThreads() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor)executor).getActiveCount();
+        }
+
+        return -1;
+    }
+
+    @Override
     public int size() {
         if (executor instanceof ThreadPoolExecutor) {
             return ((ThreadPoolExecutor)executor).getQueue().size();
