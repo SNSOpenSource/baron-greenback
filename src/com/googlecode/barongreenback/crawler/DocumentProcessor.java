@@ -50,7 +50,5 @@ public class DocumentProcessor {
         } else {
             return Sequences.sequence();
         }
-
     }
-
 }

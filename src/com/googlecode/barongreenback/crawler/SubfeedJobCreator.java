@@ -9,7 +9,6 @@ import static com.googlecode.barongreenback.crawler.SubfeedDatasource.dataSource
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Keywords.UNIQUE;
 import static com.googlecode.lazyrecords.Keywords.metadata;
-import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 
