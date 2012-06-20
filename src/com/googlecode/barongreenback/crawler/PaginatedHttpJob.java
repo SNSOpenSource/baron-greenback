@@ -11,10 +11,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.googlecode.barongreenback.crawler.CheckPointStopper.checkpointReached;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
+import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.not;
-import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.Xml.selectContents;
 
 public class PaginatedHttpJob extends HttpJob {
@@ -39,8 +40,12 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> processDocument(Document document) {
-        DocumentProcessor processed = new DocumentProcessor(document, dataSource(), destination(), checkpoint());
-        return cast(Pair.pair(processed.merged(), processed.subfeedJobs().join(nextPageJob(document))));
+        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = SubfeedJobCreator.process(dataSource(), destination(), filterToCheckpoint(transformData(document, dataSource().definition())));
+        return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
+    }
+
+    private Sequence<Record> filterToCheckpoint(Sequence<Record> records) {
+        return records.takeWhile(Predicates.<Record>not(checkpointReached(checkpoint()))).realise();
     }
 
     public Callable1<String, Date> toDateValue() {

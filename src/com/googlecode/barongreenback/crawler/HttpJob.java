@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
+import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static java.util.Collections.unmodifiableMap;
 
@@ -35,6 +36,7 @@ public class HttpJob implements StagedJob<Response> {
         return (HttpDataSource) context.get("dataSource");
     }
 
+    @Override
     public Definition destination() {
         return (Definition) context.get("destination");
     }
@@ -44,8 +46,7 @@ public class HttpJob implements StagedJob<Response> {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
-                final DocumentProcessor processed = new DocumentProcessor(loadDocument(response), dataSource(), destination(), Predicates.<Record>always());
-                return Unchecked.cast(Pair.pair(processed.merged(), processed.subfeedJobs()));
+                return SubfeedJobCreator.process(dataSource(), destination(), transformData(loadDocument(response), dataSource().definition()).realise());
             }
         };
     }

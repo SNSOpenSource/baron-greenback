@@ -4,13 +4,17 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
+import com.googlecode.utterlyidle.Response;
 import org.junit.Test;
 
+import static com.googlecode.barongreenback.crawler.SubfeedDatasource.dataSource;
+import static com.googlecode.barongreenback.crawler.SubfeedJobCreator.process;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keywords.UNIQUE;
 import static com.googlecode.lazyrecords.Keywords.keyword;
@@ -29,11 +33,11 @@ public class SubfeedJobCreatorTest {
                     set(UNIQUE, true));
     public static final Definition SOME_DESTINATION = Definition.constructors.definition(null, null);
     public static final Uri URI = Uri.uri("http://hello.com/");
-    public static final Keyword<String> PREV_UNIQUE = Keywords.keyword("foo", String.class);
+    public static final Keyword<String> PREV_UNIQUE = Keywords.keyword("foo", String.class).metadata(record().set(UNIQUE, true));
 
     @Test
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {
-        Sequence<HttpJob> jobs = SubfeedJobCreator.createSubfeedJobs(one(record().set(LINK, URI)), SOME_DESTINATION, Sequences.<Pair<Keyword<?>, Object>>sequence());
+        Sequence<StagedJob<Response>> jobs = SubfeedJobCreator.createSubfeedJobs(one(record().set(LINK, URI)), SOME_DESTINATION, Sequences.<Pair<Keyword<?>, Object>>sequence());
         assertThat(jobs.size(), NumberMatcher.is(1));
         assertThat(jobs.head().destination(), is(SOME_DESTINATION));
         assertThat(jobs.head().dataSource().uri(), is(URI));
@@ -42,12 +46,13 @@ public class SubfeedJobCreatorTest {
     @Test
     public void shouldPassDownKeyAndValuesToSubfeedJobs() throws Exception {
         Pair<Keyword<?>, Object> previousUnique = cast(Pair.pair(PREV_UNIQUE, "bar"));
-        Sequence<HttpJob> job = SubfeedJobCreator.createSubfeedJobs(one(record().set(LINK, URI)), SOME_DESTINATION, one(previousUnique));
+        Sequence<StagedJob<Response>> job = SubfeedJobCreator.createSubfeedJobs(one(record().set(LINK, URI)), SOME_DESTINATION, one(previousUnique));
         assertThat(((SubfeedDatasource) job.head().dataSource()).uniqueIdentifiers(), is(sequence(previousUnique, Pair.<Keyword<?>, Object>pair(LINK, URI))));
     }
-//    @Test
-//    public void shouldMergeUniqueKeysIntoEachRecord() throws Exception {
-//        Sequence<Record> records = DocumentProcessor.mergePreviousUniqueIdentifiers(one(record().set(PERSON_NAME, "Dan")), SubfeedDatasource.dataSource(null, null, one(Pair.<Keyword<?>, Object>pair(LINK, URI))));
-//        assertThat(records, is(one(record().set(PERSON_NAME, "Dan").set(LINK, URI))));
-//    }
+
+    @Test
+    public void shouldMergeUniqueKeysIntoEachRecord() throws Exception {
+        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> records = process(dataSource(null, null, one(Pair.<Keyword<?>, Object>pair(LINK, URI))), SOME_DESTINATION, one(record().set(PERSON_NAME, "Dan")));
+        assertThat(records.first(), is(one(record().set(PERSON_NAME, "Dan").set(LINK, URI))));
+    }
 }

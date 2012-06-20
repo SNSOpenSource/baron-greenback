@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Function1;
@@ -14,4 +15,6 @@ public interface StagedJob<I> {
     Function1<Sequence<Record>, Number> write(Application application);
 
     HttpDataSource dataSource();
+
+    Definition destination();
 }
