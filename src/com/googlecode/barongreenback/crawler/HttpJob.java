@@ -6,7 +6,6 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.yadic.Container;
 
 import java.util.Map;
@@ -15,7 +14,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
-import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 import static java.util.Collections.unmodifiableMap;
 
 public class HttpJob implements StagedJob<Response> {
@@ -32,19 +30,13 @@ public class HttpJob implements StagedJob<Response> {
         return new HttpJob(context);
     }
 
+    @Override
     public HttpDataSource dataSource() {
         return (HttpDataSource) context.get("dataSource");
     }
 
     public Definition destination() {
         return (Definition) context.get("destination");
-    }
-
-    @Override
-    public Function<Response> getInput(Container container) {
-        return asFunction(container.get(HttpClient.class)).deferApply(
-                get(dataSource().uri()).build()).then(
-                container.get(FailureHandler.class).captureFailures(dataSource()));
     }
 
     @Override

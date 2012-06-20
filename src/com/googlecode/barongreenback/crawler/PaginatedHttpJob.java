@@ -33,12 +33,12 @@ public class PaginatedHttpJob extends HttpJob {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
-                return process(loadDocument(response));
+                return processDocument(loadDocument(response));
             }
         };
     }
 
-    protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> process(Document document) {
+    protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> processDocument(Document document) {
         DocumentProcessor processed = new DocumentProcessor(document, dataSource(), destination(), checkpoint());
         return cast(Pair.pair(processed.merged(), processed.subfeedJobs().join(nextPageJob(document))));
     }

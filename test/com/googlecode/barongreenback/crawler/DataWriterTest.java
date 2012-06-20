@@ -4,6 +4,7 @@ import com.googlecode.lazyrecords.*;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
@@ -12,6 +13,7 @@ import static com.googlecode.totallylazy.Sequences.one;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+@Ignore
 public class DataWriterTest {
 //    @Test
 //    public void shouldWriteDataToRecords() throws Exception {

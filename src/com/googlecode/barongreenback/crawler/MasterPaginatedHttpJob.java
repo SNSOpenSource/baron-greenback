@@ -4,7 +4,9 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
@@ -12,14 +14,10 @@ import org.w3c.dom.Document;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.googlecode.barongreenback.crawler.CheckPointStopper.checkpointReached;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.lazyrecords.Keywords.metadata;
-import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Unchecked.cast;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
@@ -48,7 +46,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
                 container.get(CheckpointUpdater.class).update(
                         selectCheckpoints(document).headOption().map(toDateValue())
                 );
-                return process(document);
+                return processDocument(document);
             }
         };
     }

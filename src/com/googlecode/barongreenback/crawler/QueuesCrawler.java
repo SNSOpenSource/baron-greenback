@@ -65,7 +65,7 @@ public class QueuesCrawler extends AbstractCrawler {
     }
 
     public Future<?> crawl(StagedJob<Response> job, Container container) {
-        return submit(inputHandler, job.getInput(container).then(
+        return submit(inputHandler, new HttpReader().getInput(container, job.dataSource()).then(
                 submit(processHandler, processJobs(job.process(container), container).then(
                         submit(outputHandler, job.write(application))))), container);
     }
