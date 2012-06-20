@@ -11,6 +11,7 @@ import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 
 import java.io.PrintStream;
@@ -18,8 +19,11 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CheckPointStopper.extractCheckpoint;
+import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
+import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Sequences.forwardOnly;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Uri.uri;
 
 public class SequentialCrawler extends AbstractCrawler {
     private final StringMappings mappings;
@@ -68,7 +72,13 @@ public class SequentialCrawler extends AbstractCrawler {
 
     private Number put(final String recordName, final Sequence<Record> recordsToAdd, final Sequence<Keyword<?>> keywords1) {
         Definition definition = Definition.constructors.definition(recordName, keywords1);
-        return new DataWriter(records.value()).writeUnique(definition, recordsToAdd);
+        Number updated = 0;
+        for (Record record : recordsToAdd) {
+            Sequence<Keyword<?>> unique = record.keywords().filter(UNIQUE_FILTER);
+            Number rows = records.value().put(definition, Record.methods.update(using(unique), record));
+            updated = Numbers.add(updated, rows);
+        }
+        return updated;
     }
 
     private Object convertFromString(String checkpoint, String checkpointType) throws Exception {

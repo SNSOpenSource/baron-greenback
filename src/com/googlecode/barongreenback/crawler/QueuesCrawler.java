@@ -5,7 +5,10 @@ import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
@@ -15,8 +18,9 @@ import com.googlecode.yadic.SimpleContainer;
 
 import java.io.PrintStream;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
 
+import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 import static com.googlecode.totallylazy.Runnables.VOID;
 
 public class QueuesCrawler extends AbstractCrawler {
@@ -51,6 +55,13 @@ public class QueuesCrawler extends AbstractCrawler {
 
         HttpDataSource dataSource = HttpDataSource.dataSource(from(crawler), source);
 
+        Container container = crawlContainer(log, new CheckpointUpdater(checkpointUpdater(id, crawler)));
+
+        crawl(masterPaginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), container);
+        return -1;
+    }
+
+    private Container crawlContainer(PrintStream log, CheckpointUpdater checkpointUpdater) {
         Container container = new SimpleContainer();
         container.addInstance(PrintStream.class, log);
         container.add(Auditor.class, PrintAuditor.class);
@@ -58,16 +69,14 @@ public class QueuesCrawler extends AbstractCrawler {
         container.add(HttpClient.class, AuditHandler.class);
         container.addInstance(RetryQueue.class, retry);
         container.add(FailureHandler.class);
-        container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(checkpointUpdater(id, crawler)));
-
-        crawl(MasterPaginatedHttpJob.masterPaginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), container);
-        return -1;
+        container.addInstance(CheckpointUpdater.class, checkpointUpdater);
+        return container;
     }
 
     public Future<?> crawl(StagedJob<Response> job, Container container) {
-        return submit(inputHandler, new HttpReader().getInput(container, job.dataSource()).then(
+        return submit(inputHandler, HttpReader.getInput(container, job.dataSource()).then(
                 submit(processHandler, processJobs(job.process(container), container).then(
-                        submit(outputHandler, job.write(application))))), container);
+                        submit(outputHandler, DataWriter.write(application, job.destination()))))), container);
     }
 
     private Function1<Option<?>, Void> checkpointUpdater(final UUID id, final Model crawler) {

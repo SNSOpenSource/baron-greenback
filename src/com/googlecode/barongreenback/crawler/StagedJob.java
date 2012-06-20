@@ -10,11 +10,9 @@ import com.googlecode.utterlyidle.Application;
 import com.googlecode.yadic.Container;
 
 public interface StagedJob<I> {
-    Function1<I, Pair<Sequence<Record>, Sequence<StagedJob<I>>>> process(Container container);
-
-    Function1<Sequence<Record>, Number> write(Application application);
-
     HttpDataSource dataSource();
 
     Definition destination();
+
+    Function1<I, Pair<Sequence<Record>, Sequence<StagedJob<I>>>> process(Container container);
 }
