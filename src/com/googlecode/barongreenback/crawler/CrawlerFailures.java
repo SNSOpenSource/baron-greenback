@@ -45,4 +45,8 @@ public class CrawlerFailures implements StatusMonitor {
     public Option<Pair<StagedJob<Response>, Response>> get(UUID id) {
         return Option.option(failures.get(id));
     }
+
+    public boolean isEmpty() {
+        return failures.isEmpty();
+    }
 }

@@ -3,11 +3,13 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Runnables;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.annotations.*;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,7 +34,9 @@ public class CrawlerFailureResource {
     @GET
     @Path("failures")
     public Model failures() {
-        return model().add("failures", sequence(crawlerFailures.values().entrySet()).map(toModel()).toList());
+        return model().
+                add("anyExists", !crawlerFailures.isEmpty()).
+                add("failures", sequence(crawlerFailures.values().entrySet()).map(toModel()).toList());
     }
 
     @POST
@@ -46,6 +50,41 @@ public class CrawlerFailureResource {
     public Response ignore(@FormParam("id") UUID id) {
         return crawlerFailures.get(id).map(toIgnore(id)).getOrElse(response(Status.NOT_FOUND));
     }
+
+    @POST
+    @Path("failures/retryAll")
+    public Response retryAll() {
+        sequence(new HashSet<UUID>(crawlerFailures.values().keySet())).each(retry());
+        return backToMe();
+    }
+
+    @POST
+    @Path("failures/ignoreAll")
+    public Response ignoreAll() {
+        sequence(new HashSet<UUID>(crawlerFailures.values().keySet())).each(ignore());
+        return backToMe();
+    }
+
+    private Callable1<UUID, Void> ignore() {
+        return new Callable1<UUID, Void>() {
+            @Override
+            public Void call(UUID uuid) throws Exception {
+                ignore(uuid);
+                return Runnables.VOID;
+            }
+        };
+    }
+
+    private Callable1<UUID, Void> retry() {
+        return new Callable1<UUID, Void>() {
+            @Override
+            public Void call(UUID uuid) throws Exception {
+                retry(uuid);
+                return Runnables.VOID;
+            }
+        };
+    }
+
 
     private Callable1<Pair<StagedJob<Response>, Response>, Response> toIgnore(final UUID id) {
         return new Callable1<Pair<StagedJob<Response>, Response>, Response>() {
