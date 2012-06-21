@@ -1,16 +1,19 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.utterlyidle.Response;
 
 import java.util.*;
 
 public class CrawlerFailures implements StatusMonitor {
-    private final Map<UUID, Pair<StagedJob<Response>, Response>> failures;
-
-    public CrawlerFailures() {
-        this.failures = new HashMap<UUID, Pair<StagedJob<Response>, Response>>();
-    }
+    public static final int MAX_FAILURES = 1000;
+    private final Map<UUID, Pair<StagedJob<Response>, Response>> failures = new LinkedHashMap<UUID, Pair<StagedJob<Response>, Response>>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<UUID, Pair<StagedJob<Response>, Response>> eldest) {
+            return size() > MAX_FAILURES;
+        }
+    };
 
     @Override
     public String name() {
@@ -39,7 +42,7 @@ public class CrawlerFailures implements StatusMonitor {
         failures.remove(id);
     }
 
-    public Pair<StagedJob<Response>, Response> get(UUID id) {
-        return failures.get(id);
+    public Option<Pair<StagedJob<Response>, Response>> get(UUID id) {
+        return Option.option(failures.get(id));
     }
 }

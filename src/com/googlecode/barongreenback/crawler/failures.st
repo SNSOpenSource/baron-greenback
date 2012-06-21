@@ -13,9 +13,10 @@
         <td><a href="$failure.uri$">$failure.uri$</a></td>
         <td><div class="entity">$failure.response$</div></td>
         <td>
-            <form action="/crawler/failures/retry" method="get">
+            <form action="/crawler/failures/retry" method="post">
                 <input type="hidden" name="id" value="$failure.id$"/>
                 <input type="submit" value="retry" class="btn"/>
+                <input type="submit" value="ignore" class="btn danger"/>
             </form>
         </td>
     </tr>
