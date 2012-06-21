@@ -40,7 +40,8 @@ public class CrawlerFailureResource {
             @Override
             public Model call(Map.Entry<UUID, Pair<StagedJob<Response>, Response>> entry) throws Exception {
                 return model().
-                        add("datasource", entry.getValue().first()).
+                        add("job", entry.getValue().first()).
+                        add("uri", entry.getValue().first().dataSource().uri()).
                         add("response", entry.getValue().second()).
                         add("id", entry.getKey());
             }
