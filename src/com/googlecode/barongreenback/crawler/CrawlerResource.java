@@ -151,9 +151,8 @@ public class CrawlerResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response crawl(@FormParam("id") final UUID id) throws Exception {
         PrintStream log = new StringPrintStream();
-        return numberOfRecordsUpdated(crawler.crawl(id, log), log);
+        return numberOfRecordsUpdated(crawler.crawl(id), log);
     }
-
 
     private Sequence<Pair<UUID, Model>> allCrawlerModels() {
         return modelRepository.find(where(MODEL_TYPE, is("form")));

@@ -27,10 +27,10 @@ public class ShowAndTell {
                 application,
                 defaultConfiguration().port(9000));
 
-        String definition = Strings.toString(WebApplication.class.getResourceAsStream("BBC.json"));
-        Response response = application.handle(post("crawler/import").form("model", definition).form("action", "Import").build());
-        if (response.status().code() >= 400) {
-            throw new RuntimeException(String.format("Problem importing BBC.json definition \n%s", response));
-        }
+//        String definition = Strings.toString(WebApplication.class.getResourceAsStream("BBC.json"));
+//        Response response = application.handle(post("crawler/import").form("model", definition).form("action", "Import").build());
+//        if (response.status().code() >= 400) {
+//            throw new RuntimeException(String.format("Problem importing BBC.json definition \n%s", response));
+//        }
     }
 }

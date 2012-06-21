@@ -28,13 +28,14 @@ public class QueuesCrawler extends AbstractCrawler {
     private final ProcessHandler processHandler;
     private final OutputHandler outputHandler;
     private final Application application;
+    private final PrintStream log;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
-    private final RetryQueue retry;
+    private final CrawlerFailures retry;
 
     public QueuesCrawler(final ModelRepository modelRepository, final Application application, InputHandler inputHandler,
                          ProcessHandler processHandler, OutputHandler outputHandler, CheckPointHandler checkpointHandler,
-                         StringMappings mappings, RetryQueue retry) {
+                         StringMappings mappings, CrawlerFailures retry, PrintStream log) {
         super(modelRepository);
         this.inputHandler = inputHandler;
         this.processHandler = processHandler;
@@ -43,10 +44,11 @@ public class QueuesCrawler extends AbstractCrawler {
         this.mappings = mappings;
         this.retry = retry;
         this.application = application;
+        this.log = log;
     }
 
     @Override
-    public Number crawl(final UUID id, PrintStream log) throws Exception {
+    public Number crawl(final UUID id) throws Exception {
         final Model crawler = crawlerFor(id);
         Definition source = sourceDefinition(crawler);
         Definition destination = destinationDefinition(crawler);
@@ -55,27 +57,27 @@ public class QueuesCrawler extends AbstractCrawler {
 
         HttpDataSource dataSource = HttpDataSource.dataSource(from(crawler), source);
 
-        Container container = crawlContainer(log, new CheckpointUpdater(checkpointUpdater(id, crawler)));
+        CheckpointUpdater checkpointUpdater = new CheckpointUpdater(checkpointUpdater(id, crawler));
 
-        crawl(masterPaginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings), container);
+        crawl(masterPaginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings, checkpointUpdater));
         return -1;
     }
 
-    private Container crawlContainer(PrintStream log, CheckpointUpdater checkpointUpdater) {
+    private Container crawlContainer() {
         Container container = new SimpleContainer();
         container.addInstance(PrintStream.class, log);
         container.add(Auditor.class, PrintAuditor.class);
         container.add(HttpHandler.class, ClientHttpHandler.class);
         container.add(HttpClient.class, AuditHandler.class);
-        container.addInstance(RetryQueue.class, retry);
+        container.addInstance(CrawlerFailures.class, retry);
         container.add(FailureHandler.class);
-        container.addInstance(CheckpointUpdater.class, checkpointUpdater);
         return container;
     }
 
-    public Future<?> crawl(StagedJob<Response> job, Container container) {
-        return submit(inputHandler, HttpReader.getInput(container, job.dataSource()).then(
-                submit(processHandler, processJobs(job.process(container), container).then(
+    public Future<?> crawl(StagedJob<Response> job) {
+        Container container = crawlContainer();
+        return submit(inputHandler, HttpReader.getInput(container, job).then(
+                submit(processHandler, processJobs(job.process(container)).then(
                         submit(outputHandler, DataWriter.write(application, job.destination()))))), container);
     }
 
@@ -112,13 +114,13 @@ public class QueuesCrawler extends AbstractCrawler {
         };
     }
 
-    private <T> Function1<T, Sequence<Record>> processJobs(final Function1<T, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> function, final Container container) {
+    private <T> Function1<T, Sequence<Record>> processJobs(final Function1<T, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> function) {
         return new Function1<T, Sequence<Record>>() {
             @Override
             public Sequence<Record> call(T t) throws Exception {
                 Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = function.call(t);
                 for (StagedJob<Response> job : pair.second()) {
-                    crawl(job, container);
+                    crawl(job);
                 }
                 return pair.first();
             }

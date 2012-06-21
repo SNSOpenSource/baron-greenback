@@ -9,9 +9,9 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 
 public class HttpReader {
-    public static Function<Response> getInput(Container container, HttpDataSource dataSource) {
+    public static Function<Response> getInput(Container container, StagedJob<Response> job) {
         return asFunction(container.get(HttpClient.class)).deferApply(
-                get(dataSource.uri()).build()).then(
-                container.get(FailureHandler.class).captureFailures(dataSource));
+                get(job.dataSource().uri()).build()).then(
+                container.get(FailureHandler.class).captureFailures(job));
     }
 }

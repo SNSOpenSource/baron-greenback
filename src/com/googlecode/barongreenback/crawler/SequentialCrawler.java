@@ -30,17 +30,19 @@ public class SequentialCrawler extends AbstractCrawler {
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
     private final CheckPointHandler checkPointHandler;
+    private final PrintStream log;
 
-    public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler1) {
+    public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler1, PrintStream log) {
         super(modelRepository);
         this.mappings = mappings;
         this.httpClient = httpClient;
         this.records = records;
         this.checkPointHandler = checkPointHandler1;
+        this.log = log;
     }
 
     @Override
-    public Number crawl(UUID id, PrintStream log) throws Exception {
+    public Number crawl(UUID id) throws Exception {
         final Model crawler = crawlerFor(id);
         final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
 

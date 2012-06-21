@@ -2,8 +2,11 @@ package com.googlecode.barongreenback.shared;
 
 
 import com.googlecode.barongreenback.WebApplication;
+import com.googlecode.barongreenback.crawler.HttpDataSource;
+import com.googlecode.barongreenback.crawler.SubfeedDatasource;
 import com.googlecode.barongreenback.search.pager.PagerRenderer;
 import com.googlecode.barongreenback.search.pager.RequestPager;
+import com.googlecode.funclate.Renderer;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.URLs;
@@ -42,6 +45,18 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
         shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer(shared));
+        shared.registerRenderer(instanceOf(HttpDataSource.class), new Renderer<HttpDataSource>() {
+            @Override
+            public String render(HttpDataSource httpDataSource) throws Exception {
+                return "HTTPDDATASOURCES:" + httpDataSource.toString();
+            }
+        });
+        shared.registerRenderer(instanceOf(SubfeedDatasource.class), new Renderer<HttpDataSource>() {
+            @Override
+            public String render(HttpDataSource httpDataSource) throws Exception {
+                return "SUBFEEDS!:" + httpDataSource.toString();
+            }
+        });
         return new EnhancedStringTemplateGroup(baseUrl, shared);
     }
 
@@ -69,5 +84,7 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
     private static String packageName(HierarchicalPath path) {
         return path.segments().init().last();
     }
+
+
 
 }

@@ -21,11 +21,15 @@ import static com.googlecode.totallylazy.Predicates.where;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
-    private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
+    private final CheckpointUpdater checkpointUpdater;
+
+    private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings, CheckpointUpdater checkpointUpdater) {
         super(context, mappings);
+        this.checkpointUpdater = checkpointUpdater;
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDataSource dataSource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDataSource dataSource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, CheckpointUpdater checkpointUpdater) {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("dataSource", dataSource);
         context.put("destination", destination);
@@ -35,7 +39,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         context.put("checkpointXPath", checkpointXPath(dataSource.definition()));
         context.put("checkpointAsString", checkpointAsString(mappings, checkpoint));
 
-        return new MasterPaginatedHttpJob(context, mappings);
+        return new MasterPaginatedHttpJob(context, mappings, checkpointUpdater);
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process(final Container container) {
@@ -43,7 +47,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
                 Document document = loadDocument(response);
-                container.get(CheckpointUpdater.class).update(
+                checkpointUpdater.update(
                         selectCheckpoints(document).headOption().map(toDateValue())
                 );
                 return processDocument(document);
