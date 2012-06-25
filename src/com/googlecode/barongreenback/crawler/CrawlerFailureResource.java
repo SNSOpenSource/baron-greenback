@@ -1,9 +1,8 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.shared.messages.Messages;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Runnables;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -11,9 +10,11 @@ import com.googlecode.utterlyidle.annotations.*;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -33,10 +34,21 @@ public class CrawlerFailureResource {
 
     @GET
     @Path("failures")
-    public Model failures() {
-        return model().
+    public Model failures(@QueryParam("message") Option<String> message) {
+        Model model = model().
                 add("anyExists", !crawlerFailures.isEmpty()).
                 add("failures", sequence(crawlerFailures.values().entrySet()).map(toModel()).toList());
+        message.fold(model, toMessageModel());
+        return model;
+    }
+
+    private Callable2<Model, String, Model> toMessageModel() {
+        return new Callable2<Model, String, Model>() {
+            @Override
+            public Model call(Model model, String s) throws Exception {
+                return model.add("message", model().add("text", s).add("category", "success"));
+            }
+        };
     }
 
     @POST
@@ -54,15 +66,19 @@ public class CrawlerFailureResource {
     @POST
     @Path("failures/retryAll")
     public Response retryAll() {
-        sequence(new HashSet<UUID>(crawlerFailures.values().keySet())).each(retry());
-        return backToMe();
+        Set<UUID> uuids = crawlerFailures.values().keySet();
+        int rowsToDelete = uuids.size();
+        sequence(new HashSet<UUID>(uuids)).each(retry());
+        return backToMe(rowsToDelete + " failures have been added to the job queue");
     }
 
     @POST
     @Path("failures/ignoreAll")
     public Response ignoreAll() {
-        sequence(new HashSet<UUID>(crawlerFailures.values().keySet())).each(ignore());
-        return backToMe();
+        Set<UUID> uuids = crawlerFailures.values().keySet();
+        int rowsToDelete = uuids.size();
+        sequence(new HashSet<UUID>(uuids)).each(ignore());
+        return backToMe(rowsToDelete + " failure(s) have been ignored");
     }
 
     private Callable1<UUID, Void> ignore() {
@@ -91,7 +107,7 @@ public class CrawlerFailureResource {
             @Override
             public Response call(Pair<StagedJob<Response>, Response> stagedJobResponsePair) throws Exception {
                 crawlerFailures.delete(id);
-                return backToMe();
+                return backToMe("Job ignored");
             }
         };
     }
@@ -102,14 +118,14 @@ public class CrawlerFailureResource {
             public Response call(Pair<StagedJob<Response>, Response> failure) throws Exception {
                 crawler.crawl(failure.first());
                 crawlerFailures.delete(id);
-                return backToMe();
+                return backToMe("Job retried");
 
             }
         };
     }
 
-    private Response backToMe() {
-        return redirector.seeOther(method(on(CrawlerFailureResource.class).failures()));
+    private Response backToMe(String message) {
+        return redirector.seeOther(method(on(CrawlerFailureResource.class).failures(some(message))));
     }
 
     private Callable1<Map.Entry<UUID, Pair<StagedJob<Response>, Response>>, Model> toModel() {
