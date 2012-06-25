@@ -21,7 +21,6 @@ public class SearcherPoolActivator implements Callable<SearcherPool> {
 
     @Override
     public SearcherPool call() throws Exception {
-//        return container.create(LucenePool.class);
         try {
             String className = properties.getProperty(PROPERTY_NAME, OptimisedPool.class.getName());
             return container.create(Class.forName(className));
