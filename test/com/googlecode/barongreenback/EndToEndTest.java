@@ -136,7 +136,6 @@ public class EndToEndTest extends ApplicationTests {
 
         JobsListPage jobs = listPage.crawl(name);
         latch.await();
-        Thread.sleep(1000);
         return jobs;
     }
 

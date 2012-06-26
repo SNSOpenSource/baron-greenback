@@ -5,10 +5,13 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Application;
+import com.googlecode.yadic.Container;
 
-import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
 import static com.googlecode.lazyrecords.Using.using;
@@ -34,5 +37,26 @@ public class DataWriter {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public static Function1<Sequence<Record>, Number> write(final Application application, final Definition destination, final Container crawlContainer) {
+        return new Function1<Sequence<Record>, Number>() {
+            @Override
+            public Number call(final Sequence<Record> newData) throws Exception {
+                return application.usingRequestScope(new Callable1<Container, Number>() {
+                    @Override
+                    public Number call(Container container) throws Exception {
+                        try {
+                            Number updated = new DataWriter(container.get(BaronGreenbackRecords.class).value()).writeUnique(destination, newData);
+                            crawlContainer.get(AtomicInteger.class).addAndGet(updated.intValue());
+                            return updated;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+        };
     }
 }

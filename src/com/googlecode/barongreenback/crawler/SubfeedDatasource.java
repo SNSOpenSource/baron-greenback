@@ -11,9 +11,6 @@ public class SubfeedDatasource extends HttpDataSource {
 
     private SubfeedDatasource(Uri uri, Definition source, Sequence<Pair<Keyword<?>, Object>> uniqueIdentifiers) {
         super(uri, source);
-        if(uniqueIdentifiers.isEmpty()) {
-            throw new RuntimeException("Bollocks");
-        }
         this.uniqueIdentifiers = uniqueIdentifiers;
     }
 

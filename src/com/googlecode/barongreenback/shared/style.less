@@ -76,7 +76,7 @@ input.more, a.export, a.import, a.edit, a.cancel, a.download {
     .btn;
 }
 
-input.delete, input.stop, input.reset, input.resetAll, input.deleteAll {
+input.delete, input.stop, input.reset, input.resetAll, input.deleteAll, input.ignore, input.ignoreAll {
     .btn;
     .btn.danger;
 }
@@ -181,7 +181,7 @@ form.search {
     }
 }
 
-form.delete, form.crawl, form.start, form.stop, form.copy, form.reset, form.crawlAll, form.resetAll, form.deleteAll, form.restore, form.backup {
+form.delete, form.crawl, form.start, form.stop, form.copy, form.reset, form.crawlAll, form.resetAll, form.deleteAll, form.restore, form.backup, form.retryAll, form.ignoreAll, form.retry, form.ignore {
     margin: 0;
     padding: 0;
     .inlineBlock;
@@ -313,7 +313,7 @@ div.rowsPerPage {
     }
 }
 
-body.queues {
+body.queues, body.failures  {
     table.results {
         table-layout: fixed;
         td {
@@ -321,10 +321,14 @@ body.queues {
         }
         div.entity {
             height: 2em;
+            white-space: pre;
+        }
+        form {
+            margin-bottom: 0;
         }
     }
+}
 
-    div.entity {
-        white-space: pre;
-    }
+body.failures .Actions {
+    width: 130px;
 }

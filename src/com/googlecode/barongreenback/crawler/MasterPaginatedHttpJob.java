@@ -4,6 +4,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
+import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -21,11 +22,15 @@ import static com.googlecode.totallylazy.Predicates.where;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
-    private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
-        super(context, mappings);
+    private final CheckpointUpdater checkpointUpdater;
+
+    private MasterPaginatedHttpJob(Container container, Map<String, Object> context, StringMappings mappings, CheckpointUpdater checkpointUpdater) {
+        super(container, context, mappings);
+        this.checkpointUpdater = checkpointUpdater;
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDataSource dataSource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(Container container, HttpDataSource dataSource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, CheckpointUpdater checkpointUpdater) {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("dataSource", dataSource);
         context.put("destination", destination);
@@ -35,18 +40,18 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         context.put("checkpointXPath", checkpointXPath(dataSource.definition()));
         context.put("checkpointAsString", checkpointAsString(mappings, checkpoint));
 
-        return new MasterPaginatedHttpJob(context, mappings);
+        return new MasterPaginatedHttpJob(container, context, mappings, checkpointUpdater);
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process(final Container container) {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process() {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
                 Document document = loadDocument(response);
-                container.get(CheckpointUpdater.class).update(
+                checkpointUpdater.update(
                         selectCheckpoints(document).headOption().map(toDateValue())
                 );
-                return processDocument(document);
+                return processDocument(document, container());
             }
         };
     }

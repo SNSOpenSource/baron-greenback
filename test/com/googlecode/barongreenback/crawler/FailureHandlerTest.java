@@ -1,10 +1,10 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.utterlyidle.*;
+import com.googlecode.yadic.SimpleContainer;
 import org.junit.Test;
-
-import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.googlecode.barongreenback.crawler.FailureHandler.captureFailures;
 import static com.googlecode.totallylazy.Pair.pair;
@@ -15,23 +15,24 @@ import static org.junit.Assert.assertThat;
 public class FailureHandlerTest {
     @Test
     public void shouldPlaceOnRetryQueueIfFailed() throws Exception {
-        RetryQueue retryQueue = new RetryQueue();
-        FailureHandler failureHandler = new FailureHandler(retryQueue);
+        CrawlerFailures crawlerFailures = new CrawlerFailures();
+        FailureHandler failureHandler = new FailureHandler(crawlerFailures);
         HttpDataSource dataSource = new HttpDataSource(uri("/any/uri"), null);
         Response originalResponse = ResponseBuilder.response(Status.NOT_FOUND).build();
-        Response response = failureHandler.captureFailures(dataSource, originalResponse);
+        HttpJob expectedJob = HttpJob.job(new SimpleContainer(), dataSource, Definition.constructors.definition(null, null));
+        Response response = failureHandler.captureFailures(expectedJob, originalResponse);
         assertThat(response.entity().toString(), is(""));
         assertThat(response.status(), is(Status.NO_CONTENT));
-        assertThat(retryQueue.value.contains(pair(dataSource, originalResponse)), is(true));
+        assertThat(crawlerFailures.values().values().contains(Pair.<StagedJob<Response>, Response>pair(expectedJob, originalResponse)), is(true));
     }
 
     @Test
     public void shouldReturnOriginalResponseWhenOk() throws Exception {
-        RetryQueue retryQueue = new RetryQueue();
+        CrawlerFailures crawlerFailures = new CrawlerFailures();
         HttpDataSource dataSource = new HttpDataSource(uri("/any/uri"), null);
         Response expectedResponse = ResponseBuilder.response(Status.OK).build();
-        Response response = captureFailures(dataSource, retryQueue, expectedResponse);
+        Response response = captureFailures(HttpJob.job(new SimpleContainer(), dataSource, Definition.constructors.definition(null, null)), crawlerFailures, expectedResponse);
         assertThat(response, is(expectedResponse));
-        assertThat(retryQueue.value.size(), is(0));
+        assertThat(crawlerFailures.values().values().size(), is(0));
     }
 }

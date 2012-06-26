@@ -31,16 +31,18 @@ public class ConcurrentCrawler extends AbstractCrawler {
     private final CheckPointHandler checkPointHandler;
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
+    private final PrintStream log;
 
-    public ConcurrentCrawler(ModelRepository modelRepository, HttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler) {
+    public ConcurrentCrawler(ModelRepository modelRepository, HttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler, PrintStream log) {
         super(modelRepository);
         this.checkPointHandler = checkPointHandler;
         this.httpClient = httpClient;
         this.records = records;
+        this.log = log;
     }
 
     @Override
-    public Number crawl(final UUID id, PrintStream log) throws Exception {
+    public Number crawl(final UUID id) throws Exception {
         final Model crawler = crawlerFor(id);
         final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
         updateView(crawler, keywords(recordDefinition));

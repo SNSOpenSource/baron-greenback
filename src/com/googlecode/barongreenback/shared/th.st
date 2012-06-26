@@ -1,1 +1,1 @@
- <th class="$class$ header">$if (link)$<a href="$link$">$endif$$header$$if(link)$</a>$endif$</th>
+ <th class="$header$ $class$ header">$if (link)$<a href="$link$">$endif$$header$$if(link)$</a>$endif$</th>
