@@ -11,6 +11,7 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.yadic.SimpleContainer;
 import org.junit.Test;
 
 import static com.googlecode.barongreenback.crawler.SubfeedDatasource.dataSource;
@@ -37,7 +38,7 @@ public class SubfeedJobCreatorTest {
 
     @Test
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {
-        Sequence<StagedJob<Response>> jobs = SubfeedJobCreator.createSubfeedJobs(one(record().set(LINK, URI)), SOME_DESTINATION, Sequences.<Pair<Keyword<?>, Object>>sequence());
+        Sequence<StagedJob<Response>> jobs = SubfeedJobCreator.createSubfeedJobs(new SimpleContainer(), one(record().set(LINK, URI)), SOME_DESTINATION, Sequences.<Pair<Keyword<?>, Object>>sequence());
         assertThat(jobs.size(), NumberMatcher.is(1));
         assertThat(jobs.head().destination(), is(SOME_DESTINATION));
         assertThat(jobs.head().dataSource().uri(), is(URI));
@@ -46,13 +47,13 @@ public class SubfeedJobCreatorTest {
     @Test
     public void shouldPassDownKeyAndValuesToSubfeedJobs() throws Exception {
         Pair<Keyword<?>, Object> previousUnique = cast(Pair.pair(PREV_UNIQUE, "bar"));
-        Sequence<StagedJob<Response>> job = SubfeedJobCreator.createSubfeedJobs(one(record().set(LINK, URI)), SOME_DESTINATION, one(previousUnique));
+        Sequence<StagedJob<Response>> job = SubfeedJobCreator.createSubfeedJobs(new SimpleContainer(), one(record().set(LINK, URI)), SOME_DESTINATION, one(previousUnique));
         assertThat(((SubfeedDatasource) job.head().dataSource()).uniqueIdentifiers(), is(sequence(previousUnique, Pair.<Keyword<?>, Object>pair(LINK, URI))));
     }
 
     @Test
     public void shouldMergeUniqueKeysIntoEachRecord() throws Exception {
-        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> records = process(dataSource(null, null, one(Pair.<Keyword<?>, Object>pair(LINK, URI))), SOME_DESTINATION, one(record().set(PERSON_NAME, "Dan")));
+        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> records = process(new SimpleContainer(), dataSource(null, null, one(Pair.<Keyword<?>, Object>pair(LINK, URI))), SOME_DESTINATION, one(record().set(PERSON_NAME, "Dan")));
         assertThat(records.first(), is(one(record().set(PERSON_NAME, "Dan").set(LINK, URI))));
     }
 }

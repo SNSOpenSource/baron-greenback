@@ -5,6 +5,7 @@ import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.yadic.Container;
 
 import static com.googlecode.barongreenback.crawler.SubfeedDatasource.dataSource;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
@@ -15,14 +16,14 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 
 public class SubfeedJobCreator {
-    public static Pair<Sequence<Record>, Sequence<StagedJob<Response>>> process(HttpDataSource dataSource, Definition destination, Sequence<Record> records) {
+    public static Pair<Sequence<Record>, Sequence<StagedJob<Response>>> process(Container container, HttpDataSource dataSource, Definition destination, Sequence<Record> records) {
         return Pair.pair(
                 mergePreviousUniqueIdentifiers(records, dataSource),
-                createSubfeedJobs(records, destination, dataSourceUniques(dataSource)));
+                createSubfeedJobs(container, records, destination, dataSourceUniques(dataSource)));
     }
 
-    public static Sequence<StagedJob<Response>> createSubfeedJobs(Sequence<Record> records, Definition destination, Sequence<Pair<Keyword<?>, Object>> uniques) {
-        return records.flatMap(subfeedsKeywords(destination, uniques));
+    public static Sequence<StagedJob<Response>> createSubfeedJobs(final Container container, Sequence<Record> records, Definition destination, Sequence<Pair<Keyword<?>, Object>> uniques) {
+        return records.flatMap(subfeedsKeywords(container, destination, uniques));
     }
 
     private static Sequence<Record> mergePreviousUniqueIdentifiers(Sequence<Record> records, final HttpDataSource dataSource) {
@@ -41,30 +42,30 @@ public class SubfeedJobCreator {
         return Sequences.sequence();
     }
 
-    private static Callable1<Record, Sequence<StagedJob<Response>>> subfeedsKeywords(final Definition destination, final Sequence<Pair<Keyword<?>, Object>> uniques) {
+    private static Callable1<Record, Sequence<StagedJob<Response>>> subfeedsKeywords(final Container container, final Definition destination, final Sequence<Pair<Keyword<?>, Object>> uniques) {
         return new Callable1<Record, Sequence<StagedJob<Response>>>() {
             public Sequence<StagedJob<Response>> call(final Record record) throws Exception {
                 Sequence<Keyword<?>> subfeedKeywords = record.keywords().filter(where(metadata(RECORD_DEFINITION), is(Predicates.notNullValue()))).realise();
-                return subfeedKeywords.map(toJob(record, destination, uniques));
+                return subfeedKeywords.map(toJob(container, record, destination, uniques));
             }
         };
     }
 
-    private static Callable1<Keyword<?>, StagedJob<Response>> toJob(final Record record, final Definition destination, final Sequence<Pair<Keyword<?>, Object>> uniques) {
+    private static Callable1<Keyword<?>, StagedJob<Response>> toJob(final Container container, final Record record, final Definition destination, final Sequence<Pair<Keyword<?>, Object>> uniques) {
         return new Callable1<Keyword<?>, StagedJob<Response>>() {
             @Override
             public HttpJob call(Keyword<?> keyword) throws Exception {
-                return job(keyword, record, destination, uniques);
+                return job(container, keyword, record, destination, uniques);
             }
         };
     }
 
-    private static HttpJob job(Keyword<?> subfeedKeyword, Record record, Definition destination, Sequence<Pair<Keyword<?>, Object>> uniques) {
+    private static HttpJob job(Container container, Keyword<?> subfeedKeyword, Record record, Definition destination, Sequence<Pair<Keyword<?>, Object>> uniques) {
         Object value = record.get(subfeedKeyword);
         Uri uri = Uri.uri(value.toString());
 
         Sequence<Pair<Keyword<?>, Object>> keysAndValues = uniques.join(record.fields().filter(where(Callables.<Keyword<?>>first(), where(metadata(UNIQUE), is(true))))).realise();
 
-        return HttpJob.job(dataSource(uri, subfeedKeyword.metadata().get(RECORD_DEFINITION).definition(), keysAndValues), destination);
+        return HttpJob.job(container, dataSource(uri, subfeedKeyword.metadata().get(RECORD_DEFINITION).definition(), keysAndValues), destination);
     }
 }

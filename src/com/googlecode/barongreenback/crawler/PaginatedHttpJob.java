@@ -21,26 +21,26 @@ import static com.googlecode.totallylazy.Xml.selectContents;
 public class PaginatedHttpJob extends HttpJob {
     protected StringMappings mappings;
 
-    protected PaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
-        super(context);
+    protected PaginatedHttpJob(Container container, Map<String, Object> context, StringMappings mappings) {
+        super(container, context);
         this.mappings = mappings;
     }
 
-    public static PaginatedHttpJob paginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
-        return new PaginatedHttpJob(context, mappings);
+    public static PaginatedHttpJob paginatedHttpJob(Container container, Map<String, Object> context, StringMappings mappings) {
+        return new PaginatedHttpJob(container, context, mappings);
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process(final Container container) {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process() {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
-                return processDocument(loadDocument(response));
+                return processDocument(loadDocument(response), container());
             }
         };
     }
 
-    protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> processDocument(Document document) {
-        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = SubfeedJobCreator.process(dataSource(), destination(), filterToCheckpoint(transformData(document, dataSource().definition())));
+    protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> processDocument(Document document, Container container) {
+        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = SubfeedJobCreator.process(container, dataSource(), destination(), filterToCheckpoint(transformData(document, dataSource().definition())));
         return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
     }
 
@@ -74,7 +74,7 @@ public class PaginatedHttpJob extends HttpJob {
     private PaginatedHttpJob job(HttpDataSource dataSource) {
         ConcurrentHashMap<String, Object> newContext = new ConcurrentHashMap<String, Object>(context);
         newContext.put("dataSource", dataSource);
-        return paginatedHttpJob(newContext, mappings);
+        return paginatedHttpJob(container(), newContext, mappings);
     }
 
     protected Sequence<String> selectCheckpoints(Document document) {

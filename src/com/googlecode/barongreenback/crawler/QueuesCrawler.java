@@ -5,10 +5,7 @@ import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
@@ -19,6 +16,7 @@ import com.googlecode.yadic.SimpleContainer;
 import java.io.PrintStream;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 import static com.googlecode.totallylazy.Runnables.VOID;
@@ -59,9 +57,15 @@ public class QueuesCrawler extends AbstractCrawler {
 
         CheckpointUpdater checkpointUpdater = new CheckpointUpdater(checkpointUpdater(id, crawler));
 
-        crawl(masterPaginatedHttpJob(dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings, checkpointUpdater));
-        return -1;
+        Container container = crawlContainer();
+
+        crawl(masterPaginatedHttpJob(container, dataSource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings, checkpointUpdater));
+
+        container.get(CountLatch.class).await();
+
+        return container.get(AtomicInteger.class).get();
     }
+
 
     private Container crawlContainer() {
         Container container = new SimpleContainer();
@@ -71,14 +75,15 @@ public class QueuesCrawler extends AbstractCrawler {
         container.add(HttpClient.class, AuditHandler.class);
         container.addInstance(CrawlerFailures.class, retry);
         container.add(FailureHandler.class);
+        container.add(CountLatch.class);
+        container.addInstance(AtomicInteger.class, new AtomicInteger(0));
         return container;
     }
 
     public Future<?> crawl(StagedJob<Response> job) {
-        Container container = crawlContainer();
-        return submit(inputHandler, HttpReader.getInput(container, job).then(
-                submit(processHandler, processJobs(job.process(container)).then(
-                        submit(outputHandler, DataWriter.write(application, job.destination()))))), container);
+        return submit(inputHandler, HttpReader.getInput(job).then(
+                submit(processHandler, processJobs(job.process()).then(
+                        submit(outputHandler, DataWriter.write(application, job.destination(), job.container()), job.container())), job.container())), job.container());
     }
 
     private Function1<Option<?>, Void> checkpointUpdater(final UUID id, final Model crawler) {
@@ -92,6 +97,7 @@ public class QueuesCrawler extends AbstractCrawler {
     }
 
     private Future<?> submit(JobExecutor jobExecutor, final Runnable runnable, final Container container) {
+        container.get(CountLatch.class).countUp();
         return jobExecutor.executor.submit(new Runnable() {
             @Override
             public void run() {
@@ -100,16 +106,25 @@ public class QueuesCrawler extends AbstractCrawler {
                 } catch (RuntimeException e) {
                     e.printStackTrace(container.get(PrintStream.class));
                     throw e;
+                } finally {
+                    container.get(CountLatch.class).countDown();
                 }
             }
         });
     }
 
-    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> then) {
+    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> then, final Container container) {
         return new Function1<T, Future<?>>() {
             @Override
             public Future<?> call(T result) throws Exception {
-                return jobExecutor.executor.submit((Runnable) then.deferApply(result));
+                container.get(CountLatch.class).countUp();
+                return jobExecutor.executor.submit((Runnable) then.deferApply(result).then(new Callable1<Object, Object>() {
+                    @Override
+                    public Object call(Object o) throws Exception {
+                        container.get(CountLatch.class).countDown();
+                        return o;
+                    }
+                }));
             }
         };
     }

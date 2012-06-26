@@ -11,7 +11,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.yadic.Container;
 
-import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
 import static com.googlecode.lazyrecords.Using.using;
@@ -39,7 +39,7 @@ public class DataWriter {
         }
     }
 
-    public static Function1<Sequence<Record>, Number> write(final Application application, final Definition destination) {
+    public static Function1<Sequence<Record>, Number> write(final Application application, final Definition destination, final Container crawlContainer) {
         return new Function1<Sequence<Record>, Number>() {
             @Override
             public Number call(final Sequence<Record> newData) throws Exception {
@@ -47,7 +47,9 @@ public class DataWriter {
                     @Override
                     public Number call(Container container) throws Exception {
                         try {
-                            return new DataWriter(container.get(BaronGreenbackRecords.class).value()).writeUnique(destination, newData);
+                            Number updated = new DataWriter(container.get(BaronGreenbackRecords.class).value()).writeUnique(destination, newData);
+                            crawlContainer.get(AtomicInteger.class).addAndGet(updated.intValue());
+                            return updated;
                         } catch (Exception e) {
                             e.printStackTrace();
                             throw new RuntimeException(e);

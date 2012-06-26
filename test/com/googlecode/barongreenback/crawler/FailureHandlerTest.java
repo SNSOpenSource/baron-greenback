@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.utterlyidle.*;
+import com.googlecode.yadic.SimpleContainer;
 import org.junit.Test;
 
 import static com.googlecode.barongreenback.crawler.FailureHandler.captureFailures;
@@ -18,7 +19,7 @@ public class FailureHandlerTest {
         FailureHandler failureHandler = new FailureHandler(crawlerFailures);
         HttpDataSource dataSource = new HttpDataSource(uri("/any/uri"), null);
         Response originalResponse = ResponseBuilder.response(Status.NOT_FOUND).build();
-        HttpJob expectedJob = HttpJob.job(dataSource, Definition.constructors.definition(null, null));
+        HttpJob expectedJob = HttpJob.job(new SimpleContainer(), dataSource, Definition.constructors.definition(null, null));
         Response response = failureHandler.captureFailures(expectedJob, originalResponse);
         assertThat(response.entity().toString(), is(""));
         assertThat(response.status(), is(Status.NO_CONTENT));
@@ -30,7 +31,7 @@ public class FailureHandlerTest {
         CrawlerFailures crawlerFailures = new CrawlerFailures();
         HttpDataSource dataSource = new HttpDataSource(uri("/any/uri"), null);
         Response expectedResponse = ResponseBuilder.response(Status.OK).build();
-        Response response = captureFailures(HttpJob.job(dataSource, Definition.constructors.definition(null, null)), crawlerFailures, expectedResponse);
+        Response response = captureFailures(HttpJob.job(new SimpleContainer(), dataSource, Definition.constructors.definition(null, null)), crawlerFailures, expectedResponse);
         assertThat(response, is(expectedResponse));
         assertThat(crawlerFailures.values().values().size(), is(0));
     }
