@@ -51,12 +51,14 @@ public class CrawlerResource {
     private final Redirector redirector;
     private final CrawlInterval interval;
     private final Crawler crawler;
+    private final PrintStream log;
 
-    public CrawlerResource(final ModelRepository modelRepository, Redirector redirector, CrawlInterval interval, Crawler crawler) {
+    public CrawlerResource(final ModelRepository modelRepository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log) {
         this.interval = interval;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.crawler = crawler;
+        this.log = log;
     }
 
     @GET
@@ -150,7 +152,6 @@ public class CrawlerResource {
     @Path("crawl")
     @Produces(MediaType.TEXT_PLAIN)
     public Response crawl(@FormParam("id") final UUID id) throws Exception {
-        PrintStream log = new StringPrintStream();
         return numberOfRecordsUpdated(crawler.crawl(id), log);
     }
 

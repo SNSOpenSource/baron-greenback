@@ -65,7 +65,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
         return container.get(AtomicInteger.class).get();
     }
-
+ 
 
     private Container crawlContainer() {
         Container container = new SimpleContainer();

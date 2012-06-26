@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.crawler;
 
-import java.io.PrintStream;
 import java.util.UUID;
 
 public interface Crawler {
