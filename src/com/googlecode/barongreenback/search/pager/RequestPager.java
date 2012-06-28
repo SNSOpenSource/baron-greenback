@@ -18,7 +18,7 @@ public class RequestPager implements Pager {
 
     private int currentPage;
     private String numberOfRowsPerPage;
-    private Number totalRows;
+    private int totalRows;
     private Request request;
 
 
@@ -46,8 +46,8 @@ public class RequestPager implements Pager {
         return "ALL".equalsIgnoreCase(numberOfRowsPerPage) || getCalculatedNumberOfPages() == 1;
     }
 
-    private double getCalculatedNumberOfPages() {
-        return Math.ceil(totalRows.doubleValue() / getRowsPerPageAsInteger());
+    private int getCalculatedNumberOfPages() {
+        return totalRows / getRowsPerPageAsInteger();
     }
 
     private int getRowsPerPageAsInteger() {
@@ -58,7 +58,7 @@ public class RequestPager implements Pager {
         return String.valueOf(numberOfRowsPerPage);
     }
 
-    public Number getTotalRows() {
+    public int getTotalRows() {
         return totalRows;
     }
 
@@ -66,7 +66,7 @@ public class RequestPager implements Pager {
         return currentPage;
     }
 
-    public Number getNumberOfPages() {
+    public int getNumberOfPages() {
         if (isShowingAllPages()) {
             return 1;
         }
@@ -78,7 +78,7 @@ public class RequestPager implements Pager {
     }
 
     public boolean isPaged() {
-        return getNumberOfPages().intValue() > 1;
+        return getNumberOfPages() > 1;
     }
 
     public List<Map.Entry<String, String>> getQueryParametersToUrl() {

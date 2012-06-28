@@ -1,8 +1,10 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import com.googlecode.barongreenback.persistence.ModelMapping;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Records;
+import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -20,7 +22,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 
 public class CachingModelRepositoryTest {
-
     private Records records;
     private ModelCache cache;
     private ModelRepository cachingModelRepository;
@@ -29,7 +30,7 @@ public class CachingModelRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
-        records = new MemoryRecords();
+        records = new MemoryRecords(new StringMappings().add(Model.class, new ModelMapping()));
         cache = new ModelCache();
         cachingModelRepository = new CachingModelRepository(new RecordsModelRepository(BaronGreenbackRecords.records(records)), cache);
         model = Model.model().add("key", "someValue");

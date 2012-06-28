@@ -13,11 +13,11 @@ public interface Pager {
 
     String getRowsPerPage();
 
-    Number getTotalRows();
+    int getTotalRows();
 
     int getCurrentPage();
 
-    Number getNumberOfPages();
+    int getNumberOfPages();
 
     String getQueryStringForPage(int pageNumber);
 

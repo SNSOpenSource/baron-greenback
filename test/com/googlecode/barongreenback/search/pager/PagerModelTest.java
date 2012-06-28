@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.numbers.Numbers.range;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -91,14 +92,15 @@ public class PagerModelTest {
     private Pager pagerWithValues(final Sequence<?> originalSequence, final int currentPage, final int rowsPerPage) {
         return new Pager() {
             public <T> Sequence<T> paginate(Sequence<T> sequence) {
-                return (Sequence<T>) originalSequence.drop((getCurrentPage()-1) * rowsPerPage).take(rowsPerPage);
+                int count = (getCurrentPage() - 1) * rowsPerPage;
+                return originalSequence.<T>unsafeCast().drop(count).take(rowsPerPage);
             }
 
             public String getRowsPerPage() {
                 return String.valueOf(rowsPerPage);
             }
 
-            public Number getTotalRows() {
+            public int getTotalRows() {
                 return originalSequence.size();
             }
 
@@ -106,20 +108,20 @@ public class PagerModelTest {
                 return currentPage;
             }
 
-            public Number getNumberOfPages() {
-                return Math.ceil(getTotalRows().doubleValue() / rowsPerPage);
+            public int getNumberOfPages() {
+                return getTotalRows() / rowsPerPage;
             }
 
             public String getQueryStringForPage(int pageNumber) {
-                return "QS"+pageNumber;
+                return "QS" + pageNumber;
             }
 
             public boolean isPaged() {
-                return getNumberOfPages().intValue() > 1;
+                return getNumberOfPages() > 1;
             }
 
             public List<Map.Entry<String, String>> getQueryParametersToUrl() {
-                return null;  
+                return null;
             }
         };
     }
