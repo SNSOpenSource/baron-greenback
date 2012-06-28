@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
-import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static java.util.Collections.unmodifiableMap;
 
 public class HttpJob implements StagedJob<Response> {
@@ -22,6 +21,7 @@ public class HttpJob implements StagedJob<Response> {
     protected HttpJob(Container container, Map<String, Object> context) {
         this.container = container;
         this.context = unmodifiableMap(context);
+
     }
 
     public static HttpJob job(Container container, HttpDatasource datasource, Definition destination) {
@@ -55,5 +55,4 @@ public class HttpJob implements StagedJob<Response> {
             }
         };
     }
-
 }

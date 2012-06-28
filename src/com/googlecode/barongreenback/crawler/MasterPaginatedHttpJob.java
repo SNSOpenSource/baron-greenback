@@ -26,7 +26,8 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
     }
 
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(Container crawlContainer, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(Container crawlContainer, HttpDatasource datasource,
+                                                                Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("dataSource", datasource);
         context.put("destination", destination);

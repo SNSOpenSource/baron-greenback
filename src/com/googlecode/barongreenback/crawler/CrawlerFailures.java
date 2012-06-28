@@ -21,8 +21,8 @@ public class CrawlerFailures implements StatusMonitor {
     }
 
     @Override
-    public int activeThreads() {
-        return 0;
+    public Option<Integer> activeThreads() {
+        return Option.none();
     }
 
     @Override

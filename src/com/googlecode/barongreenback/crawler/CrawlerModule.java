@@ -42,7 +42,7 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     @Override
     public Module addPerApplicationObjects(Container container) throws   Exception {
         container.add(CrawlerFailures.class);
-        container.addInstance(InputHandler.class, new InputHandler(executor(getRuntime().availableProcessors(), new LinkedBlockingQueue<Runnable>())));
+        container.addInstance(InputHandler.class, new InputHandler(executor(10, new LinkedBlockingQueue<Runnable>())));
         container.addInstance(ProcessHandler.class, new ProcessHandler(executor(1, new LinkedBlockingQueue<Runnable>(50))));
         container.addInstance(OutputHandler.class, new OutputHandler(executor(1, new LinkedBlockingQueue<Runnable>())));
         return this;

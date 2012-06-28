@@ -12,6 +12,7 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import java.util.List;
 
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 @Path("crawler")
@@ -42,7 +43,10 @@ public class CrawlerStatusResource {
         return new Callable1<StatusMonitor, Model>() {
             @Override
             public Model call(StatusMonitor statusMonitor) throws Exception {
-                return model().add("name", statusMonitor.name()).add("size", statusMonitor.size()).add("activeThreads", statusMonitor.activeThreads());
+                return model().
+                        add("name", statusMonitor.name()).
+                        add("size", statusMonitor.size()).
+                        add("activeThreads", statusMonitor.activeThreads().map(asString(Integer.class)).getOrElse("N/A"));
             }
         };
     }

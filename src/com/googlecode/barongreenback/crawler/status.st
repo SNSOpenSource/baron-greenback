@@ -4,11 +4,7 @@
 </head>
 <body>
 <table>
-    <tr>
-        <th>Name</th>
-        <th>Active Threads</th>
-        <th>Queued Jobs</th>
-    </tr>
+    $thead(headers=["Name", "Active Threads", "Queued Jobs" ])$
     $executors : {executor |
     <tr>
         <td>$executor.name$</td>

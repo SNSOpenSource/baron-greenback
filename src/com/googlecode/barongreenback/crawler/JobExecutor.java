@@ -1,7 +1,12 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.totallylazy.Option;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Some.some;
 
 public class JobExecutor implements StatusMonitor {
     public final ExecutorService executor;
@@ -16,12 +21,12 @@ public class JobExecutor implements StatusMonitor {
     }
 
     @Override
-    public int activeThreads() {
+    public Option<Integer> activeThreads() {
         if (executor instanceof ThreadPoolExecutor) {
-            return ((ThreadPoolExecutor)executor).getActiveCount();
+            return Option.some(((ThreadPoolExecutor) executor).getActiveCount());
         }
 
-        return -1;
+        return none();
     }
 
     @Override

@@ -61,7 +61,9 @@ public class PaginatedHttpJob extends HttpJob {
 
     public Option<PaginatedHttpJob> nextPageJob(Document document) {
         if (Strings.isEmpty(moreXPath())) return none();
-        Uri moreUri = Uri.uri(selectContents(document, moreXPath()));
+        String value = selectContents(document, moreXPath());
+        if(Strings.isEmpty(value)) return none();
+        Uri moreUri = Uri.uri(value);
 
         if (!containsCheckpoint(document)) {
             return Option.some(job(dataSource().uri(moreUri)));
