@@ -23,6 +23,10 @@ public class CheckPointStopper implements Feeder<Uri> {
         this.feeder = feeder;
     }
 
+    public static Sequence<Record> stopAt(Object checkpoint, Sequence<Record> records) {
+        return records.takeWhile(not(CheckPointStopper.checkpointReached(checkpoint))).realise();
+    }
+
     public Sequence<Record> get(Uri source, RecordDefinition definition) throws Exception {
         return feeder.get(source, definition).
                 takeWhile(not(checkpointReached(currentCheckPoint)));

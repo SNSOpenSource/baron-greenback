@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 
 import java.util.UUID;
@@ -17,7 +16,7 @@ public class CheckpointUpdater {
         this.crawler = crawler;
     }
 
-    public void update(Option<?> checkooint) throws Exception {
-        checkpointHandler.updateCheckPoint(id, crawler, checkooint);
+    public void update(Option<?> checkpoint) throws Exception {
+        checkpointHandler.updateCheckPoint(id, crawler, checkpoint);
     }
 }

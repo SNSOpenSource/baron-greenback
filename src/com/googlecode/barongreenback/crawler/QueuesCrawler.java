@@ -101,18 +101,22 @@ public class QueuesCrawler extends AbstractCrawler {
         });
     }
 
-    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> then, final Container container) {
+    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable, final Container container) {
         return new Function1<T, Future<?>>() {
             @Override
             public Future<?> call(T result) throws Exception {
                 container.get(CountLatch.class).countUp();
-                return jobExecutor.executor.submit((Runnable) then.deferApply(result).then(new Callable1<Object, Object>() {
+                return jobExecutor.executor.submit((Runnable) runnable.deferApply(result).then(countLatchDown()));
+            }
+
+            private Callable1<Object, Object> countLatchDown() {
+                return new Callable1<Object, Object>() {
                     @Override
                     public Object call(Object o) throws Exception {
                         container.get(CountLatch.class).countDown();
                         return o;
                     }
-                }));
+                };
             }
         };
     }

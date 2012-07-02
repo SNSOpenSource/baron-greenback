@@ -12,13 +12,13 @@ import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class CheckPointStopper2Test {
+public class CheckPointStopperTest {
     @Test
     public void stopsOnceCheckPointIsReached() throws Exception {
         Keyword<String> name = Keywords.keyword("name", String.class).metadata(record().set(CompositeCrawler.CHECKPOINT, true));
         Record dan = record().set(name, "Dan");
         Sequence<Record> allRecords = Sequences.sequence(dan, record().set(name, "Raymond"));
-        Sequence<Record> result = CheckPointStopper2.stopAt("Raymond", allRecords);
+        Sequence<Record> result = CheckPointStopper.stopAt("Raymond", allRecords);
         assertThat(result, is(one(dan)));
     }
 }

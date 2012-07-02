@@ -11,11 +11,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.googlecode.barongreenback.crawler.CheckPointStopper.checkpointReached;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Xml.selectContents;
 
 public class PaginatedHttpJob extends HttpJob {
@@ -41,13 +39,9 @@ public class PaginatedHttpJob extends HttpJob {
 
     protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> processDocument(Document document, Container container) {
         Sequence<Record> events = transformData(document, dataSource().source());
-        Sequence<Record> filtered = filterToCheckpoint(events);
+        Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
         Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = SubfeedJobCreator.process(container, dataSource(), destination(), filtered);
         return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
-    }
-
-    private Sequence<Record> filterToCheckpoint(Sequence<Record> records) {
-        return records.takeWhile(Predicates.<Record>not(checkpointReached(checkpoint()))).realise();
     }
 
     public Callable1<String, Date> toDateValue() {
@@ -62,7 +56,7 @@ public class PaginatedHttpJob extends HttpJob {
     public Option<PaginatedHttpJob> nextPageJob(Document document) {
         if (Strings.isEmpty(moreXPath())) return none();
         String value = selectContents(document, moreXPath());
-        if(Strings.isEmpty(value)) return none();
+        if (Strings.isEmpty(value)) return none();
         Uri moreUri = Uri.uri(value);
 
         if (!containsCheckpoint(document)) {
