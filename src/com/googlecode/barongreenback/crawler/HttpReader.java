@@ -9,7 +9,7 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 
 public class HttpReader {
-    public static Function<Response> getInput(StagedJob<Response> job) {
+    public static Function<Response> getInput(StagedJob job) {
         Uri uri = job.dataSource().uri();
         return asFunction(job.container().get(HttpClient.class)).deferApply(
                 get(uri).build()).then(

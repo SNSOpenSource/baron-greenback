@@ -62,7 +62,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
         return crawlContainer.get(AtomicInteger.class).get();
     }
- 
+
 
     private Container crawlContainer(UUID id, Model crawler) {
         Container container = new SimpleContainer();
@@ -78,7 +78,7 @@ public class QueuesCrawler extends AbstractCrawler {
         return container;
     }
 
-    public Future<?> crawl(StagedJob<Response> job) {
+    public Future<?> crawl(StagedJob job) {
         return submit(inputHandler, HttpReader.getInput(job).then(
                 submit(processHandler, processJobs(job.process()).then(
                         submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
@@ -86,7 +86,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
     private Future<?> submit(JobExecutor jobExecutor, final Runnable function, final Container container) {
         container.get(CountLatch.class).countUp();
-        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function, container), container));
+        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function, container.get(CountLatch.class)), container.get(PrintStream.class)));
     }
 
     private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable, final Container container) {
@@ -98,39 +98,39 @@ public class QueuesCrawler extends AbstractCrawler {
         };
     }
 
-    private Runnable countLatchDownAfter(final Runnable function, final Container container) {
+    private Runnable countLatchDownAfter(final Runnable function, final CountLatch countLatch) {
         return new Runnable() {
             @Override
             public void run() {
                 try {
                     function.run();
                 } finally {
-                    container.get(CountLatch.class).countDown();
+                    countLatch.countDown();
                 }
             }
         };
     }
 
-    private Runnable logExceptions(final Runnable runnable, final Container container) {
+    private Runnable logExceptions(final Runnable function, final PrintStream printStream) {
         return new Runnable() {
             @Override
             public void run() {
                 try {
-                    runnable.run();
+                    function.run();
                 } catch (RuntimeException e) {
-                    e.printStackTrace(container.get(PrintStream.class));
+                    e.printStackTrace(printStream);
                     throw e;
                 }
             }
         };
     }
 
-    private <T> Function1<T, Sequence<Record>> processJobs(final Function1<T, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> function) {
+    private <T> Function1<T, Sequence<Record>> processJobs(final Function1<T, Pair<Sequence<Record>, Sequence<StagedJob>>> function) {
         return new Function1<T, Sequence<Record>>() {
             @Override
             public Sequence<Record> call(T t) throws Exception {
-                Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = function.call(t);
-                for (StagedJob<Response> job : pair.second()) {
+                Pair<Sequence<Record>, Sequence<StagedJob>> pair = function.call(t);
+                for (StagedJob job : pair.second()) {
                     crawl(job);
                 }
                 return pair.first();

@@ -40,10 +40,10 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         return new MasterPaginatedHttpJob(crawlContainer, context, mappings);
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process() {
-        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process() {
+        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
-            public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
+            public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
                 Document document = loadDocument(response);
                 container().get(CheckpointUpdater.class).update(
                         selectCheckpoints(document).headOption().map(toDateValue())

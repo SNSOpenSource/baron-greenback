@@ -28,19 +28,19 @@ public class PaginatedHttpJob extends HttpJob {
         return new PaginatedHttpJob(container, context, mappings);
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process() {
-        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process() {
+        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
-            public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
+            public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
                 return processDocument(loadDocument(response), container());
             }
         };
     }
 
-    protected Pair<Sequence<Record>, Sequence<StagedJob<Response>>> processDocument(Document document, Container container) {
+    protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Document document, Container container) {
         Sequence<Record> events = transformData(document, dataSource().source());
         Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
-        Pair<Sequence<Record>, Sequence<StagedJob<Response>>> pair = SubfeedJobCreator.process(container, dataSource(), destination(), filtered);
+        Pair<Sequence<Record>, Sequence<StagedJob>> pair = SubfeedJobCreator.process(container, dataSource(), destination(), filtered);
         return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
     }
 

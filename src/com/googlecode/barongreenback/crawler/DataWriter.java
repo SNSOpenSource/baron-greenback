@@ -41,7 +41,7 @@ public class DataWriter {
         return 0;
     }
 
-    public static Function1<Sequence<Record>, Number> write(final Application application, final StagedJob<Response> job) {
+    public static Function1<Sequence<Record>, Number> write(final Application application, final StagedJob job) {
         return new Function1<Sequence<Record>, Number>() {
             @Override
             public Number call(final Sequence<Record> newData) throws Exception {

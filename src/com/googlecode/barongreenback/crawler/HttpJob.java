@@ -14,7 +14,7 @@ import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static java.util.Collections.unmodifiableMap;
 
-public class HttpJob implements StagedJob<Response> {
+public class HttpJob implements StagedJob {
     protected final Map<String, Object> context;
     private final Container container;
 
@@ -47,10 +47,10 @@ public class HttpJob implements StagedJob<Response> {
     }
 
     @Override
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>> process() {
-        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob<Response>>>>() {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process() {
+        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
-            public Pair<Sequence<Record>, Sequence<StagedJob<Response>>> call(Response response) throws Exception {
+            public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
                 return SubfeedJobCreator.process(container, dataSource(), destination(), transformData(loadDocument(response), dataSource().source()).realise());
             }
         };

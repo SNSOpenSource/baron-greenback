@@ -23,7 +23,7 @@ public class FailureHandlerTest {
         Response response = failureHandler.captureFailures(expectedJob, originalResponse);
         assertThat(response.entity().toString(), is(""));
         assertThat(response.status(), is(Status.NO_CONTENT));
-        assertThat(crawlerFailures.values().values().contains(Pair.<StagedJob<Response>, Response>pair(expectedJob, originalResponse)), is(true));
+        assertThat(crawlerFailures.values().values().contains(Pair.<StagedJob, Response>pair(expectedJob, originalResponse)), is(true));
     }
 
     @Test

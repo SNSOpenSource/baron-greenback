@@ -14,7 +14,7 @@ public class FailureHandler {
         this.crawlerFailures = crawlerFailures;
     }
 
-    public Function1<Response, Response> captureFailures(final StagedJob<Response> job) {
+    public Function1<Response, Response> captureFailures(final StagedJob job) {
         return new Function1<Response, Response>() {
             @Override
             public Response call(Response response) throws Exception {
@@ -23,11 +23,11 @@ public class FailureHandler {
         };
     }
 
-    public Response captureFailures(StagedJob<Response> job, Response response) {
+    public Response captureFailures(StagedJob job, Response response) {
         return captureFailures(job, crawlerFailures, response);
     }
 
-    public static Response captureFailures(StagedJob<Response> job, CrawlerFailures crawlerFailures, Response response) {
+    public static Response captureFailures(StagedJob job, CrawlerFailures crawlerFailures, Response response) {
         if(!response.status().equals(Status.OK)) {
             crawlerFailures.add(Pair.pair(job, response));
             return response(Status.NO_CONTENT).build();
