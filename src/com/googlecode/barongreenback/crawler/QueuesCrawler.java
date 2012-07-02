@@ -84,9 +84,35 @@ public class QueuesCrawler extends AbstractCrawler {
                         submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
     }
 
-    private Future<?> submit(JobExecutor jobExecutor, final Runnable runnable, final Container container) {
+    private Future<?> submit(JobExecutor jobExecutor, final Runnable function, final Container container) {
         container.get(CountLatch.class).countUp();
-        return jobExecutor.executor.submit(new Runnable() {
+        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function, container), container));
+    }
+
+    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable, final Container container) {
+        return new Function1<T, Future<?>>() {
+            @Override
+            public Future<?> call(T result) throws Exception {
+                return submit(jobExecutor, runnable.deferApply(result), container);
+            }
+        };
+    }
+
+    private Runnable countLatchDownAfter(final Runnable function, final Container container) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    function.run();
+                } finally {
+                    container.get(CountLatch.class).countDown();
+                }
+            }
+        };
+    }
+
+    private Runnable logExceptions(final Runnable runnable, final Container container) {
+        return new Runnable() {
             @Override
             public void run() {
                 try {
@@ -94,29 +120,7 @@ public class QueuesCrawler extends AbstractCrawler {
                 } catch (RuntimeException e) {
                     e.printStackTrace(container.get(PrintStream.class));
                     throw e;
-                } finally {
-                    container.get(CountLatch.class).countDown();
                 }
-            }
-        });
-    }
-
-    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable, final Container container) {
-        return new Function1<T, Future<?>>() {
-            @Override
-            public Future<?> call(T result) throws Exception {
-                container.get(CountLatch.class).countUp();
-                return jobExecutor.executor.submit((Runnable) runnable.deferApply(result).then(countLatchDown()));
-            }
-
-            private Callable1<Object, Object> countLatchDown() {
-                return new Callable1<Object, Object>() {
-                    @Override
-                    public Object call(Object o) throws Exception {
-                        container.get(CountLatch.class).countDown();
-                        return o;
-                    }
-                };
             }
         };
     }
