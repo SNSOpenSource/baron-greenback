@@ -66,10 +66,10 @@ public class DataWriter {
     }
 
     private Sequence<Keyword<?>> checkOnlyOne(Sequence<Keyword<?>> uniques) {
-        if(uniques.size() != 1) {
-            throw new IllegalStateException("There should be exactly 1 unique field, instead there are " + uniques.size() + " (" + uniques + ").\n" +
-                    "Please correct the crawler definition.");
-        }
+//        if(uniques.size() != 1) {
+//            throw new IllegalStateException("There should be exactly 1 unique field, instead there are " + uniques.size() + " (" + uniques + ").\n" +
+//                    "Please correct the crawler definition.");
+//        }
         return uniques;
     }
 }

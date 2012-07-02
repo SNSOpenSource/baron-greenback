@@ -21,11 +21,7 @@ public class SubfeedJobCreator {
     }
 
     public static Sequence<StagedJob> createSubfeedJobs(final Container container, Sequence<Record> records, Definition destination, Sequence<Pair<Keyword<?>, Object>> data) {
-        Sequence<StagedJob> realise = records.flatMap(subfeedsKeywords(container, destination, data)).unique(uri()).realise();
-        for (StagedJob job : realise) {
-            System.out.println("job.dataSource().uri = " + job.dataSource().uri());
-        }
-        return realise;
+        return records.flatMap(subfeedsKeywords(container, destination, data)).unique(uri()).realise();
     }
 
     private static Sequence<Record> mergePreviousData(Sequence<Record> records, final HttpDatasource datasource) {
