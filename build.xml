@@ -34,7 +34,7 @@
     </path>
 
     <target name="update" description="Updates library dependencies">
-        <!--<install version="40"/>-->
+        <install version="48"/>
         <parallel>
             <update dependencies="build/build.dependencies"
                     directory="${build.dependencies.dir}"/>
