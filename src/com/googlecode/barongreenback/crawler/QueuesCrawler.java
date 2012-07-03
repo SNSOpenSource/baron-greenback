@@ -1,8 +1,10 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.ModelRepository;
+import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.CountLatch;
@@ -21,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
+import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final InputHandler inputHandler;
@@ -51,6 +54,7 @@ public class QueuesCrawler extends AbstractCrawler {
         final Model crawler = crawlerFor(id);
         Definition source = sourceDefinition(crawler);
         Definition destination = destinationDefinition(crawler);
+        checkOnlyOne(destination);
 
         updateView(crawler, destination.fields());
 
@@ -138,5 +142,14 @@ public class QueuesCrawler extends AbstractCrawler {
                 return pair.first();
             }
         };
+    }
+
+    private Sequence<Keyword<?>> checkOnlyOne(Definition definition) {
+        Sequence<Keyword<?>> uniques = definition.fields().filter(RecordDefinition.UNIQUE_FILTER);
+        if(uniques.size() != 1) {
+            throw new IllegalStateException("There should be exactly 1 unique field, instead there are " + uniques.size() + " (" + uniques + ").\n" +
+                    "Please correct the crawler definition.");
+        }
+        return uniques;
     }
 }

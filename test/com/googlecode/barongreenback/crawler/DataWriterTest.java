@@ -31,20 +31,4 @@ public class DataWriterTest {
         Sequence<Record> result = records.get(children);
         assertThat(result, is(one(expected)));
     }
-
-    @Test
-    @Ignore("Need to discuss aliased keywords")
-    public void shouldBeExactlyOneUniqueField() {
-        Records records = new MemoryRecords();
-        Keyword<String> field1 = Keywords.keyword("field1", String.class).metadata(record().set(Keywords.UNIQUE, true));
-        Keyword<String> field2 = Keywords.keyword("field2", String.class).metadata(record().set(Keywords.UNIQUE, true));
-        Definition children = definition("children", field1, field2);
-        Record record = record().set(field1, "some value").set(field2, "some other value");
-        try {
-            new DataWriter(records, new StringPrintStream()).writeUnique(children, one(record));
-            fail("An " + IllegalStateException.class.getSimpleName() + " exception should have been thrown");
-        } catch (Exception e) {
-            assertThat(e.getCause(), instanceOf(IllegalStateException.class));
-        }
-    }
 }

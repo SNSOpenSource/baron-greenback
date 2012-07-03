@@ -8,6 +8,7 @@ import com.googlecode.barongreenback.queues.CountDownCompleter;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.matchers.Matchers;
@@ -21,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
@@ -123,7 +125,7 @@ public class EndToEndTest extends ApplicationTests {
 
     private CrawlerListPage importCrawler(String filename) throws Exception {
         CrawlerImportPage crawlerImportPage = new CrawlerImportPage(browser);
-        return crawlerImportPage.importCrawler(Strings.toString(EndToEndTest.class.getResourceAsStream(filename)));
+        return crawlerImportPage.importCrawler(Strings.toString(EndToEndTest.class.getResourceAsStream(filename)), Option.<UUID>none());
     }
 
     private JobsListPage crawlSampleData(CrawlerListPage listPage, String name) throws Exception {
