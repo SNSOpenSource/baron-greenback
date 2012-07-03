@@ -47,7 +47,7 @@ public class RequestPager implements Pager {
     }
 
     private int getCalculatedNumberOfPages() {
-        return totalRows / getRowsPerPageAsInteger();
+        return (int) Math.ceil((double) totalRows / getRowsPerPageAsInteger());
     }
 
     private int getRowsPerPageAsInteger() {

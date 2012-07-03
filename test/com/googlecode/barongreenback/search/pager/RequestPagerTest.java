@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RequestPagerTest {
-
     @Test
     public void defaultsTheCurrentPageAndRows() throws Exception {
         Request request = RequestBuilder.get("/somePath").build();
@@ -75,6 +74,15 @@ public class RequestPagerTest {
         assertThat(paginatedSequence, is(sequence));
         assertThat(pager.getTotalRows(), is(sequence.size()));
         assertThat(pager.getNumberOfPages(), NumberMatcher.is(1));
+    }
+
+    @Test
+    public void calculatesCorrectPagesWhenAllRowsAreOnOnePage() throws Exception {
+        Pager pager = new RequestPager(requestForCurrentPageAndRows(1, 20).build());
+        Sequence<Number> sequence = range(1, 10);
+
+        pager.paginate(sequence);
+        assertThat(pager.getNumberOfPages(), is(1));
     }
 
     private String removeLeadingQuestionMark(Pager pager) {
