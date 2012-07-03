@@ -7,8 +7,8 @@ import java.util.concurrent.Callable;
 
 public class CrawlerActivator implements Callable<Crawler> {
     private static final String PROPERTY_NAME = "crawler.class.name";
-//    private static final Class<?> DEFAULT = QueuesCrawler.class;
-    private static final Class<?> DEFAULT = SequentialCrawler.class;
+    private static final Class<?> DEFAULT = QueuesCrawler.class;
+//    private static final Class<?> DEFAULT = SequentialCrawler.class;
     private final BaronGreenbackProperties properties;
     private final Container container;
 

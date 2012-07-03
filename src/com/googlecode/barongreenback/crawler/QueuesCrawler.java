@@ -5,10 +5,12 @@ import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.CountLatch;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.*;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.SimpleContainer;
@@ -64,6 +66,12 @@ public class QueuesCrawler extends AbstractCrawler {
     }
 
 
+    public Future<?> crawl(StagedJob job) {
+        return submit(inputHandler, HttpReader.getInput(job).then(
+                submit(processHandler, processJobs(job.process()).then(
+                        submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
+    }
+
     private Container crawlContainer(UUID id, Model crawler) {
         Container container = new SimpleContainer();
         container.addInstance(PrintStream.class, log);
@@ -76,12 +84,6 @@ public class QueuesCrawler extends AbstractCrawler {
         container.addInstance(AtomicInteger.class, new AtomicInteger(0));
         container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(checkpointHandler, id, crawler));
         return container;
-    }
-
-    public Future<?> crawl(StagedJob job) {
-        return submit(inputHandler, HttpReader.getInput(job).then(
-                submit(processHandler, processJobs(job.process()).then(
-                        submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
     }
 
     private Future<?> submit(JobExecutor jobExecutor, final Runnable function, final Container container) {
