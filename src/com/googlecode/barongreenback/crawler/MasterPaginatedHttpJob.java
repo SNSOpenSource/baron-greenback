@@ -4,13 +4,12 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,10 +43,12 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                Document document = loadDocument(response);
-                container().get(CheckpointUpdater.class).update(
-                        selectCheckpoints(document).headOption().map(toDateValue())
-                );
+                Option<Document> document = loadDocument(response);
+
+                for (Document doc : document) {
+                    container().get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
+                }
+
                 return processDocument(document, container());
             }
         };

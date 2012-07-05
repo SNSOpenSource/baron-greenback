@@ -16,6 +16,7 @@ import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Predicates.some;
 import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.Uri.functions.uri;
@@ -43,7 +44,7 @@ public class PaginatedHttpJob extends HttpJob {
         };
     }
 
-    protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Document document, Container container) {
+    protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document, Container container) {
         Sequence<Record> events = transformData(document, dataSource().source());
         Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
         Pair<Sequence<Record>, Sequence<StagedJob>> pair = SubfeedJobCreator.process(container, dataSource(), destination(), filtered);
@@ -59,10 +60,14 @@ public class PaginatedHttpJob extends HttpJob {
         };
     }
 
-    public Option<PaginatedHttpJob> nextPageJob(Document document) {
-        if (containsCheckpoint(document)) return none();
-
-        return moreUri(document).map(toJob());
+    public Option<PaginatedHttpJob> nextPageJob(Option<Document> document) {
+        return document.flatMap(new Callable1<Document, Option<PaginatedHttpJob>>() {
+            @Override
+            public Option<PaginatedHttpJob> call(Document document) throws Exception {
+                if (containsCheckpoint(document)) return none();
+                return moreUri(document).map(toJob());
+            }
+        });
     }
 
     private Callable1<Uri, PaginatedHttpJob> toJob() {
