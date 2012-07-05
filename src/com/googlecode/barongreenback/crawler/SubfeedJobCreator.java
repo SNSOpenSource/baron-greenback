@@ -4,7 +4,6 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.*;
-import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
@@ -21,7 +20,7 @@ public class SubfeedJobCreator {
     }
 
     public static Sequence<StagedJob> createSubfeedJobs(final Container container, Sequence<Record> records, Definition destination, Sequence<Pair<Keyword<?>, Object>> data) {
-        return records.flatMap(subfeedsKeywords(container, destination, data)).unique(uri()).realise();
+        return records.flatMap(subfeedsKeywords(container, destination, data)).unique(datasource()).realise();
     }
 
     private static Sequence<Record> mergePreviousData(Sequence<Record> records, final HttpDatasource datasource) {
@@ -42,11 +41,11 @@ public class SubfeedJobCreator {
         };
     }
 
-    private static Callable1<StagedJob, Uri> uri() {
-        return new Callable1<StagedJob, Uri>() {
+    private static Callable1<StagedJob, HttpDatasource> datasource() {
+        return new Callable1<StagedJob, HttpDatasource>() {
             @Override
-            public Uri call(StagedJob job) throws Exception {
-                return job.dataSource().uri();
+            public HttpDatasource call(StagedJob job) throws Exception {
+                return job.dataSource();
             }
         };
     }

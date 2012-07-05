@@ -12,6 +12,7 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.SimpleContainer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.googlecode.barongreenback.crawler.SubfeedJobCreator.process;
@@ -31,7 +32,7 @@ public class SubfeedJobCreatorTest {
             record().
                     set(RecordDefinition.RECORD_DEFINITION, new RecordDefinition(definition("/subfeed", PERSON_NAME))).
                     set(UNIQUE, true));
-    public static final Definition SOME_DESTINATION = Definition.constructors.definition(null, null);
+    public static final Definition SOME_DESTINATION = Definition.constructors.definition("foo", Sequences.<Keyword<?>>empty());
     public static final Uri URI = Uri.uri("http://hello.com/");
     public static final Keyword<String> PREV_UNIQUE = Keywords.keyword("foo", String.class).metadata(record().set(UNIQUE, true));
 
@@ -47,7 +48,7 @@ public class SubfeedJobCreatorTest {
     public void shouldPassDownKeyAndValuesToSubfeedJobs() throws Exception {
         Pair<Keyword<?>, Object> previousUnique = cast(Pair.pair(PREV_UNIQUE, "bar"));
         Sequence<StagedJob> job = SubfeedJobCreator.createSubfeedJobs(new SimpleContainer(), one(record().set(LINK, URI)), SOME_DESTINATION, one(previousUnique));
-        assertThat(((SubfeedDatasource) job.head().dataSource()).data(), is(sequence(previousUnique, Pair.<Keyword<?>, Object>pair(LINK, URI))));
+        assertThat((job.head().dataSource()).data(), is(sequence(previousUnique, Pair.<Keyword<?>, Object>pair(LINK, URI))));
     }
 
     @Test

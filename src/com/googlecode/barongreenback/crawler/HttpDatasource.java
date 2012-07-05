@@ -41,4 +41,14 @@ public class HttpDatasource {
     public Sequence<Pair<Keyword<?>, Object>> data() {
         return Sequences.empty();
     }
+
+    @Override
+    public int hashCode() {
+        return uri().hashCode() * source().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof HttpDatasource) && ((HttpDatasource) obj).uri().equals(uri) && ((HttpDatasource) obj).source().equals(source);
+    }
 }
