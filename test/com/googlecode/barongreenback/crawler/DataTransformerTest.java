@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Xml;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
@@ -21,7 +22,7 @@ public class DataTransformerTest {
     public void shouldConvertSimpleXml() throws Exception {
         Keyword<String> childName = keyword("name", String.class);
         Document document = document("<root><child><name>bob</name></child><child><name>sue</name></child></root>");
-        Sequence<Record> records = DataTransformer.transformData(document, definition("/root/child", childName));
+        Sequence<Record> records = DataTransformer.transformData(Option.some(document), definition("/root/child", childName));
         assertThat(records.size(), NumberMatcher.is(2));
         assertThat(records.head().get(childName), is("bob"));
         assertThat(records.second().get(childName), is("sue"));
@@ -31,14 +32,14 @@ public class DataTransformerTest {
     public void shouldIgnoreUnrelatedXml() throws Exception {
         Keyword<String> childName = keyword("name", String.class);
         Document document = document("<someOtherXml/>");
-        Sequence<Record> records = DataTransformer.transformData(document, definition("/root/child", childName));
+        Sequence<Record> records = DataTransformer.transformData(Option.some(document), definition("/root/child", childName));
         assertThat(records.size(), NumberMatcher.is(0));
     }
 
     @Test
     public void shouldCreateEmptyDocumentForEmptyResponse() throws Exception {
         Response emptyResponse = response().entity("").build();
-        Document document = DataTransformer.loadDocument(emptyResponse);
-        assertThat(Xml.format(document), is(Xml.format(document("<empty/>"))));
+        Option<Document> document = DataTransformer.loadDocument(emptyResponse);
+        assertThat(document.isEmpty(), is(true));
     }
 }

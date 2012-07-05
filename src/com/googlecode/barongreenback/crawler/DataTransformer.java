@@ -2,38 +2,38 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.Records;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Response;
 import org.w3c.dom.Document;
 
-import static com.googlecode.totallylazy.Xml.document;
+import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Sequences.one;
+import static com.googlecode.totallylazy.Strings.empty;
+import static com.googlecode.totallylazy.Xml.functions.document;
 
 public class DataTransformer {
-    private static final Document EMPTY_DOCUMENT = document("<empty/>");
-
-    public static Sequence<Record> transformData(Document document, Definition source) {
-        if(document == EMPTY_DOCUMENT) {
-            return Sequences.empty();
-        }
-        return new DocumentFeeder().get(document, source).map(copy()).realise();
+    public static Sequence<Record> transformData(Option<Document> document, final Definition source) {
+        return document.toSequence().flatMap(toDocumentFeeder(source));
     }
 
-    public static Document loadDocument(Response response) {
-        String entity = response.entity().toString();
-        if (entity.isEmpty()) {
-            return EMPTY_DOCUMENT;
-        }
-        return document(entity);
+    public static Option<Document> loadDocument(Response response) {
+        return one(response.entity().toString()).filter(not(empty())).map(document()).headOption();
     }
 
-    public static Record copy(Record record) {
+    private static Callable1<Document, Sequence<Record>> toDocumentFeeder(final Definition source) {
+        return new Callable1<Document, Sequence<Record>>() {
+            @Override
+            public Sequence<Record> call(Document document) throws Exception {
+                return new DocumentFeeder().get(document, source).map(copy()).realise();
+            }
+        };
+    }
+
+    private static Record copy(Record record) {
         return Record.constructors.record(record.fields());
     }
 
-    public static Function1<Record, Record> copy() {
+    private static Function1<Record, Record> copy() {
         return new Function1<Record, Record>() {
             @Override
             public Record call(Record record) throws Exception {
