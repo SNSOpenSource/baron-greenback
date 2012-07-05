@@ -6,6 +6,7 @@ import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import java.util.Date;
 import java.util.Map;
@@ -14,7 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Xml.selectContents;
+import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Sequences.one;
+import static com.googlecode.totallylazy.Strings.empty;
+import static com.googlecode.totallylazy.Uri.functions.uri;
+import static com.googlecode.totallylazy.Xml.functions.selectContents;
+import static com.googlecode.totallylazy.Xml.functions.selectNodes;
 
 public class PaginatedHttpJob extends HttpJob {
     protected StringMappings mappings;
@@ -54,15 +60,22 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     public Option<PaginatedHttpJob> nextPageJob(Document document) {
-        if (Strings.isEmpty(moreXPath())) return none();
-        String value = selectContents(document, moreXPath());
-        if (Strings.isEmpty(value)) return none();
-        Uri moreUri = Uri.uri(value);
+        if (containsCheckpoint(document)) return none();
 
-        if (!containsCheckpoint(document)) {
-            return Option.some(job(dataSource().uri(moreUri)));
-        }
-        return none();
+        return moreUri(document).map(toJob());
+    }
+
+    private Callable1<Uri, PaginatedHttpJob> toJob() {
+        return new Callable1<Uri, PaginatedHttpJob>() {
+            @Override
+            public PaginatedHttpJob call(Uri uri) throws Exception {
+                return job(dataSource().uri(uri));
+            }
+        };
+    }
+
+    private Option<Uri> moreUri(final Document document) {
+        return one(moreXPath()).filter(not(empty())).map(selectContents().apply(document)).filter(not(empty())).map(uri()).headOption();
     }
 
     private boolean containsCheckpoint(Document document) {
@@ -76,7 +89,7 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     protected Sequence<String> selectCheckpoints(Document document) {
-        return Xml.selectNodes(document, checkpointXPath()).map(Xml.contents());
+        return one(checkpointXPath()).filter(not(empty())).flatMap(selectNodes().apply(document)).map(Xml.contents());
     }
 
     protected Object checkpoint() {
