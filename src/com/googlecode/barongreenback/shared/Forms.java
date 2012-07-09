@@ -55,4 +55,15 @@ public class Forms {
         return model.add("emptyKeyword", emptyKeyword()).
                 add("types", types(String.class, Date.class, URI.class));
     }
+
+    public static class functions {
+        public static Callable1<Model, Model> addTemplates() {
+            return new Callable1<Model, Model>() {
+                @Override
+                public Model call(Model model) throws Exception {
+                    return Forms.addTemplates(model);
+                }
+            };
+        }
+    }
 }

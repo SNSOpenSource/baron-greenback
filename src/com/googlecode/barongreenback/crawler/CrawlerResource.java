@@ -1,44 +1,32 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.JobsResource;
-import com.googlecode.barongreenback.persistence.StringPrintStream;
 import com.googlecode.barongreenback.queues.QueuesResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.proxy.Invocation;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
-import com.googlecode.utterlyidle.annotations.FormParam;
-import com.googlecode.utterlyidle.annotations.GET;
-import com.googlecode.utterlyidle.annotations.POST;
-import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.Produces;
-import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.utterlyidle.annotations.*;
 
 import java.io.PrintStream;
 import java.util.List;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.shared.Forms.functions.addTemplates;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.lazyrecords.Using.using;
-import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.utterlyidle.Response.functions.asResponse;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.lang.String.format;
@@ -70,9 +58,8 @@ public class CrawlerResource {
 
     @GET
     @Path("export")
-    @Produces("application/json")
-    public String export(@QueryParam("id") UUID id) {
-        return modelFor(id).toString();
+    public Response export(@QueryParam("id") UUID id) {
+        return modelFor(id).map(Callables.asString()).map(asResponse(MediaType.APPLICATION_JSON)).getOrElse(crawlerNotFound(id));
     }
 
     @GET
@@ -98,7 +85,7 @@ public class CrawlerResource {
     @POST
     @Path("reset")
     public Response reset(@FormParam("id") UUID id) {
-        Model model = modelRepository.get(id).get();
+        Model model = modelFor(id).get();
         Model form = model.get("form", Model.class);
         form.remove("checkpoint", String.class);
         form.add("checkpoint", "");
@@ -124,13 +111,13 @@ public class CrawlerResource {
     @Path("exists")
     @Produces(MediaType.TEXT_PLAIN)
     public boolean exists(@QueryParam("id") UUID id) {
-        return !modelRepository.get(id).isEmpty();
+        return !modelFor(id).isEmpty();
     }
 
     @GET
     @Path("edit")
-    public Model edit(@QueryParam("id") UUID id) {
-        return Forms.addTemplates(modelFor(id));
+    public Response edit(@QueryParam("id") final UUID id) {
+        return modelFor(id).map(addTemplates()).map(asResponse()).getOrElse(crawlerNotFound(id));
     }
 
     @POST
@@ -159,8 +146,8 @@ public class CrawlerResource {
         return modelRepository.find(where(MODEL_TYPE, is("form")));
     }
 
-    private Model modelFor(UUID id) {
-        return modelRepository.get(id).get();
+    private Option<Model> modelFor(UUID id) {
+        return modelRepository.get(id);
     }
 
     private Callable1<? super Pair<UUID, Model>, Model> asModelWithId() {
@@ -203,5 +190,9 @@ public class CrawlerResource {
         return response(Status.OK.description(format("OK - Updated %s Records", updated))).
                 entity(log).
                 build();
+    }
+
+    private Response crawlerNotFound(UUID id) {
+        return response(Status.NOT_FOUND).entity(format("Crawler %s not found", id)).build();
     }
 }
