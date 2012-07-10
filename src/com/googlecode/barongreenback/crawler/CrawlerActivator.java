@@ -20,10 +20,14 @@ public class CrawlerActivator implements Callable<Crawler> {
     @Override
     public Crawler call() throws Exception {
         try {
-            String className = properties.getProperty(PROPERTY_NAME, DEFAULT.getName());
-            return container.create(Class.forName(className));
+            Class<?> crawlerClass = crawlerClass();
+            return container.create(crawlerClass);
         } catch (Exception e) {
             return container.create(DEFAULT);
         }
+    }
+
+    public Class crawlerClass() throws ClassNotFoundException {
+        return Class.forName(properties.getProperty(PROPERTY_NAME, DEFAULT.getName()));
     }
 }
