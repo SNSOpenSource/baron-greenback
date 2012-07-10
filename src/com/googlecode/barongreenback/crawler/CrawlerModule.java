@@ -33,7 +33,8 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(CompositeCrawler.class);
         container.add(CheckPointHandler.class);
-        container.addActivator(Crawler.class, CrawlerActivator.class);
+        container.add(CrawlerActivator.class);
+        container.addActivator(Crawler.class, container.get(CrawlerActivator.class));
         container.add(CrawlInterval.class);
         container.addInstance(PrintStream.class, new StringPrintStream());
         return this;

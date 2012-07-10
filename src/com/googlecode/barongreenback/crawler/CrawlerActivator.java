@@ -20,8 +20,7 @@ public class CrawlerActivator implements Callable<Crawler> {
     @Override
     public Crawler call() throws Exception {
         try {
-            Class<?> crawlerClass = crawlerClass();
-            return container.create(crawlerClass);
+            return container.create(crawlerClass());
         } catch (Exception e) {
             return container.create(DEFAULT);
         }
