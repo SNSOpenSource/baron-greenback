@@ -11,5 +11,11 @@
             $post(name="reset", id=item.id, disabled="true")$
         $endif$
         $post(name="delete", id=item.id)$
+
+        $if(item.model.form.enabled)$
+            $post(name="disable", id=item.id)$
+        $else$
+            $post(name="enable", id=item.id)$
+        $endif$
     </td>
 </tr>

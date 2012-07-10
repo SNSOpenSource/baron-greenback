@@ -5,6 +5,7 @@ import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
+import com.googlecode.utterlyidle.html.Input;
 import com.googlecode.utterlyidle.html.Link;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -90,5 +91,9 @@ public class CrawlerListPage {
 
     public boolean isResettable(String name) {
         return html.input(formFor(name, "reset") + "/" + button("reset")).enabled();
+    }
+
+    public boolean isEnabled(String name) {
+        return html.contains(formFor(name, "disable"));
     }
 }

@@ -129,9 +129,10 @@ public class CrawlerResource {
         String more = form.get("more", String.class);
         String checkpoint = form.get("checkpoint", String.class);
         String checkpointType = form.get("checkpointType", String.class);
+        Boolean enabled = form.get("enabled", Boolean.class);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        modelRepository.set(id, Forms.crawler(update, from, more, checkpoint, checkpointType, recordDefinition.toModel()));
+        modelRepository.set(id, Forms.crawler(update, from, more, checkpoint, checkpointType, enabled, recordDefinition.toModel()));
         return redirectToCrawlerList();
     }
 
@@ -140,6 +141,28 @@ public class CrawlerResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response crawl(@FormParam("id") final UUID id) throws Exception {
         return numberOfRecordsUpdated(crawler.crawl(id), log);
+    }
+
+    @POST
+    @Path("enable")
+    public Response enable(@FormParam("id") UUID id) throws Exception {
+        return modelFor(id).map(setCrawlerEnabled(id, true)).getOrElse(crawlerNotFound(id));
+    }
+
+    @POST
+    @Path("disable")
+    public Response disable(@FormParam("id") UUID id) throws Exception {
+        return modelFor(id).map(setCrawlerEnabled(id, false)).getOrElse(crawlerNotFound(id));
+    }
+
+    private Callable1<Model, Response> setCrawlerEnabled(final UUID id, final boolean enabled) {
+        return new Callable1<Model, Response>() {
+            @Override
+            public Response call(Model model) throws Exception {
+                model.get("form", Model.class).set("enabled", enabled);
+                return edit(id, model);
+            }
+        };
     }
 
     private Sequence<Pair<UUID, Model>> allCrawlerModels() {

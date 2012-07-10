@@ -22,6 +22,7 @@ public class CrawlerPage {
     public static final String MORE = "//input[@name='form.more']";
     public static final String CHECKPOINT_VALUE = "//input[@name='form.checkpoint']";
     public static final String CHECKPOINT_TYPE = "//select[@name='form.checkpointType']";
+    public static final String ENABLED = "//input[@name='form.enabled']";
     public static final String RECORD_NAME = "//input[@id='form.record.name']";
     public static final String KEYWORD_NAME = "//input[@id='form.record.keywords[%s].name']";
     public static final String ALIAS = "//input[@id='form.record.keywords[%s].alias']";
@@ -68,6 +69,10 @@ public class CrawlerPage {
 
     public Select checkpointType() {
         return html.select(CHECKPOINT_TYPE);
+    }
+
+    public Checkbox enabled() {
+        return html.checkbox(ENABLED);
     }
 
     public Input recordName() {

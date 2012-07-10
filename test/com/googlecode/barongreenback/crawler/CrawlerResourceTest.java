@@ -76,5 +76,15 @@ public class CrawlerResourceTest extends ApplicationTests {
         assertThat(listPage.linkFor("news").value(), containsString(id));
     }
 
-
+    @Test
+    public void canEnabledAndDisableCrawler() throws Exception {
+        CrawlerPage newPage = new CrawlerPage(browser);
+        newPage.update().value("enabled crawler");
+        newPage.enabled().check();
+        CrawlerListPage list = newPage.save();
+        assertThat(list.isEnabled("enabled crawler"), is(true));
+        CrawlerPage edit = list.edit("enabled crawler");
+        edit.enabled().uncheck();
+        assertThat(edit.save().isEnabled("enabled crawler"), is(false));
+    }
 }

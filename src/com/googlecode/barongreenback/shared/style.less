@@ -53,10 +53,13 @@ h1, h2, h3, h4, h5, h6, .btn, a.update {
 }
 
 .btn {
-    &.primary, &.danger {
+    &.primary, &.danger, &.success {
         &:hover {
             color: #fff;
         }
+    }
+    &.success {
+        .gradientBar(lighten(@green, 15%), @green);
     }
     &.danger {
         .gradientBar(lighten(@red, 15%), @red);
@@ -76,9 +79,14 @@ input.more, a.export, a.import, a.edit, a.cancel, a.download {
     .btn;
 }
 
-input.delete, input.stop, input.reset, input.resetAll, input.deleteAll, input.ignore, input.ignoreAll {
+input.delete, input.stop, input.reset, input.resetAll, input.deleteAll, input.ignore, input.ignoreAll, input.disable {
     .btn;
     .btn.danger;
+}
+
+input.enable {
+    .btn;
+    .btn.success;
 }
 
 .fixIE7Overlapping {
@@ -181,7 +189,7 @@ form.search {
     }
 }
 
-form.delete, form.crawl, form.start, form.stop, form.copy, form.reset, form.crawlAll, form.resetAll, form.deleteAll, form.restore, form.backup, form.retryAll, form.ignoreAll, form.retry, form.ignore {
+form.delete, form.crawl, form.start, form.stop, form.copy, form.reset, form.crawlAll, form.resetAll, form.deleteAll, form.restore, form.backup, form.retryAll, form.ignoreAll, form.retry, form.ignore, form.enable, form.disable {
     margin: 0;
     padding: 0;
     .inlineBlock;
