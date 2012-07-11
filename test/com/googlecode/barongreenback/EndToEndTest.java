@@ -80,8 +80,8 @@ public class EndToEndTest extends ApplicationTests {
 
     @Test
     public void createCrawlerViaImportWithSubfeedAndThenViewAllRecords() throws Exception {
-        crawlSampleData(importCrawler("testCrawler.json"), "test");
-//        crawlSampleData(importCrawler("testQueuesCrawler.json"), "test");
+//        crawlSampleData(importCrawler("testCrawler.json"), "test");
+        crawlSampleData(importCrawler("testQueuesCrawler.json"), "test");
         ViewSearchPage viewSearchPage = view("test");
 
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));

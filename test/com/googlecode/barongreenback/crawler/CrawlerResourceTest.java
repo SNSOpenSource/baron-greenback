@@ -112,5 +112,4 @@ public class CrawlerResourceTest extends ApplicationTests {
         model.get("form", Model.class).set("enabled", enabled);
         return model;
     }
-
 }

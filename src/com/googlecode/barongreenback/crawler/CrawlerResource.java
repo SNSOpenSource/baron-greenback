@@ -6,13 +6,25 @@ import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.proxy.Invocation;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
-import com.googlecode.utterlyidle.annotations.*;
+import com.googlecode.utterlyidle.annotations.FormParam;
+import com.googlecode.utterlyidle.annotations.GET;
+import com.googlecode.utterlyidle.annotations.POST;
+import com.googlecode.utterlyidle.annotations.Path;
+import com.googlecode.utterlyidle.annotations.Produces;
+import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -22,8 +34,10 @@ import static com.googlecode.barongreenback.shared.Forms.functions.addTemplates;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.Response.functions.asResponse;
@@ -35,18 +49,24 @@ import static java.util.UUID.randomUUID;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerResource {
+    public static final Sequence<Pair<String,String>> CRAWLERS = sequence(
+            pair("Sequential Crawler", SequentialCrawler.class.getName()),
+            pair("Queues Crawler", QueuesCrawler.class.getName()));
+    public static UUID ACTIVE_CRAWLER_ID = UUID.fromString("2efabd42-7961-4800-a5d4-8f974a3a2508");
     private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final CrawlInterval interval;
     private final Crawler crawler;
     private final PrintStream log;
+    private final CrawlerActivator crawlerActivator;
 
-    public CrawlerResource(final ModelRepository modelRepository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log) {
+    public CrawlerResource(final ModelRepository modelRepository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log, CrawlerActivator crawlerActivator) {
         this.interval = interval;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.crawler = crawler;
         this.log = log;
+        this.crawlerActivator = crawlerActivator;
     }
 
     @GET
@@ -54,6 +74,36 @@ public class CrawlerResource {
     public Model list() {
         List<Model> models = allCrawlerModels().map(asModelWithId()).toList();
         return model().add("items", models).add("anyExists", !models.isEmpty());
+    }
+
+    @GET
+    @Path("active")
+    public Model active() throws ClassNotFoundException {
+        return CRAWLERS.
+                fold(model().add("activeCrawler", crawlerDisplayFor(currentCrawler())),
+                        new Callable2<Model, Pair<String, String>, Model>() {
+                            @Override
+                            public Model call(Model model, Pair<String, String> crawler) throws Exception {
+                                model.add("crawlers", model().add("name", crawler.first()).add("value", crawler.second()).add(crawler.first(), true));
+                                return model;
+                            }
+                        });
+    }
+
+    private String crawlerDisplayFor(String crawler) throws ClassNotFoundException {
+        return CRAWLERS.filter(where(Callables.<String>second(), is(crawler))).map(Callables.<String>first()).head();
+    }
+
+    private String currentCrawler() throws ClassNotFoundException {
+        return crawlerActivator.crawlerClass().getName();
+    }
+
+
+    @POST
+    @Path("change")
+    public Response changeCrawler(@FormParam("crawler") String crawler) {
+        modelRepository.set(ACTIVE_CRAWLER_ID, model().add("crawler", crawler));
+        return redirectToCrawlerList();
     }
 
     @GET

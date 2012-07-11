@@ -17,14 +17,16 @@
     <a href="import" class="import">Import</a>
 
     $if(anyExists)$
-        $post(url=item.jobUrl, name="crawlAll", value="Crawl All")$
+        $post(name="crawlAll", value="Crawl All")$
         $post(name="resetAll", value="Reset All")$
         $post(name="deleteAll", value="Delete All")$
     $else$
-        $post(url=item.jobUrl, name="crawlAll", value="Crawl All", disabled="true")$
+        $post(name="crawlAll", value="Crawl All", disabled="true")$
         $post(name="resetAll", value="Reset All", disabled="true")$
         $post(name="deleteAll", value="Delete All", disabled="true")$
     $endif$
+
+    $include.({$base$crawler/active}).body;format="raw"$
 </div>
 
 </body>

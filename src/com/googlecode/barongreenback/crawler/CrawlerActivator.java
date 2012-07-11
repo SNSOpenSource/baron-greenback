@@ -1,20 +1,26 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
+import com.googlecode.barongreenback.shared.ModelRepository;
+import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.yadic.Container;
 
 import java.util.concurrent.Callable;
 
+import static com.googlecode.barongreenback.crawler.CrawlerResource.ACTIVE_CRAWLER_ID;
+
 public class CrawlerActivator implements Callable<Crawler> {
     static final String PROPERTY_NAME = "crawler.class.name";
-//    private static final Class<?> DEFAULT = QueuesCrawler.class;
-    private static final Class<?> DEFAULT = SequentialCrawler.class;
+    private static final Class<?> DEFAULT = QueuesCrawler.class;
     private final BaronGreenbackProperties properties;
     private final Container container;
+    private final ModelRepository modelRepository;
 
-    public CrawlerActivator(BaronGreenbackProperties properties, Container container) {
+    public CrawlerActivator(BaronGreenbackProperties properties, Container container, ModelRepository modelRepository) {
         this.properties = properties;
         this.container = container;
+        this.modelRepository = modelRepository;
     }
 
     @Override
@@ -27,6 +33,7 @@ public class CrawlerActivator implements Callable<Crawler> {
     }
 
     public Class crawlerClass() throws ClassNotFoundException {
-        return Class.forName(properties.getProperty(PROPERTY_NAME, DEFAULT.getName()));
+        Option<String> fromRepo = modelRepository.get(ACTIVE_CRAWLER_ID).map(Model.value("crawler", String.class));
+        return Class.forName(fromRepo.getOrElse(properties.getProperty(PROPERTY_NAME, DEFAULT.getName())));
     }
 }
