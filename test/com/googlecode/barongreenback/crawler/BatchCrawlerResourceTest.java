@@ -2,14 +2,17 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
+import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.junit.Test;
 
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.contentOf;
+import static java.util.UUID.randomUUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 public class BatchCrawlerResourceTest extends ApplicationTests {
     @Test
@@ -17,8 +20,8 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
         JobsListPage jobsListPage = new JobsListPage(browser);
         assertThat(jobsListPage.numberOfJobs(), is(0));
 
-        importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
-        CrawlerListPage crawlerListPage = importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
+        importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
+        CrawlerListPage crawlerListPage = importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
 
         crawlerListPage.crawlAll();
 
@@ -28,8 +31,8 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
 
     @Test
     public void canDeleteAll() throws Exception {
-        importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
-        CrawlerListPage crawlerListPage = importCrawlerWithId(UUID.randomUUID(), contentOf("crawler.json"));
+        importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
+        CrawlerListPage crawlerListPage = importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
         assertThat(crawlerListPage.numberOfCrawlers(), is(2));
 
         crawlerListPage = crawlerListPage.deleteAll();
@@ -37,7 +40,7 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
         assertThat(crawlerListPage.numberOfCrawlers(), is(0));
     }
 
-    private CrawlerListPage importCrawlerWithId(UUID uuid, String crawler) throws Exception {
+    public static CrawlerListPage importCrawlerWithId(UUID uuid, String crawler, HttpClient browser) throws Exception {
         ImportCrawlerPage importPage = new ImportCrawlerPage(browser);
         importPage.id().value(uuid.toString());
         importPage.model().value(crawler);

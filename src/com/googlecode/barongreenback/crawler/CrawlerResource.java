@@ -140,7 +140,28 @@ public class CrawlerResource {
     @Path("crawl")
     @Produces(MediaType.TEXT_PLAIN)
     public Response crawl(@FormParam("id") final UUID id) throws Exception {
-        return numberOfRecordsUpdated(crawler.crawl(id), log);
+        return modelFor(id).map(toNumberOfRecordsUpdated(id)).getOrElse(crawlerNotFound(id));
+    }
+
+    private Callable1<Model, Response> toNumberOfRecordsUpdated(final UUID id) {
+        return new Callable1<Model, Response>() {
+            @Override
+            public Response call(Model model) throws Exception {
+                if (enabled(model, true)) {
+                    return numberOfRecordsUpdated(crawler.crawl(id), log);
+                }
+                return forbidden(model);
+            }
+
+            private Response forbidden(Model model) {
+                String updates = model.get("form", Model.class).get("update", String.class);
+                return response(Status.FORBIDDEN).entity(format("Crawler '%s' not enabled", updates)).build();
+            }
+
+            private Boolean enabled(Model model, Boolean defaultValue) {
+                return Option.option(model.get("form", Model.class).get("enabled", Boolean.class)).getOrElse(defaultValue);
+            }
+        };
     }
 
     @POST

@@ -7,13 +7,15 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Html;
 
+import java.util.UUID;
+
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.modify;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
-import static com.googlecode.utterlyidle.io.HierarchicalPath.hierarchicalPath;
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
@@ -45,5 +47,9 @@ public class QueuesPage {
     public QueuesPage deleteAll() throws Exception {
         Request request = html.form("//form[@class='deleteAll']").submit("//input[@class='deleteAll']");
         return new QueuesPage(httpHandler, httpHandler.handle(request));
+    }
+
+    public int responseStatusFor(UUID crawlerId) {
+        return Integer.valueOf(html.selectContent(format("//*[@class='completed' and descendant::*[@class='entity' and contains(text(), '%s')]]/descendant::*[@class='response']/*[@class='code']/text()", crawlerId)));
     }
 }

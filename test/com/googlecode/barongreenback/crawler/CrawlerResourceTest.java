@@ -1,6 +1,9 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.queues.QueuesPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
+import com.googlecode.funclate.Model;
+import com.googlecode.utterlyidle.Status;
 import org.junit.Test;
 
 import java.util.Date;
@@ -8,9 +11,11 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.contentOf;
 import static com.googlecode.totallylazy.Closeables.using;
+import static java.util.UUID.randomUUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 public class CrawlerResourceTest extends ApplicationTests {
     @Test
@@ -87,4 +92,25 @@ public class CrawlerResourceTest extends ApplicationTests {
         edit.enabled().uncheck();
         assertThat(edit.save().isEnabled("enabled crawler"), is(false));
     }
+
+    @Test
+    public void crawlAllOnlyCrawlsEnabled() throws Exception {
+        UUID disabledCrawlerId = randomUUID();
+        String disabled = "disabled";
+
+        CrawlerListPage list = BatchCrawlerResourceTest.importCrawlerWithId(disabledCrawlerId, namedCrawler(disabled, false).toString(), browser);
+        list.crawl(disabled);
+
+        QueuesPage queuesPage = new QueuesPage(browser);
+        assertThat(queuesPage.responseStatusFor(disabledCrawlerId), is(Status.FORBIDDEN.code()));
+    }
+
+    private Model namedCrawler(String name, boolean enabled) {
+        String crawler = contentOf("crawler.json");
+        Model model = Model.parse(crawler);
+        model.get("form", Model.class).set("update", name);
+        model.get("form", Model.class).set("enabled", enabled);
+        return model;
+    }
+
 }
