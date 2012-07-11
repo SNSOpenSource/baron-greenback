@@ -157,6 +157,25 @@ public class CrawlerResource {
         return edit(randomUUID(), model);
     }
 
+    @POST
+    @Path("copy")
+    public Response copy(@FormParam("id")UUID id) throws Exception {
+        return modelFor(id).map(copyCrawler()).getOrElse(crawlerNotFound(id));
+    }
+
+    private Callable1<Model, Response> copyCrawler() {
+        return new Callable1<Model, Response>() {
+            @Override
+            public Response call(Model crawler) throws Exception {
+                Model root = crawler.get("form", Model.class);
+                root.set("enabled", false);
+                root.set("update", "copy of " + root.get("update", String.class));
+                modelRepository.set(UUID.randomUUID(), crawler);
+                return redirectToCrawlerList();
+            }
+        };
+    }
+
     @GET
     @Path("exists")
     @Produces(MediaType.TEXT_PLAIN)

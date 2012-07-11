@@ -3,6 +3,7 @@
     <td><a href="$item.model.form.from$" class="from">$item.model.form.from$</a></td>
     <td>
         $post(url=item.jobUrl, name="crawl", id=item.id)$
+        $post(name="copy", id=item.id)$
         $get(name="edit", id=item.id)$
         $get(name="export", id=item.id)$
         $if(item.resettable)$
@@ -17,5 +18,6 @@
         $else$
             $post(name="enable", id=item.id)$
         $endif$
+
     </td>
 </tr>

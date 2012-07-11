@@ -105,6 +105,14 @@ public class CrawlerResourceTest extends ApplicationTests {
         assertThat(queuesPage.responseStatusFor(disabledCrawlerId), is(Status.FORBIDDEN.code()));
     }
 
+    @Test
+    public void canCopyACrawlerDefinition() throws Exception {
+        CrawlerListPage list = BatchCrawlerResourceTest.importCrawlerWithId(randomUUID(), namedCrawler("crawler", true).toString(), browser);
+        list = list.copy("crawler");
+        assertThat(list.contains("copy of crawler"), is(true));
+        assertThat(list.isEnabled("copy of crawler"), is(false));
+    }
+
     private Model namedCrawler(String name, boolean enabled) {
         String crawler = contentOf("crawler.json");
         Model model = Model.parse(crawler);

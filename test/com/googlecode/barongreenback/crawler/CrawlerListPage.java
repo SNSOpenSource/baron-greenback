@@ -5,7 +5,6 @@ import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
-import com.googlecode.utterlyidle.html.Input;
 import com.googlecode.utterlyidle.html.Link;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -31,7 +30,7 @@ public class CrawlerListPage {
     }
 
     public boolean contains(String name) {
-        return html.selectContent("descendant::a[contains(@class, 'update')]/text()").equals(name);
+        return html.selectContent("descendant::a[contains(@class, 'update') and text()='"+name+"']").equals(name);
     }
 
     public CrawlerPage edit(String name) throws Exception {
@@ -95,5 +94,10 @@ public class CrawlerListPage {
 
     public boolean isEnabled(String name) {
         return html.contains(formFor(name, "disable"));
+    }
+
+    public CrawlerListPage copy(String crawlerName) throws Exception {
+        httpHandler.handle(html.form(formFor(crawlerName, "copy")).submit(button("copy")));
+        return new CrawlerListPage(httpHandler);
     }
 }
