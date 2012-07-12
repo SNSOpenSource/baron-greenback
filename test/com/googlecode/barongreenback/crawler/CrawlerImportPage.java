@@ -19,7 +19,7 @@ public class CrawlerImportPage {
     private Html html;
 
     public CrawlerImportPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerResource.class).importForm()))).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerDefinitionResource.class).importForm()))).build()));
     }
 
     public CrawlerImportPage(HttpHandler httpHandler, Response response) throws Exception {

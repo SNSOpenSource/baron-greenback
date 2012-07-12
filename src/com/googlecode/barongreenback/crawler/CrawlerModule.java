@@ -1,10 +1,8 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.persistence.StringPrintStream;
-import com.googlecode.barongreenback.persistence.lucene.SearcherPoolActivator;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.RecordDefinitionActivator;
-import com.googlecode.lazyrecords.lucene.SearcherPool;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.*;
 import com.googlecode.yadic.Container;
@@ -13,12 +11,10 @@ import java.io.PrintStream;
 import java.util.concurrent.*;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
-import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
-import static java.lang.Runtime.getRuntime;
 
 public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, RequestScopedModule, ApplicationScopedModule {
     public Module addResources(Resources resources) throws Exception {
-        resources.add(annotatedClass(CrawlerResource.class));
+        resources.add(annotatedClass(CrawlerDefinitionResource.class));
         resources.add(annotatedClass(BatchCrawlerResource.class));
         resources.add(annotatedClass(CrawlerStatusResource.class));
         resources.add(annotatedClass(CrawlerFailureResource.class));

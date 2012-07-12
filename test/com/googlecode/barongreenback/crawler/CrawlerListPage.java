@@ -20,7 +20,7 @@ public class CrawlerListPage {
     private final Html html;
 
     public CrawlerListPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerResource.class).list()))).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerDefinitionResource.class).list()))).build()));
     }
 
     public CrawlerListPage(HttpHandler httpHandler, Response response) throws Exception {

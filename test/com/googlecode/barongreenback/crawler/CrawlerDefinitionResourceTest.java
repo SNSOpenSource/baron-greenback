@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-public class CrawlerResourceTest extends ApplicationTests {
+public class CrawlerDefinitionResourceTest extends ApplicationTests {
     @Test
     public void canResetACrawler() throws Exception {
         CrawlerPage newPage = new CrawlerPage(browser);

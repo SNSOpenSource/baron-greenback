@@ -21,7 +21,7 @@ public class ImportCrawlerPage {
     private final Html html;
 
     public ImportCrawlerPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerResource.class).importForm()))).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerDefinitionResource.class).importForm()))).build()));
     }
 
     public ImportCrawlerPage(HttpHandler httpHandler, Response response) throws Exception {

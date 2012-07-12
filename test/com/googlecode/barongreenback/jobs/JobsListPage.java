@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.jobs;
 
-import com.googlecode.barongreenback.crawler.CrawlerResource;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;

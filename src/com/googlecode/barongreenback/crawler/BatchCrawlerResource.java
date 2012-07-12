@@ -1,13 +1,11 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.shared.InvocationHandler;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
@@ -18,7 +16,7 @@ import com.googlecode.utterlyidle.annotations.Produces;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CrawlerResource.scheduleAQueuedCrawl;
+import static com.googlecode.barongreenback.crawler.CrawlerDefinitionResource.scheduleAQueuedCrawl;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -83,7 +81,7 @@ public class BatchCrawlerResource {
     public Callable1<UUID, Response> reset() {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
-                return invocationHandler.handle(method(on(CrawlerResource.class).reset(uuid)));
+                return invocationHandler.handle(method(on(CrawlerDefinitionResource.class).reset(uuid)));
             }
         };
     }
@@ -91,7 +89,7 @@ public class BatchCrawlerResource {
     public Callable1<UUID, Response> delete() {
         return new Callable1<UUID, Response>() {
             public Response call(UUID uuid) throws Exception {
-                return invocationHandler.handle(method(on(CrawlerResource.class).delete(uuid)));
+                return invocationHandler.handle(method(on(CrawlerDefinitionResource.class).delete(uuid)));
             }
         };
     }

@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.shared;
 
-import com.googlecode.barongreenback.crawler.CrawlerResource;
+import com.googlecode.barongreenback.crawler.CrawlerDefinitionResource;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.GET;
@@ -19,6 +19,6 @@ public class HomeResource {
     @GET
     @Path("")
     public Response homePage() {
-        return redirector.seeOther(method(on(CrawlerResource.class).list()));
+        return redirector.seeOther(method(on(CrawlerDefinitionResource.class).list()));
     }
 }

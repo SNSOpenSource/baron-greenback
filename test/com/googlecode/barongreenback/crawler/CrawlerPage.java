@@ -42,7 +42,7 @@ public class CrawlerPage {
     }
 
     public CrawlerPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerResource.class).newForm()))).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(CrawlerDefinitionResource.class).newForm()))).build()));
     }
 
     public CrawlerListPage save() throws Exception {

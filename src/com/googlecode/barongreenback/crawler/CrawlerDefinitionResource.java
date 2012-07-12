@@ -7,7 +7,6 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -48,25 +47,19 @@ import static java.util.UUID.randomUUID;
 
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
-public class CrawlerResource {
-    public static final Sequence<Pair<String,String>> CRAWLERS = sequence(
-            pair("Sequential Crawler", SequentialCrawler.class.getName()),
-            pair("Queues Crawler", QueuesCrawler.class.getName()));
-    public static UUID ACTIVE_CRAWLER_ID = UUID.fromString("2efabd42-7961-4800-a5d4-8f974a3a2508");
+public class CrawlerDefinitionResource {
     private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final CrawlInterval interval;
     private final Crawler crawler;
     private final PrintStream log;
-    private final CrawlerActivator crawlerActivator;
 
-    public CrawlerResource(final ModelRepository modelRepository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log, CrawlerActivator crawlerActivator) {
+    public CrawlerDefinitionResource(final ModelRepository modelRepository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log) {
         this.interval = interval;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.crawler = crawler;
         this.log = log;
-        this.crawlerActivator = crawlerActivator;
     }
 
     @GET
@@ -74,36 +67,6 @@ public class CrawlerResource {
     public Model list() {
         List<Model> models = allCrawlerModels().map(asModelWithId()).toList();
         return model().add("items", models).add("anyExists", !models.isEmpty());
-    }
-
-    @GET
-    @Path("active")
-    public Model active() throws ClassNotFoundException {
-        return CRAWLERS.
-                fold(model().add("activeCrawler", crawlerDisplayFor(currentCrawler())),
-                        new Callable2<Model, Pair<String, String>, Model>() {
-                            @Override
-                            public Model call(Model model, Pair<String, String> crawler) throws Exception {
-                                model.add("crawlers", model().add("name", crawler.first()).add("value", crawler.second()).add(crawler.first(), true));
-                                return model;
-                            }
-                        });
-    }
-
-    private String crawlerDisplayFor(String crawler) throws ClassNotFoundException {
-        return CRAWLERS.filter(where(Callables.<String>second(), is(crawler))).map(Callables.<String>first()).head();
-    }
-
-    private String currentCrawler() throws ClassNotFoundException {
-        return crawlerActivator.crawlerClass().getName();
-    }
-
-
-    @POST
-    @Path("change")
-    public Response changeCrawler(@FormParam("crawler") String crawler) {
-        modelRepository.set(ACTIVE_CRAWLER_ID, model().add("crawler", crawler));
-        return redirectToCrawlerList();
     }
 
     @GET
@@ -285,7 +248,7 @@ public class CrawlerResource {
     }
 
     public static Uri scheduleAQueuedCrawl(UUID crawlerId, UUID schedulerId, Long interval) throws Exception {
-        String crawlerJob = absolutePathOf(method(on(CrawlerResource.class).crawl(crawlerId)));
+        String crawlerJob = absolutePathOf(method(on(CrawlerDefinitionResource.class).crawl(crawlerId)));
         String queued = absolutePathOf(method(on(QueuesResource.class).queue(null, crawlerJob)));
         return relativeUriOf(method(on(JobsResource.class).schedule(schedulerId, interval, queued)));
     }

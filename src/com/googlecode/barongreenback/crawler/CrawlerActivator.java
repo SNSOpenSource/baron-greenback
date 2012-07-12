@@ -8,7 +8,7 @@ import com.googlecode.yadic.Container;
 
 import java.util.concurrent.Callable;
 
-import static com.googlecode.barongreenback.crawler.CrawlerResource.ACTIVE_CRAWLER_ID;
+import static com.googlecode.barongreenback.crawler.CrawlerImplementationResource.ACTIVE_CRAWLER_ID;
 
 public class CrawlerActivator implements Callable<Crawler> {
     static final String PROPERTY_NAME = "crawler.class.name";
