@@ -3,14 +3,11 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.queues.QueuesResource;
 import com.googlecode.barongreenback.shared.Forms;
-import com.googlecode.barongreenback.shared.ModelRepository;
-import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.proxy.Invocation;
@@ -30,13 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.Forms.functions.addTemplates;
-import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
-import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Pair.pair;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.Response.functions.asResponse;
@@ -48,31 +39,31 @@ import static java.util.UUID.randomUUID;
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerDefinitionResource {
-    private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final CrawlInterval interval;
     private final Crawler crawler;
     private final PrintStream log;
+    private final CrawlerRepository repository;
 
-    public CrawlerDefinitionResource(final ModelRepository modelRepository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log) {
+    public CrawlerDefinitionResource(CrawlerRepository repository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log) {
         this.interval = interval;
-        this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.crawler = crawler;
         this.log = log;
+        this.repository = repository;
     }
 
     @GET
     @Path("list")
     public Model list() {
-        List<Model> models = allCrawlerModels().map(asModelWithId()).toList();
+        List<Model> models = repository.allCrawlerModels().map(asModelWithId()).toList();
         return model().add("items", models).add("anyExists", !models.isEmpty());
     }
 
     @GET
     @Path("export")
     public Response export(@QueryParam("id") UUID id) {
-        return modelFor(id).map(Callables.asString()).map(asResponse(MediaType.APPLICATION_JSON)).getOrElse(crawlerNotFound(id));
+        return repository.modelFor(id).map(Callables.asString()).map(asResponse(MediaType.APPLICATION_JSON)).getOrElse(crawlerNotFound(id));
     }
 
     @GET
@@ -84,27 +75,21 @@ public class CrawlerDefinitionResource {
     @POST
     @Path("import")
     public Response importJson(@FormParam("model") String model, @FormParam("id") Option<UUID> id) {
-        modelRepository.set(id.getOrElse(randomUUID()), Model.parse(model));
+        repository.importCrawler(id, model);
         return redirectToCrawlerList();
     }
 
     @POST
     @Path("delete")
     public Response delete(@FormParam("id") UUID id) {
-        modelRepository.remove(id);
+        repository.remove(id);
         return redirectToCrawlerList();
     }
 
     @POST
     @Path("reset")
     public Response reset(@FormParam("id") UUID id) {
-        Model model = modelFor(id).get();
-        Model form = model.get("form", Model.class);
-        form.remove("checkpoint", String.class);
-        form.add("checkpoint", "");
-        form.remove("checkpointType", String.class);
-        form.add("checkpointType", String.class.getName());
-        modelRepository.set(id, model);
+        repository.reset(id);
         return redirectToCrawlerList();
     }
 
@@ -122,49 +107,27 @@ public class CrawlerDefinitionResource {
 
     @POST
     @Path("copy")
-    public Response copy(@FormParam("id")UUID id) throws Exception {
-        return modelFor(id).map(copyCrawler()).getOrElse(crawlerNotFound(id));
-    }
-
-    private Callable1<Model, Response> copyCrawler() {
-        return new Callable1<Model, Response>() {
-            @Override
-            public Response call(Model crawler) throws Exception {
-                Model root = crawler.get("form", Model.class);
-                root.set("enabled", false);
-                root.set("update", "copy of " + root.get("update", String.class));
-                modelRepository.set(UUID.randomUUID(), crawler);
-                return redirectToCrawlerList();
-            }
-        };
+    public Response copy(@FormParam("id") UUID id) throws Exception {
+        return repository.copy(id).map(redirect()).getOrElse(crawlerNotFound(id));
     }
 
     @GET
     @Path("exists")
     @Produces(MediaType.TEXT_PLAIN)
     public boolean exists(@QueryParam("id") UUID id) {
-        return !modelFor(id).isEmpty();
+        return !repository.modelFor(id).isEmpty();
     }
 
     @GET
     @Path("edit")
     public Response edit(@QueryParam("id") final UUID id) {
-        return modelFor(id).map(addTemplates()).map(asResponse()).getOrElse(crawlerNotFound(id));
+        return repository.modelFor(id).map(addTemplates()).map(asResponse()).getOrElse(crawlerNotFound(id));
     }
 
     @POST
     @Path("edit")
     public Response edit(@QueryParam("id") UUID id, final Model root) throws Exception {
-        Model form = root.get("form", Model.class);
-        String from = form.get("from", String.class);
-        String update = form.get("update", String.class);
-        String more = form.get("more", String.class);
-        String checkpoint = form.get("checkpoint", String.class);
-        String checkpointType = form.get("checkpointType", String.class);
-        Boolean enabled = form.get("enabled", Boolean.class);
-        Model record = form.get("record", Model.class);
-        RecordDefinition recordDefinition = convert(record);
-        modelRepository.set(id, Forms.crawler(update, from, more, checkpoint, checkpointType, enabled, recordDefinition.toModel()));
+        repository.edit(id, root);
         return redirectToCrawlerList();
     }
 
@@ -172,7 +135,7 @@ public class CrawlerDefinitionResource {
     @Path("crawl")
     @Produces(MediaType.TEXT_PLAIN)
     public Response crawl(@FormParam("id") final UUID id) throws Exception {
-        return modelFor(id).map(toNumberOfRecordsUpdated(id)).getOrElse(crawlerNotFound(id));
+        return repository.modelFor(id).map(toNumberOfRecordsUpdated(id)).getOrElse(crawlerNotFound(id));
     }
 
     private Callable1<Model, Response> toNumberOfRecordsUpdated(final UUID id) {
@@ -199,13 +162,13 @@ public class CrawlerDefinitionResource {
     @POST
     @Path("enable")
     public Response enable(@FormParam("id") UUID id) throws Exception {
-        return modelFor(id).map(setCrawlerEnabled(id, true)).getOrElse(crawlerNotFound(id));
+        return repository.modelFor(id).map(setCrawlerEnabled(id, true)).getOrElse(crawlerNotFound(id));
     }
 
     @POST
     @Path("disable")
     public Response disable(@FormParam("id") UUID id) throws Exception {
-        return modelFor(id).map(setCrawlerEnabled(id, false)).getOrElse(crawlerNotFound(id));
+        return repository.modelFor(id).map(setCrawlerEnabled(id, false)).getOrElse(crawlerNotFound(id));
     }
 
     private Callable1<Model, Response> setCrawlerEnabled(final UUID id, final boolean enabled) {
@@ -216,14 +179,6 @@ public class CrawlerDefinitionResource {
                 return edit(id, model);
             }
         };
-    }
-
-    private Sequence<Pair<UUID, Model>> allCrawlerModels() {
-        return modelRepository.find(where(MODEL_TYPE, is("form")));
-    }
-
-    private Option<Model> modelFor(UUID id) {
-        return modelRepository.get(id);
     }
 
     private Callable1<? super Pair<UUID, Model>, Model> asModelWithId() {
@@ -257,6 +212,15 @@ public class CrawlerDefinitionResource {
         return "/" + relativeUriOf(method);
     }
 
+    private Callable1<Model, Response> redirect() {
+        return new Callable1<Model, Response>() {
+            @Override
+            public Response call(Model model) throws Exception {
+                return redirectToCrawlerList();
+            }
+        };
+    }
+
     private Response redirectToCrawlerList() {
         return redirector.seeOther(method(on(getClass()).list()));
     }
@@ -271,4 +235,5 @@ public class CrawlerDefinitionResource {
     private Response crawlerNotFound(UUID id) {
         return response(Status.NOT_FOUND).entity(format("Crawler %s not found", id)).build();
     }
+
 }

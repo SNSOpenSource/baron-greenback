@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.shared;
 
+import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.handlers.ResponseHandlers;
