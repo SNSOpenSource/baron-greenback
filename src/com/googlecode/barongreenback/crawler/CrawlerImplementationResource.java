@@ -5,8 +5,10 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -23,6 +25,7 @@ import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Some.some;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 
@@ -71,11 +74,11 @@ public class CrawlerImplementationResource {
     @Path("change")
     public Response changeCrawler(@FormParam("crawler") String crawler) {
         modelRepository.set(ACTIVE_CRAWLER_ID, model().add("crawler", crawler));
-        return redirectToCrawlerList();
+        return redirectToCrawlerList(some("Crawler changed to " + Sequences.sequence(crawler.split("\\.")).last()));
     }
 
-    private Response redirectToCrawlerList() {
-        return redirector.seeOther(method(on(CrawlerDefinitionResource.class).list()));
+    private Response redirectToCrawlerList(Option<String> messages) {
+        return redirector.seeOther(method(on(CrawlerDefinitionResource.class).list(messages)));
     }
 
 }

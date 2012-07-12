@@ -94,7 +94,7 @@ public class CrawlerDefinitionResourceTest extends ApplicationTests {
     }
 
     @Test
-    public void crawlAllOnlyCrawlsEnabled() throws Exception {
+    public void onlyCrawlEnabled() throws Exception {
         UUID disabledCrawlerId = randomUUID();
         String disabled = "disabled";
 

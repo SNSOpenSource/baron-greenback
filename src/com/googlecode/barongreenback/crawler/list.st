@@ -5,6 +5,7 @@
 </head>
 <body class="list">
 
+$message()$
 <table class="results zebra-striped">
     $thead(headers=["updates", "from", "action" ])$
     <tbody>

@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.queues.QueuesResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -55,9 +56,20 @@ public class CrawlerDefinitionResource {
 
     @GET
     @Path("list")
-    public Model list() {
+    public Model list(@QueryParam("message") Option<String> message) {
         List<Model> models = repository.allCrawlerModels().map(asModelWithId()).toList();
-        return model().add("items", models).add("anyExists", !models.isEmpty());
+        Model model = model().add("items", models).add("anyExists", !models.isEmpty());
+        message.fold(model, toMessageModel());
+        return model;
+    }
+
+    private Callable2<Model, String, Model> toMessageModel() {
+        return new Callable2<Model, String, Model>() {
+            @Override
+            public Model call(Model model, String message) throws Exception {
+                return model.add("message", model().add("text", message).add("category", "success"));
+            }
+        };
     }
 
     @GET
@@ -222,7 +234,7 @@ public class CrawlerDefinitionResource {
     }
 
     private Response redirectToCrawlerList() {
-        return redirector.seeOther(method(on(getClass()).list()));
+        return redirector.seeOther(method(on(getClass()).list(Option.<String>none())));
     }
 
 
