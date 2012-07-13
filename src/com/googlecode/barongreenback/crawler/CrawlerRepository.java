@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
+import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static java.util.UUID.randomUUID;
@@ -83,7 +84,7 @@ public class CrawlerRepository {
     }
 
     public Boolean enabled(Model model) {
-        return model.get("form", Model.class).get("enabled", Boolean.class);
+        return option(model.get("form", Model.class).get("enabled", Boolean.class)).getOrElse(false);
     }
 
 }
