@@ -4,7 +4,7 @@
     "more":"",
     "checkpoint":"",
     "checkpointType":"java.lang.String",
-    "enabled": true,
+    "disabled": false,
     "record":{
         "name":"/feed/entry",
         "keywords":[
