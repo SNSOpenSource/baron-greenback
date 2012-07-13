@@ -13,7 +13,7 @@ import static com.googlecode.funclate.Model.model;
 public class Forms {
     public static final Integer NUMBER_OF_FIELDS = 3;
 
-    public static Model crawler(String update, String from, String more, String checkpoint, String checkpointType, Boolean enabled, Model definition) {
+    public static Model crawler(String update, String from, String more, String checkpoint, String checkpointType, Boolean disabled, Model definition) {
         return model().
                 add("form", model().
                         add("update", update).
@@ -21,12 +21,12 @@ public class Forms {
                         add("more", more).
                         add("checkpoint", checkpoint).
                         add("checkpointType", checkpointType).
-                        add("enabled", enabled).
+                        add("disabled", disabled).
                         add("record", definition));
     }
 
     public static Model emptyForm(Integer numberOfFields) {
-        return addTemplates(crawler("", "", "", "", "", true, emptyDefinition(numberOfFields(numberOfFields))));
+        return addTemplates(crawler("", "", "", "", "", false, emptyDefinition(numberOfFields(numberOfFields))));
     }
 
     public static Model emptyKeyword() {

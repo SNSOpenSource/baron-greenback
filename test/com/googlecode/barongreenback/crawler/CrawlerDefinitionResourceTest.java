@@ -85,11 +85,10 @@ public class CrawlerDefinitionResourceTest extends ApplicationTests {
     public void canEnabledAndDisableCrawler() throws Exception {
         CrawlerPage newPage = new CrawlerPage(browser);
         newPage.update().value("enabled crawler");
-        newPage.enabled().check();
         CrawlerListPage list = newPage.save();
         assertThat(list.isEnabled("enabled crawler"), is(true));
         CrawlerPage edit = list.edit("enabled crawler");
-        edit.enabled().uncheck();
+        edit.disabled().check();
         assertThat(edit.save().isEnabled("enabled crawler"), is(false));
     }
 
@@ -98,10 +97,11 @@ public class CrawlerDefinitionResourceTest extends ApplicationTests {
         UUID disabledCrawlerId = randomUUID();
         String disabled = "disabled";
 
-        CrawlerListPage list = BatchCrawlerResourceTest.importCrawlerWithId(disabledCrawlerId, namedCrawler(disabled, false).toString(), browser);
+        CrawlerListPage list = BatchCrawlerResourceTest.importCrawlerWithId(disabledCrawlerId, namedCrawler(disabled, true).toString(), browser);
         list.crawl(disabled);
 
         QueuesPage queuesPage = new QueuesPage(browser);
+        System.out.println("queuesPage = " + queuesPage);
         assertThat(queuesPage.responseStatusFor(disabledCrawlerId), is(Status.FORBIDDEN.code()));
     }
 
@@ -113,11 +113,11 @@ public class CrawlerDefinitionResourceTest extends ApplicationTests {
         assertThat(list.isEnabled("copy of crawler"), is(false));
     }
 
-    private Model namedCrawler(String name, boolean enabled) {
+    private Model namedCrawler(String name, boolean disabled) {
         String crawler = contentOf("crawler.json");
         Model model = Model.parse(crawler);
         model.get("form", Model.class).set("update", name);
-        model.get("form", Model.class).set("enabled", enabled);
+        model.get("form", Model.class).set("disabled", disabled);
         return model;
     }
 }

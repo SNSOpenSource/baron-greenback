@@ -5,7 +5,6 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -45,7 +44,7 @@ public class CrawlerRepository {
             @Override
             public Model call(Model crawler) throws Exception {
                 Model root = crawler.get("form", Model.class);
-                root.set("enabled", false);
+                root.set("disabled", true);
                 root.set("update", "copy of " + root.get("update", String.class));
                 return crawler;
             }
@@ -77,14 +76,14 @@ public class CrawlerRepository {
         String more = form.get("more", String.class);
         String checkpoint = form.get("checkpoint", String.class);
         String checkpointType = form.get("checkpointType", String.class);
-        Boolean enabled = form.get("enabled", Boolean.class);
+        Boolean disabled = disabled(root);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
-        modelRepository.set(id, Forms.crawler(update, from, more, checkpoint, checkpointType, enabled, recordDefinition.toModel()));
+        modelRepository.set(id, Forms.crawler(update, from, more, checkpoint, checkpointType, disabled, recordDefinition.toModel()));
     }
 
-    public Boolean enabled(Model model) {
-        return option(model.get("form", Model.class).get("enabled", Boolean.class)).getOrElse(false);
+    public Boolean disabled(Model model) {
+        return option(model.get("form", Model.class).get("disabled", Boolean.class)).getOrElse(false);
     }
 
 }

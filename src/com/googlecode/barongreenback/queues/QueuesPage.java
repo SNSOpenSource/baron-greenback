@@ -52,4 +52,9 @@ public class QueuesPage {
     public int responseStatusFor(UUID crawlerId) {
         return Integer.valueOf(html.selectContent(format("//*[@class='completed' and descendant::*[@class='entity' and contains(text(), '%s')]]/descendant::*[@class='response']/*[@class='code']/text()", crawlerId)));
     }
+
+    @Override
+    public String toString() {
+        return html.toString();
+    }
 }

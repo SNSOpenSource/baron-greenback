@@ -2,7 +2,7 @@
     "update":"test",
     "from":"http://localhost:9001/data",
     "more":"",
-    "enabled": true,
+    "disabled": false,
     "record":{
         "name":"/feed/entry",
         "keywords":[
