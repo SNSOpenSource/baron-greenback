@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -80,4 +81,9 @@ public class CrawlerRepository {
         RecordDefinition recordDefinition = convert(record);
         modelRepository.set(id, Forms.crawler(update, from, more, checkpoint, checkpointType, enabled, recordDefinition.toModel()));
     }
+
+    public Boolean enabled(Model model) {
+        return model.get("form", Model.class).get("enabled", Boolean.class);
+    }
+
 }

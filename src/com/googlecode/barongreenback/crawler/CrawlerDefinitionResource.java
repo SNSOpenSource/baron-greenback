@@ -154,7 +154,7 @@ public class CrawlerDefinitionResource {
         return new Callable1<Model, Response>() {
             @Override
             public Response call(Model model) throws Exception {
-                if (enabled(model, true)) {
+                if (repository.enabled(model)) {
                     return numberOfRecordsUpdated(crawler.crawl(id), log);
                 }
                 return forbidden(model);
@@ -163,10 +163,6 @@ public class CrawlerDefinitionResource {
             private Response forbidden(Model model) {
                 String updates = model.get("form", Model.class).get("update", String.class);
                 return response(Status.FORBIDDEN).entity(format("Crawler '%s' not enabled", updates)).build();
-            }
-
-            private Boolean enabled(Model model, Boolean defaultValue) {
-                return Option.option(model.get("form", Model.class).get("enabled", Boolean.class)).getOrElse(defaultValue);
             }
         };
     }
