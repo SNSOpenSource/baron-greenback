@@ -1,8 +1,8 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.persistence.StringPrintStream;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.RecordDefinitionActivator;
+import com.googlecode.totallylazy.StringPrintStream;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.*;
 import com.googlecode.yadic.Container;

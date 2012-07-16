@@ -1,22 +1,20 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.persistence.StringPrintStream;
-import com.googlecode.lazyrecords.*;
+import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.matchers.NumberMatcher;
-import org.junit.Ignore;
+import com.googlecode.totallylazy.StringPrintStream;
 import org.junit.Test;
 
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Sequences.one;
-import static com.googlecode.totallylazy.Sequences.sequence;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public class DataWriterTest {
     @Test
