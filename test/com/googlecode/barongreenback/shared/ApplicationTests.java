@@ -35,7 +35,7 @@ public abstract class ApplicationTests {
                 return null;
             }
         });
-        browser = Browser.browser(application);
+        browser = new RedirectHttpHandler(new RelativeUrlHandler(application));
     }
 
 }

@@ -45,7 +45,7 @@ public class QueuesPage {
     }
 
     public QueuesPage deleteAll() throws Exception {
-        Request request = html.form("//form[@class='deleteAll']").submit("//input[@class='deleteAll']");
+        Request request = html.form("//form[@class='deleteAll']").submit("descendant::input[@class='deleteAll']");
         return new QueuesPage(httpHandler, httpHandler.handle(request));
     }
 

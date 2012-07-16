@@ -3,6 +3,11 @@
     <td><a href="$item.model.form.from$" class="from">$item.model.form.from$</a></td>
     <td>
         $post(url=item.jobUrl, name="crawl", id=item.id)$
+        $if(item.model.form.disabled)$
+            $post(name="enable", id=item.id)$
+        $else$
+            $post(name="disable", id=item.id)$
+        $endif$
         $post(name="copy", id=item.id)$
         $get(name="edit", id=item.id)$
         $get(name="export", id=item.id)$
@@ -12,12 +17,5 @@
             $post(name="reset", id=item.id, disabled="true")$
         $endif$
         $post(name="delete", id=item.id)$
-
-        $if(item.model.form.disabled)$
-            $post(name="enable", id=item.id)$
-        $else$
-            $post(name="disable", id=item.id)$
-        $endif$
-
     </td>
 </tr>

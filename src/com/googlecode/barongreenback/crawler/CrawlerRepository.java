@@ -76,14 +76,14 @@ public class CrawlerRepository {
         String more = form.get("more", String.class);
         String checkpoint = form.get("checkpoint", String.class);
         String checkpointType = form.get("checkpointType", String.class);
-        Boolean disabled = disabled(root);
+        Boolean disabled = !enabled(root);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
         modelRepository.set(id, Forms.crawler(update, from, more, checkpoint, checkpointType, disabled, recordDefinition.toModel()));
     }
 
-    public Boolean disabled(Model model) {
-        return option(model.get("form", Model.class).get("disabled", Boolean.class)).getOrElse(false);
+    public Boolean enabled(Model model) {
+        return !option(model.get("form", Model.class).get("disabled", Boolean.class)).getOrElse(false);
     }
 
 }

@@ -31,7 +31,7 @@ public class CrawlerListPage {
     }
 
     public boolean contains(String name) {
-        return html.selectContent("descendant::a[contains(@class, 'update') and text()='"+name+"']").equals(name);
+        return html.selectContent(format("descendant::a[contains(@class, 'update') and text()='%s']", name)).equals(name);
     }
 
     public CrawlerPage edit(String name) throws Exception {
@@ -44,7 +44,7 @@ public class CrawlerListPage {
     }
 
     private String linkTo(String crawlerName) {
-        return "descendant::a[contains(@class, 'update') and text() = '" + crawlerName + "']";
+        return format("descendant::a[contains(@class, 'update') and text() = '%s']", crawlerName);
     }
 
     public JobsListPage crawl(String name) throws Exception {

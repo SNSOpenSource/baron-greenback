@@ -154,7 +154,7 @@ public class CrawlerDefinitionResource {
         return new Callable1<Model, Response>() {
             @Override
             public Response call(Model model) throws Exception {
-                if (!repository.disabled(model)) {
+                if (repository.enabled(model)) {
                     return numberOfRecordsUpdated(crawler.crawl(id), log);
                 }
                 return forbidden(model);
@@ -170,20 +170,20 @@ public class CrawlerDefinitionResource {
     @POST
     @Path("enable")
     public Response enable(@FormParam("id") UUID id) throws Exception {
-        return repository.modelFor(id).map(setCrawlerDisabled(id, false)).getOrElse(crawlerNotFound(id));
+        return repository.modelFor(id).map(enable(id, true)).getOrElse(crawlerNotFound(id));
     }
 
     @POST
     @Path("disable")
     public Response disable(@FormParam("id") UUID id) throws Exception {
-        return repository.modelFor(id).map(setCrawlerDisabled(id, true)).getOrElse(crawlerNotFound(id));
+        return repository.modelFor(id).map(enable(id, false)).getOrElse(crawlerNotFound(id));
     }
 
-    private Callable1<Model, Response> setCrawlerDisabled(final UUID id, final boolean disabled) {
+    private Callable1<Model, Response> enable(final UUID id, final boolean enabled) {
         return new Callable1<Model, Response>() {
             @Override
             public Response call(Model model) throws Exception {
-                model.get("form", Model.class).set("disabled", disabled);
+                model.get("form", Model.class).set("disabled", !enabled);
                 return edit(id, model);
             }
         };

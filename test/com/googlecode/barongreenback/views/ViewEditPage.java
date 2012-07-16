@@ -48,7 +48,7 @@ public class ViewEditPage {
     }
 
     public ViewListPage save() throws Exception {
-        Request request = html.form("//form").submit("//input[@value='Save']");
+        Request request = html.form("//form").submit("descendant::input[@value='Save']");
         Response response = httpHandler.handle(request);
         return new ViewListPage(httpHandler, response);
     }

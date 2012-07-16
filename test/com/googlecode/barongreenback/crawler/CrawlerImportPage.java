@@ -33,6 +33,6 @@ public class CrawlerImportPage {
         for (UUID uuid : id) {
             html.input("//input[@name='id']").value(uuid.toString());
         }
-        return new CrawlerListPage(httpHandler, httpHandler.handle(html.form("//form[contains(@class, 'import')]").submit("//input[@type='submit']")));
+        return new CrawlerListPage(httpHandler, httpHandler.handle(html.form("//form[contains(@class, 'import')]").submit("descendant::input[@type='submit']")));
     }
 }
