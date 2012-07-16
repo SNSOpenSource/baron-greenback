@@ -109,20 +109,20 @@ public class CrawlerFailureResource {
     }
 
 
-    private Callable1<Pair<StagedJob, Response>, Response> toIgnore(final UUID id) {
-        return new Callable1<Pair<StagedJob, Response>, Response>() {
+    private Callable1<Pair<StagedJob, String>, Response> toIgnore(final UUID id) {
+        return new Callable1<Pair<StagedJob, String>, Response>() {
             @Override
-            public Response call(Pair<StagedJob, Response> stagedJobResponsePair) throws Exception {
+            public Response call(Pair<StagedJob, String> stagedJobResponsePair) throws Exception {
                 crawlerFailures.delete(id);
                 return backToMe("Job ignored");
             }
         };
     }
 
-    private Callable1<Pair<StagedJob, Response>, Response> toRetry(final UUID id) {
-        return new Callable1<Pair<StagedJob, Response>, Response>() {
+    private Callable1<Pair<StagedJob, String>, Response> toRetry(final UUID id) {
+        return new Callable1<Pair<StagedJob, String>, Response>() {
             @Override
-            public Response call(Pair<StagedJob, Response> failure) throws Exception {
+            public Response call(Pair<StagedJob, String> failure) throws Exception {
                 crawler.crawl(failure.first());
                 crawlerFailures.delete(id);
                 return backToMe("Job retried");
@@ -135,10 +135,10 @@ public class CrawlerFailureResource {
         return redirector.seeOther(method(on(CrawlerFailureResource.class).failures(some(message))));
     }
 
-    private Callable1<Map.Entry<UUID, Pair<StagedJob, Response>>, Model> toModel() {
-        return new Callable1<Map.Entry<UUID, Pair<StagedJob, Response>>, Model>() {
+    private Callable1<Map.Entry<UUID, Pair<StagedJob, String>>, Model> toModel() {
+        return new Callable1<Map.Entry<UUID, Pair<StagedJob, String>>, Model>() {
             @Override
-            public Model call(Map.Entry<UUID, Pair<StagedJob, Response>> entry) throws Exception {
+            public Model call(Map.Entry<UUID, Pair<StagedJob, String>> entry) throws Exception {
                 return model().
                         add("job", entry.getValue().first()).
                         add("uri", entry.getValue().first().dataSource().uri()).

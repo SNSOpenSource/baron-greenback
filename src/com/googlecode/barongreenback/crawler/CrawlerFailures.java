@@ -8,9 +8,9 @@ import java.util.*;
 
 public class CrawlerFailures implements StatusMonitor {
     public static final int MAX_FAILURES = 1000;
-    private final Map<UUID, Pair<StagedJob, Response>> failures = new LinkedHashMap<UUID, Pair<StagedJob, Response>>() {
+    private final Map<UUID, Pair<StagedJob, String>> failures = new LinkedHashMap<UUID, Pair<StagedJob, String>>() {
         @Override
-        protected boolean removeEldestEntry(Map.Entry<UUID, Pair<StagedJob, Response>> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<UUID, Pair<StagedJob, String>> eldest) {
             return size() > MAX_FAILURES;
         }
     };
@@ -30,11 +30,11 @@ public class CrawlerFailures implements StatusMonitor {
         return failures.size();
     }
 
-    public void add(Pair<StagedJob, Response> failure) {
+    public void add(Pair<StagedJob, String> failure) {
         failures.put(UUID.randomUUID(), failure);
     }
 
-    public Map<UUID, Pair<StagedJob, Response>> values() {
+    public Map<UUID, Pair<StagedJob, String>> values() {
         return failures;
     }
 
@@ -42,7 +42,7 @@ public class CrawlerFailures implements StatusMonitor {
         failures.remove(id);
     }
 
-    public Option<Pair<StagedJob, Response>> get(UUID id) {
+    public Option<Pair<StagedJob, String>> get(UUID id) {
         return Option.option(failures.get(id));
     }
 
