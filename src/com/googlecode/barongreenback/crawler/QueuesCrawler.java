@@ -26,7 +26,7 @@ import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.maste
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 
 public class QueuesCrawler extends AbstractCrawler {
-    private final CrawlerHttpHandler crawlerHttpHandler;
+    private final CrawlerHttpClient crawlerHttpHandler;
     private final InputHandler inputHandler;
     private final ProcessHandler processHandler;
     private final OutputHandler outputHandler;
@@ -36,7 +36,7 @@ public class QueuesCrawler extends AbstractCrawler {
     private final StringMappings mappings;
     private final CrawlerFailures retry;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final Application application, final CrawlerHttpHandler crawlerHttpHandler, InputHandler inputHandler,
+    public QueuesCrawler(final ModelRepository modelRepository, final Application application, final CrawlerHttpClient crawlerHttpHandler, InputHandler inputHandler,
                          ProcessHandler processHandler, OutputHandler outputHandler, CheckPointHandler checkpointHandler,
                          StringMappings mappings, CrawlerFailures retry, PrintStream log) {
         super(modelRepository);

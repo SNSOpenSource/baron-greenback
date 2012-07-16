@@ -6,10 +6,10 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 
-public class CrawlerHttpHandler implements HttpHandler {
+public class CrawlerHttpClient implements HttpClient {
     private final HttpHandler httpHandler;
 
-    public CrawlerHttpHandler(HttpClient httpClient) {
+    public CrawlerHttpClient(HttpClient httpClient) {
         httpHandler = httpClient;
     }
 

@@ -32,7 +32,7 @@ public class SequentialCrawler extends AbstractCrawler {
     private final CheckPointHandler checkPointHandler;
     private final PrintStream log;
 
-    public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, HttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler1, PrintStream log) {
+    public SequentialCrawler(ModelRepository modelRepository, StringMappings mappings, CrawlerHttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler1, PrintStream log) {
         super(modelRepository);
         this.mappings = mappings;
         this.httpClient = httpClient;
