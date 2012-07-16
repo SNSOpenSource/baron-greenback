@@ -11,7 +11,7 @@ mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.totallylazy:totallylazy:jar
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:77
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:519
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.yadic:yadic:jar|sources:150
-mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.funclate:funclate:jar|sources:77
+mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.funclate:funclate:jar|sources:78
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:8
 
 mvn:rhino:js:jar:1.6R7
