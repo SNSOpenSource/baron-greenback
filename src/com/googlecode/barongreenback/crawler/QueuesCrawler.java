@@ -26,6 +26,7 @@ import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.maste
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 
 public class QueuesCrawler extends AbstractCrawler {
+    private final CrawlerHttpHandler crawlerHttpHandler;
     private final InputHandler inputHandler;
     private final ProcessHandler processHandler;
     private final OutputHandler outputHandler;
@@ -35,10 +36,11 @@ public class QueuesCrawler extends AbstractCrawler {
     private final StringMappings mappings;
     private final CrawlerFailures retry;
 
-    public QueuesCrawler(final ModelRepository modelRepository, final Application application, InputHandler inputHandler,
+    public QueuesCrawler(final ModelRepository modelRepository, final Application application, final CrawlerHttpHandler crawlerHttpHandler, InputHandler inputHandler,
                          ProcessHandler processHandler, OutputHandler outputHandler, CheckPointHandler checkpointHandler,
                          StringMappings mappings, CrawlerFailures retry, PrintStream log) {
         super(modelRepository);
+        this.crawlerHttpHandler = crawlerHttpHandler;
         this.inputHandler = inputHandler;
         this.processHandler = processHandler;
         this.outputHandler = outputHandler;
@@ -80,7 +82,7 @@ public class QueuesCrawler extends AbstractCrawler {
         Container container = new SimpleContainer();
         container.addInstance(PrintStream.class, log);
         container.add(Auditor.class, PrintAuditor.class);
-        container.add(HttpHandler.class, ClientHttpHandler.class);
+        container.addInstance(HttpHandler.class, crawlerHttpHandler);
         container.add(HttpClient.class, AuditHandler.class);
         container.addInstance(CrawlerFailures.class, retry);
         container.add(FailureHandler.class);

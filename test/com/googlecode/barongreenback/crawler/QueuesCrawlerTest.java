@@ -5,9 +5,10 @@ import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.yadic.Container;
 import org.junit.Test;
-
 import java.util.UUID;
 
 public class QueuesCrawlerTest extends ApplicationTests {
@@ -22,7 +23,7 @@ public class QueuesCrawlerTest extends ApplicationTests {
     }
 
     private void importAndCrawl(String filename) throws Exception {
-        application.usingRequestScope(get(BaronGreenbackProperties.class)).setProperty(CrawlerActivator.PROPERTY_NAME, QueuesCrawler.class.getName());
+        application.applicationScope().get(BaronGreenbackProperties.class).setProperty(CrawlerActivator.PROPERTY_NAME, QueuesCrawler.class.getName());
 
         CrawlerImportPage importer = new CrawlerImportPage(browser);
         UUID id = UUID.randomUUID();
@@ -37,6 +38,7 @@ public class QueuesCrawlerTest extends ApplicationTests {
         return new Callable1<Container, T>() {
             @Override
             public T call(Container container) throws Exception {
+                container.addInstance(Request.class, RequestBuilder.get("/").build());
                 return container.get(aClass);
             }
         };
