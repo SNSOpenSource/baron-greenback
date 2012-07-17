@@ -13,7 +13,10 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.handlers.*;
+import com.googlecode.utterlyidle.handlers.AuditHandler;
+import com.googlecode.utterlyidle.handlers.Auditor;
+import com.googlecode.utterlyidle.handlers.HttpClient;
+import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.SimpleContainer;
 
@@ -23,7 +26,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
-import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final CrawlerHttpClient crawlerHttpHandler;
@@ -64,15 +66,16 @@ public class QueuesCrawler extends AbstractCrawler {
 
         Container crawlContainer = crawlContainer(id, crawler);
 
-        crawl(masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
-
-        crawlContainer.get(CountLatch.class).await();
-
-        return crawlContainer.get(AtomicInteger.class).get();
+        return crawlAndWait(masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
     }
 
+    public int crawlAndWait(StagedJob job) throws InterruptedException {
+        crawl(job);
+        job.container().get(CountLatch.class).await();
+        return job.container().get(AtomicInteger.class).get();
+    }
 
-    public Future<?> crawl(StagedJob job) {
+     public Future<?> crawl(StagedJob job) throws InterruptedException {
         return submit(inputHandler, HttpReader.getInput(job).then(
                 submit(processHandler, processJobs(job.process()).then(
                         submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
