@@ -1,6 +1,6 @@
 {"form":{
     "update":"news",
-    "from":"http://feeds.bbci.co.uk/news/rss.xml",
+    "from":"http://feeds.bbci.co.uk/newsxxx/rss.xml",
     "more":"",
     "checkpoint":"",
     "checkpointType":"java.lang.String",

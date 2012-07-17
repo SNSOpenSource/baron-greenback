@@ -45,7 +45,11 @@ public class CrawlerFailureResource {
         Model model = model().
                 add("anyExists", !crawlerFailures.isEmpty()).
                 add("failures", sequence(crawlerFailures.values().entrySet()).map(toModel()).toList());
-        message.fold(model, toMessageModel());
+        message.fold(model, toMessageModel())
+                .add("retryUrl",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null))))
+                .add("ignoreUrl",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null))))
+                .add("retryAll",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retryAll())))
+                .add("ignoreAll",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignoreAll())));
         return model;
     }
 

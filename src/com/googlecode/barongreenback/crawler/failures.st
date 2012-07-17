@@ -14,8 +14,8 @@ $message()$
         <td><a href="$it.uri$">$it.uri$</a></td>
         <td><div class="entity">$it.response$</div></td>
         <td>
-            $post(name="retry", value="Retry", url="/crawler/failures/retry", id=it.id)$
-            $post(name="ignore", value="Ignore", url="/crawler/failures/ignore", id=it.id)$
+            $post(name="retry", value="Retry", url=retryUrl, id=it.id)$
+            $post(name="ignore", value="Ignore", url=ignoreUrl, id=it.id)$
         </td>
     </tr>
     }$
@@ -24,8 +24,8 @@ $message()$
 
 <div class="actions">
     $if(anyExists)$
-        $post(name="retryAll", value="Retry All", url="/crawler/failures/retryAll")$
-        $post(name="ignoreAll", value="Ignore All", url="/crawler/failures/ignoreAll")$
+        $post(name="retryAll", value="Retry All", url=retryAll)$
+        $post(name="ignoreAll", value="Ignore All", url=ignoreAll)$
     $else$
         $post(name="retryAll", value="Retry All", disabled="true")$
         $post(name="ignoreAll", value="Ignore All", disabled="true")$
