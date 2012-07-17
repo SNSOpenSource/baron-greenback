@@ -127,7 +127,7 @@ public class CrawlerFailureResource {
         return new Callable1<Pair<StagedJob, String>, Response>() {
             @Override
             public Response call(Pair<StagedJob, String> failure) throws Exception {
-                crawler.crawlAndWait(failure.first());
+                crawler.crawl(failure.first());
                 crawlerFailures.delete(id);
                 return backToMe("Job retried");
 

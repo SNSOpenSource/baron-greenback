@@ -66,16 +66,13 @@ public class QueuesCrawler extends AbstractCrawler {
 
         Container crawlContainer = crawlContainer(id, crawler);
 
-        return crawlAndWait(masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
+        crawl(masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
+
+        crawlContainer.get(CountLatch.class).await();
+        return crawlContainer.get(AtomicInteger.class).get();
     }
 
-    public int crawlAndWait(StagedJob job) throws InterruptedException {
-        crawl(job);
-        job.container().get(CountLatch.class).await();
-        return job.container().get(AtomicInteger.class).get();
-    }
-
-     public Future<?> crawl(StagedJob job) throws InterruptedException {
+    public Future<?> crawl(StagedJob job) throws InterruptedException {
         return submit(inputHandler, HttpReader.getInput(job).then(
                 submit(processHandler, processJobs(job.process()).then(
                         submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
@@ -151,7 +148,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
     private Sequence<Keyword<?>> checkOnlyOne(Definition definition) {
         Sequence<Keyword<?>> uniques = definition.fields().filter(RecordDefinition.UNIQUE_FILTER);
-        if(uniques.size() != 1) {
+        if (uniques.size() != 1) {
             throw new IllegalStateException("There should be exactly 1 unique field, instead there are " + uniques.size() + " (" + uniques + ").\n" +
                     "Please correct the crawler definition.");
         }
