@@ -7,7 +7,7 @@ import com.googlecode.utterlyidle.Response;
 import java.util.*;
 
 public class CrawlerFailures implements StatusMonitor {
-    public static final int MAX_FAILURES = 1000;
+    public static final int MAX_FAILURES = 100000;
     private final Map<UUID, Pair<StagedJob, String>> failures = new LinkedHashMap<UUID, Pair<StagedJob, String>>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<UUID, Pair<StagedJob, String>> eldest) {

@@ -214,24 +214,28 @@ body {
     }
 }
 
+table {
+    th, td {
+        padding: 5px 7px 4px;
+    }
 
-
-table.results {
-    th a {
-        color: inherit;
-    }
-    span.jobstatus {
-        text-transform: capitalize;
-        padding-left: 20px;
-    }
-    span.jobstatus.running {
-            background: url(running.gif) no-repeat;
-    }
-    span.jobstatus.idle {
-            background: url(idle.gif) no-repeat;
-    }
-    tfoot tr td {
-        border-top: 1px solid #ddd;
+    &.results {
+        th a {
+            color: inherit;
+        }
+        span.jobstatus {
+            text-transform: capitalize;
+            padding-left: 20px;
+        }
+        span.jobstatus.running {
+                background: url(running.gif) no-repeat;
+        }
+        span.jobstatus.idle {
+                background: url(idle.gif) no-repeat;
+        }
+        tfoot tr td {
+            border-top: 1px solid #ddd;
+        }
     }
 }
 
