@@ -17,9 +17,8 @@ import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keywords.UNIQUE;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
+import static com.googlecode.lazyrecords.Record.functions.merge;
 import static com.googlecode.totallylazy.Sequences.one;
-import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -35,7 +34,7 @@ public class SubfeedJobCreatorTest {
 
     @Test
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {
-        Sequence<StagedJob> jobs = new SubfeedJobCreator(new SimpleContainer(), SubfeedDatasource.datasource(null, null, Sequences.<Pair<Keyword<?>, Object>>sequence()), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
+        Sequence<StagedJob> jobs = new SubfeedJobCreator(new SimpleContainer(), SubfeedDatasource.datasource(null, null, record()), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
         assertThat(jobs.size(), NumberMatcher.is(1));
         assertThat(jobs.head().destination(), is(SOME_DESTINATION));
         assertThat(jobs.head().datasource().uri(), is(URI));
@@ -43,14 +42,16 @@ public class SubfeedJobCreatorTest {
 
     @Test
     public void shouldPassDownKeyAndValuesToSubfeedJobs() throws Exception {
-        Pair<Keyword<?>, Object> previousUnique = cast(Pair.pair(PREV_UNIQUE, "bar"));
-        Sequence<StagedJob> jobs = new SubfeedJobCreator(new SimpleContainer(), SubfeedDatasource.datasource(null, null, one(previousUnique)), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
-        assertThat(jobs.head().datasource().data(), is(sequence(previousUnique, Pair.<Keyword<?>, Object>pair(LINK, URI))));
+        Record previousUnique = record(one(Pair.<Keyword<?>, Object>pair(PREV_UNIQUE, "bar")));
+        Sequence<StagedJob> jobs = new SubfeedJobCreator(new SimpleContainer(), SubfeedDatasource.datasource(null, null, previousUnique), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
+        Record record = record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)));
+        assertThat(jobs.head().datasource().record(), is(one(record).map(merge(previousUnique)).head()));
     }
 
     @Test
     public void shouldMergeUniqueKeysIntoEachRecord() throws Exception {
-        Pair<Sequence<Record>, Sequence<StagedJob>> records = new SubfeedJobCreator(new SimpleContainer(), SubfeedDatasource.datasource(null, null, one(Pair.<Keyword<?>, Object>pair(LINK, URI))), SOME_DESTINATION).process(one(record().set(PERSON_NAME, "Dan")));
-        assertThat(records.first(), is(one(record().set(LINK, URI).set(PERSON_NAME, "Dan"))));
+        Pair<Sequence<Record>, Sequence<StagedJob>> records = new SubfeedJobCreator(new SimpleContainer(),
+                SubfeedDatasource.datasource(null, null, record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)))), SOME_DESTINATION).process(one(record().set(PERSON_NAME, "Dan")));
+        assertThat(records.first(), is(one(record().set(PERSON_NAME, "Dan").set(LINK, URI))));
     }
 }
