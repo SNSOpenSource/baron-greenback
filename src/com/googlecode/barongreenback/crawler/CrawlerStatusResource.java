@@ -17,7 +17,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerStatusResource {
 
-     private final CrawlerFailures crawlerFailures;
+    private final CrawlerFailures crawlerFailures;
     private final CrawlerExecutors crawlerExecutors;
 
     public CrawlerStatusResource(CrawlerExecutors crawlerExecutors, CrawlerFailures crawlerFailures) {

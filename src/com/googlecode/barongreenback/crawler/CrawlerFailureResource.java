@@ -31,12 +31,12 @@ import static com.googlecode.utterlyidle.Responses.response;
 public class CrawlerFailureResource {
     private final CrawlerFailures crawlerFailures;
     private final Redirector redirector;
-    private final QueuesCrawler crawler;
+    private final StagedJobExecutor executor;
 
-    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, Crawler crawler) {
+    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, StagedJobExecutor executor) {
         this.crawlerFailures = crawlerFailures;
         this.redirector = redirector;
-        this.crawler = (QueuesCrawler) crawler;
+        this.executor = executor;
     }
 
     @GET
@@ -49,7 +49,7 @@ public class CrawlerFailureResource {
                 .add("retryUrl",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null))))
                 .add("ignoreUrl",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null))))
                 .add("retryAll",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retryAll())))
-                .add("ignoreAll",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignoreAll())));
+                .add("ignoreAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignoreAll())));
         return model;
     }
 
@@ -127,10 +127,9 @@ public class CrawlerFailureResource {
         return new Callable1<Pair<StagedJob, String>, Response>() {
             @Override
             public Response call(Pair<StagedJob, String> failure) throws Exception {
-                crawler.crawl(failure.first());
+                executor.crawl(failure.first());
                 crawlerFailures.delete(id);
                 return backToMe("Job retried");
-
             }
         };
     }
@@ -145,7 +144,7 @@ public class CrawlerFailureResource {
             public Model call(Map.Entry<UUID, Pair<StagedJob, String>> entry) throws Exception {
                 return model().
                         add("job", entry.getValue().first()).
-                        add("uri", entry.getValue().first().dataSource().uri()).
+                        add("uri", entry.getValue().first().datasource().uri()).
                         add("response", entry.getValue().second()).
                         add("id", entry.getKey());
             }
