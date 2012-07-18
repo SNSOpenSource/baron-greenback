@@ -144,7 +144,7 @@ public class CrawlerFailureResource {
             public Model call(Map.Entry<UUID, Pair<StagedJob, String>> entry) throws Exception {
                 return model().
                         add("job", entry.getValue().first()).
-                        add("uri", entry.getValue().first().dataSource().uri()).
+                        add("uri", entry.getValue().first().datasource().uri()).
                         add("response", entry.getValue().second()).
                         add("id", entry.getKey());
             }

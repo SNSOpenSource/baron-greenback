@@ -18,7 +18,7 @@ public class HttpDatasource {
         this.source = source;
     }
 
-    public static HttpDatasource dataSource(Uri uri, Definition source) {
+    public static HttpDatasource datasource(Uri uri, Definition source) {
         return new HttpDatasource(uri, source);
     }
 

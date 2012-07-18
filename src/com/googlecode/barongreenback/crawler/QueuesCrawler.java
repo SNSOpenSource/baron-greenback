@@ -51,7 +51,7 @@ public class QueuesCrawler extends AbstractCrawler {
 
         updateView(crawler, destination.fields());
 
-        HttpDatasource datasource = HttpDatasource.dataSource(from(crawler), source);
+        HttpDatasource datasource = HttpDatasource.datasource(from(crawler), source);
 
         Container crawlContainer = crawlContainer(id, crawler);
 

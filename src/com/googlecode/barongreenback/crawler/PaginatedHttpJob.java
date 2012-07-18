@@ -49,9 +49,9 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document, Container container) {
-        Sequence<Record> events = transformData(document, dataSource().source());
+        Sequence<Record> events = transformData(document, datasource().source());
         Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
-        Pair<Sequence<Record>, Sequence<StagedJob>> pair = SubfeedJobCreator.process(container, dataSource(), destination(), filtered);
+        Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(container, datasource(), destination()).process(filtered);
         return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
     }
 
@@ -78,7 +78,7 @@ public class PaginatedHttpJob extends HttpJob {
         return new Callable1<Uri, PaginatedHttpJob>() {
             @Override
             public PaginatedHttpJob call(Uri uri) throws Exception {
-                return job(dataSource().uri(uri));
+                return job(datasource().uri(uri));
             }
         };
     }
@@ -93,7 +93,7 @@ public class PaginatedHttpJob extends HttpJob {
 
     private PaginatedHttpJob job(HttpDatasource datasource) {
         ConcurrentHashMap<String, Object> newContext = new ConcurrentHashMap<String, Object>(context);
-        newContext.put("dataSource", datasource);
+        newContext.put("datasource", datasource);
         return paginatedHttpJob(container(), newContext, mappings);
     }
 

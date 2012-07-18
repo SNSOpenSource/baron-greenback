@@ -11,7 +11,7 @@ import com.googlecode.yadic.Container;
 public interface StagedJob {
     Container container();
 
-    HttpDatasource dataSource();
+    HttpDatasource datasource();
 
     Definition destination();
 
