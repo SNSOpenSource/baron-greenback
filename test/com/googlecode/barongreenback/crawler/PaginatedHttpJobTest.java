@@ -4,7 +4,6 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.yadic.SimpleContainer;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,9 +32,9 @@ public class PaginatedHttpJobTest {
         context.put("moreXPath", "/root/more");
         context.put("checkpointAsString", "Today");
         context.put("checkpointXPath", "/root/date");
-        context.put("dataSource", HttpDatasource.dataSource(Uri.uri("http://go.away.com"), null));
+        context.put("datasource", HttpDatasource.datasource(Uri.uri("http://go.away.com"), null));
         PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(new SimpleContainer(), context, null);
         Option<PaginatedHttpJob> more = job.nextPageJob(some(document("<root><date>Yesterday</date><more>next</more></root>")));
-        assertThat(more.get().dataSource().uri(), is(Uri.uri("next")));
+        assertThat(more.get().datasource().uri(), is(Uri.uri("next")));
     }
 }

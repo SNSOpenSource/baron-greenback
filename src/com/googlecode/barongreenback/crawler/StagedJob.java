@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -11,9 +12,20 @@ import com.googlecode.yadic.Container;
 public interface StagedJob {
     Container container();
 
-    HttpDatasource dataSource();
+    HttpDatasource datasource();
 
     Definition destination();
 
     Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process();
+
+    public static class functions {
+        public static Callable1<StagedJob, HttpDatasource> datasource() {
+            return new Callable1<StagedJob, HttpDatasource>() {
+                @Override
+                public HttpDatasource call(StagedJob job) throws Exception {
+                    return job.datasource();
+                }
+            };
+        }
+    }
 }

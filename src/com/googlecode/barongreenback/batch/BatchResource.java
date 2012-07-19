@@ -55,8 +55,8 @@ import static java.lang.String.format;
 public class BatchResource {
 
     public static final File BACKUP_LOCATION = Files.temporaryDirectory();
-    private ModelRepository modelRepository;
-    private Redirector redirector;
+    private final ModelRepository modelRepository;
+    private final Redirector redirector;
     private final Persistence persistence;
     private final HttpScheduler scheduler;
     private final Queues queues;

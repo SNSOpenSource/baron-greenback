@@ -1,10 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
@@ -18,7 +15,7 @@ public class HttpDatasource {
         this.source = source;
     }
 
-    public static HttpDatasource dataSource(Uri uri, Definition source) {
+    public static HttpDatasource datasource(Uri uri, Definition source) {
         return new HttpDatasource(uri, source);
     }
 
@@ -38,8 +35,8 @@ public class HttpDatasource {
         return source;
     }
 
-    public Sequence<Pair<Keyword<?>, Object>> data() {
-        return Sequences.empty();
+    public Record record() {
+        return Record.constructors.record();
     }
 
     @Override
