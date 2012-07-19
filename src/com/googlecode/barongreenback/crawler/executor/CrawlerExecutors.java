@@ -1,5 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.executor;
 
+import com.googlecode.barongreenback.crawler.BlockingRetryRejectedExecutionHandler;
 import com.googlecode.totallylazy.Callable1;
 
 import java.io.Closeable;

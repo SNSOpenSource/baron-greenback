@@ -1,4 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.executor;
+
+import com.googlecode.barongreenback.crawler.executor.JobExecutor;
 
 import java.util.concurrent.ExecutorService;
 
