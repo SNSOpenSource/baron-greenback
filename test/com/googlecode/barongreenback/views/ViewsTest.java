@@ -14,29 +14,29 @@ import static org.hamcrest.Matchers.is;
 public class ViewsTest {
     @Test
     public void canConvertKeywordWithAlias() throws Exception{
-        Model model = model().add(Views.ROOT, model().
+        Model model = model().add(ViewsRepository.ROOT, model().
                 add("name", "news").
                 add("records", "news").
                 add("query", "").
                 add("visible", true).
                 add("priority", "").
-                add("keywords", Sequences.sequence(keyword("some/xpath").as(keyword("NiceName"))).map(Views.asModel()).toList()));
+                add("keywords", Sequences.sequence(keyword("some/xpath").as(keyword("NiceName"))).map(ViewsRepository.asModel()).toList()));
         Model field = model.<Model>get("view").<Model>get("keywords");
         assertThat(field.<String>get("name"), is("NiceName"));
     }
 
     @Test
     public void canConvertKeyword() throws Exception{
-        Record metadata = Record.constructors.record().set(Views.GROUP, "someGroup").
-                set(Views.VISIBLE, false).
+        Record metadata = Record.constructors.record().set(ViewsRepository.GROUP, "someGroup").
+                set(ViewsRepository.VISIBLE, false).
                 set(Keywords.UNIQUE, true);
-        Model model = model().add(Views.ROOT, model().
+        Model model = model().add(ViewsRepository.ROOT, model().
                 add("name", "news").
                 add("records", "news").
                 add("query", "").
                 add("visible", true).
                 add("priority", "").
-                add("keywords", Sequences.sequence(keyword("aField", String.class).metadata(metadata)).map(Views.asModel()).toList()));
+                add("keywords", Sequences.sequence(keyword("aField", String.class).metadata(metadata)).map(ViewsRepository.asModel()).toList()));
 
         Model field = model.<Model>get("view").get("keywords");
         assertThat(field.<String>get("name"), is("aField"));

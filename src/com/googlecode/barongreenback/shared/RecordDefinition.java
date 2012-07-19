@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.crawler.CompositeCrawler;
-import com.googlecode.barongreenback.views.Views;
+import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.AliasedKeyword;
 import com.googlecode.lazyrecords.Definition;
@@ -108,7 +108,7 @@ public class RecordDefinition {
     }
 
     private static boolean visible(Keyword keyword) {
-        return booleanValueOf(keyword, Views.VISIBLE);
+        return booleanValueOf(keyword, ViewsRepository.VISIBLE);
     }
 
     private static boolean subfeed(Keyword keyword) {
@@ -142,7 +142,7 @@ public class RecordDefinition {
     }
 
     private static String group(Keyword keyword) {
-        return keyword.metadata().get(Views.GROUP);
+        return keyword.metadata().get(ViewsRepository.GROUP);
     }
 
     private static String type(Keyword keyword) {
@@ -209,8 +209,8 @@ public class RecordDefinition {
                 }
                 return keyword.metadata(Record.constructors.record().
                         set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
-                        set(Views.VISIBLE, model.get("visible", Boolean.class)).
-                        set(Views.GROUP, model.get("group", String.class)).
+                        set(ViewsRepository.VISIBLE, model.get("visible", Boolean.class)).
+                        set(ViewsRepository.GROUP, model.get("group", String.class)).
                         set(CompositeCrawler.CHECKPOINT, model.get("checkpoint", Boolean.class)).
                         set(RecordDefinition.SUBFEED, model.get("subfeed", Boolean.class)).
                         set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));

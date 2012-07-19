@@ -5,7 +5,7 @@ import com.googlecode.barongreenback.crawler.CrawlerTests;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
-import com.googlecode.barongreenback.views.Views;
+import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.lazyrecords.*;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
@@ -100,7 +100,7 @@ public class SearchResourceTest extends ApplicationTests {
                 Definition users = Definition.constructors.definition("users", keywords(recordSequence));
                 records.add(users, recordSequence);
                 ModelRepository views = container.get(ModelRepository.class);
-                views.set(UUID.randomUUID(), Views.convertToViewModel(users));
+                views.set(UUID.randomUUID(), ViewsRepository.convertToViewModel(users));
                 return VOID;
             }
         });
