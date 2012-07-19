@@ -7,17 +7,10 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.handlers.AuditHandler;
-import com.googlecode.utterlyidle.handlers.Auditor;
-import com.googlecode.utterlyidle.handlers.HttpClient;
-import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import com.googlecode.yadic.Container;
-import com.googlecode.yadic.SimpleContainer;
 
 import java.io.PrintStream;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 
@@ -61,18 +54,8 @@ public class QueuesCrawler extends AbstractCrawler {
 
 
     private Container crawlContainer(UUID id, Model crawler) {
-        Container container = new SimpleContainer(requestContainer);
-        container.add(StagedJobExecutor.class);
-        container.addInstance(PrintStream.class, log);
-        container.add(Auditor.class, PrintAuditor.class);
-        container.addInstance(HttpHandler.class, crawlerHttpHandler);
-        container.add(HttpClient.class, AuditHandler.class);
-        container.addInstance(CrawlerFailures.class, retry);
-        container.add(FailureHandler.class);
-        container.addInstance(AtomicInteger.class, new AtomicInteger(0));
-        container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(checkpointHandler, id, crawler));
-        return container;
-    }
+        return CrawlContainer.crawlContainer(requestContainer, log, crawlerHttpHandler, retry, new CheckpointUpdater(checkpointHandler, id, crawler));
+   }
 
     private Sequence<Keyword<?>> checkOnlyOne(Definition definition) {
         Sequence<Keyword<?>> uniques = definition.fields().filter(RecordDefinition.UNIQUE_FILTER);
