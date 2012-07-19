@@ -10,18 +10,26 @@ import com.googlecode.yadic.Container;
 
 import java.io.PrintStream;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StagedJobExecutor {
     private final InputHandler inputHandler;
     private final ProcessHandler processHandler;
     private final OutputHandler outputHandler;
     private final Application application;
+    private final CountLatch latch = new CountLatch();
 
     public StagedJobExecutor(CrawlerExecutors executors, Application application) {
         this.inputHandler = executors.inputHandler();
         this.processHandler = executors.processHandler();
         this.outputHandler = executors.outputHandler();
         this.application = application;
+    }
+
+    public int crawlAndWait(StagedJob job) throws InterruptedException {
+        crawl(job);
+        latch.await();
+        return job.container().get(AtomicInteger.class).get();
     }
 
     public Future<?> crawl(StagedJob job) throws InterruptedException {
@@ -31,8 +39,8 @@ public class StagedJobExecutor {
     }
 
     private Future<?> submit(JobExecutor jobExecutor, final Runnable function, final Container container) {
-        container.get(CountLatch.class).countUp();
-        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function, container.get(CountLatch.class)), container.get(PrintStream.class)));
+        latch.countUp();
+        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function), container.get(PrintStream.class)));
     }
 
     private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable, final Container container) {
@@ -44,14 +52,14 @@ public class StagedJobExecutor {
         };
     }
 
-    private Runnable countLatchDownAfter(final Runnable function, final CountLatch countLatch) {
+    private Runnable countLatchDownAfter(final Runnable function) {
         return new Runnable() {
             @Override
             public void run() {
                 try {
                     function.run();
                 } finally {
-                    countLatch.countDown();
+                    latch.countDown();
                 }
             }
         };
