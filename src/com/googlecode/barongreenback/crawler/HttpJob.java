@@ -16,23 +16,16 @@ import static java.util.Collections.unmodifiableMap;
 
 public class HttpJob implements StagedJob {
     protected final Map<String, Object> context;
-    private final Container container;
 
-    protected HttpJob(Container container, Map<String, Object> context) {
-        this.container = container;
+    protected HttpJob(Map<String, Object> context) {
         this.context = unmodifiableMap(context);
     }
 
-    public static HttpJob job(Container container, HttpDatasource datasource, Definition destination) {
+    public static HttpJob job(HttpDatasource datasource, Definition destination) {
         ConcurrentMap<String, Object> context = new ConcurrentHashMap<String, Object>();
         context.put("datasource", datasource);
         context.put("destination", destination);
-        return new HttpJob(container, context);
-    }
-
-    @Override
-    public Container container() {
-        return container;
+        return new HttpJob(context);
     }
 
     @Override
@@ -46,11 +39,11 @@ public class HttpJob implements StagedJob {
     }
 
     @Override
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process() {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container container) {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                return new SubfeedJobCreator(container, datasource(), destination()).process(transformData(loadDocument(response), datasource().source()).realise());
+                return new SubfeedJobCreator(datasource(), destination()).process(transformData(loadDocument(response), datasource().source()).realise());
             }
         };
     }

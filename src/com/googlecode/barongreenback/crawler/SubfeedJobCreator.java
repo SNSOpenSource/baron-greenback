@@ -20,12 +20,10 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.one;
 
 public class SubfeedJobCreator {
-    private final Container container;
     private final HttpDatasource parentDatasource;
     private final Definition destination;
 
-    public SubfeedJobCreator(Container container, HttpDatasource parentDatasource, Definition destination) {
-        this.container = container;
+    public SubfeedJobCreator(HttpDatasource parentDatasource, Definition destination) {
         this.parentDatasource = parentDatasource;
         this.destination = destination;
     }
@@ -62,6 +60,6 @@ public class SubfeedJobCreator {
         Record newRecord = one(record).map(merge(parentDatasource.record())).head();
         Definition subfeedDefinition = subfeedField.first().metadata().get(RECORD_DEFINITION).definition();
 
-        return HttpJob.job(container, SubfeedDatasource.datasource(uri, subfeedDefinition, newRecord), destination);
+        return HttpJob.job(SubfeedDatasource.datasource(uri, subfeedDefinition, newRecord), destination);
     }
 }

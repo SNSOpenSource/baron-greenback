@@ -44,7 +44,7 @@ public class DataWriter {
         return 0;
     }
 
-    public static Function1<Sequence<Record>, Number> write(final Application application, final StagedJob job) {
+    public static Function1<Sequence<Record>, Number> write(final Application application, final StagedJob job, final Container crawlContainer) {
         return new Function1<Sequence<Record>, Number>() {
             @Override
             public Number call(final Sequence<Record> newData) throws Exception {
@@ -53,7 +53,7 @@ public class DataWriter {
                     public Number call(Container container) throws Exception {
                         try {
                             Number updated = new DataWriter(container.get(BaronGreenbackRecords.class).value(), container.get(PrintStream.class)).writeUnique(job.destination(), newData);
-                            job.container().get(AtomicInteger.class).addAndGet(updated.intValue());
+                            crawlContainer.get(AtomicInteger.class).addAndGet(updated.intValue());
                             return updated;
                         } catch (Exception e) {
                             e.printStackTrace();

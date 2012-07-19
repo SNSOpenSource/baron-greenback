@@ -10,13 +10,11 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 public interface StagedJob {
-    Container container();
-
     HttpDatasource datasource();
 
     Definition destination();
 
-    Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process();
+    Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(Container container);
 
     public static class functions {
         public static Callable1<StagedJob, HttpDatasource> datasource() {

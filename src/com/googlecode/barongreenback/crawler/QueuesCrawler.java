@@ -6,19 +6,11 @@ import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.handlers.AuditHandler;
-import com.googlecode.utterlyidle.handlers.Auditor;
-import com.googlecode.utterlyidle.handlers.HttpClient;
-import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import com.googlecode.yadic.Container;
-import com.googlecode.yadic.SimpleContainer;
 
 import java.io.PrintStream;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 
@@ -27,19 +19,16 @@ public class QueuesCrawler extends AbstractCrawler {
     private final PrintStream log;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
-    private final CrawlerFailures retry;
-    private final StagedJobExecutor executor;
+    private final Container requestContainer;
 
     public QueuesCrawler(CrawlerRepository crawlerRepository, ModelRepository modelRepository, CrawlerHttpClient crawlerHttpHandler,
-                         CheckPointHandler checkpointHandler, StringMappings mappings, CrawlerFailures retry, PrintStream log,
-                         StagedJobExecutor executor) {
+                         CheckPointHandler checkpointHandler, StringMappings mappings, PrintStream log, Container requestContainer) {
         super(crawlerRepository, modelRepository);
         this.crawlerHttpHandler = crawlerHttpHandler;
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
-        this.retry = retry;
         this.log = log;
-        this.executor = executor;
+        this.requestContainer = requestContainer;
     }
 
     @Override
@@ -55,26 +44,13 @@ public class QueuesCrawler extends AbstractCrawler {
 
         Container crawlContainer = crawlContainer(id, crawler);
 
-        executor.crawl(masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
-
-        crawlContainer.get(CountLatch.class).await();
-        return crawlContainer.get(AtomicInteger.class).get();
+        return crawlContainer.get(StagedJobExecutor.class).crawlAndWait(
+                masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
     }
-
 
     private Container crawlContainer(UUID id, Model crawler) {
-        Container container = new SimpleContainer();
-        container.addInstance(PrintStream.class, log);
-        container.add(Auditor.class, PrintAuditor.class);
-        container.addInstance(HttpHandler.class, crawlerHttpHandler);
-        container.add(HttpClient.class, AuditHandler.class);
-        container.addInstance(CrawlerFailures.class, retry);
-        container.add(FailureHandler.class);
-        container.add(CountLatch.class);
-        container.addInstance(AtomicInteger.class, new AtomicInteger(0));
-        container.addInstance(CheckpointUpdater.class, new CheckpointUpdater(checkpointHandler, id, crawler));
-        return container;
-    }
+        return CrawlerScope.crawlContainer(requestContainer, log, crawlerHttpHandler, new CheckpointUpdater(checkpointHandler, id, crawler));
+   }
 
     private Sequence<Keyword<?>> checkOnlyOne(Definition definition) {
         Sequence<Keyword<?>> uniques = definition.fields().filter(RecordDefinition.UNIQUE_FILTER);

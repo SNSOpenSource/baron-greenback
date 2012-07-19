@@ -9,7 +9,6 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,8 +19,8 @@ import static com.googlecode.totallylazy.Predicates.where;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
-    private MasterPaginatedHttpJob(Container container, Map<String, Object> context, StringMappings mappings) {
-        super(container, context, mappings);
+    private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
+        super(context, mappings);
     }
 
 
@@ -36,20 +35,20 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         context.put("checkpointXPath", checkpointXPath(datasource.source()));
         context.put("checkpointAsString", checkpointAsString(mappings, checkpoint));
 
-        return new MasterPaginatedHttpJob(crawlContainer, context, mappings);
+        return new MasterPaginatedHttpJob(context, mappings);
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process() {
+    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container container) {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
                 Option<Document> document = loadDocument(response);
 
                 for (Document doc : document) {
-                    container().get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
+                    container.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
                 }
 
-                return processDocument(document, container());
+                return processDocument(document, container);
             }
         };
     }

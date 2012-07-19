@@ -10,48 +10,58 @@ import com.googlecode.yadic.Container;
 
 import java.io.PrintStream;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StagedJobExecutor {
     private final InputHandler inputHandler;
     private final ProcessHandler processHandler;
     private final OutputHandler outputHandler;
     private final Application application;
+    private final CountLatch latch = new CountLatch();
+    private final Container container;
 
-    public StagedJobExecutor(CrawlerExecutors executors, Application application) {
+    public StagedJobExecutor(CrawlerExecutors executors, Application application, Container crawlContainer) {
+        this.container = crawlContainer;
         this.inputHandler = executors.inputHandler();
         this.processHandler = executors.processHandler();
         this.outputHandler = executors.outputHandler();
         this.application = application;
     }
 
+    public int crawlAndWait(StagedJob job) throws InterruptedException {
+        crawl(job);
+        latch.await();
+        return container.get(AtomicInteger.class).get();
+    }
+
     public Future<?> crawl(StagedJob job) throws InterruptedException {
-        return submit(inputHandler, HttpReader.getInput(job).then(
-                submit(processHandler, processJobs(job.process()).then(
-                        submit(outputHandler, DataWriter.write(application, job), job.container())), job.container())), job.container());
+        return submit(inputHandler, HttpReader.getInput(job, container).then(
+                submit(processHandler, processJobs(job.process(container)).then(
+                        submit(outputHandler, DataWriter.write(application, job, container))))));
     }
 
-    private Future<?> submit(JobExecutor jobExecutor, final Runnable function, final Container container) {
-        container.get(CountLatch.class).countUp();
-        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function, container.get(CountLatch.class)), container.get(PrintStream.class)));
+    private Future<?> submit(JobExecutor jobExecutor, final Runnable function) {
+        latch.countUp();
+        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function), container.get(PrintStream.class)));
     }
 
-    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable, final Container container) {
+    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable) {
         return new Function1<T, Future<?>>() {
             @Override
             public Future<?> call(T result) throws Exception {
-                return submit(jobExecutor, runnable.deferApply(result), container);
+                return submit(jobExecutor, runnable.deferApply(result));
             }
         };
     }
 
-    private Runnable countLatchDownAfter(final Runnable function, final CountLatch countLatch) {
+    private Runnable countLatchDownAfter(final Runnable function) {
         return new Runnable() {
             @Override
             public void run() {
                 try {
                     function.run();
                 } finally {
-                    countLatch.countDown();
+                    latch.countDown();
                 }
             }
         };
