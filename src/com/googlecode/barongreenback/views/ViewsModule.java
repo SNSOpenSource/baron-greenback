@@ -19,6 +19,7 @@ public class ViewsModule implements ResourcesModule, RequestScopedModule{
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(Views.class);
         container.add(RecordsService.class);
+        container.add(ViewsRepository.class);
         return this;
     }
 }

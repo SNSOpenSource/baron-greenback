@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -32,8 +33,8 @@ public class SequentialCrawler extends AbstractCrawler {
     private final CheckPointHandler checkPointHandler;
     private final PrintStream log;
 
-    public SequentialCrawler(CrawlerRepository crawlerRepository, ModelRepository modelRepository, StringMappings mappings, CrawlerHttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler1, PrintStream log) {
-        super(crawlerRepository, modelRepository);
+    public SequentialCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository, StringMappings mappings, CrawlerHttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler1, PrintStream log) {
+        super(crawlerRepository, viewsRepository);
         this.mappings = mappings;
         this.httpClient = httpClient;
         this.records = records;

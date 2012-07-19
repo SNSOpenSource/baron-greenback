@@ -1,8 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
-import com.googlecode.barongreenback.views.Views;
+import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -15,16 +14,13 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
-import static com.googlecode.barongreenback.views.Views.find;
-import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Uri.uri;
-import static java.util.UUID.randomUUID;
 
 public abstract class AbstractCrawler implements Crawler {
     private final CrawlerRepository crawlerRepository;
-    protected final ModelRepository viewRepository;
+    protected final ViewsRepository viewRepository;
 
-    public AbstractCrawler(CrawlerRepository crawlerRepository, ModelRepository viewRepository) {
+    public AbstractCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewRepository) {
         this.crawlerRepository = crawlerRepository;
         this.viewRepository = viewRepository;
     }
@@ -34,16 +30,7 @@ public abstract class AbstractCrawler implements Crawler {
     }
 
     protected void updateView(Model crawler, Sequence<Keyword<?>> keywords) {
-        final String name = name(crawler);
-        if (find(viewRepository, name).isEmpty()) {
-            viewRepository.set(randomUUID(), model().add(Views.ROOT, model().
-                    add("name", name).
-                    add("records", update(crawler)).
-                    add("query", "").
-                    add("visible", true).
-                    add("priority", "").
-                    add("keywords", keywords.map(Views.asModel()).toList())));
-        }
+        ViewsRepository.ensureViewForCrawlerExists(viewRepository, crawler, keywords);
     }
 
     public static Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {

@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -21,9 +22,9 @@ public class QueuesCrawler extends AbstractCrawler {
     private final StringMappings mappings;
     private final Container requestContainer;
 
-    public QueuesCrawler(CrawlerRepository crawlerRepository, ModelRepository modelRepository, CrawlerHttpClient crawlerHttpHandler,
+    public QueuesCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository, CrawlerHttpClient crawlerHttpHandler,
                          CheckPointHandler checkpointHandler, StringMappings mappings, PrintStream log, Container requestContainer) {
-        super(crawlerRepository, modelRepository);
+        super(crawlerRepository, viewsRepository);
         this.crawlerHttpHandler = crawlerHttpHandler;
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
