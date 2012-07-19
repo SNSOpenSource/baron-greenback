@@ -25,8 +25,8 @@ public class CrawlerScope implements Container {
         Containers.selfRegister(container);
     }
 
-    public static CrawlerScope crawlerScope(Container requestContainer, CheckpointUpdater checkpointUpdater) {
-        return new CrawlerScope(requestContainer, checkpointUpdater);
+    public static CrawlerScope crawlerScope(Container requestScope, CheckpointUpdater checkpointUpdater) {
+        return new CrawlerScope(requestScope, checkpointUpdater);
     }
 
     @Override

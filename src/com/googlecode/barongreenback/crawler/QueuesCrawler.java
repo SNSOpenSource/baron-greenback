@@ -14,15 +14,13 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 
 public class QueuesCrawler extends AbstractCrawler {
-    private final CrawlerHttpClient crawlerHttpHandler;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
     private final Container requestContainer;
 
-    public QueuesCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository, CrawlerHttpClient crawlerHttpHandler,
+    public QueuesCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository,
                          CheckPointHandler checkpointHandler, StringMappings mappings, Container requestContainer) {
         super(crawlerRepository, viewsRepository);
-        this.crawlerHttpHandler = crawlerHttpHandler;
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
         this.requestContainer = requestContainer;
@@ -35,12 +33,12 @@ public class QueuesCrawler extends AbstractCrawler {
         Definition destination = destinationDefinition(crawler);
         checkOnlyOne(destination);
 
-        HttpDatasource datasource = HttpDatasource.datasource(from(crawler), source);
+        HttpDatasource datasource = HttpDatasource.datasource(from(crawler), id, source);
 
         Container crawlerScope = crawlerScope(id, crawler);
 
         return crawlerScope.get(StagedJobExecutor.class).crawlAndWait(
-                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
+                masterPaginatedHttpJob(datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
     }
 
     private Container crawlerScope(UUID id, Model crawler) {

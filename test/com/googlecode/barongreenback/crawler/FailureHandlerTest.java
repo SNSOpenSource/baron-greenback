@@ -1,24 +1,24 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
-import com.googlecode.totallylazy.Exceptions;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Status;
-import com.googlecode.yadic.SimpleContainer;
 import org.junit.Test;
 
-import static com.googlecode.totallylazy.Exceptions.*;
+import java.util.UUID;
+
+import static com.googlecode.totallylazy.Exceptions.asString;
 import static com.googlecode.totallylazy.Uri.uri;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class FailureHandlerTest {
-    private static final HttpDatasource DATASOURCE = new HttpDatasource(uri("/any/uri"), null);
+    private static final HttpDatasource DATASOURCE = new HttpDatasource(uri("/any/uri"), UUID.randomUUID(), null);
     private static final HttpJob JOB = HttpJob.job(DATASOURCE, Definition.constructors.definition(null, null));
     private CrawlerFailures crawlerFailures = new CrawlerFailures();
     private FailureHandler failureHandler = new FailureHandler(crawlerFailures);

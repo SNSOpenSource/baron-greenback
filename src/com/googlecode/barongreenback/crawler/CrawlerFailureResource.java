@@ -14,6 +14,7 @@ import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.yadic.Container;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -31,12 +32,14 @@ import static com.googlecode.utterlyidle.Responses.response;
 public class CrawlerFailureResource {
     private final CrawlerFailures crawlerFailures;
     private final Redirector redirector;
-    private final StagedJobExecutor executor;
+    private final CrawlerRepository crawlerRepository;
+    private final Container requestScope;
 
-    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, StagedJobExecutor executor) {
+    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope) {
         this.crawlerFailures = crawlerFailures;
         this.redirector = redirector;
-        this.executor = executor;
+        this.crawlerRepository = crawlerRepository;
+        this.requestScope = requestScope;
     }
 
     @GET
@@ -46,9 +49,9 @@ public class CrawlerFailureResource {
                 add("anyExists", !crawlerFailures.isEmpty()).
                 add("failures", sequence(crawlerFailures.values().entrySet()).map(toModel()).toList());
         message.fold(model, toMessageModel())
-                .add("retryUrl",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null))))
-                .add("ignoreUrl",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null))))
-                .add("retryAll",redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retryAll())))
+                .add("retryUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null))))
+                .add("ignoreUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null))))
+                .add("retryAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retryAll())))
                 .add("ignoreAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignoreAll())));
         return model;
     }
@@ -127,7 +130,7 @@ public class CrawlerFailureResource {
         return new Callable1<Pair<StagedJob, String>, Response>() {
             @Override
             public Response call(Pair<StagedJob, String> failure) throws Exception {
-                executor.crawl(failure.first());
+                executor(failure.first()).crawl(failure.first());
                 crawlerFailures.delete(id);
                 return backToMe("Job retried");
             }
@@ -149,5 +152,12 @@ public class CrawlerFailureResource {
                         add("id", entry.getKey());
             }
         };
+    }
+
+    private StagedJobExecutor executor(StagedJob stagedJob) {
+        CrawlerScope crawlerScope = CrawlerScope.crawlerScope(requestScope,
+                new CheckpointUpdater(requestScope.get(CheckPointHandler.class), stagedJob.datasource().crawlerId(),
+                        crawlerRepository.modelFor(stagedJob.datasource().crawlerId()).get()));
+        return crawlerScope.get(StagedJobExecutor.class);
     }
 }
