@@ -32,6 +32,10 @@ public class CrawlerRepository {
         this.modelRepository = modelRepository;
     }
 
+    public Model crawlerFor(UUID id) {
+        return modelFor(id).get().get("form", Model.class);
+    }
+
     public Sequence<Pair<UUID, Model>> allCrawlerModels() {
         return modelRepository.find(where(MODEL_TYPE, is("form"))).map(Callables.<UUID, Model, Model>second(addName()));
     }

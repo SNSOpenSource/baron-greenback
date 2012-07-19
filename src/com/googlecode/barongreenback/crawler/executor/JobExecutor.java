@@ -1,5 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.executor;
 
+import com.googlecode.barongreenback.crawler.StatusMonitor;
 import com.googlecode.totallylazy.Option;
 
 import java.util.concurrent.ExecutorService;

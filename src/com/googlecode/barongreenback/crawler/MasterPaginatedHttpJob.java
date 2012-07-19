@@ -1,5 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.views.ViewsRepository;
+import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -11,6 +13,7 @@ import org.w3c.dom.Document;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.lazyrecords.Keywords.metadata;
@@ -18,14 +21,13 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
-
     private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
         super(context, mappings);
     }
 
-
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID id, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
         Map<String, Object> context = new HashMap<String, Object>();
+        context.put("crawlerId", id);
         context.put("datasource", datasource);
         context.put("destination", destination);
 
@@ -37,10 +39,16 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         return new MasterPaginatedHttpJob(context, mappings);
     }
 
+    public UUID crawlerId() {
+        return (UUID) context.get("crawlerId");
+    }
+
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
+                updateView(crawlerScope);
+
                 Option<Document> document = loadDocument(response);
 
                 for (Document doc : document) {
@@ -48,6 +56,13 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
                 }
 
                 return processDocument(document, crawlerScope);
+            }
+
+            private void updateView(Container crawlerScope) {
+                ViewsRepository viewsRepository = crawlerScope.get(ViewsRepository.class);
+                CrawlerRepository crawlerRepository = crawlerScope.get(CrawlerRepository.class);
+                Model crawler = crawlerRepository.crawlerFor(crawlerId());
+                viewsRepository.ensureViewForCrawlerExists(crawler, AbstractCrawler.destinationDefinition(crawler).fields());
             }
         };
     }

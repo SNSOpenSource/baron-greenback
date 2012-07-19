@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.batch;
 
-import com.googlecode.barongreenback.crawler.CrawlerExecutors;
+import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
 import com.googlecode.barongreenback.jobs.HttpScheduler;
 import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.queues.Queues;

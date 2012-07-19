@@ -26,11 +26,11 @@ public abstract class AbstractCrawler implements Crawler {
     }
 
     protected Model crawlerFor(UUID id) {
-        return crawlerRepository.modelFor(id).get().get("form", Model.class);
+        return crawlerRepository.crawlerFor(id);
     }
 
     protected void updateView(Model crawler, Sequence<Keyword<?>> keywords) {
-        ViewsRepository.ensureViewForCrawlerExists(viewRepository, crawler, keywords);
+        viewRepository.ensureViewForCrawlerExists(crawler, keywords);
     }
 
     public static Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {

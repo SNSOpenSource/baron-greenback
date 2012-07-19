@@ -30,10 +30,10 @@ public class ViewsRepository {
                 add("keywords", keywords.map(Views.asModel()).toList()));
     }
 
-    public static void ensureViewForCrawlerExists(ViewsRepository viewRepository, Model crawler, Sequence<Keyword<?>> keywords) {
+    public void ensureViewForCrawlerExists(Model crawler, Sequence<Keyword<?>> keywords) {
         final String name = AbstractCrawler.name(crawler);
-        if (viewRepository.viewForName(name).isEmpty()) {
-            viewRepository.set(randomUUID(), viewModel(keywords, name, AbstractCrawler.update(crawler), "", true, ""));
+        if (viewForName(name).isEmpty()) {
+            set(randomUUID(), viewModel(keywords, name, AbstractCrawler.update(crawler), "", true, ""));
         }
     }
 
