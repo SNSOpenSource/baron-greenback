@@ -10,7 +10,6 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
-import com.googlecode.yadic.SimpleContainer;
 import org.junit.Test;
 
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
@@ -34,7 +33,7 @@ public class SubfeedJobCreatorTest {
 
     @Test
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {
-        Sequence<StagedJob> jobs = new SubfeedJobCreator(new SimpleContainer(), SubfeedDatasource.datasource(null, null, record()), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
+        Sequence<StagedJob> jobs = new SubfeedJobCreator(SubfeedDatasource.datasource(null, null, record()), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
         assertThat(jobs.size(), NumberMatcher.is(1));
         assertThat(jobs.head().destination(), is(SOME_DESTINATION));
         assertThat(jobs.head().datasource().uri(), is(URI));
@@ -43,14 +42,14 @@ public class SubfeedJobCreatorTest {
     @Test
     public void shouldPassDownKeyAndValuesToSubfeedJobs() throws Exception {
         Record previousUnique = record(one(Pair.<Keyword<?>, Object>pair(PREV_UNIQUE, "bar")));
-        Sequence<StagedJob> jobs = new SubfeedJobCreator(new SimpleContainer(), SubfeedDatasource.datasource(null, null, previousUnique), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
+        Sequence<StagedJob> jobs = new SubfeedJobCreator(SubfeedDatasource.datasource(null, null, previousUnique), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
         Record record = record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)));
         assertThat(jobs.head().datasource().record(), is(one(record).map(merge(previousUnique)).head()));
     }
 
     @Test
     public void shouldMergeUniqueKeysIntoEachRecord() throws Exception {
-        Pair<Sequence<Record>, Sequence<StagedJob>> records = new SubfeedJobCreator(new SimpleContainer(),
+        Pair<Sequence<Record>, Sequence<StagedJob>> records = new SubfeedJobCreator(
                 SubfeedDatasource.datasource(null, null, record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)))), SOME_DESTINATION).process(one(record().set(PERSON_NAME, "Dan")));
         assertThat(records.first(), is(one(record().set(PERSON_NAME, "Dan").set(LINK, URI))));
     }

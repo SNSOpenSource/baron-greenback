@@ -19,20 +19,15 @@ public class QueuesCrawler extends AbstractCrawler {
     private final PrintStream log;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
-    private final CrawlerFailures retry;
-    private final StagedJobExecutor executor;
     private final Container requestContainer;
 
     public QueuesCrawler(CrawlerRepository crawlerRepository, ModelRepository modelRepository, CrawlerHttpClient crawlerHttpHandler,
-                         CheckPointHandler checkpointHandler, StringMappings mappings, CrawlerFailures retry, PrintStream log,
-                         StagedJobExecutor executor, Container requestContainer) {
+                         CheckPointHandler checkpointHandler, StringMappings mappings, PrintStream log, Container requestContainer) {
         super(crawlerRepository, modelRepository);
         this.crawlerHttpHandler = crawlerHttpHandler;
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
-        this.retry = retry;
         this.log = log;
-        this.executor = executor;
         this.requestContainer = requestContainer;
     }
 
@@ -49,12 +44,12 @@ public class QueuesCrawler extends AbstractCrawler {
 
         Container crawlContainer = crawlContainer(id, crawler);
 
-        return executor.crawlAndWait(masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
+        return crawlContainer.get(StagedJobExecutor.class).crawlAndWait(
+                masterPaginatedHttpJob(crawlContainer, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
     }
 
-
     private Container crawlContainer(UUID id, Model crawler) {
-        return CrawlContainer.crawlContainer(requestContainer, log, crawlerHttpHandler, retry, new CheckpointUpdater(checkpointHandler, id, crawler));
+        return CrawlerScope.crawlContainer(requestContainer, log, crawlerHttpHandler, new CheckpointUpdater(checkpointHandler, id, crawler));
    }
 
     private Sequence<Keyword<?>> checkOnlyOne(Definition definition) {

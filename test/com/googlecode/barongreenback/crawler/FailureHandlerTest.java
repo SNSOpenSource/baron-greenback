@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 
 public class FailureHandlerTest {
     private static final HttpDatasource DATASOURCE = new HttpDatasource(uri("/any/uri"), null);
-    private static final HttpJob JOB = HttpJob.job(new SimpleContainer(), DATASOURCE, Definition.constructors.definition(null, null));
+    private static final HttpJob JOB = HttpJob.job(DATASOURCE, Definition.constructors.definition(null, null));
     private CrawlerFailures crawlerFailures = new CrawlerFailures();
     private FailureHandler failureHandler = new FailureHandler(crawlerFailures);
 
