@@ -6,7 +6,6 @@ import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
