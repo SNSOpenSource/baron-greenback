@@ -3,7 +3,7 @@ package com.googlecode.barongreenback.search;
 import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.barongreenback.shared.AdvancedMode;
-import com.googlecode.barongreenback.views.Views;
+import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
@@ -34,8 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
-import static com.googlecode.barongreenback.views.Views.unwrap;
-import static com.googlecode.barongreenback.views.Views.view;
+import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.lazyrecords.Keywords.keywords;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -107,7 +106,7 @@ public class SearchResource {
         final Option<Record> record = recordsService.findUnique(viewName, query);
         if (record.isEmpty()) return Responses.response(Status.NOT_FOUND);
 
-        Map<String, Map<String, Object>> group = record.get().fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(Views.GROUP));
+        Map<String, Map<String, Object>> group = record.get().fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(ViewsRepository.GROUP));
         return baseModel(viewName, query).add("record", group);
     }
 

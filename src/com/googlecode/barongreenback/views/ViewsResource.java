@@ -29,10 +29,10 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.shared.Forms.NUMBER_OF_FIELDS;
 import static com.googlecode.barongreenback.shared.Forms.addTemplates;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
-import static com.googlecode.barongreenback.views.Views.clean;
-import static com.googlecode.barongreenback.views.Views.name;
-import static com.googlecode.barongreenback.views.Views.priority;
-import static com.googlecode.barongreenback.views.Views.valueFor;
+import static com.googlecode.barongreenback.views.ViewsRepository.clean;
+import static com.googlecode.barongreenback.views.ViewsRepository.name;
+import static com.googlecode.barongreenback.views.ViewsRepository.priority;
+import static com.googlecode.barongreenback.views.ViewsRepository.valueFor;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.ascending;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -56,7 +56,7 @@ public class ViewsResource {
     @GET
     @Path("menu")
     public Model menu(@QueryParam("current") @DefaultValue("") String current, @QueryParam("query") @DefaultValue("") String query) {
-        return modelsWithViewData(current, Views.where(valueFor("visible", Boolean.class), is(true)), query);
+        return modelsWithViewData(current, ViewsRepository.where(valueFor("visible", Boolean.class), is(true)), query);
     }
 
 
@@ -102,7 +102,7 @@ public class ViewsResource {
     @Path("copy")
     public Response copy(@FormParam("id") UUID id) {
         Option<Model> modelOption = modelRepository.get(id);
-        Model modelCopy = Views.copy(modelOption.get());
+        Model modelCopy = ViewsRepository.copy(modelOption.get());
         modelRepository.set(UUID.randomUUID(), modelCopy);
         return redirectToList();
     }
