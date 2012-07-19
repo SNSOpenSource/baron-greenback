@@ -6,7 +6,11 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
@@ -14,7 +18,6 @@ import org.w3c.dom.Document;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.lazyrecords.Keywords.metadata;
@@ -26,9 +29,8 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         super(context, mappings);
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID id, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
         Map<String, Object> context = new HashMap<String, Object>();
-        context.put("crawlerId", id);
         context.put("datasource", datasource);
         context.put("destination", destination);
 
@@ -38,10 +40,6 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         context.put("checkpointAsString", checkpointAsString(mappings, checkpoint));
 
         return new MasterPaginatedHttpJob(context, mappings);
-    }
-
-    public UUID crawlerId() {
-        return (UUID) context.get("crawlerId");
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
@@ -62,7 +60,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
             private void updateView(Container crawlerScope) {
                 ViewsRepository viewsRepository = crawlerScope.get(ViewsRepository.class);
                 CrawlerRepository crawlerRepository = crawlerScope.get(CrawlerRepository.class);
-                Model crawler = crawlerRepository.crawlerFor(crawlerId());
+                Model crawler = crawlerRepository.crawlerFor(datasource().crawlerId());
                 viewsRepository.ensureViewForCrawlerExists(crawler, AbstractCrawler.destinationDefinition(crawler).fields());
             }
         };

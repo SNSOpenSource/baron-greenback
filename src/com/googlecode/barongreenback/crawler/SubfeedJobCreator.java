@@ -9,7 +9,6 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.yadic.Container;
 
 import static com.googlecode.barongreenback.crawler.StagedJob.functions.datasource;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
@@ -60,6 +59,6 @@ public class SubfeedJobCreator {
         Record newRecord = one(record).map(merge(parentDatasource.record())).head();
         Definition subfeedDefinition = subfeedField.first().metadata().get(RECORD_DEFINITION).definition();
 
-        return HttpJob.job(SubfeedDatasource.datasource(uri, subfeedDefinition, newRecord), destination);
+        return HttpJob.job(SubfeedDatasource.datasource(uri, parentDatasource.crawlerId(), subfeedDefinition, newRecord), destination);
     }
 }

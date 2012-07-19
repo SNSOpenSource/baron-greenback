@@ -6,21 +6,25 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 
+import java.util.UUID;
+
 public class HttpDatasource {
     protected final Uri uri;
+    private final UUID id;
     protected final Definition source;
 
-    public HttpDatasource(Uri uri, Definition source) {
+    public HttpDatasource(Uri uri, UUID id, Definition source) {
         this.uri = uri;
+        this.id = id;
         this.source = source;
     }
 
-    public static HttpDatasource datasource(Uri uri, Definition source) {
-        return new HttpDatasource(uri, source);
+    public static HttpDatasource datasource(Uri uri, UUID id, Definition source) {
+        return new HttpDatasource(uri, id, source);
     }
 
     public HttpDatasource uri(Uri uri) {
-        return new HttpDatasource(uri, source);
+        return new HttpDatasource(uri, id, source);
     }
 
     public Uri uri() {
@@ -37,6 +41,10 @@ public class HttpDatasource {
 
     public Record record() {
         return Record.constructors.record();
+    }
+
+    public UUID crawlerId() {
+        return id;
     }
 
     @Override
