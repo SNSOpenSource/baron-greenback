@@ -11,6 +11,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -55,7 +56,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
                     crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
                 }
 
-                return processDocument(document, crawlerScope);
+                return processDocument(document);
             }
 
             private void updateView(Container crawlerScope) {
@@ -75,5 +76,14 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
     private static String checkpointAsString(StringMappings mappings, Object checkpoint) {
         if (checkpoint == null) return null;
         return mappings.toString(checkpoint.getClass(), checkpoint);
+    }
+
+    private Callable1<String, Date> toDateValue() {
+        return new Callable1<String, Date>() {
+            @Override
+            public Date call(String value) throws Exception {
+                return mappings.toValue(Date.class, value);
+            }
+        };
     }
 }

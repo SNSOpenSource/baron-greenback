@@ -9,25 +9,22 @@ import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.yadic.Container;
 
-import java.io.PrintStream;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 
 public class QueuesCrawler extends AbstractCrawler {
     private final CrawlerHttpClient crawlerHttpHandler;
-    private final PrintStream log;
     private final CheckPointHandler checkpointHandler;
     private final StringMappings mappings;
     private final Container requestContainer;
 
     public QueuesCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository, CrawlerHttpClient crawlerHttpHandler,
-                         CheckPointHandler checkpointHandler, StringMappings mappings, PrintStream log, Container requestContainer) {
+                         CheckPointHandler checkpointHandler, StringMappings mappings, Container requestContainer) {
         super(crawlerRepository, viewsRepository);
         this.crawlerHttpHandler = crawlerHttpHandler;
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
-        this.log = log;
         this.requestContainer = requestContainer;
     }
 
@@ -47,8 +44,8 @@ public class QueuesCrawler extends AbstractCrawler {
     }
 
     private Container crawlerScope(UUID id, Model crawler) {
-        return CrawlerScope.crawlerScope(requestContainer, log, crawlerHttpHandler, new CheckpointUpdater(checkpointHandler, id, crawler));
-   }
+        return CrawlerScope.crawlerScope(requestContainer, new CheckpointUpdater(checkpointHandler, id, crawler));
+    }
 
     private Sequence<Keyword<?>> checkOnlyOne(Definition definition) {
         Sequence<Keyword<?>> uniques = definition.fields().filter(RecordDefinition.UNIQUE_FILTER);

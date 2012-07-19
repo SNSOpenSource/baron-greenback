@@ -13,7 +13,6 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,25 +42,16 @@ public class PaginatedHttpJob extends HttpJob {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                return processDocument(loadDocument(response), crawlerScope);
+                return processDocument(loadDocument(response));
             }
         };
     }
 
-    protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document, Container container) {
+    protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document) {
         Sequence<Record> events = transformData(document, datasource().source());
         Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
         Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(datasource(), destination()).process(filtered);
         return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
-    }
-
-    public Callable1<String, Date> toDateValue() {
-        return new Callable1<String, Date>() {
-            @Override
-            public Date call(String value) throws Exception {
-                return mappings.toValue(Date.class, value);
-            }
-        };
     }
 
     public Option<PaginatedHttpJob> nextPageJob(Option<Document> document) {

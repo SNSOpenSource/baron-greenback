@@ -1,9 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.handlers.AuditHandler;
 import com.googlecode.utterlyidle.handlers.Auditor;
-import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
@@ -11,7 +8,6 @@ import com.googlecode.yadic.Resolver;
 import com.googlecode.yadic.SimpleContainer;
 import com.googlecode.yadic.TypeMap;
 
-import java.io.PrintStream;
 import java.lang.reflect.Type;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,21 +15,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CrawlerScope implements Container {
     private SimpleContainer container;
 
-    private CrawlerScope(Container requestScope, PrintStream log, CrawlerHttpClient crawlerHttpHandler, CheckpointUpdater checkpointUpdater) {
+    private CrawlerScope(Container requestScope, CheckpointUpdater checkpointUpdater) {
         container = new SimpleContainer(requestScope);
         container.add(StagedJobExecutor.class);
-        container.addInstance(PrintStream.class, log);
         container.add(Auditor.class, PrintAuditor.class);
-        container.addInstance(HttpHandler.class, crawlerHttpHandler);
-        container.add(HttpClient.class, AuditHandler.class);
         container.add(FailureHandler.class);
         container.addInstance(AtomicInteger.class, new AtomicInteger(0));
         container.addInstance(CheckpointUpdater.class, checkpointUpdater);
         Containers.selfRegister(container);
     }
 
-    public static CrawlerScope crawlerScope(Container requestContainer, PrintStream log, CrawlerHttpClient crawlerHttpHandler, CheckpointUpdater checkpointUpdater) {
-        return new CrawlerScope(requestContainer, log, crawlerHttpHandler, checkpointUpdater);
+    public static CrawlerScope crawlerScope(Container requestContainer, CheckpointUpdater checkpointUpdater) {
+        return new CrawlerScope(requestContainer, checkpointUpdater);
     }
 
     @Override
