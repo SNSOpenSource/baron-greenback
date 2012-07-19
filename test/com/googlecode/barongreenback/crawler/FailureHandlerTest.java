@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.Failure.failure;
 import static com.googlecode.totallylazy.Exceptions.asString;
 import static com.googlecode.totallylazy.Uri.uri;
 import static org.hamcrest.Matchers.is;
@@ -30,7 +31,7 @@ public class FailureHandlerTest {
 
         assertThat(response.entity().toString(), is(""));
         assertThat(response.status(), is(Status.NO_CONTENT));
-        assertThat(crawlerFailures.values().values().contains(Pair.<StagedJob, String>pair(JOB, originalResponse.toString())), is(true));
+        assertThat(crawlerFailures.values().values().contains(failure(JOB, originalResponse.toString())), is(true));
     }
 
     @Test
@@ -64,7 +65,7 @@ public class FailureHandlerTest {
             fail("An exception should have been thrown");
         } catch (Exception e) {
             assertThat(e, is(expectedException));
-            assertThat(crawlerFailures.values().values().contains(Pair.<StagedJob, String>pair(JOB, asString(e))), is(true));
+            assertThat(crawlerFailures.values().values().contains(failure(JOB, asString(e))), is(true));
         }
     }
 }
