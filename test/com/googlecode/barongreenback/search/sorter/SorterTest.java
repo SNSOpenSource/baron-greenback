@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.search.sorter;
 
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.MapRecord;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
