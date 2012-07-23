@@ -12,19 +12,25 @@ public class HttpDatasource {
     protected final Uri uri;
     private final UUID id;
     protected final Definition source;
+    private final Record record;
 
-    public HttpDatasource(Uri uri, UUID id, Definition source) {
+    public HttpDatasource(Uri uri, UUID id, Definition source, Record record) {
         this.uri = uri;
         this.id = id;
         this.source = source;
+        this.record = record;
     }
 
     public static HttpDatasource datasource(Uri uri, UUID id, Definition source) {
-        return new HttpDatasource(uri, id, source);
+        return new HttpDatasource(uri, id, source, Record.constructors.record());
+    }
+
+    public static HttpDatasource datasource(Uri uri, UUID id, Definition source, Record record) {
+        return new HttpDatasource(uri, id, source, record);
     }
 
     public HttpDatasource uri(Uri uri) {
-        return new HttpDatasource(uri, id, source);
+        return new HttpDatasource(uri, id, source, record);
     }
 
     public Uri uri() {
@@ -40,7 +46,7 @@ public class HttpDatasource {
     }
 
     public Record record() {
-        return Record.constructors.record();
+        return record;
     }
 
     public UUID crawlerId() {

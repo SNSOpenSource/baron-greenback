@@ -116,21 +116,21 @@ public class CrawlerFailureResource {
     }
 
 
-    private Callable1<Pair<StagedJob, String>, Response> toIgnore(final UUID id) {
-        return new Callable1<Pair<StagedJob, String>, Response>() {
+    private Callable1<Failure, Response> toIgnore(final UUID id) {
+        return new Callable1<Failure, Response>() {
             @Override
-            public Response call(Pair<StagedJob, String> stagedJobResponsePair) throws Exception {
+            public Response call(Failure stagedJobResponsePair) throws Exception {
                 crawlerFailures.delete(id);
                 return backToMe("Job ignored");
             }
         };
     }
 
-    private Callable1<Pair<StagedJob, String>, Response> toRetry(final UUID id) {
-        return new Callable1<Pair<StagedJob, String>, Response>() {
+    private Callable1<Failure, Response> toRetry(final UUID id) {
+        return new Callable1<Failure, Response>() {
             @Override
-            public Response call(Pair<StagedJob, String> failure) throws Exception {
-                executor(failure.first()).crawl(failure.first());
+            public Response call(Failure failure) throws Exception {
+                executor(failure.job()).crawl(failure.job());
                 crawlerFailures.delete(id);
                 return backToMe("Job retried");
             }
@@ -141,14 +141,14 @@ public class CrawlerFailureResource {
         return redirector.seeOther(method(on(CrawlerFailureResource.class).failures(some(message))));
     }
 
-    private Callable1<Map.Entry<UUID, Pair<StagedJob, String>>, Model> toModel() {
-        return new Callable1<Map.Entry<UUID, Pair<StagedJob, String>>, Model>() {
+    private Callable1<Map.Entry<UUID, Failure>, Model> toModel() {
+        return new Callable1<Map.Entry<UUID, Failure>, Model>() {
             @Override
-            public Model call(Map.Entry<UUID, Pair<StagedJob, String>> entry) throws Exception {
+            public Model call(Map.Entry<UUID, Failure> entry) throws Exception {
                 return model().
-                        add("job", entry.getValue().first()).
-                        add("uri", entry.getValue().first().datasource().uri()).
-                        add("response", entry.getValue().second()).
+                        add("job", entry.getValue().job()).
+                        add("uri", entry.getValue().job().datasource().uri()).
+                        add("reason", entry.getValue().reason()).
                         add("id", entry.getKey());
             }
         };

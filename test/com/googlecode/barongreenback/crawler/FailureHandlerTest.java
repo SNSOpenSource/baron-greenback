@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Pair;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.ResponseBuilder;
@@ -11,14 +10,16 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.Failure.failure;
 import static com.googlecode.totallylazy.Exceptions.asString;
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Uri.uri;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class FailureHandlerTest {
-    private static final HttpDatasource DATASOURCE = new HttpDatasource(uri("/any/uri"), UUID.randomUUID(), null);
+    private static final HttpDatasource DATASOURCE = HttpDatasource.datasource(uri("/any/uri"), UUID.randomUUID(), null);
     private static final HttpJob JOB = HttpJob.job(DATASOURCE, Definition.constructors.definition(null, null));
     private CrawlerFailures crawlerFailures = new CrawlerFailures();
     private FailureHandler failureHandler = new FailureHandler(crawlerFailures);
@@ -30,7 +31,7 @@ public class FailureHandlerTest {
 
         assertThat(response.entity().toString(), is(""));
         assertThat(response.status(), is(Status.NO_CONTENT));
-        assertThat(crawlerFailures.values().values().contains(Pair.<StagedJob, String>pair(JOB, originalResponse.toString())), is(true));
+        assertThat(crawlerFailures.values().values().contains(failure(JOB, originalResponse.toString())), is(true));
     }
 
     @Test
@@ -64,7 +65,7 @@ public class FailureHandlerTest {
             fail("An exception should have been thrown");
         } catch (Exception e) {
             assertThat(e, is(expectedException));
-            assertThat(crawlerFailures.values().values().contains(Pair.<StagedJob, String>pair(JOB, asString(e))), is(true));
+            assertThat(crawlerFailures.values().values().contains(failure(JOB, asString(e))), is(true));
         }
     }
 }

@@ -59,6 +59,6 @@ public class SubfeedJobCreator {
         Record newRecord = one(record).map(merge(parentDatasource.record())).head();
         Definition subfeedDefinition = subfeedField.first().metadata().get(RECORD_DEFINITION).definition();
 
-        return HttpJob.job(SubfeedDatasource.datasource(uri, parentDatasource.crawlerId(), subfeedDefinition, newRecord), destination);
+        return HttpJob.job(HttpDatasource.datasource(uri, parentDatasource.crawlerId(), subfeedDefinition, newRecord), destination);
     }
 }
