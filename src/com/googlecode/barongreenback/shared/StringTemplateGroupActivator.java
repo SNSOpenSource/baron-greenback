@@ -2,11 +2,8 @@ package com.googlecode.barongreenback.shared;
 
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.crawler.HttpDatasource;
-import com.googlecode.barongreenback.crawler.SubfeedDatasource;
 import com.googlecode.barongreenback.search.pager.PagerRenderer;
 import com.googlecode.barongreenback.search.pager.RequestPager;
-import com.googlecode.funclate.Renderer;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.URLs;
@@ -45,18 +42,6 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
         shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
         shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer(shared));
-        shared.registerRenderer(instanceOf(HttpDatasource.class), new Renderer<HttpDatasource>() {
-            @Override
-            public String render(HttpDatasource httpDatasource) throws Exception {
-                return "HTTPDDATASOURCES:" + httpDatasource.toString();
-            }
-        });
-        shared.registerRenderer(instanceOf(SubfeedDatasource.class), new Renderer<HttpDatasource>() {
-            @Override
-            public String render(HttpDatasource httpDatasource) throws Exception {
-                return "SUBFEEDS!:" + httpDatasource.toString();
-            }
-        });
         return new EnhancedStringTemplateGroup(baseUrl, shared);
     }
 
