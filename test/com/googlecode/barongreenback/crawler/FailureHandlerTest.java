@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
@@ -19,7 +20,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class FailureHandlerTest {
-    private static final HttpDatasource DATASOURCE = HttpDatasource.datasource(uri("/any/uri"), UUID.randomUUID(), null);
+    private static final HttpDatasource DATASOURCE = HttpDatasource.datasource(uri("/any/uri"), UUID.randomUUID(), null, Record.constructors.record());
     private static final HttpJob JOB = HttpJob.job(DATASOURCE, Definition.constructors.definition(null, null));
     private CrawlerFailures crawlerFailures = new CrawlerFailures();
     private FailureHandler failureHandler = new FailureHandler(crawlerFailures);

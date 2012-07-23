@@ -30,4 +30,9 @@ public class Failure {
     public boolean equals(Object other) {
         return other instanceof Failure && job.equals(((Failure) other).job()) && reason.equals(((Failure) other).reason());
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s, %s", job.toString(), reason);
+    }
 }

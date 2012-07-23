@@ -1,10 +1,10 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.utterlyidle.Response;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class CrawlerFailures implements StatusMonitor {
     public static final int MAX_FAILURES = 100000;

@@ -106,4 +106,9 @@ public class PaginatedHttpJob extends HttpJob {
     private String checkpointAsString() {
         return (String) context.get("checkpointAsString");
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s, checkpoint: %s, moreXPath: %s, checkpointXPath: %s, checkpointAsString: %s", super.toString(), checkpoint(), moreXPath(), checkpointXPath(), checkpointAsString());
+    }
 }

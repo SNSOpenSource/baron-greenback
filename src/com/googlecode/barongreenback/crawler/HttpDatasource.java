@@ -9,20 +9,16 @@ import com.googlecode.utterlyidle.RequestBuilder;
 import java.util.UUID;
 
 public class HttpDatasource {
-    protected final Uri uri;
+    private final Uri uri;
     private final UUID id;
-    protected final Definition source;
+    private final Definition source;
     private final Record record;
 
-    public HttpDatasource(Uri uri, UUID id, Definition source, Record record) {
+    private HttpDatasource(Uri uri, UUID id, Definition source, Record record) {
         this.uri = uri;
         this.id = id;
         this.source = source;
         this.record = record;
-    }
-
-    public static HttpDatasource datasource(Uri uri, UUID id, Definition source) {
-        return new HttpDatasource(uri, id, source, Record.constructors.record());
     }
 
     public static HttpDatasource datasource(Uri uri, UUID id, Definition source, Record record) {
@@ -30,7 +26,7 @@ public class HttpDatasource {
     }
 
     public HttpDatasource uri(Uri uri) {
-        return new HttpDatasource(uri, id, source, record);
+        return datasource(uri, id, source, record);
     }
 
     public Uri uri() {
@@ -61,5 +57,10 @@ public class HttpDatasource {
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof HttpDatasource) && ((HttpDatasource) obj).uri().equals(uri) && ((HttpDatasource) obj).source().equals(source);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("uri: %s, id: %s, source: %s, record: %s", uri, id, source, record);
     }
 }

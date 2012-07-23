@@ -49,4 +49,19 @@ public class HttpJob implements StagedJob {
             }
         };
     }
+
+    @Override
+    public int hashCode() {
+        return context.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof HttpJob) && ((HttpJob) other).context.equals(context);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("datasource: %s, destination: %s", datasource(), destination());
+    }
 }
