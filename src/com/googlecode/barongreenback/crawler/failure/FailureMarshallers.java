@@ -13,32 +13,21 @@ import static com.googlecode.totallylazy.Predicates.where;
 
 public enum FailureMarshallers {
     //please don't change enum names--these are stored in lucene
-    http(HttpJob.class) {
-        @Override
-        public FailureMarshaller marshaller(Container scope) {
-            return scope.get(HttpJobFailureMarshaller.class);
-        }
-    },
-    paginated(PaginatedHttpJob.class) {
-        @Override
-        public FailureMarshaller marshaller(Container scope) {
-            return scope.get(PaginatedJobFailureMarshaller.class);
-        }
-    },
-    master(MasterPaginatedHttpJob.class) {
-        @Override
-        public FailureMarshaller marshaller(Container scope) {
-            return scope.get(MasterPaginatedJobFailureMarshaller.class);
-        }
-    };
+    http(HttpJob.class, HttpJobFailureMarshaller.class),
+    paginated(PaginatedHttpJob.class, PaginatedJobFailureMarshaller.class),
+    master(MasterPaginatedHttpJob.class, MasterPaginatedJobFailureMarshaller.class);
 
     private final Class<? extends StagedJob> jobClass;
+    private final Class<? extends FailureMarshaller> marshallerClass;
 
-    FailureMarshallers(Class<? extends StagedJob> jobClass) {
+    FailureMarshallers(Class<? extends StagedJob> jobClass, Class<? extends FailureMarshaller> marshallerClass) {
         this.jobClass = jobClass;
+        this.marshallerClass = marshallerClass;
     }
 
-    abstract public FailureMarshaller marshaller(Container scope);
+    public FailureMarshaller marshaller(Container scope) {
+        return scope.get(marshallerClass);
+    }
 
     public static FailureMarshallers forJob(StagedJob job) {
         return Sequences.sequence(values()).find(where(jobClass(), Predicates.<Class<? extends StagedJob>>is(job.getClass()))).get();
