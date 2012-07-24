@@ -86,4 +86,8 @@ public class CrawlerFailureRepository implements Repository<UUID, Failure>, Find
     private Failure unmarshal(Record record) {
         return FailureMarshallers.valueOf(record.get(JOB_TYPE)).marshaller(scope).unmarshal(record);
     }
+
+    public int removeAll() {
+        return records.remove(FAILURES).intValue();
+    }
 }

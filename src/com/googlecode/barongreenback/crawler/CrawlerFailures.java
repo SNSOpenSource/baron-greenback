@@ -52,4 +52,8 @@ public class CrawlerFailures implements StatusMonitor {
     public boolean isEmpty() {
         return repository.isEmpty();
     }
+
+    public int removeAll() {
+        return repository.removeAll();
+    }
 }

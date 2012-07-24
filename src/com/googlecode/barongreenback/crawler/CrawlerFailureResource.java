@@ -92,10 +92,7 @@ public class CrawlerFailureResource {
     @POST
     @Path("failures/ignoreAll")
     public Response ignoreAll() {
-        Sequence<UUID> uuids = crawlerFailures.values().map(Callables.<UUID>first());
-        int rowsToDelete = uuids.size();
-        uuids.each(ignore());
-        return backToMe(rowsToDelete + " failure(s) have been ignored");
+        return backToMe(crawlerFailures.removeAll() + " failure(s) have been ignored");
     }
 
     private Callable1<UUID, Void> ignore() {
