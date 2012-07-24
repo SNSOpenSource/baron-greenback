@@ -3,6 +3,8 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
 import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 
 import java.util.Map;
 import java.util.UUID;
@@ -35,8 +37,8 @@ public class CrawlerFailures implements StatusMonitor {
         repository.set(UUID.randomUUID(), failure);
     }
 
-    public Map<UUID, Failure> values() {
-        return Maps.map(repository.find(all()));
+    public Sequence<Pair<UUID, Failure>> values() {
+        return repository.find(all());
     }
 
     public void delete(UUID id) {

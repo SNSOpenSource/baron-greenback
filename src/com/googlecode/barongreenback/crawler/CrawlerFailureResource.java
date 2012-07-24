@@ -1,10 +1,14 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.search.pager.Pager;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Runnables;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -15,14 +19,10 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import com.googlecode.yadic.Container;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.Responses.response;
@@ -44,9 +44,10 @@ public class CrawlerFailureResource {
     @GET
     @Path("failures")
     public Model failures(@QueryParam("message") Option<String> message) {
+        Sequence<Pair<UUID, Failure>> unpaged = crawlerFailures.values();
         Model model = model().
                 add("anyExists", !crawlerFailures.isEmpty()).
-                add("failures", sequence(crawlerFailures.values().entrySet()).map(toModel()).toList());
+                add("failures", unpaged.map(toModel()).toList());
         message.fold(model, toMessageModel())
                 .add("retryUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null))))
                 .add("ignoreUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null))))
@@ -79,18 +80,18 @@ public class CrawlerFailureResource {
     @POST
     @Path("failures/retryAll")
     public Response retryAll() {
-        Set<UUID> uuids = crawlerFailures.values().keySet();
+        Sequence<UUID> uuids = crawlerFailures.values().map(Callables.<UUID>first());
         int rowsToDelete = uuids.size();
-        sequence(new HashSet<UUID>(uuids)).each(retry());
+        uuids.each(retry());
         return backToMe(rowsToDelete + " failures have been added to the job queue");
     }
 
     @POST
     @Path("failures/ignoreAll")
     public Response ignoreAll() {
-        Set<UUID> uuids = crawlerFailures.values().keySet();
+        Sequence<UUID> uuids = crawlerFailures.values().map(Callables.<UUID>first());
         int rowsToDelete = uuids.size();
-        sequence(new HashSet<UUID>(uuids)).each(ignore());
+        uuids.each(ignore());
         return backToMe(rowsToDelete + " failure(s) have been ignored");
     }
 
@@ -140,15 +141,15 @@ public class CrawlerFailureResource {
         return redirector.seeOther(method(on(CrawlerFailureResource.class).failures(some(message))));
     }
 
-    private Callable1<Map.Entry<UUID, Failure>, Model> toModel() {
-        return new Callable1<Map.Entry<UUID, Failure>, Model>() {
+    private Callable1<Pair<UUID, Failure>, Model> toModel() {
+        return new Callable1<Pair<UUID, Failure>, Model>() {
             @Override
-            public Model call(Map.Entry<UUID, Failure> entry) throws Exception {
+            public Model call(Pair<UUID, Failure> pair) throws Exception {
                 return model().
-                        add("job", entry.getValue().job()).
-                        add("uri", entry.getValue().job().datasource().uri()).
-                        add("reason", entry.getValue().reason()).
-                        add("id", entry.getKey());
+                        add("job", pair.second().job()).
+                        add("uri", pair.second().job().datasource().uri()).
+                        add("reason", pair.second().reason()).
+                        add("id", pair.first());
             }
         };
     }

@@ -46,8 +46,8 @@ import static com.googlecode.totallylazy.proxy.Call.on;
 public class SearchResource {
     private final Redirector redirector;
     private final AdvancedMode mode;
-    private Pager pager;
-    private Sorter sorter;
+    private final Pager pager;
+    private final Sorter sorter;
     private final RecordsService recordsService;
 
     public SearchResource(final Redirector redirector, final AdvancedMode mode,

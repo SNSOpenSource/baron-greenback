@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
@@ -52,7 +53,7 @@ public class FailureHandlerTest {
 
         assertThat(response.entity().toString(), is(""));
         assertThat(response.status(), is(Status.NO_CONTENT));
-        assertThat(scope.get(CrawlerFailures.class).values().values().contains(failure(job, originalResponse.toString())), is(true));
+        assertThat(scope.get(CrawlerFailures.class).values().map(Callables.<Failure>second()).contains(failure(job, originalResponse.toString())), is(true));
     }
 
     @Test
@@ -61,7 +62,7 @@ public class FailureHandlerTest {
         Response response = scope.get(FailureHandler.class).captureFailures(returning(originalResponse), job).call(null);
 
         assertThat(response, is(originalResponse));
-        assertThat(scope.get(CrawlerFailures.class).values().values().size(), is(0));
+        assertThat(scope.get(CrawlerFailures.class).values().map(Callables.<Failure>second()).size(), is(0));
     }
 
     private Function1<Request, Response> returning(final Response response) {
@@ -86,7 +87,7 @@ public class FailureHandlerTest {
             fail("An exception should have been thrown");
         } catch (Exception e) {
             assertThat(e, is(expectedException));
-            assertThat(scope.get(CrawlerFailures.class).values().values().contains(failure(job, asString(e))), is(true));
+            assertThat(scope.get(CrawlerFailures.class).values().map(Callables.<Failure>second()).contains(failure(job, asString(e))), is(true));
         }
     }
 }
