@@ -4,7 +4,6 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Runnables;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -116,21 +115,21 @@ public class CrawlerFailureResource {
     }
 
 
-    private Callable1<Pair<StagedJob, String>, Response> toIgnore(final UUID id) {
-        return new Callable1<Pair<StagedJob, String>, Response>() {
+    private Callable1<Failure, Response> toIgnore(final UUID id) {
+        return new Callable1<Failure, Response>() {
             @Override
-            public Response call(Pair<StagedJob, String> stagedJobResponsePair) throws Exception {
+            public Response call(Failure stagedJobResponsePair) throws Exception {
                 crawlerFailures.delete(id);
                 return backToMe("Job ignored");
             }
         };
     }
 
-    private Callable1<Pair<StagedJob, String>, Response> toRetry(final UUID id) {
-        return new Callable1<Pair<StagedJob, String>, Response>() {
+    private Callable1<Failure, Response> toRetry(final UUID id) {
+        return new Callable1<Failure, Response>() {
             @Override
-            public Response call(Pair<StagedJob, String> failure) throws Exception {
-                executor(failure.first()).crawl(failure.first());
+            public Response call(Failure failure) throws Exception {
+                executor(failure.job()).crawl(failure.job());
                 crawlerFailures.delete(id);
                 return backToMe("Job retried");
             }
@@ -141,14 +140,14 @@ public class CrawlerFailureResource {
         return redirector.seeOther(method(on(CrawlerFailureResource.class).failures(some(message))));
     }
 
-    private Callable1<Map.Entry<UUID, Pair<StagedJob, String>>, Model> toModel() {
-        return new Callable1<Map.Entry<UUID, Pair<StagedJob, String>>, Model>() {
+    private Callable1<Map.Entry<UUID, Failure>, Model> toModel() {
+        return new Callable1<Map.Entry<UUID, Failure>, Model>() {
             @Override
-            public Model call(Map.Entry<UUID, Pair<StagedJob, String>> entry) throws Exception {
+            public Model call(Map.Entry<UUID, Failure> entry) throws Exception {
                 return model().
-                        add("job", entry.getValue().first()).
-                        add("uri", entry.getValue().first().datasource().uri()).
-                        add("response", entry.getValue().second()).
+                        add("job", entry.getValue().job()).
+                        add("uri", entry.getValue().job().datasource().uri()).
+                        add("reason", entry.getValue().reason()).
                         add("id", entry.getKey());
             }
         };
@@ -156,7 +155,7 @@ public class CrawlerFailureResource {
 
     private StagedJobExecutor executor(StagedJob stagedJob) {
         CrawlerScope crawlerScope = CrawlerScope.crawlerScope(requestScope,
-                new CheckpointUpdater(requestScope.get(CheckPointHandler.class), stagedJob.datasource().crawlerId(),
+                new CheckpointUpdater(requestScope.get(CheckpointHandler.class), stagedJob.datasource().crawlerId(),
                         crawlerRepository.modelFor(stagedJob.datasource().crawlerId()).get()));
         return crawlerScope.get(StagedJobExecutor.class);
     }

@@ -1,11 +1,11 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Pair;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 
+import static com.googlecode.barongreenback.crawler.Failure.failure;
 import static com.googlecode.totallylazy.Exceptions.asString;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 
@@ -43,6 +43,6 @@ public class FailureHandler {
     }
 
     private static void addFailure(CrawlerFailures crawlerFailures, StagedJob job, String reason) {
-        crawlerFailures.add(Pair.pair(job, reason));
+        crawlerFailures.add(failure(job, reason));
     }
 }

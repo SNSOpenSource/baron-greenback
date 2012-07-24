@@ -86,9 +86,9 @@ public class RecordDefinition {
         return toModel(definition());
     }
 
-    public static Model toModel(final Definition definition1) {
-        return recordDefinition(definition1.name(),
-                definition1.fields().map(asKeywordDefinition()).toArray(Model.class));
+    public static Model toModel(final Definition definition) {
+        return recordDefinition(definition.name(),
+                definition.fields().map(asKeywordDefinition()).toArray(Model.class));
     }
 
     private static Callable1<Keyword, Model> asKeywordDefinition() {

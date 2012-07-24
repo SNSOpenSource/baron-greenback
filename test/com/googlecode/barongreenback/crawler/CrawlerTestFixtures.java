@@ -5,13 +5,18 @@ import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Maps;
+import com.googlecode.totallylazy.Pair;
 
 import java.net.URI;
+import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
+import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class CrawlerTestFixtures {
     public static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).setMetadata(Keywords.UNIQUE, true);

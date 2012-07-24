@@ -35,7 +35,7 @@ public class SubfeedJobCreatorTest {
 
     @Test
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {
-        Sequence<StagedJob> jobs = new SubfeedJobCreator(SubfeedDatasource.datasource(null, UUID.randomUUID(), null, record()), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
+        Sequence<StagedJob> jobs = new SubfeedJobCreator(HttpDatasource.datasource(null, UUID.randomUUID(), null, record()), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
         assertThat(jobs.size(), NumberMatcher.is(1));
         assertThat(jobs.head().destination(), is(SOME_DESTINATION));
         assertThat(jobs.head().datasource().uri(), is(URI));
@@ -44,7 +44,7 @@ public class SubfeedJobCreatorTest {
     @Test
     public void shouldPassDownKeyAndValuesToSubfeedJobs() throws Exception {
         Record previousUnique = record(one(Pair.<Keyword<?>, Object>pair(PREV_UNIQUE, "bar")));
-        Sequence<StagedJob> jobs = new SubfeedJobCreator(SubfeedDatasource.datasource(null, UUID.randomUUID(), null, previousUnique), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
+        Sequence<StagedJob> jobs = new SubfeedJobCreator(HttpDatasource.datasource(null, UUID.randomUUID(), null, previousUnique), SOME_DESTINATION).process(one(record().set(LINK, URI))).second();
         Record record = record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)));
         assertThat(jobs.head().datasource().record(), is(one(record).map(merge(previousUnique)).head()));
     }
@@ -52,7 +52,7 @@ public class SubfeedJobCreatorTest {
     @Test
     public void shouldMergeUniqueKeysIntoEachRecord() throws Exception {
         Pair<Sequence<Record>, Sequence<StagedJob>> records = new SubfeedJobCreator(
-                SubfeedDatasource.datasource(null, UUID.randomUUID(), null, record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)))), SOME_DESTINATION).process(one(record().set(PERSON_NAME, "Dan")));
+                HttpDatasource.datasource(null, UUID.randomUUID(), null, record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)))), SOME_DESTINATION).process(one(record().set(PERSON_NAME, "Dan")));
         assertThat(records.first(), is(one(record().set(PERSON_NAME, "Dan").set(LINK, URI))));
     }
 }

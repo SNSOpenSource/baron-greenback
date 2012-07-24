@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
@@ -30,15 +29,15 @@ public class SequentialCrawler extends AbstractCrawler {
     private final StringMappings mappings;
     private final HttpClient httpClient;
     private final BaronGreenbackRecords records;
-    private final CheckPointHandler checkPointHandler;
+    private final CheckpointHandler checkpointHandler;
     private final PrintStream log;
 
-    public SequentialCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository, StringMappings mappings, CrawlerHttpClient httpClient, BaronGreenbackRecords records, CheckPointHandler checkPointHandler1, PrintStream log) {
+    public SequentialCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository, StringMappings mappings, CrawlerHttpClient httpClient, BaronGreenbackRecords records, CheckpointHandler checkpointHandler, PrintStream log) {
         super(crawlerRepository, viewsRepository);
         this.mappings = mappings;
         this.httpClient = httpClient;
         this.records = records;
-        this.checkPointHandler = checkPointHandler1;
+        this.checkpointHandler = checkpointHandler;
         this.log = log;
     }
 
@@ -53,7 +52,7 @@ public class SequentialCrawler extends AbstractCrawler {
         }
 
         Record head = recordIterator.next();
-        checkPointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head));
+        checkpointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head));
 
         Sequence<Keyword<?>> keywords = keywords(recordDefinition);
         updateView(crawler, keywords);

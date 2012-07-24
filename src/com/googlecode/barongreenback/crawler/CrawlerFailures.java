@@ -1,16 +1,16 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.utterlyidle.Response;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class CrawlerFailures implements StatusMonitor {
     public static final int MAX_FAILURES = 100000;
-    private final Map<UUID, Pair<StagedJob, String>> failures = new LinkedHashMap<UUID, Pair<StagedJob, String>>() {
+    private final Map<UUID, Failure> failures = new LinkedHashMap<UUID, Failure>() {
         @Override
-        protected boolean removeEldestEntry(Map.Entry<UUID, Pair<StagedJob, String>> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<UUID, Failure> eldest) {
             return size() > MAX_FAILURES;
         }
     };
@@ -30,11 +30,11 @@ public class CrawlerFailures implements StatusMonitor {
         return failures.size();
     }
 
-    public void add(Pair<StagedJob, String> failure) {
+    public void add(Failure failure) {
         failures.put(UUID.randomUUID(), failure);
     }
 
-    public Map<UUID, Pair<StagedJob, String>> values() {
+    public Map<UUID, Failure> values() {
         return failures;
     }
 
@@ -42,11 +42,12 @@ public class CrawlerFailures implements StatusMonitor {
         failures.remove(id);
     }
 
-    public Option<Pair<StagedJob, String>> get(UUID id) {
+    public Option<Failure> get(UUID id) {
         return Option.option(failures.get(id));
     }
 
     public boolean isEmpty() {
         return failures.isEmpty();
     }
+
 }

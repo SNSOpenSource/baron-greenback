@@ -28,7 +28,7 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     public Module addPerRequestObjects(Container container) throws Exception {
         container.add(CrawlerHttpClient.class);
         container.add(CompositeCrawler.class);
-        container.add(CheckPointHandler.class);
+        container.add(CheckpointHandler.class);
         container.add(CrawlerRepository.class);
         container.add(CrawlerActivator.class);
         container.addActivator(Crawler.class, container.get(CrawlerActivator.class));
