@@ -26,11 +26,6 @@ public class CrawlerScope implements Container {
         container.add(FailureHandler.class);
         container.addInstance(AtomicInteger.class, new AtomicInteger(0));
         container.addInstance(CheckpointUpdater.class, checkpointUpdater);
-        container.add(HttpJobFailureMarshaller.class);
-        container.add(PaginatedJobFailureMarshaller.class);
-        container.add(MasterPaginatedJobFailureMarshaller.class);
-        container.add(CrawlerFailureRepository.class);
-        container.add(CrawlerFailures.class);
         Containers.selfRegister(container);
     }
 

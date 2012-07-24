@@ -4,7 +4,6 @@ import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.Failure;
 import com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob;
-import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 
@@ -16,17 +15,6 @@ public class MasterPaginatedJobFailureMarshaller extends AbstractFailureMarshall
     public MasterPaginatedJobFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, StringMappings mappings) {
         super(crawlerRepository, checkpointHandler);
         this.mappings = mappings;
-    }
-
-    @Override
-    public Record marshal(Failure failure) {
-        return record().
-                set(CrawlerFailureRepository.TYPE, nameForClass(failure.job().getClass())).
-                set(CrawlerFailureRepository.REASON, failure.reason()).
-                set(CrawlerFailureRepository.SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
-                set(CrawlerFailureRepository.RECORD, toJson(failure.job().datasource().record())).
-                set(CrawlerFailureRepository.CRAWLER_ID, failure.job().datasource().crawlerId()).
-                set(CrawlerFailureRepository.URI, failure.job().datasource().uri());
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.googlecode.yadic.Container;
 import static com.googlecode.totallylazy.Predicates.where;
 
 public enum FailureMarshallers {
+    //please don't change enum names--these are stored in lucene
     http(HttpJob.class) {
         @Override
         public FailureMarshaller marshaller(Container scope) {

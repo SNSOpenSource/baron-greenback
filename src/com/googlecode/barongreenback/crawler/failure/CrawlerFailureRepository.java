@@ -27,14 +27,14 @@ import static com.googlecode.totallylazy.Predicates.where;
 
 public class CrawlerFailureRepository implements Repository<UUID, Failure>, Finder<Pair<UUID, Failure>> {
     public static final Keyword<UUID> ID = keyword("id", UUID.class);
-    public static final Keyword<String> TYPE = keyword("type", String.class);
+    public static final Keyword<String> JOB_TYPE = keyword("jobType", String.class);
     public static final Keyword<String> REASON = keyword("reason", String.class);
     public static final Keyword<Uri> URI = keyword("uri", Uri.class);
     public static final Keyword<String> SOURCE = keyword("source", String.class);
     public static final Keyword<UUID> CRAWLER_ID = keyword("crawlerId", UUID.class);
     public static final Keyword<String> RECORD = keyword("record", String.class);
 
-    private static final Definition FAILURES = Definition.constructors.definition("failures", ID, TYPE, REASON, URI, CRAWLER_ID, SOURCE, RECORD);
+    private static final Definition FAILURES = Definition.constructors.definition("failures", ID, JOB_TYPE, REASON, URI, CRAWLER_ID, SOURCE, RECORD);
 
     private final Records records;
     private final Container scope;
@@ -84,6 +84,6 @@ public class CrawlerFailureRepository implements Repository<UUID, Failure>, Find
     }
 
     private Failure unmarshal(Record record) {
-        return FailureMarshallers.valueOf(record.get(TYPE)).marshaller(scope).unmarshal(record);
+        return FailureMarshallers.valueOf(record.get(JOB_TYPE)).marshaller(scope).unmarshal(record);
     }
 }

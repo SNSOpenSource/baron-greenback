@@ -3,10 +3,8 @@ package com.googlecode.barongreenback.crawler.failure;
 import com.googlecode.barongreenback.crawler.AbstractCrawler;
 import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
+import com.googlecode.barongreenback.crawler.Failure;
 import com.googlecode.barongreenback.crawler.HttpDatasource;
-import com.googlecode.barongreenback.crawler.HttpJob;
-import com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob;
-import com.googlecode.barongreenback.crawler.PaginatedHttpJob;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
@@ -15,34 +13,22 @@ import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Function2;
 import com.googlecode.totallylazy.LazyException;
-import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequences;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.lazyrecords.Record.constructors.record;
-import static com.googlecode.totallylazy.Sequences.sequence;
 
 abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     private final CrawlerRepository crawlerRepository;
     private final CheckpointHandler checkpointHandler;
 
-    private static final Map<Class, String> typeMap = Maps.map(sequence(
-            Pair.<Class, String>pair(MasterPaginatedHttpJob.class, "master"),
-            Pair.<Class, String>pair(PaginatedHttpJob.class, "paginated"),
-            Pair.<Class, String>pair(HttpJob.class, "http")));
-
     public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler) {
         this.crawlerRepository = crawlerRepository;
         this.checkpointHandler = checkpointHandler;
-    }
-
-    public String nameForClass(Class aClass) {
-        return typeMap.get(aClass);
     }
 
     public Definition destination(Record record) {
@@ -109,5 +95,16 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
                 return model;
             }
         };
+    }
+
+    @Override
+    public Record marshal(Failure failure) {
+        return record().
+                set(CrawlerFailureRepository.JOB_TYPE, FailureMarshallers.forJob(failure.job()).name()).
+                set(CrawlerFailureRepository.REASON, failure.reason()).
+                set(CrawlerFailureRepository.SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
+                set(CrawlerFailureRepository.RECORD, toJson(failure.job().datasource().record())).
+                set(CrawlerFailureRepository.CRAWLER_ID, failure.job().datasource().crawlerId()).
+                set(CrawlerFailureRepository.URI, failure.job().datasource().uri());
     }
 }

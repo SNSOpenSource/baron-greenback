@@ -1,6 +1,10 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
+import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
+import com.googlecode.barongreenback.crawler.failure.HttpJobFailureMarshaller;
+import com.googlecode.barongreenback.crawler.failure.MasterPaginatedJobFailureMarshaller;
+import com.googlecode.barongreenback.crawler.failure.PaginatedJobFailureMarshaller;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.RecordDefinitionActivator;
 import com.googlecode.totallylazy.StringPrintStream;
@@ -34,12 +38,16 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
         container.addActivator(Crawler.class, container.get(CrawlerActivator.class));
         container.add(CrawlInterval.class);
         container.addInstance(PrintStream.class, new StringPrintStream());
+        container.add(HttpJobFailureMarshaller.class);
+        container.add(PaginatedJobFailureMarshaller.class);
+        container.add(MasterPaginatedJobFailureMarshaller.class);
+        container.add(CrawlerFailureRepository.class);
+        container.add(CrawlerFailures.class);
         return this;
     }
 
     @Override
     public Module addPerApplicationObjects(Container container) throws   Exception {
-        container.add(CrawlerFailures.class);
         container.addInstance(CrawlerExecutors.class, new CrawlerExecutors());
         return this;
     }
