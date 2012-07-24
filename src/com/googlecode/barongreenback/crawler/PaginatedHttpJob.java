@@ -27,15 +27,9 @@ import static com.googlecode.totallylazy.Xml.functions.selectContents;
 import static com.googlecode.totallylazy.Xml.functions.selectNodes;
 
 public class PaginatedHttpJob extends HttpJob {
-    protected StringMappings mappings;
 
-    protected PaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
+    protected PaginatedHttpJob(Map<String, Object> context) {
         super(context);
-        this.mappings = mappings;
-    }
-
-    public static PaginatedHttpJob paginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
-        return new PaginatedHttpJob(context, mappings);
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
@@ -81,10 +75,14 @@ public class PaginatedHttpJob extends HttpJob {
         return selectCheckpoints(document).contains(checkpointAsString());
     }
 
+    static PaginatedHttpJob paginatedHttpJob(Map<String, Object> context) {
+        return new PaginatedHttpJob(context);
+    }
+
     private PaginatedHttpJob job(HttpDatasource datasource) {
         ConcurrentHashMap<String, Object> newContext = new ConcurrentHashMap<String, Object>(context);
         newContext.put("datasource", datasource);
-        return paginatedHttpJob(newContext, mappings);
+        return paginatedHttpJob(newContext);
     }
 
     protected Sequence<String> selectCheckpoints(Document document) {

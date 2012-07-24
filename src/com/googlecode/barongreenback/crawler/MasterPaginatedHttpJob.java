@@ -25,8 +25,11 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
+    private final StringMappings mappings;
+
     private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
-        super(context, mappings);
+        super(context);
+        this.mappings = mappings;
     }
 
     public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {

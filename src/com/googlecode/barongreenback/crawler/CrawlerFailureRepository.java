@@ -5,7 +5,6 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.Repository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.ImmutableKeyword;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
@@ -14,7 +13,6 @@ import com.googlecode.totallylazy.Function2;
 import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Uri;
 
@@ -83,7 +81,7 @@ public class CrawlerFailureRepository implements Repository<UUID, Failure>  {
                 RecordDefinition.convert(Model.parse(record.get(source))).definition(),
                 fromJson(record.get(CrawlerFailureRepository.record)));
         Definition destination = AbstractCrawler.destinationDefinition(crawlerRepository.crawlerFor(crawlerId));
-        HttpJob job = HttpJob.job(datasource, destination);
+        HttpJob job = HttpJob.httpJob(datasource, destination);
         return some(Failure.failure(job, record.get(reason)));
     }
 

@@ -45,7 +45,7 @@ public class CrawlerFailureRepositoryTest {
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
         UUID crawlerFailureId = UUID.randomUUID();
 
-        Failure failure = Failure.failure(HttpJob.job(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination), "Bigtime failure");
+        Failure failure = Failure.failure(HttpJob.httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination), "Bigtime failure");
 
         CrawlerFailureRepository repository = scope.get(CrawlerFailureRepository.class);
         repository.set(crawlerFailureId, failure);

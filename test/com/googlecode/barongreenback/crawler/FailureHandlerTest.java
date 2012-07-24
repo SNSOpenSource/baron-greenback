@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 
 public class FailureHandlerTest {
     private static final HttpDatasource DATASOURCE = HttpDatasource.datasource(uri("/any/uri"), UUID.randomUUID(), null, Record.constructors.record());
-    private static final HttpJob JOB = HttpJob.job(DATASOURCE, Definition.constructors.definition(null, null));
+    private static final HttpJob JOB = HttpJob.httpJob(DATASOURCE, Definition.constructors.definition(null, null));
     private CrawlerFailures crawlerFailures = new CrawlerFailures();
     private FailureHandler failureHandler = new FailureHandler(crawlerFailures);
 

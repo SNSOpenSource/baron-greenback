@@ -22,7 +22,7 @@ public class PaginatedHttpJobTest {
         context.put("moreXPath", "/root/more");
         context.put("checkpointAsString", "Today");
         context.put("checkpointXPath", "/root/date");
-        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(context, null);
+        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(context);
         Option<PaginatedHttpJob> more = job.nextPageJob(some(document("<root><date>Today</date></root>")));
         assertThat(more, is(none(PaginatedHttpJob.class)));
     }
@@ -34,7 +34,7 @@ public class PaginatedHttpJobTest {
         context.put("checkpointAsString", "Today");
         context.put("checkpointXPath", "/root/date");
         context.put("datasource", HttpDatasource.datasource(Uri.uri("http://go.away.com"), UUID.randomUUID(), null, Record.constructors.record()));
-        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(context, null);
+        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(context);
         Option<PaginatedHttpJob> more = job.nextPageJob(some(document("<root><date>Yesterday</date><more>next</more></root>")));
         assertThat(more.get().datasource().uri(), is(Uri.uri("next")));
     }

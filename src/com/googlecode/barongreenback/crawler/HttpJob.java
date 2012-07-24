@@ -23,7 +23,7 @@ public class HttpJob implements StagedJob {
         this.context = unmodifiableMap(context);
     }
 
-    public static HttpJob job(HttpDatasource datasource, Definition destination) {
+    public static HttpJob httpJob(HttpDatasource datasource, Definition destination) {
         ConcurrentMap<String, Object> context = new ConcurrentHashMap<String, Object>();
         context.put("datasource", datasource);
         context.put("destination", destination);
