@@ -76,7 +76,7 @@ public class CrawlerFailureRepositoryTest {
         assertThat(repository.get(crawlerFailureId), is(some(failure)));
     }
 
-    private static Container testScope() {
+    public static Container testScope() {
         Container scope = new SimpleContainer();
         scope.add(CrawlerFailureRepository.class);
         scope.add(BaronGreenbackRecords.class);

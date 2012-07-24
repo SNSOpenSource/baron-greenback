@@ -2,12 +2,17 @@ package com.googlecode.barongreenback.crawler.failure;
 
 import com.googlecode.barongreenback.crawler.Failure;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import com.googlecode.barongreenback.shared.Finder;
 import com.googlecode.barongreenback.shared.Repository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.yadic.Container;
 
@@ -20,7 +25,7 @@ import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 
-public class CrawlerFailureRepository implements Repository<UUID, Failure> {
+public class CrawlerFailureRepository implements Repository<UUID, Failure>, Finder<Pair<UUID, Failure>> {
     public static final Keyword<UUID> ID = keyword("id", UUID.class);
     public static final Keyword<String> TYPE = keyword("type", String.class);
     public static final Keyword<String> REASON = keyword("reason", String.class);
@@ -48,11 +53,37 @@ public class CrawlerFailureRepository implements Repository<UUID, Failure> {
     @Override
     public Option<Failure> get(UUID id) {
         Record record = records.get(FAILURES).find(where(CrawlerFailureRepository.ID, is(id))).get();
-        return option(FailureMarshallers.valueOf(record.get(TYPE)).marshaller(scope).unmarshal(record));
+        return option(unmarshal(record));
     }
 
     @Override
     public void remove(UUID id) {
         records.remove(FAILURES, where(CrawlerFailureRepository.ID, is(id)));
+    }
+
+    @Override
+    public Sequence<Pair<UUID, Failure>> find(Predicate<? super Record> predicate) {
+        return records.get(FAILURES).filter(predicate).map(asPair());
+    }
+
+    public int size() {
+        return records.get(FAILURES).size();
+    }
+
+    public boolean isEmpty() {
+        return records.get(FAILURES).isEmpty();
+    }
+
+    private Callable1<Record, Pair<UUID, Failure>> asPair() {
+        return new Callable1<Record, Pair<UUID, Failure>>() {
+            @Override
+            public Pair<UUID, Failure> call(Record record) throws Exception {
+                return Pair.pair(record.get(ID), unmarshal(record));
+            }
+        };
+    }
+
+    private Failure unmarshal(Record record) {
+        return FailureMarshallers.valueOf(record.get(TYPE)).marshaller(scope).unmarshal(record);
     }
 }

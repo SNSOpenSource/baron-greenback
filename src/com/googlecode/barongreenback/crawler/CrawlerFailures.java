@@ -1,19 +1,20 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
+import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Option;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.googlecode.totallylazy.Predicates.all;
+
 public class CrawlerFailures implements StatusMonitor {
-    public static final int MAX_FAILURES = 100000;
-    private final Map<UUID, Failure> failures = new LinkedHashMap<UUID, Failure>() {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<UUID, Failure> eldest) {
-            return size() > MAX_FAILURES;
-        }
-    };
+    private final CrawlerFailureRepository repository;
+
+    public CrawlerFailures(CrawlerFailureRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public String name() {
@@ -27,27 +28,26 @@ public class CrawlerFailures implements StatusMonitor {
 
     @Override
     public int size() {
-        return failures.size();
+        return repository.size();
     }
 
     public void add(Failure failure) {
-        failures.put(UUID.randomUUID(), failure);
+        repository.set(UUID.randomUUID(), failure);
     }
 
     public Map<UUID, Failure> values() {
-        return failures;
+        return Maps.map(repository.find(all()));
     }
 
     public void delete(UUID id) {
-        failures.remove(id);
+        repository.remove(id);
     }
 
     public Option<Failure> get(UUID id) {
-        return Option.option(failures.get(id));
+        return repository.get(id);
     }
 
     public boolean isEmpty() {
-        return failures.isEmpty();
+        return repository.isEmpty();
     }
-
 }
