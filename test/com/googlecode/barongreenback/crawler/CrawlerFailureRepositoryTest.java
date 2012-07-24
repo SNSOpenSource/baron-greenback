@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
 import com.googlecode.barongreenback.crawler.failure.HttpJobFailureMarshaller;
+import com.googlecode.barongreenback.crawler.failure.MasterPaginatedJobFailureMarshaller;
 import com.googlecode.barongreenback.crawler.failure.PaginatedJobFailureMarshaller;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.persistence.ModelMapping;
@@ -22,6 +23,9 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.HttpJob.httpJob;
+import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
+import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
@@ -47,7 +51,7 @@ public class CrawlerFailureRepositoryTest {
 
     @Test
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
-        Failure failure = Failure.failure(HttpJob.httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination), "Bigtime failure");
+        Failure failure = Failure.failure(httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination), "Bigtime failure");
 
         CrawlerFailureRepository repository = scope.get(CrawlerFailureRepository.class);
         repository.set(crawlerFailureId, failure);
@@ -56,7 +60,16 @@ public class CrawlerFailureRepositoryTest {
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        Failure failure = Failure.failure(PaginatedHttpJob.paginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failure");
+        Failure failure = Failure.failure(paginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failure");
+
+        CrawlerFailureRepository repository = scope.get(CrawlerFailureRepository.class);
+        repository.set(crawlerFailureId, failure);
+        assertThat(repository.get(crawlerFailureId), is(some(failure)));
+    }
+
+    @Test
+    public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
+        Failure failure = Failure.failure(masterPaginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failure");
 
         CrawlerFailureRepository repository = scope.get(CrawlerFailureRepository.class);
         repository.set(crawlerFailureId, failure);
@@ -74,6 +87,7 @@ public class CrawlerFailureRepositoryTest {
         scope.add(CheckpointHandler.class);
         scope.add(HttpJobFailureMarshaller.class);
         scope.add(PaginatedJobFailureMarshaller.class);
+        scope.add(MasterPaginatedJobFailureMarshaller.class);
         Containers.selfRegister(scope);
         return scope;
     }

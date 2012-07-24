@@ -39,9 +39,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
                 Option<Document> document = loadDocument(response);
 
-                for (Document doc : document) {
-                    crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
-                }
+                for (Document doc : document) crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
 
                 return processDocument(document);
             }

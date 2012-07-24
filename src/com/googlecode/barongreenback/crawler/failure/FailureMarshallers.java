@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler.failure;
 
 import com.googlecode.barongreenback.crawler.HttpJob;
+import com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob;
 import com.googlecode.barongreenback.crawler.PaginatedHttpJob;
 import com.googlecode.barongreenback.crawler.StagedJob;
 import com.googlecode.totallylazy.Callable1;
@@ -21,6 +22,12 @@ public enum FailureMarshallers {
         @Override
         public FailureMarshaller marshaller(Container scope) {
             return scope.get(PaginatedJobFailureMarshaller.class);
+        }
+    },
+    master(MasterPaginatedHttpJob.class) {
+        @Override
+        public FailureMarshaller marshaller(Container scope) {
+            return scope.get(MasterPaginatedJobFailureMarshaller.class);
         }
     };
 
