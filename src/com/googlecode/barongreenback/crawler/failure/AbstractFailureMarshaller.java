@@ -19,6 +19,12 @@ import com.googlecode.totallylazy.Sequences;
 import java.util.List;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.CRAWLER_ID;
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.JOB_TYPE;
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.REASON;
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.RECORD;
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.SOURCE;
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.URI;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 
@@ -32,34 +38,39 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     }
 
     public Definition destination(Record record) {
-        UUID crawlerId = record.get(CrawlerFailureRepository.CRAWLER_ID);
-        Model crawler = crawlerRepository.crawlerFor(crawlerId);
-        return AbstractCrawler.destinationDefinition(crawler);
+        return AbstractCrawler.destinationDefinition(crawlerIdFor(record));
     }
 
     public HttpDatasource datasource(Record record) {
-        UUID crawlerId = record.get(CrawlerFailureRepository.CRAWLER_ID);
+        UUID crawlerId = record.get(CRAWLER_ID);
         return HttpDatasource.datasource(
-                record.get(CrawlerFailureRepository.URI),
+                record.get(URI),
                 crawlerId,
-                RecordDefinition.convert(Model.parse(record.get(CrawlerFailureRepository.SOURCE))).definition(),
-                fromJson(record.get(CrawlerFailureRepository.RECORD)));
+                RecordDefinition.convert(Model.parse(record.get(SOURCE))).definition(),
+                fromJson(record.get(RECORD)));
+    }
+
+    @Override
+    public Record marshal(Failure failure) {
+        return record().
+                set(JOB_TYPE, FailureMarshallers.forJob(failure.job()).name()).
+                set(REASON, failure.reason()).
+                set(SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
+                set(RECORD, toJson(failure.job().datasource().record())).
+                set(CRAWLER_ID, failure.job().datasource().crawlerId()).
+                set(URI, failure.job().datasource().uri());
     }
 
     protected Object lastCheckpointFor(Record record) {
-        UUID crawlerId = record.get(CrawlerFailureRepository.CRAWLER_ID);
-        Model crawler = crawlerRepository.crawlerFor(crawlerId);
         try {
-            return checkpointHandler.lastCheckPointFor(crawler);
+            return checkpointHandler.lastCheckPointFor(crawlerIdFor(record));
         } catch (Exception e) {
             throw LazyException.lazyException(e);
         }
     }
 
     protected String moreUri(Record record) {
-        UUID crawlerId = record.get(CrawlerFailureRepository.CRAWLER_ID);
-        Model crawler = crawlerRepository.crawlerFor(crawlerId);
-        return AbstractCrawler.more(crawler);
+        return AbstractCrawler.more(crawlerIdFor(record));
     }
 
     private Record fromJson(String json) {
@@ -97,14 +108,8 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
         };
     }
 
-    @Override
-    public Record marshal(Failure failure) {
-        return record().
-                set(CrawlerFailureRepository.JOB_TYPE, FailureMarshallers.forJob(failure.job()).name()).
-                set(CrawlerFailureRepository.REASON, failure.reason()).
-                set(CrawlerFailureRepository.SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
-                set(CrawlerFailureRepository.RECORD, toJson(failure.job().datasource().record())).
-                set(CrawlerFailureRepository.CRAWLER_ID, failure.job().datasource().crawlerId()).
-                set(CrawlerFailureRepository.URI, failure.job().datasource().uri());
+    private Model crawlerIdFor(Record record) {
+        UUID crawlerId = record.get(CRAWLER_ID);
+        return crawlerRepository.crawlerFor(crawlerId);
     }
 }
