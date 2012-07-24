@@ -21,15 +21,15 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 
 public class CrawlerFailureRepository implements Repository<UUID, Failure> {
-    public static final Keyword<UUID> failureId = keyword("failureId", UUID.class);
-    public static final Keyword<String> type = keyword("type", String.class);
-    public static final Keyword<String> reason = keyword("reason", String.class);
-    public static final Keyword<Uri> uri = keyword("uri", Uri.class);
-    public static final Keyword<String> source = keyword("source", String.class);
-    public static final Keyword<UUID> crawlerId = keyword("crawlerId", UUID.class);
-    public static final Keyword<String> record = keyword("record", String.class);
+    public static final Keyword<UUID> ID = keyword("id", UUID.class);
+    public static final Keyword<String> TYPE = keyword("type", String.class);
+    public static final Keyword<String> REASON = keyword("reason", String.class);
+    public static final Keyword<Uri> URI = keyword("uri", Uri.class);
+    public static final Keyword<String> SOURCE = keyword("source", String.class);
+    public static final Keyword<UUID> CRAWLER_ID = keyword("crawlerId", UUID.class);
+    public static final Keyword<String> RECORD = keyword("record", String.class);
 
-    private static final Definition failures = Definition.constructors.definition("failures", failureId, type, reason, uri, crawlerId, source, record);
+    private static final Definition FAILURES = Definition.constructors.definition("failures", ID, TYPE, REASON, URI, CRAWLER_ID, SOURCE, RECORD);
 
     private final Records records;
     private final Container scope;
@@ -41,18 +41,18 @@ public class CrawlerFailureRepository implements Repository<UUID, Failure> {
 
     @Override
     public void set(UUID id, Failure failure) {
-        Record record = FailureMarshallers.forJob(failure.job()).marshaller(scope).marshal(failure).set(failureId, id);
-        records.put(failures, update(using(failureId), record));
+        Record record = FailureMarshallers.forJob(failure.job()).marshaller(scope).marshal(failure).set(CrawlerFailureRepository.ID, id);
+        records.put(FAILURES, update(using(CrawlerFailureRepository.ID), record));
     }
 
     @Override
     public Option<Failure> get(UUID id) {
-        Record record = records.get(failures).find(where(failureId, is(id))).get();
-        return option(FailureMarshallers.valueOf(record.get(type)).marshaller(scope).unmarshal(record));
+        Record record = records.get(FAILURES).find(where(CrawlerFailureRepository.ID, is(id))).get();
+        return option(FailureMarshallers.valueOf(record.get(TYPE)).marshaller(scope).unmarshal(record));
     }
 
     @Override
-    public void remove(UUID key) {
-        throw new UnsupportedOperationException("not done yet");
+    public void remove(UUID id) {
+        records.remove(FAILURES, where(CrawlerFailureRepository.ID, is(id)));
     }
 }

@@ -21,17 +21,17 @@ public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
     @Override
     public Record marshal(Failure failure) {
         return record().
-                set(CrawlerFailureRepository.type, nameForClass(failure.job().getClass())).
-                set(CrawlerFailureRepository.reason, failure.reason()).
-                set(CrawlerFailureRepository.source, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
-                set(CrawlerFailureRepository.record, toJson(failure.job().datasource().record())).
-                set(CrawlerFailureRepository.crawlerId, failure.job().datasource().crawlerId()).
-                set(CrawlerFailureRepository.uri, failure.job().datasource().uri());
+                set(CrawlerFailureRepository.TYPE, nameForClass(failure.job().getClass())).
+                set(CrawlerFailureRepository.REASON, failure.reason()).
+                set(CrawlerFailureRepository.SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
+                set(CrawlerFailureRepository.RECORD, toJson(failure.job().datasource().record())).
+                set(CrawlerFailureRepository.CRAWLER_ID, failure.job().datasource().crawlerId()).
+                set(CrawlerFailureRepository.URI, failure.job().datasource().uri());
     }
 
     @Override
     public Failure unmarshal(Record record) {
         PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings);
-        return Failure.failure(job, record.get(CrawlerFailureRepository.reason));
+        return Failure.failure(job, record.get(CrawlerFailureRepository.REASON));
     }
 }

@@ -46,22 +46,22 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     }
 
     public Definition destination(Record record) {
-        UUID crawlerId = record.get(CrawlerFailureRepository.crawlerId);
+        UUID crawlerId = record.get(CrawlerFailureRepository.CRAWLER_ID);
         Model crawler = crawlerRepository.crawlerFor(crawlerId);
         return AbstractCrawler.destinationDefinition(crawler);
     }
 
     public HttpDatasource datasource(Record record) {
-        UUID crawlerId = record.get(CrawlerFailureRepository.crawlerId);
+        UUID crawlerId = record.get(CrawlerFailureRepository.CRAWLER_ID);
         return HttpDatasource.datasource(
-                record.get(CrawlerFailureRepository.uri),
+                record.get(CrawlerFailureRepository.URI),
                 crawlerId,
-                RecordDefinition.convert(Model.parse(record.get(CrawlerFailureRepository.source))).definition(),
-                fromJson(record.get(CrawlerFailureRepository.record)));
+                RecordDefinition.convert(Model.parse(record.get(CrawlerFailureRepository.SOURCE))).definition(),
+                fromJson(record.get(CrawlerFailureRepository.RECORD)));
     }
 
     protected Object lastCheckpointFor(Record record) {
-        UUID crawlerId = record.get(CrawlerFailureRepository.crawlerId);
+        UUID crawlerId = record.get(CrawlerFailureRepository.CRAWLER_ID);
         Model crawler = crawlerRepository.crawlerFor(crawlerId);
         try {
             return checkpointHandler.lastCheckPointFor(crawler);
@@ -71,7 +71,7 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     }
 
     protected String moreUri(Record record) {
-        UUID crawlerId = record.get(CrawlerFailureRepository.crawlerId);
+        UUID crawlerId = record.get(CrawlerFailureRepository.CRAWLER_ID);
         Model crawler = crawlerRepository.crawlerFor(crawlerId);
         return AbstractCrawler.more(crawler);
     }
