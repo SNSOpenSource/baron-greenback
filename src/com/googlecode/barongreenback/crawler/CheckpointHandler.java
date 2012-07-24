@@ -9,11 +9,11 @@ import java.util.UUID;
 
 import static com.googlecode.funclate.Model.model;
 
-public class CheckPointHandler {
+public class CheckpointHandler {
     private final StringMappings mappings;
     private final ModelRepository modelRepository;
 
-    public CheckPointHandler(StringMappings mappings, ModelRepository modelRepository) {
+    public CheckpointHandler(StringMappings mappings, ModelRepository modelRepository) {
         this.mappings = mappings;
         this.modelRepository = modelRepository;
     }

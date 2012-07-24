@@ -4,7 +4,6 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Runnables;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -156,7 +155,7 @@ public class CrawlerFailureResource {
 
     private StagedJobExecutor executor(StagedJob stagedJob) {
         CrawlerScope crawlerScope = CrawlerScope.crawlerScope(requestScope,
-                new CheckpointUpdater(requestScope.get(CheckPointHandler.class), stagedJob.datasource().crawlerId(),
+                new CheckpointUpdater(requestScope.get(CheckpointHandler.class), stagedJob.datasource().crawlerId(),
                         crawlerRepository.modelFor(stagedJob.datasource().crawlerId()).get()));
         return crawlerScope.get(StagedJobExecutor.class);
     }

@@ -1,5 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Callable1;
@@ -13,13 +15,17 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
+import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.Uri.functions.uri;
@@ -30,6 +36,38 @@ public class PaginatedHttpJob extends HttpJob {
 
     protected PaginatedHttpJob(Map<String, Object> context) {
         super(context);
+    }
+
+    static PaginatedHttpJob paginatedHttpJob(Map<String, Object> context) {
+        return new PaginatedHttpJob(context);
+    }
+
+    public static PaginatedHttpJob paginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+        Map<String, Object> context = createContext(datasource, destination, checkpoint, moreXPath, mappings);
+
+        return paginatedHttpJob(context);
+    }
+
+    protected static Map<String, Object> createContext(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+        Map<String, Object> context = new HashMap<String, Object>();
+        context.put("datasource", datasource);
+        context.put("destination", destination);
+
+        context.put("moreXPath", moreXPath);
+        context.put("checkpoint", checkpoint);
+        context.put("checkpointXPath", checkpointXPath(datasource.source()));
+        context.put("checkpointAsString", checkpointAsString(mappings, checkpoint));
+        return context;
+    }
+
+    protected static String checkpointXPath(Definition source) {
+        Keyword<?> keyword = source.fields().find(where(metadata(CompositeCrawler.CHECKPOINT), is(true))).get();
+        return String.format("%s/%s", source.name(), keyword.name());
+    }
+
+    protected static String checkpointAsString(StringMappings mappings, Object checkpoint) {
+        if (checkpoint == null) return null;
+        return mappings.toString(checkpoint.getClass(), checkpoint);
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
@@ -73,10 +111,6 @@ public class PaginatedHttpJob extends HttpJob {
 
     private boolean containsCheckpoint(Document document) {
         return selectCheckpoints(document).contains(checkpointAsString());
-    }
-
-    static PaginatedHttpJob paginatedHttpJob(Map<String, Object> context) {
-        return new PaginatedHttpJob(context);
     }
 
     private PaginatedHttpJob job(HttpDatasource datasource) {

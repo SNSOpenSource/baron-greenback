@@ -33,6 +33,6 @@ public class Failure {
 
     @Override
     public String toString() {
-        return String.format("%s, %s", job.toString(), reason);
+        return String.format("job: %s, reason: %s", job.toString(), reason);
     }
 }
