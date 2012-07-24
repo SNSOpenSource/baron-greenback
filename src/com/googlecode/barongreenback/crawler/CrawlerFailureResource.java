@@ -58,8 +58,8 @@ public class CrawlerFailureResource {
     private Callable2<Model, String, Model> toMessageModel() {
         return new Callable2<Model, String, Model>() {
             @Override
-            public Model call(Model model, String s) throws Exception {
-                return model.add("message", model().add("text", s).add("category", "success"));
+            public Model call(Model model, String text) throws Exception {
+                return model.add("message", model().add("text", text).add("category", "success"));
             }
         };
     }
