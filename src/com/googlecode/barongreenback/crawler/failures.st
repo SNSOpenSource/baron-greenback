@@ -21,6 +21,7 @@ $message()$
     }$
     </tbody>
 </table>
+$pager$
 
 <div class="actions">
     $if(anyExists)$

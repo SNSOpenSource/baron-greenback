@@ -33,12 +33,14 @@ public class CrawlerFailureResource {
     private final Redirector redirector;
     private final CrawlerRepository crawlerRepository;
     private final Container requestScope;
+    private final Pager pager;
 
-    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope) {
+    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager) {
         this.crawlerFailures = crawlerFailures;
         this.redirector = redirector;
         this.crawlerRepository = crawlerRepository;
         this.requestScope = requestScope;
+        this.pager = pager;
     }
 
     @GET
@@ -47,12 +49,13 @@ public class CrawlerFailureResource {
         Sequence<Pair<UUID, Failure>> unpaged = crawlerFailures.values();
         Model model = model().
                 add("anyExists", !crawlerFailures.isEmpty()).
-                add("failures", unpaged.map(toModel()).toList());
-        message.fold(model, toMessageModel())
-                .add("retryUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null))))
-                .add("ignoreUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null))))
-                .add("retryAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retryAll())))
-                .add("ignoreAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignoreAll())));
+                add("failures", pager.paginate(unpaged).map(toModel()).toList()).
+                add("pager", pager);
+        message.fold(model, toMessageModel()).
+                add("retryUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null)))).
+                add("ignoreUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null)))).
+                add("retryAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retryAll()))).
+                add("ignoreAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignoreAll())));
         return model;
     }
 
