@@ -1,8 +1,8 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
-import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
@@ -35,7 +35,6 @@ import java.util.Map;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.lazyrecords.Keywords.keywords;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 

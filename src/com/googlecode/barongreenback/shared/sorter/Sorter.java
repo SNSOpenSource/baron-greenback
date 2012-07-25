@@ -1,11 +1,14 @@
 package com.googlecode.barongreenback.shared.sorter;
 
-import com.googlecode.barongreenback.crawler.CrawlerFailureResource;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Maps;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.QueryParameters;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Requests;
@@ -52,10 +55,7 @@ public class Sorter {
     private static Callable1<? super Keyword, Model> asHeader() {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {
-                return Model.model().
-                        add("name", keyword.name()).
-                        add("escapedName", escape(keyword.name())).
-                        add("unique", keyword.metadata().get(Keywords.UNIQUE));
+                return Model.model().add("name", keyword.name());
             }
         };
     }
