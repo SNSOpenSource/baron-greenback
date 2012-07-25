@@ -1,8 +1,8 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.search.pager.Pager;
-import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.barongreenback.shared.AdvancedMode;
+import com.googlecode.barongreenback.shared.pager.Pager;
+import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
@@ -30,13 +30,11 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.lazyrecords.Keywords.keywords;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 
@@ -134,13 +132,9 @@ public class SearchResource {
                 if (results.isEmpty()) return baseModel(viewName, query);
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
-                return baseModel(viewName, query).
-                        add("headers", headers(visibleHeaders, results)).
-                        add("pager", pager).
-                        add("sorter", sorter).
-                        add("sortLinks", sorter.sortLinks(visibleHeaders)).
-                        add("sortedHeaders", sorter.sortedHeaders(visibleHeaders)).
-                        add("results", results.map(asModel(viewName, visibleHeaders)).toList());
+                return pager.model(sorter.model(baseModel(viewName, query).
+                        add("results", results.map(asModel(viewName, visibleHeaders)).toList()),
+                        visibleHeaders, results));
             }
         };
     }
@@ -190,33 +184,4 @@ public class SearchResource {
     private Sequence<Keyword<?>> headers(Model view) {
         return toKeywords(unwrap(view));
     }
-
-    private List<Map<String, Object>> headers(Sequence<Keyword<?>> headers, Sequence<Record> results) {
-        if (headers.isEmpty()) {
-            return toModel(keywords(results).realise());
-        }
-        return toModel(headers);
-    }
-
-    private List<Map<String, Object>> toModel(Sequence<Keyword<?>> keywords) {
-        return keywords.map(asHeader()).
-                map(Model.asMap()).
-                toList();
-    }
-
-    private Callable1<? super Keyword, Model> asHeader() {
-        return new Callable1<Keyword, Model>() {
-            public Model call(Keyword keyword) throws Exception {
-                return model().
-                        add("name", keyword.name()).
-                        add("escapedName", escape(keyword.name())).
-                        add("unique", keyword.metadata().get(Keywords.UNIQUE));
-            }
-        };
-    }
-
-    private String escape(String name) {
-        return name.replace(' ', '_');
-    }
-
 }

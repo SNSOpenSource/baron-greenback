@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
+import com.googlecode.barongreenback.crawler.failures.Failures;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.utterlyidle.MediaType;
@@ -18,18 +19,18 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerStatusResource {
 
-    private final CrawlerFailures crawlerFailures;
+    private final Failures failures;
     private final CrawlerExecutors crawlerExecutors;
 
-    public CrawlerStatusResource(CrawlerExecutors crawlerExecutors, CrawlerFailures crawlerFailures) {
+    public CrawlerStatusResource(CrawlerExecutors crawlerExecutors, Failures failures) {
         this.crawlerExecutors = crawlerExecutors;
-        this.crawlerFailures = crawlerFailures;
+        this.failures = failures;
     }
 
     @GET
     @Path("status")
     public Model status() {
-        List<Model> executors = sequence(crawlerExecutors.inputHandler(), crawlerExecutors.processHandler(), crawlerExecutors.outputHandler(), crawlerFailures).safeCast(StatusMonitor.class).map(toModel()).toList();
+        List<Model> executors = sequence(crawlerExecutors.inputHandler(), crawlerExecutors.processHandler(), crawlerExecutors.outputHandler(), failures).safeCast(StatusMonitor.class).map(toModel()).toList();
         return model().add("executors", executors);
     }
 

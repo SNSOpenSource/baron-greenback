@@ -6,19 +6,15 @@
 <body class="failures">
 
 $message()$
-<table class="shouldExpand results zebra-striped">
-    $thead(headers=["Uri", "Response", "Actions"])$
-    <tbody>
-    $failures: {
+<table class="$if(pager.paged)$paged$endif$ shouldExpand results zebra-striped">
+    <thead>
     <tr>
-        <td><a href="$it.uri$">$it.uri$</a></td>
-        <td><div class="entity">$it.reason$</div></td>
-        <td>
-            $post(name="retry", value="Retry", url=retryUrl, id=it.id)$
-            $post(name="ignore", value="Ignore", url=ignoreUrl, id=it.id)$
-        </td>
+        $sorter/th(headers=headers, sortedHeaders=sortedHeaders)$
+        $th(class="orange", header="Actions")$
     </tr>
-    }$
+    </thead>
+    <tbody>
+    $items:item(item=it)$
     </tbody>
 </table>
 $pager$

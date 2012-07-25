@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.search.pager;
+package com.googlecode.barongreenback.shared.pager;
 
 public class Page {
     private String text;

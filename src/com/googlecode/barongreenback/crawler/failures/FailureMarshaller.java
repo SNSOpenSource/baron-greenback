@@ -1,6 +1,5 @@
-package com.googlecode.barongreenback.crawler.failure;
+package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.Failure;
 import com.googlecode.lazyrecords.Record;
 
 public interface FailureMarshaller {

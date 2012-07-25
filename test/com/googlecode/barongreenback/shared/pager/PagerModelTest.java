@@ -1,5 +1,6 @@
-package com.googlecode.barongreenback.search.pager;
+package com.googlecode.barongreenback.shared.pager;
 
+import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import org.junit.Test;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.numbers.Numbers.range;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -122,6 +122,11 @@ public class PagerModelTest {
 
             public List<Map.Entry<String, String>> getQueryParametersToUrl() {
                 return null;
+            }
+
+            @Override
+            public Model model(Model model) {
+                return model;
             }
         };
     }

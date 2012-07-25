@@ -1,8 +1,8 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.search.pager.Pager;
-import com.googlecode.barongreenback.search.pager.RequestPager;
-import com.googlecode.barongreenback.search.sorter.Sorter;
+import com.googlecode.barongreenback.shared.pager.Pager;
+import com.googlecode.barongreenback.shared.pager.RequestPager;
+import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.lazyrecords.parser.ParametrizedParser;
 import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.lazyrecords.parser.PredicateParser;

@@ -1,9 +1,8 @@
-package com.googlecode.barongreenback.crawler.failure;
+package com.googlecode.barongreenback.crawler.failures;
 
 import com.googlecode.barongreenback.crawler.AbstractCrawler;
 import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
-import com.googlecode.barongreenback.crawler.Failure;
 import com.googlecode.barongreenback.crawler.HttpDatasource;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
@@ -19,12 +18,12 @@ import com.googlecode.totallylazy.Sequences;
 import java.util.List;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.CRAWLER_ID;
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.JOB_TYPE;
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.REASON;
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.RECORD;
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.SOURCE;
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.URI;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.CRAWLER_ID;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.JOB_TYPE;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REASON;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.RECORD;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.SOURCE;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.URI;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 

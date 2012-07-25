@@ -1,9 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
-import com.googlecode.barongreenback.crawler.failure.HttpJobFailureMarshaller;
-import com.googlecode.barongreenback.crawler.failure.MasterPaginatedJobFailureMarshaller;
-import com.googlecode.barongreenback.crawler.failure.PaginatedJobFailureMarshaller;
+import com.googlecode.barongreenback.crawler.failures.FailureHandler;
 import com.googlecode.utterlyidle.handlers.Auditor;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import com.googlecode.yadic.Container;
