@@ -191,20 +191,20 @@ public class SearchResource {
         return toKeywords(unwrap(view));
     }
 
-    private List<Map<String, Object>> headers(Sequence<Keyword<?>> headers, Sequence<Record> results) {
+    public static List<Map<String, Object>> headers(Sequence<Keyword<?>> headers, Sequence<Record> results) {
         if (headers.isEmpty()) {
             return toModel(keywords(results).realise());
         }
         return toModel(headers);
     }
 
-    private List<Map<String, Object>> toModel(Sequence<Keyword<?>> keywords) {
+    private static List<Map<String, Object>> toModel(Sequence<Keyword<?>> keywords) {
         return keywords.map(asHeader()).
                 map(Model.asMap()).
                 toList();
     }
 
-    private Callable1<? super Keyword, Model> asHeader() {
+    private static Callable1<? super Keyword, Model> asHeader() {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {
                 return model().
@@ -215,7 +215,7 @@ public class SearchResource {
         };
     }
 
-    private String escape(String name) {
+    private static String escape(String name) {
         return name.replace(' ', '_');
     }
 
