@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.search.pager.Pager;
-import com.googlecode.barongreenback.search.sorter.Sorter;
+import com.googlecode.barongreenback.shared.pager.Pager;
+import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;

@@ -2,8 +2,8 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
 import com.googlecode.barongreenback.search.SearchResource;
-import com.googlecode.barongreenback.search.pager.Pager;
-import com.googlecode.barongreenback.search.sorter.Sorter;
+import com.googlecode.barongreenback.shared.pager.Pager;
+import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;

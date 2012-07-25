@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.search.pager;
+package com.googlecode.barongreenback.shared.pager;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.funclate.Renderer;

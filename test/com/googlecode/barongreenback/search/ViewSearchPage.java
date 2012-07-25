@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.search.pager.Pager;
+import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;

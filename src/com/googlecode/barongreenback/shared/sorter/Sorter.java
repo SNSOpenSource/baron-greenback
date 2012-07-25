@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.search.sorter;
+package com.googlecode.barongreenback.shared.sorter;
 
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;

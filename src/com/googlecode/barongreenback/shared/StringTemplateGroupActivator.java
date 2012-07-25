@@ -2,8 +2,8 @@ package com.googlecode.barongreenback.shared;
 
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.search.pager.PagerRenderer;
-import com.googlecode.barongreenback.search.pager.RequestPager;
+import com.googlecode.barongreenback.shared.pager.PagerRenderer;
+import com.googlecode.barongreenback.shared.pager.RequestPager;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.URLs;
