@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.search.sorter;
+package com.googlecode.barongreenback.shared.sorter;
 
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -12,8 +12,8 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static com.googlecode.barongreenback.search.sorter.Sorter.SORT_COLUMN_QUERY_PARAM;
-import static com.googlecode.barongreenback.search.sorter.Sorter.SORT_DIRECTION_QUERY_PARAM;
+import static com.googlecode.barongreenback.shared.sorter.Sorter.SORT_COLUMN_QUERY_PARAM;
+import static com.googlecode.barongreenback.shared.sorter.Sorter.SORT_DIRECTION_QUERY_PARAM;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Triple.triple;

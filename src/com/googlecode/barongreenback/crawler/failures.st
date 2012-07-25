@@ -6,8 +6,13 @@
 <body class="failures">
 
 $message()$
-<table class="shouldExpand results zebra-striped">
-    $thead(headers=["Uri", "Response", "Actions"])$
+<table class="$if(pager.paged)$paged$endif$ shouldExpand results zebra-striped">
+    <thead>
+    <tr>
+        $sorter/th(headers=headers, sortedHeaders=sortedHeaders)$
+        $th(class="orange", header="Actions")$
+    </tr>
+    </thead>
     <tbody>
     $failures: {
     <tr>
