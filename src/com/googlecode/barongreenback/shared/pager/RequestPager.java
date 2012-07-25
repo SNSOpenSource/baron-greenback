@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.shared.pager;
 
+import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.QueryParameters;
@@ -83,5 +84,10 @@ public class RequestPager implements Pager {
 
     public List<Map.Entry<String, String>> getQueryParametersToUrl() {
         return sequence(query(request).remove(ROWS_PER_PAGE_PARAM).remove(CURRENT_PAGE_PARAM)).map(pairToEntry(String.class, String.class)).toList();
+    }
+
+    @Override
+    public Model model(Model model) {
+        return model.add("pager", this);
     }
 }

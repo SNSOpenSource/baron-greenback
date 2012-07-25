@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.shared.pager;
 
+import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Sequence;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface Pager {
     boolean isPaged();
 
     List<Map.Entry<String, String>> getQueryParametersToUrl();
+
+    Model model(Model model);
 }

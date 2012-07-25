@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
-import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.Model;
@@ -26,7 +25,9 @@ import com.googlecode.yadic.Container;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.*;
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.ID;
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.REASON;
+import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.URI;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.all;
@@ -61,20 +62,14 @@ public class CrawlerFailureResource {
         Sequence<Record> unpaged = repository.find(all());
         Sequence<Record> sorted = sorter.sort(unpaged, headers);
         Sequence<Record> paged = pager.paginate(sorted);
-        Model model = model().
+        Model model = pager.model(sorter.model(model().
                 add("anyExists", !crawlerFailures.isEmpty()).
-                add("failures", paged.map(toModel()).toList()).
-                add("pager", pager).
-                add("headers", SearchResource.headers(headers, paged)).
-                add("sorter", sorter).
-                add("sortLinks", sorter.sortLinks(headers)).
-                add("sortedHeaders", sorter.sortedHeaders(headers));
-        message.fold(model, toMessageModel()).
+                add("failures", paged.map(toModel()).toList()), headers, paged));
+        return message.fold(model, toMessageModel()).
                 add("retryUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null)))).
                 add("ignoreUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null)))).
                 add("retryAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retryAll()))).
                 add("ignoreAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignoreAll())));
-        return model;
     }
 
     private Callable2<Model, String, Model> toMessageModel() {

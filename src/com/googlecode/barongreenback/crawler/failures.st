@@ -9,10 +9,7 @@ $message()$
 <table class="$if(pager.paged)$paged$endif$ shouldExpand results zebra-striped">
     <thead>
     <tr>
-        $headers:
-        th(class="blue " + it.escapedName + " " + sortedHeaders.(it.name), header=it.name, link=sortLinks.(it.name)),
-        th(class="green " + it.escapedName + " " + sortedHeaders.(it.name), header=it.name, link=sortLinks.(it.name))
-        $
+        $sorter/th(headers=headers, sortedHeaders=sortedHeaders)$
         $th(class="orange", header="Actions")$
     </tr>
     </thead>

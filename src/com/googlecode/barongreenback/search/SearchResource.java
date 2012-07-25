@@ -30,7 +30,6 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
@@ -134,13 +133,9 @@ public class SearchResource {
                 if (results.isEmpty()) return baseModel(viewName, query);
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
-                return baseModel(viewName, query).
-                        add("headers", headers(visibleHeaders, results)).
-                        add("pager", pager).
-                        add("sorter", sorter).
-                        add("sortLinks", sorter.sortLinks(visibleHeaders)).
-                        add("sortedHeaders", sorter.sortedHeaders(visibleHeaders)).
-                        add("results", results.map(asModel(viewName, visibleHeaders)).toList());
+                return pager.model(sorter.model(baseModel(viewName, query).
+                        add("results", results.map(asModel(viewName, visibleHeaders)).toList()),
+                        visibleHeaders, results));
             }
         };
     }
@@ -190,33 +185,4 @@ public class SearchResource {
     private Sequence<Keyword<?>> headers(Model view) {
         return toKeywords(unwrap(view));
     }
-
-    public static List<Map<String, Object>> headers(Sequence<Keyword<?>> headers, Sequence<Record> results) {
-        if (headers.isEmpty()) {
-            return toModel(keywords(results).realise());
-        }
-        return toModel(headers);
-    }
-
-    private static List<Map<String, Object>> toModel(Sequence<Keyword<?>> keywords) {
-        return keywords.map(asHeader()).
-                map(Model.asMap()).
-                toList();
-    }
-
-    private static Callable1<? super Keyword, Model> asHeader() {
-        return new Callable1<Keyword, Model>() {
-            public Model call(Keyword keyword) throws Exception {
-                return model().
-                        add("name", keyword.name()).
-                        add("escapedName", escape(keyword.name())).
-                        add("unique", keyword.metadata().get(Keywords.UNIQUE));
-            }
-        };
-    }
-
-    private static String escape(String name) {
-        return name.replace(' ', '_');
-    }
-
 }
