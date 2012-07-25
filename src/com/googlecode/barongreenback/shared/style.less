@@ -1,0 +1,353 @@
+@import "/baron-greenback/shared/expander/expander.less";
+@import "/baron-greenback/shared/twitter/bootstrap.less";
+
+@grayDark:          lighten(@black, 15%);
+@gray:              lighten(@black, 30%);
+
+.t+l{
+    color: red;
+    &:hover {
+        border: 1px solid red;
+    }
+}
+
+.large-input {
+    width: 270px;
+}
+
+.extra-large-input {
+    width: 530px;
+}
+
+.shadow (@shadow-color) {
+    @blur-radius: 3px;
+    @spread-radius: 1px;
+    -moz-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    -webkit-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+}
+
+.inlineBlock {
+    display: inline-block;
+    zoom: 1; // IE6-7 only
+    *display: inline; // IE6-7 only
+}
+
+.label {
+    padding: 0;
+    display: block;
+    float: none;
+    width: auto;
+    font-weight: bold;
+    text-align: left;
+    line-height: 20px;
+    padding-top: 0;
+    color: @grayDark;
+    background: none;
+    font-size: 13px;
+    text-transform: capitalize;
+}
+
+h1, h2, h3, h4, h5, h6, .btn, a.update {
+    text-transform: capitalize;
+}
+
+.btn {
+    &.primary, &.danger, &.success {
+        &:hover {
+            color: #fff;
+        }
+    }
+    &.success {
+        .gradientBar(lighten(@green, 15%), @green);
+    }
+    &.danger {
+        .gradientBar(lighten(@red, 15%), @red);
+    }
+}
+
+input[type="submit"] {
+    .btn;
+}
+
+input.crawl, input.search, a.new, input.import, input.save, input.start, body.views a.edit, input.backup, input.restore {
+    .btn;
+    .btn.primary;
+}
+
+input.more, a.export, a.import, a.edit, a.cancel, a.download {
+    .btn;
+}
+
+input.delete, input.stop, input.reset, input.resetAll, input.deleteAll, input.ignore, input.ignoreAll, input.disable {
+    .btn;
+    .btn.danger;
+}
+
+input.enable {
+    .btn;
+    .btn.success;
+}
+
+.fixIE7Overlapping {
+    position: relative;
+}
+
+div.nameValue {
+    vertical-align: top;
+    .fixIE7Overlapping;
+}
+
+div.control, div.nameValue {
+    .inlineBlock;
+    margin: 5px;
+    span.message {
+        .help-block;
+    }
+}
+
+
+
+ul.tabs {
+    float: none;
+}
+
+th, ul.tabs li {
+    text-transform: capitalize;
+}
+
+div.container, .container {
+    margin: 0 0 0 40px;
+    width: auto;
+}
+
+.content {
+    margin: 50px 20px;
+}
+
+div.fieldset {
+    .shadow(lightgray);
+    border: 1px solid #ddd;
+    margin: @blur-radius;
+    margin-top: 1em;
+    padding-top: .6em;
+    padding-left: .5em;
+    padding-right: .5em;
+
+    position: relative;
+    
+    div.legend {
+        display: inline;
+        
+        margin: 0.0em 0.4em;
+        background-color: #fff;
+        position: absolute;
+        top: -0.8em;
+        font-size: 110%;
+        font-weight: bold;
+        color: @grayDark;
+        text-transform: capitalize;
+    }
+}
+
+div.recordDefinitionTemplate, li.keywordTemplate {
+    display:none;
+}
+
+form input.from, form input#query, form input.query, input.location {
+    .extra-large-input;
+}
+
+form.import {
+    div.control {
+        display: block;
+    }
+    input.id {
+        .large-input;
+    }
+    textarea.model {
+        .extra-large-input;
+        height: 20em;
+    }
+}
+
+form.view {
+    div.rootXPath, div.alias, div.subfeed, div.checkpoint {
+        display: none;
+    }
+}
+
+.subrecordDefinition div.checkpoint {
+    display: none;
+}
+
+form.search {
+    .inlineBlock;
+    input.search {
+        vertical-align: top;
+        margin-top: 4px;
+    }
+}
+
+form.delete, form.crawl, form.start, form.stop, form.copy, form.reset, form.crawlAll, form.resetAll, form.deleteAll, form.restore, form.backup, form.retryAll, form.ignoreAll, form.retry, form.ignore, form.enable, form.disable, form.activeCrawler {
+    margin: 0;
+    padding: 0;
+    .inlineBlock;
+}
+
+body {
+    form {
+        input[type=text], input[type=password], textarea, select {
+            color: #333;
+        }
+    }
+}
+
+.actions {
+    padding-left: 20px;
+}
+
+.topbar {
+    a.home {
+        background: left no-repeat url(small-logo.png);
+        padding-left: 40px;
+    }
+}
+
+table {
+    th, td {
+        padding: 5px 7px 4px;
+    }
+
+    &.results {
+        th a {
+            color: inherit;
+        }
+        span.jobstatus {
+            text-transform: capitalize;
+            padding-left: 20px;
+        }
+        span.jobstatus.running {
+                background: url(running.gif) no-repeat;
+        }
+        span.jobstatus.idle {
+                background: url(idle.gif) no-repeat;
+        }
+        tfoot tr td {
+            border-top: 1px solid #ddd;
+        }
+    }
+}
+
+ol.fields {
+    li:hover {
+        border: 1px solid @grayLighter;
+    }
+    li {
+        border: 1px solid #fff;
+        position: relative;
+        padding-right: 20px;
+        .closeIcon {
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        .moveIcon {
+            cursor: pointer;
+            position: absolute;
+            top: 24px;
+            right: 0;
+        }
+    }
+    li.ui-sortable-helper {
+        background-color: #fff;
+        border: solid 1px @grayLighter;
+        cursor: move;
+    }
+    li.placeholder {
+        height: 5em;
+        background-color: @grayLight;
+    }
+}
+
+.icon {
+    background: #fff no-repeat;
+    width: 16px;
+    height: 16px;
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    margin: 4px;
+}
+
+.closeIcon {
+    .icon;
+    background: url('icons-red.png') -96px -128px;
+}
+
+.moveIcon {
+    .icon;
+    background: url('icons-grey.png') -128px 0;
+}
+
+form div.error {
+  @error-color: desaturate(lighten(@red, 25%), 25%);
+  > label, span.message {
+    color: @red;
+  }
+  input,
+  textarea {
+    border-color: @error-color;
+    .box-shadow(0 0 3px rgba(171,41,32,.25));
+    &:focus {
+      border-color: darken(@error-color, 10%);
+      .box-shadow(0 0 6px rgba(171,41,32,.5));
+    }
+  }
+}
+
+.results.paged .header a {
+  .inlineBlock;
+  width: 95%;
+}
+
+div.pagination div.control {
+    vertical-align: top;
+}
+
+div.rowsPerPage {
+    label {
+        padding-right: 5px;
+    }
+    select.rowsPerPage {
+        width: 60px;
+    }
+}
+
+body.queues, body.failures  {
+    div.entity {
+        white-space: pre;
+    }
+    table.results {
+        table-layout: fixed;
+        td {
+            overflow: hidden;
+        }
+        div.entity {
+            height: 2em;
+        }
+        form {
+            margin-bottom: 0;
+        }
+    }
+}
+
+body.failures .Actions {
+    width: 130px;
+}
+
+div.crawler {
+    vertical-align: top;
+    margin: 0px;
+}
