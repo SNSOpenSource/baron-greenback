@@ -1,6 +1,8 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
 import com.googlecode.barongreenback.search.pager.Pager;
+import com.googlecode.barongreenback.search.sorter.Sorter;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
@@ -34,22 +36,29 @@ public class CrawlerFailureResource {
     private final CrawlerRepository crawlerRepository;
     private final Container requestScope;
     private final Pager pager;
+    private final Sorter sorter;
+    private final CrawlerFailureRepository crawlerFailureRepository;
 
-    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager) {
+    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager, Sorter sorter, CrawlerFailureRepository crawlerFailureRepository) {
         this.crawlerFailures = crawlerFailures;
         this.redirector = redirector;
         this.crawlerRepository = crawlerRepository;
         this.requestScope = requestScope;
         this.pager = pager;
+        this.sorter = sorter;
+        this.crawlerFailureRepository = crawlerFailureRepository;
     }
 
     @GET
     @Path("failures")
     public Model failures(@QueryParam("message") Option<String> message) {
+
         Sequence<Pair<UUID, Failure>> unpaged = crawlerFailures.values();
+
+        Sequence<Pair<UUID, Failure>> paged = pager.paginate(unpaged);
         Model model = model().
                 add("anyExists", !crawlerFailures.isEmpty()).
-                add("failures", pager.paginate(unpaged).map(toModel()).toList()).
+                add("failures", paged.map(toModel()).toList()).
                 add("pager", pager);
         message.fold(model, toMessageModel()).
                 add("retryUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null)))).

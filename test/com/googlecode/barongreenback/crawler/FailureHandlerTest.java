@@ -29,8 +29,7 @@ public class FailureHandlerTest {
     private final Container scope = testScope();
 
     private Container testScope() {
-        Container scope = CrawlerFailureRepositoryTest.testScope();
-        scope.add(CrawlerFailures.class);
+        Container scope = CrawlerFailureTest.testScope();
         scope.add(FailureHandler.class);
         return scope;
     }
