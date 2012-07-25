@@ -18,9 +18,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class StagedJobExecutor {
-    private final InputHandler inputHandler;
-    private final ProcessHandler processHandler;
-    private final OutputHandler outputHandler;
+    private final JobExecutor inputHandler;
+    private final JobExecutor processHandler;
+    private final JobExecutor outputHandler;
     private final Application application;
     private final CountLatch latch = new CountLatch();
     private final Container crawlerScope;

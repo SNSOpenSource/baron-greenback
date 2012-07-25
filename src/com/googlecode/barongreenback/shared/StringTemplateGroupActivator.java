@@ -8,6 +8,7 @@ import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.URLs;
 import com.googlecode.totallylazy.Xml;
+import com.googlecode.utterlyidle.MatchedResource;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.io.HierarchicalPath;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -25,8 +26,8 @@ import static com.googlecode.totallylazy.URLs.url;
 public class StringTemplateGroupActivator implements Callable<StringTemplateGroup> {
     private final URL baseUrl;
 
-    public StringTemplateGroupActivator(final Request request) {
-        baseUrl = append(packageUrl(WebApplication.class), packageName(HierarchicalPath.hierarchicalPath(request.uri().path())));
+    public StringTemplateGroupActivator(final MatchedResource matchedResource) {
+        this(packageUrl(matchedResource.forClass()));
     }
 
     public StringTemplateGroupActivator(URL baseUrl) {
@@ -65,11 +66,4 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
     static URL append(URL url, String path) {
         return url(url.toString() + path);
     }
-
-    private static String packageName(HierarchicalPath path) {
-        return path.segments().init().last();
-    }
-
-
-
 }

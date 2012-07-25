@@ -445,22 +445,24 @@ less.Parser = function Parser(env) {
                                  n >= 0 && input.charAt(n) !== '\n';
                                  n--) { column++ }
 
-                        throw {
-                            type: e.type,
-                            message: e.message,
-                            filename: env.filename,
-                            index: e.index,
-                            line: typeof(line) === 'number' ? line + 1 : null,
-                            callLine: e.call && (getLine(e.call) + 1),
-                            callExtract: lines[getLine(e.call)],
-                            stack: e.stack,
-                            column: column,
-                            extract: [
-                                lines[line - 1],
-                                lines[line],
-                                lines[line + 1]
-                            ]
-                        };
+                        throw new Error(e.message + " " + env.filename + ":" + (typeof(line) === 'number' ? line + 1 : null));
+
+//                        throw {
+//                            type: e.type,
+//                            message: e.message,
+//                            filename: env.filename,
+//                            index: e.index,
+//                            line: typeof(line) === 'number' ? line + 1 : null,
+//                            callLine: e.call && (getLine(e.call) + 1),
+//                            callExtract: lines[getLine(e.call)],
+//                            stack: e.stack,
+//                            column: column,
+//                            extract: [
+//                                lines[line - 1],
+//                                lines[line],
+//                                lines[line + 1]
+//                            ]
+//                        };
                     }
                     if (options.compress) {
                         return css.replace(/(\s)+/g, "$1");

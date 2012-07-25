@@ -1,6 +1,8 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.crawler.executor.CrawlerExecutorConfigResource;
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
+import com.googlecode.barongreenback.crawler.executor.CrawlerExecutorsActivator;
 import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
 import com.googlecode.barongreenback.crawler.failure.HttpJobFailureMarshaller;
 import com.googlecode.barongreenback.crawler.failure.MasterPaginatedJobFailureMarshaller;
@@ -48,7 +50,9 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
 
     @Override
     public Module addPerApplicationObjects(Container container) throws   Exception {
-        container.addInstance(CrawlerExecutors.class, new CrawlerExecutors());
+        container.add(CrawlerFailures.class);
+        container.add(CrawlerExecutorsActivator.class);
+        container.addActivator(CrawlerExecutors.class, container.get(CrawlerExecutorsActivator.class));
         return this;
     }
 }
