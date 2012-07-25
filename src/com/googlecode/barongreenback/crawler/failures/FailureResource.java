@@ -1,6 +1,11 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
+import com.googlecode.barongreenback.crawler.CheckpointHandler;
+import com.googlecode.barongreenback.crawler.CheckpointUpdater;
+import com.googlecode.barongreenback.crawler.CrawlerRepository;
+import com.googlecode.barongreenback.crawler.CrawlerScope;
+import com.googlecode.barongreenback.crawler.StagedJob;
+import com.googlecode.barongreenback.crawler.StagedJobExecutor;
 import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.Model;
@@ -25,9 +30,9 @@ import com.googlecode.yadic.Container;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.ID;
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.REASON;
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.URI;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.ID;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REASON;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.URI;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.all;
@@ -35,41 +40,41 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.Responses.response;
 
-@Path("/crawler")
-public class CrawlerFailureResource {
-    private final CrawlerFailures crawlerFailures;
+@Path("/crawler/failures")
+public class FailureResource {
+    private final Failures failures;
     private final Redirector redirector;
     private final CrawlerRepository crawlerRepository;
     private final Container requestScope;
     private final Pager pager;
     private final Sorter sorter;
-    private final CrawlerFailureRepository repository;
+    private final FailureRepository failureRepository;
 
-    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager, Sorter sorter, CrawlerFailureRepository repository) {
-        this.crawlerFailures = crawlerFailures;
+    public FailureResource(Failures failures, FailureRepository failureRepository, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager, Sorter sorter) {
+        this.failures = failures;
         this.redirector = redirector;
         this.crawlerRepository = crawlerRepository;
         this.requestScope = requestScope;
         this.pager = pager;
         this.sorter = sorter;
-        this.repository = repository;
+        this.failureRepository = failureRepository;
     }
 
     @GET
-    @Path("failures")
-    public Model failures(@QueryParam("message") Option<String> message) {
+    @Path("list")
+    public Model list(@QueryParam("message") Option<String> message) {
         Sequence<Keyword<?>> headers = Sequences.sequence(URI, REASON);
-        Sequence<Record> unpaged = repository.find(all());
+        Sequence<Record> unpaged = failureRepository.find(all());
         Sequence<Record> sorted = sorter.sort(unpaged, headers);
         Sequence<Record> paged = pager.paginate(sorted);
         Model model = pager.model(sorter.model(model().
-                add("anyExists", !crawlerFailures.isEmpty()).
-                add("failures", paged.map(toModel()).toList()), headers, paged));
+                add("anyExists", !failureRepository.isEmpty()).
+                add("items", paged.map(toModel()).toList()), headers, paged));
         return message.fold(model, toMessageModel()).
-                add("retryUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retry(null)))).
-                add("ignoreUrl", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignore(null)))).
-                add("retryAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).retryAll()))).
-                add("ignoreAll", redirector.absoluteUriOf(method(on(CrawlerFailureResource.class).ignoreAll())));
+                add("retryUrl", redirector.absoluteUriOf(method(on(FailureResource.class).retry(null)))).
+                add("ignoreUrl", redirector.absoluteUriOf(method(on(FailureResource.class).ignore(null)))).
+                add("retryAll", redirector.absoluteUriOf(method(on(FailureResource.class).retryAll()))).
+                add("ignoreAll", redirector.absoluteUriOf(method(on(FailureResource.class).ignoreAll())));
     }
 
     private Callable2<Model, String, Model> toMessageModel() {
@@ -82,30 +87,30 @@ public class CrawlerFailureResource {
     }
 
     @POST
-    @Path("failures/retry")
+    @Path("retry")
     public Response retry(@FormParam("id") UUID id) {
-        return crawlerFailures.get(id).map(toRetry(id)).getOrElse(response(Status.NOT_FOUND));
+        return failures.get(id).map(toRetry(id)).getOrElse(response(Status.NOT_FOUND));
     }
 
     @POST
-    @Path("failures/ignore")
+    @Path("ignore")
     public Response ignore(@FormParam("id") UUID id) {
-        return crawlerFailures.get(id).map(toIgnore(id)).getOrElse(response(Status.NOT_FOUND));
+        return failures.get(id).map(toIgnore(id)).getOrElse(response(Status.NOT_FOUND));
     }
 
     @POST
-    @Path("failures/retryAll")
+    @Path("retryAll")
     public Response retryAll() {
-        Sequence<UUID> uuids = crawlerFailures.values().map(Callables.<UUID>first());
+        Sequence<UUID> uuids = failures.values().map(Callables.<UUID>first());
         int rowsToDelete = uuids.size();
         uuids.each(retry());
         return backToMe(rowsToDelete + " failures have been added to the job queue");
     }
 
     @POST
-    @Path("failures/ignoreAll")
+    @Path("ignoreAll")
     public Response ignoreAll() {
-        return backToMe(crawlerFailures.removeAll() + " failure(s) have been ignored");
+        return backToMe(failures.removeAll() + " failures(s) have been ignored");
     }
 
     private Callable1<UUID, Void> ignore() {
@@ -133,7 +138,7 @@ public class CrawlerFailureResource {
         return new Callable1<Failure, Response>() {
             @Override
             public Response call(Failure stagedJobResponsePair) throws Exception {
-                crawlerFailures.delete(id);
+                failures.delete(id);
                 return backToMe("Job ignored");
             }
         };
@@ -144,14 +149,14 @@ public class CrawlerFailureResource {
             @Override
             public Response call(Failure failure) throws Exception {
                 executor(failure.job()).crawl(failure.job());
-                crawlerFailures.delete(id);
+                failures.delete(id);
                 return backToMe("Job retried");
             }
         };
     }
 
     private Response backToMe(String message) {
-        return redirector.seeOther(method(on(CrawlerFailureResource.class).failures(some(message))));
+        return redirector.seeOther(method(on(FailureResource.class).list(some(message))));
     }
 
     private Callable1<Record, Model> toModel() {

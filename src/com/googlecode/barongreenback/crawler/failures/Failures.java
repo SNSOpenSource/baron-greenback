@@ -1,7 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
-import com.googlecode.barongreenback.crawler.failure.FailureMarshallers;
+import com.googlecode.barongreenback.crawler.StatusMonitor;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
@@ -11,14 +10,14 @@ import com.googlecode.yadic.Container;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository.ID;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.ID;
 import static com.googlecode.totallylazy.Predicates.all;
 
-public class CrawlerFailures implements StatusMonitor {
-    private final CrawlerFailureRepository repository;
+public class Failures implements StatusMonitor {
+    private final FailureRepository repository;
     private final Container scope;
 
-    public CrawlerFailures(CrawlerFailureRepository repository, Container scope) {
+    public Failures(FailureRepository repository, Container scope) {
         this.repository = repository;
         this.scope = scope;
     }
@@ -65,14 +64,14 @@ public class CrawlerFailures implements StatusMonitor {
     }
 
     private Failure unmarshal(Record record) {
-        return FailureMarshallers.valueOf(record.get(CrawlerFailureRepository.JOB_TYPE)).marshaller(scope).unmarshal(record);
+        return FailureMarshallers.valueOf(record.get(FailureRepository.JOB_TYPE)).marshaller(scope).unmarshal(record);
     }
 
     private Callable1<Record, Failure> unmarshal() {
         return new Callable1<Record, Failure>() {
             @Override
             public Failure call(Record record) throws Exception {
-                return CrawlerFailures.this.unmarshal(record);
+                return Failures.this.unmarshal(record);
             }
         };
     }

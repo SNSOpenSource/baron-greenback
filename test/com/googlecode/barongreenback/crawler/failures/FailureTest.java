@@ -1,9 +1,10 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.failure.CrawlerFailureRepository;
-import com.googlecode.barongreenback.crawler.failure.HttpJobFailureMarshaller;
-import com.googlecode.barongreenback.crawler.failure.MasterPaginatedJobFailureMarshaller;
-import com.googlecode.barongreenback.crawler.failure.PaginatedJobFailureMarshaller;
+import com.googlecode.barongreenback.crawler.AbstractCrawler;
+import com.googlecode.barongreenback.crawler.CheckpointHandler;
+import com.googlecode.barongreenback.crawler.CrawlerRepository;
+import com.googlecode.barongreenback.crawler.CrawlerTests;
+import com.googlecode.barongreenback.crawler.HttpDatasource;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.persistence.ModelMapping;
 import com.googlecode.barongreenback.shared.ModelRepository;
@@ -31,7 +32,7 @@ import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class CrawlerFailureTest {
+public class FailureTest {
     private static final Record record = Record.constructors.record().set(Keywords.keyword("title", String.class), "Man eats dog");
     private static final Container scope = testScope();
     private static final UUID crawlerId = UUID.randomUUID();
@@ -50,28 +51,28 @@ public class CrawlerFailureTest {
 
     @Test
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination), "Bigtime failure"));
+        assertCanPersistAndLoad(Failure.failure(httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failure"));
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failure"));
+        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failures"));
     }
 
     private void assertCanPersistAndLoad(Failure failure) {
-        CrawlerFailures failures = scope.get(CrawlerFailures.class);
-        UUID crawlerFailureId = failures.add(failure);
-        assertThat(failures.get(crawlerFailureId), is(some(failure)));
+        Failures failures = scope.get(Failures.class);
+        UUID failureId = failures.add(failure);
+        assertThat(failures.get(failureId), is(some(failure)));
     }
 
     public static Container testScope() {
         Container scope = new SimpleContainer();
-        scope.add(CrawlerFailureRepository.class);
+        scope.add(FailureRepository.class);
         scope.add(BaronGreenbackRecords.class);
         scope.add(Records.class, MemoryRecords.class);
         scope.addInstance(StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
@@ -81,7 +82,7 @@ public class CrawlerFailureTest {
         scope.add(HttpJobFailureMarshaller.class);
         scope.add(PaginatedJobFailureMarshaller.class);
         scope.add(MasterPaginatedJobFailureMarshaller.class);
-        scope.add(CrawlerFailures.class);
+        scope.add(Failures.class);
         Containers.selfRegister(scope);
         return scope;
     }

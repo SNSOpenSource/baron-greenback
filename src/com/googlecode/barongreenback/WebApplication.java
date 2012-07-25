@@ -3,6 +3,7 @@ package com.googlecode.barongreenback;
 import com.googlecode.barongreenback.batch.BatchModule;
 import com.googlecode.barongreenback.crawler.CrawlerModule;
 import com.googlecode.barongreenback.crawler.executor.ExecutorModule;
+import com.googlecode.barongreenback.crawler.failures.FailureModule;
 import com.googlecode.barongreenback.jobs.JobsModule;
 import com.googlecode.barongreenback.less.LessCssModule;
 import com.googlecode.barongreenback.persistence.PersistenceModule;
@@ -64,6 +65,7 @@ public class WebApplication extends RestApplication {
         PersistenceModule.configure(application);
         application.add(new LessCssModule());
         application.add(new CrawlerModule());
+        application.add(new FailureModule());
         application.add(new SearchModule());
         application.add(new ViewsModule());
         application.add(new JobsModule());

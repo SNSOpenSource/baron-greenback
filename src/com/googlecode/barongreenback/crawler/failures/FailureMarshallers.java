@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler.failure;
+package com.googlecode.barongreenback.crawler.failures;
 
 import com.googlecode.barongreenback.crawler.HttpJob;
 import com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob;

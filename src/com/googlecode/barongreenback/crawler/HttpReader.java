@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.crawler.failures.FailureHandler;
 import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Response;

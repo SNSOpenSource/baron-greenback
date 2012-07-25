@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler.failure;
+package com.googlecode.barongreenback.crawler.failures;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.Finder;
@@ -20,7 +20,7 @@ import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 
-public class CrawlerFailureRepository implements Repository<UUID, Record>, Finder<Record> {
+public class FailureRepository implements Repository<UUID, Record>, Finder<Record> {
     public static final Keyword<UUID> ID = keyword("id", UUID.class);
     public static final Keyword<String> JOB_TYPE = keyword("jobType", String.class);
     public static final Keyword<String> REASON = keyword("reason", String.class);
@@ -33,7 +33,7 @@ public class CrawlerFailureRepository implements Repository<UUID, Record>, Finde
 
     private final Records records;
 
-    public CrawlerFailureRepository(BaronGreenbackRecords records) {
+    public FailureRepository(BaronGreenbackRecords records) {
         this.records = records.value();
     }
 

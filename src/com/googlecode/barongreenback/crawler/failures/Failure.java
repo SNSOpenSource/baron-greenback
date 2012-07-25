@@ -1,4 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.failures;
+
+import com.googlecode.barongreenback.crawler.StagedJob;
 
 public class Failure {
     private final StagedJob job;
