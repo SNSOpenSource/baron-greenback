@@ -36,25 +36,19 @@ public class CrawlerFailureResource {
     private final CrawlerRepository crawlerRepository;
     private final Container requestScope;
     private final Pager pager;
-    private final Sorter sorter;
-    private final CrawlerFailureRepository crawlerFailureRepository;
 
-    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager, Sorter sorter, CrawlerFailureRepository crawlerFailureRepository) {
+    public CrawlerFailureResource(CrawlerFailures crawlerFailures, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager) {
         this.crawlerFailures = crawlerFailures;
         this.redirector = redirector;
         this.crawlerRepository = crawlerRepository;
         this.requestScope = requestScope;
         this.pager = pager;
-        this.sorter = sorter;
-        this.crawlerFailureRepository = crawlerFailureRepository;
     }
 
     @GET
     @Path("failures")
     public Model failures(@QueryParam("message") Option<String> message) {
-
         Sequence<Pair<UUID, Failure>> unpaged = crawlerFailures.values();
-
         Sequence<Pair<UUID, Failure>> paged = pager.paginate(unpaged);
         Model model = model().
                 add("anyExists", !crawlerFailures.isEmpty()).
