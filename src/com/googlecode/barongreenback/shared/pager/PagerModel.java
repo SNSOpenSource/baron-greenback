@@ -81,8 +81,12 @@ public class PagerModel {
 
     private Page toPage(final Pager pager, Number pageNumber) {
         String cssClass = "";
+
+        if(pageNumber.intValue() == pager.getNumberOfPages()){
+            cssClass ="final";
+        }
         if (pageNumber.intValue() == pager.getCurrentPage()) {
-            cssClass = "active";
+            cssClass += " active";
         }
         return new Page(pageNumber.toString(), cssClass, pager.getQueryStringForPage(pageNumber.intValue()));
     }
