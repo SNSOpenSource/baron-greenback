@@ -11,14 +11,16 @@ import static com.googlecode.totallylazy.Some.some;
 
 public class JobExecutor implements StatusMonitor {
     public final ExecutorService executor;
+    private final String name;
 
-    public JobExecutor(ExecutorService executor) {
+    public JobExecutor(ExecutorService executor, String name) {
         this.executor = executor;
+        this.name = name;
     }
 
     @Override
     public String name() {
-        return this.getClass().getSimpleName();
+        return name;
     }
 
     @Override

@@ -36,9 +36,9 @@ public class CrawlerExecutors implements Closeable {
     }
 
     private void initialise() {
-        this.inputHandler = createHandler(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY));
-        this.processHandler = createHandler(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY));
-        this.outputHandler = createHandler(configValues.get(OUTPUT_HANDLER_THREADS), configValues.get(OUTPUT_HANDLER_CAPACITY));
+        this.inputHandler = createHandler(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY), "Incoming");
+        this.processHandler = createHandler(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY), "Processing");
+        this.outputHandler = createHandler(configValues.get(OUTPUT_HANDLER_THREADS), configValues.get(OUTPUT_HANDLER_CAPACITY), "Writing");
     }
 
     public void resetExecutors() {
@@ -99,8 +99,8 @@ public class CrawlerExecutors implements Closeable {
                 new BlockingRetryRejectedExecutionHandler());
     }
 
-    public JobExecutor createHandler(int threads, int capacity) {
-        return new JobExecutor(createExecutor(threads, queueFor(capacity)));
+    public JobExecutor createHandler(int threads, int capacity, String name) {
+        return new JobExecutor(createExecutor(threads, queueFor(capacity)), name);
     }
 
     private LinkedBlockingQueue<Runnable> queueFor(int capacity) {

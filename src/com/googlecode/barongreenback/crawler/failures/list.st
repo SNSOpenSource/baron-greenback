@@ -29,5 +29,9 @@ $pager$
     $endif$
 </div>
 
+<ul>
+    <li><a href="$base$crawler/status">Status</a></li>
+</ul>
+
 </body>
 </html>

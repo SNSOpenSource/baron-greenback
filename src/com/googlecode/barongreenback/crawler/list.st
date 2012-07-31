@@ -30,5 +30,10 @@ $message()$
     $include.({$base$crawler/active}).body;format="raw"$
 </div>
 
+<ul>
+    <li><a href="$base$crawler/status">Status</a></li>
+    <li><a href="$base$crawler/failures/list">Failures</a></li>
+</ul>
+
 </body>
 </html>

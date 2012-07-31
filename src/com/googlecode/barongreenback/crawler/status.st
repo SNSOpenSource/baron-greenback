@@ -13,5 +13,10 @@
     </tr>
     }$
 </table>
+
+<ul>
+    <li><a href="$base$crawler/failures/list">Failures</a></li>
+</ul>
+
 </body>
 </html>

@@ -1,10 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
-import com.googlecode.barongreenback.crawler.executor.InputHandler;
 import com.googlecode.barongreenback.crawler.executor.JobExecutor;
-import com.googlecode.barongreenback.crawler.executor.OutputHandler;
-import com.googlecode.barongreenback.crawler.executor.ProcessHandler;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Function1;
