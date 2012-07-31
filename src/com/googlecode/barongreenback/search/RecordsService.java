@@ -89,8 +89,12 @@ public class RecordsService {
     }
 
     public Sequence<Record> getRecords(Model view, Predicate<Record> predicate) {
-        Definition viewDefinition = Definition.constructors.definition(viewName(view), headers(view));
+        Definition viewDefinition = definition(view);
         return records.get(viewDefinition).filter(predicate);
+    }
+
+    public Definition definition(Model view) {
+        return Definition.constructors.definition(viewName(view), headers(view));
     }
 
     public Model view(String view) {

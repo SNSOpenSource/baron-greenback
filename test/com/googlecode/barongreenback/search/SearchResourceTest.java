@@ -9,6 +9,7 @@ import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.lazyrecords.*;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -19,6 +20,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.util.UUID;
 
 import static com.googlecode.lazyrecords.Keywords.keywords;
@@ -88,10 +90,18 @@ public class SearchResourceTest extends ApplicationTests {
         assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query=BAD_QUERY"));
     }
 
+    @Test
+    public void canExportToCsv() throws Exception {
+        RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).listCsv("users", "first:Dan OR first:Matt"))));
+        Response response = application.handle(requestBuilder.build());
+        InputStream resourceAsStream = SearchResourceTest.class.getResourceAsStream("csvTest.csv");
+        String expected = Strings.toString(resourceAsStream);
+        assertThat(response.entity().toString(), Matchers.is(expected));
+    }
+
     @Before
     public void addSomeData() throws Exception {
         Waitrest waitrest = CrawlerTests.serverWithDataFeed();
-
         final Sequence<Record> recordSequence = CompositeCrawlerTest.crawlOnePageOnly().realise();
 
         application.usingRequestScope(new Callable1<Container, Void>() {
@@ -104,7 +114,6 @@ public class SearchResourceTest extends ApplicationTests {
                 return VOID;
             }
         });
-
         waitrest.close();
     }
 }

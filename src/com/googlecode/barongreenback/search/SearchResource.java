@@ -5,11 +5,13 @@ import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -17,11 +19,14 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.Status;
+import com.googlecode.utterlyidle.StreamingOutput;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -29,12 +34,17 @@ import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Streams.copy;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 
@@ -71,9 +81,67 @@ public class SearchResource {
     @GET
     @Path("list")
     public Model list(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
+        Uri uri = redirector.uriOf(method(on(SearchResource.class).listCsv(viewName, query)));
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
+        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query)).add("csvUrl", uri.toString());
+    }
 
-        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query));
+    @GET
+    @Produces(MediaType.TEXT_CSV)
+    @Path("csv")
+    public Response listCsv(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
+        final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
+        final Definition definition = recordsService.definition(recordsService.view(viewName));
+
+        final Sequence<Record> right = errorOrResults.right();
+        return ResponseBuilder.response().header("Content-Disposition", String.format("filename=%s export %s.csv", viewName, Dates.LUCENE().format(new Date()))).entity(new StreamingOutput() {
+            @Override
+            public void write(OutputStream outputStream) throws IOException {
+                PrintStream printStream = new PrintStream(outputStream);
+                try {
+                    right.map(fieldsToString(definition)).cons(headers(definition)).fold(printStream, writeLine());
+                } finally {
+                    printStream.flush();
+                }
+            }
+        }).build();
+    }
+
+    private Callable2<PrintStream, String, PrintStream> writeLine() {
+        return new Callable2<PrintStream, String, PrintStream>() {
+            @Override
+            public PrintStream call(PrintStream printStream, String dataRow) throws Exception {
+                printStream.println(dataRow);
+                return printStream;
+            }
+        };
+    }
+
+    private String headers(Definition definition) {
+        return definition.fields().toString(",");
+    }
+
+    private Callable1<Record, String> fieldsToString(final Definition definition) {
+        return new Callable1<Record, String>() {
+            @Override
+            public String call(Record record) throws Exception {
+                return record.getValuesFor(definition.fields()).map(Callables.asString()).map(escapeSpecialCharachters()).toString(", ");
+            }
+        };
+    }
+
+    private Callable1<String, String> escapeSpecialCharachters() {
+        return new Callable1<String, String>() {
+            @Override
+            public String call(String recordValue) throws Exception {
+                recordValue = recordValue.replace("\n", " ");
+                if (recordValue.contains(",")) {
+                    recordValue = "\"" + recordValue + "\"";
+                }
+                return recordValue;
+
+            }
+        };
     }
 
     @GET
