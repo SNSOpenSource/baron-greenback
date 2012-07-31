@@ -15,10 +15,10 @@ public class CrawlerExecutorsActivator implements Callable<CrawlerExecutors> {
     public CrawlerExecutors call() {
         try {
             Integer inputHandlerThreads = setProperty("input.handler.threads", "10");
-            Integer inputHandlerCapacity = setProperty("input.handler.capacity", "1");
+            Integer inputHandlerCapacity = setProperty("input.handler.capacity", "0");
             Integer processHandlerThreads = setProperty("process.handler.threads", "1");
-            Integer processHandlerCapacity = setProperty("process.handler.capacity", "0");
-            Integer outputHandlerThreads = setProperty("output.handler.threads", "50");
+            Integer processHandlerCapacity = setProperty("process.handler.capacity", "50");
+            Integer outputHandlerThreads = setProperty("output.handler.threads", "1");
             Integer outputHandlerCapacity = setProperty("output.handler.capacity", "0");
 
             return new CrawlerExecutors(inputHandlerThreads,inputHandlerCapacity,processHandlerThreads,processHandlerCapacity,
