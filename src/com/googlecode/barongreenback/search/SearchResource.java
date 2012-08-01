@@ -15,6 +15,7 @@ import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
@@ -43,6 +44,8 @@ import static com.googlecode.barongreenback.shared.CsvWriter.writeTo;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
+import static com.googlecode.totallylazy.Callables.descending;
+import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.time.Dates.LUCENE;
@@ -94,7 +97,8 @@ public class SearchResource {
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
         final Definition definition = recordsService.definition(recordsService.view(viewName));
 
-        final Sequence<Record> result = errorOrResults.right();
+        Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
+        final Sequence<Record> result = errorOrResults.right().sortBy(descending(firstComparable));
 
         return ResponseBuilder.response().
                 header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LUCENE().format(clock.now()))).
@@ -104,6 +108,28 @@ public class SearchResource {
                         writeTo(definition, result, writer);
                     }
                 }).build();
+    }
+
+    private Keyword<? extends Comparable> findFirstComparable(Definition definition) {
+        return cast(definition.fields().find(Predicates.where(forClass(), isAssignableTo(Comparable.class))).get());
+    }
+
+    private static Predicate<Class<?>> isAssignableTo(final Class<?> aClass) {
+        return new Predicate<Class<?>>() {
+            @Override
+            public boolean matches(Class<?> other) {
+                return aClass.isAssignableFrom(other);
+            }
+        };
+    }
+
+    private static Callable1<Keyword<?>, Class<?>> forClass() {
+        return new Callable1<Keyword<?>, Class<?>>() {
+            @Override
+            public Class<?> call(Keyword<?> keyword) throws Exception {
+                return keyword.forClass();
+            }
+        };
     }
 
     @GET
