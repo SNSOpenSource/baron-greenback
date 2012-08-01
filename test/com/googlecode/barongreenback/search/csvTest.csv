@@ -1,3 +1,3 @@
-summary/userId,first,id,link/@href,updated,title
+summary/userId, first, id, link/@href, updated, title
 1234, Dan, urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1, http://localhost:9001/entry1.xml, 2011-07-19T12:43:27.000Z, Added user
 999, Matt, urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef2, http://localhost:9001/entry2.xml, 2011-07-19T12:43:25.000Z, Deleted user

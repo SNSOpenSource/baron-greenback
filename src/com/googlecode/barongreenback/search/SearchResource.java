@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.shared.AdvancedMode;
+import com.googlecode.barongreenback.shared.CsvWriter;
 import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
@@ -11,7 +12,6 @@ import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -26,7 +26,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.Status;
-import com.googlecode.utterlyidle.StreamingOutput;
+import com.googlecode.utterlyidle.StreamingWriter;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -35,8 +35,7 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.Writer;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -44,7 +43,6 @@ import java.util.Map;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
-import static com.googlecode.totallylazy.Streams.copy;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 
@@ -93,55 +91,16 @@ public class SearchResource {
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
         final Definition definition = recordsService.definition(recordsService.view(viewName));
 
-        final Sequence<Record> right = errorOrResults.right();
-        return ResponseBuilder.response().header("Content-Disposition", String.format("filename=%s export %s.csv", viewName, Dates.LUCENE().format(new Date()))).entity(new StreamingOutput() {
-            @Override
-            public void write(OutputStream outputStream) throws IOException {
-                PrintStream printStream = new PrintStream(outputStream);
-                try {
-                    right.map(fieldsToString(definition)).cons(headers(definition)).fold(printStream, writeLine());
-                } finally {
-                    printStream.flush();
-                }
-            }
-        }).build();
-    }
+        final Sequence<Record> result = errorOrResults.right();
 
-    private Callable2<PrintStream, String, PrintStream> writeLine() {
-        return new Callable2<PrintStream, String, PrintStream>() {
-            @Override
-            public PrintStream call(PrintStream printStream, String dataRow) throws Exception {
-                printStream.println(dataRow);
-                return printStream;
-            }
-        };
-    }
-
-    private String headers(Definition definition) {
-        return definition.fields().toString(",");
-    }
-
-    private Callable1<Record, String> fieldsToString(final Definition definition) {
-        return new Callable1<Record, String>() {
-            @Override
-            public String call(Record record) throws Exception {
-                return record.getValuesFor(definition.fields()).map(Callables.asString()).map(escapeSpecialCharachters()).toString(", ");
-            }
-        };
-    }
-
-    private Callable1<String, String> escapeSpecialCharachters() {
-        return new Callable1<String, String>() {
-            @Override
-            public String call(String recordValue) throws Exception {
-                recordValue = recordValue.replace("\n", " ");
-                if (recordValue.contains(",")) {
-                    recordValue = "\"" + recordValue + "\"";
-                }
-                return recordValue;
-
-            }
-        };
+        return ResponseBuilder.response().
+                header("Content-Disposition", String.format("filename=%s export %s.csv", viewName, Dates.LUCENE().format(new Date()))).
+                entity(new StreamingWriter(){
+                    @Override
+                    public void write(Writer writer) throws IOException {
+                        new CsvWriter().writeTo(definition, result, writer);
+                    }
+                }).build();
     }
 
     @GET

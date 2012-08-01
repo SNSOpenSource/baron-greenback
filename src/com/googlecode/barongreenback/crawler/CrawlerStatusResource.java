@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
 import com.googlecode.barongreenback.crawler.failures.Failures;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.asString;
+import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 @Path("crawler")
@@ -41,7 +43,7 @@ public class CrawlerStatusResource {
                 return model().
                         add("name", statusMonitor.name()).
                         add("size", statusMonitor.size()).
-                        add("activeThreads", statusMonitor.activeThreads().map(asString(Integer.class)).getOrElse("N/A"));
+                        add("activeThreads", statusMonitor.activeThreads().map(toString).getOrElse("N/A"));
             }
         };
     }

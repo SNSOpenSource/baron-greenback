@@ -8,11 +8,13 @@ import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.httpserver.RestServer;
+import com.googlecode.waitrest.Waitrest;
 
 import java.io.File;
 import java.util.Properties;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
 import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneDirectory;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
