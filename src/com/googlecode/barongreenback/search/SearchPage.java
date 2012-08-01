@@ -4,6 +4,7 @@ import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Html;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -12,6 +13,7 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 
 public class SearchPage {
     private HttpHandler httpHandler;
@@ -47,5 +49,11 @@ public class SearchPage {
 
     public String queryMessage() {
         return html.selectContent("//div[contains(@class, 'error')]/span[contains(@class, 'message')]");
+    }
+
+    public String exportToCsv(String view, String query) throws Exception {
+        Response response = httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).exportCsv(view, query)))).build());
+        assertThat(response.status(), is(Status.OK));
+        return response.entity().toString();
     }
 }

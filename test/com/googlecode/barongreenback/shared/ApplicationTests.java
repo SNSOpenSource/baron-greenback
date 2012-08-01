@@ -5,10 +5,7 @@ import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
-import com.googlecode.utterlyidle.handlers.HttpClient;
-import com.googlecode.utterlyidle.handlers.RedirectHttpHandler;
 import com.googlecode.utterlyidle.html.Browser;
-import com.googlecode.utterlyidle.html.RelativeUrlHandler;
 import com.googlecode.yadic.Container;
 import org.junit.After;
 import org.junit.Before;
@@ -16,9 +13,11 @@ import org.junit.Before;
 import java.io.IOException;
 import java.util.Properties;
 
+import static com.googlecode.utterlyidle.html.Browser.browser;
+
 public abstract class ApplicationTests {
     protected Application application;
-    protected HttpClient browser;
+    protected Browser browser;
 
     @After
     public void closeApplication() throws IOException {
@@ -35,7 +34,7 @@ public abstract class ApplicationTests {
                 return null;
             }
         });
-        browser = new RedirectHttpHandler(new RelativeUrlHandler(application));
+        browser = browser(application);
     }
 
 }

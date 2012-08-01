@@ -10,12 +10,10 @@ import java.util.Date;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.contentOf;
-import static com.googlecode.totallylazy.Closeables.using;
 import static java.util.UUID.randomUUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 
 public class CrawlerDefinitionResourceTest extends ApplicationTests {
     @Test

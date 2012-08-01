@@ -8,13 +8,11 @@ import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.httpserver.RestServer;
-import com.googlecode.waitrest.Waitrest;
 
 import java.io.File;
 import java.util.Properties;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
 import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneDirectory;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
@@ -30,10 +28,14 @@ public class ShowAndTell {
                 application,
                 defaultConfiguration().port(9000));
 
-        String definition = Strings.toString(WebApplication.class.getResourceAsStream("BBC.json"));
+        String definition = bbcDefinition();
         Response response = application.handle(post("crawler/import").form("model", definition).form("id", UUID.fromString("77916239-0dfe-4217-9e2a-ceaa9e5bed42")).form("action", "Import").build());
         if (response.status().code() >= 400) {
             throw new RuntimeException(String.format("Problem importing BBC.json definition \n%s", response));
         }
+    }
+
+    public static String bbcDefinition() {
+        return Strings.toString(WebApplication.class.getResourceAsStream("BBC.json"));
     }
 }

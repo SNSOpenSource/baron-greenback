@@ -6,7 +6,9 @@ import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.ViewsRepository;
-import com.googlecode.lazyrecords.*;
+import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
@@ -28,7 +30,7 @@ import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
-import static com.googlecode.utterlyidle.HttpHeaders.*;
+import static com.googlecode.utterlyidle.HttpHeaders.LOCATION;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -92,7 +94,7 @@ public class SearchResourceTest extends ApplicationTests {
 
     @Test
     public void canExportToCsv() throws Exception {
-        RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).listCsv("users", "first:Dan OR first:Matt"))));
+        RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).exportCsv("users", "first:Dan OR first:Matt"))));
         Response response = application.handle(requestBuilder.build());
         InputStream resourceAsStream = SearchResourceTest.class.getResourceAsStream("csvTest.csv");
         String expected = Strings.toString(resourceAsStream);

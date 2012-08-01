@@ -23,7 +23,6 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTE
 import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Sequences.forwardOnly;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Uri.uri;
 
 public class SequentialCrawler extends AbstractCrawler {
     private final StringMappings mappings;
@@ -46,6 +45,9 @@ public class SequentialCrawler extends AbstractCrawler {
         final Model crawler = crawlerFor(id);
         final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
 
+        Sequence<Keyword<?>> keywords = keywords(recordDefinition);
+        updateView(crawler, keywords);
+
         Iterator<Record> recordIterator = startCrawl(log, crawler, recordDefinition);
         if (!recordIterator.hasNext()) {
             return 0;
@@ -54,8 +56,6 @@ public class SequentialCrawler extends AbstractCrawler {
         Record head = recordIterator.next();
         checkpointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head));
 
-        Sequence<Keyword<?>> keywords = keywords(recordDefinition);
-        updateView(crawler, keywords);
         return put(update(crawler), sequence(head).join(forwardOnly(recordIterator)), keywords);
     }
 

@@ -83,11 +83,9 @@ public class BatchResourceTest extends ApplicationTests {
         return new CrawlerListPage(browser).numberOfCrawlers();
     }
 
-    private BatchOperationsPage verifySuccess(BatchOperationsPage page) {
+    public static BatchOperationsPage verifySuccess(BatchOperationsPage page) {
         Message message = page.message();
         assertThat(message.message(), message.category(), Matchers.is(SUCCESS));
         return page;
     }
-
-
 }

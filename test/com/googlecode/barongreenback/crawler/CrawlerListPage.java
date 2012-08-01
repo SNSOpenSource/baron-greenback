@@ -7,11 +7,13 @@ import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Link;
-import org.omg.CORBA.StringHolder;
+
+import java.util.UUID;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
+import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -50,6 +52,15 @@ public class CrawlerListPage {
 
     private String crawlerRowFor(String crawlerName) {
         return format("descendant::tr[@class='crawler' and td[@class='name' and text()='%s']]", crawlerName);
+    }
+
+
+    public String crawlAndWait(UUID id) throws Exception {
+        Response response = httpHandler.handle(post("/" + relativeUriOf(method(on(CrawlerDefinitionResource.class).crawl(id)))).form("id", id).build());
+        if (response.status().code() >= 400) {
+            throw new RuntimeException(String.format("Problem crawling \n%s", response));
+        }
+        return response.entity().toString();
     }
 
     public JobsListPage crawl(String name) throws Exception {
@@ -104,5 +115,10 @@ public class CrawlerListPage {
 
     public CrawlerListPage copy(String crawlerName) throws Exception {
         return new CrawlerListPage(httpHandler, httpHandler.handle(html.form(formFor(crawlerName, "copy")).submit(button("copy"))));
+    }
+
+    public CrawlerListPage changeCrawler(Class<? extends Crawler> crawlerClass) throws Exception {
+        html.select("//select[@class='crawler']").value(crawlerClass.getName());
+        return new CrawlerListPage(httpHandler, httpHandler.handle(html.form("//form[@class='activeCrawler']").submit("descendant::input[@value='change']")));
     }
 }

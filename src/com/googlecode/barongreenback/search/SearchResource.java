@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.shared.AdvancedMode;
-import com.googlecode.barongreenback.shared.CsvWriter;
 import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
@@ -19,7 +18,7 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.totallylazy.time.Dates;
+import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -27,6 +26,7 @@ import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.StreamingWriter;
+import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -36,15 +36,16 @@ import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.googlecode.barongreenback.shared.CsvWriter.writeTo;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.totallylazy.time.Dates.LUCENE;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -55,14 +56,16 @@ public class SearchResource {
     private final Pager pager;
     private final Sorter sorter;
     private final RecordsService recordsService;
+    private final Clock clock;
 
     public SearchResource(final Redirector redirector, final AdvancedMode mode,
-                          final Pager pager, final Sorter sorter, final RecordsService recordsService) {
+                          final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock) {
         this.redirector = redirector;
         this.mode = mode;
         this.pager = pager;
         this.sorter = sorter;
         this.recordsService = recordsService;
+        this.clock = clock;
     }
 
     @POST
@@ -78,8 +81,8 @@ public class SearchResource {
 
     @GET
     @Path("list")
-    public Model list(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
-        Uri uri = redirector.uriOf(method(on(SearchResource.class).listCsv(viewName, query)));
+    public Model list(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
+        Uri uri = redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query)));
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
         return errorOrResults.map(handleError(viewName, query), listResults(viewName, query)).add("csvUrl", uri.toString());
     }
@@ -87,18 +90,18 @@ public class SearchResource {
     @GET
     @Produces(MediaType.TEXT_CSV)
     @Path("csv")
-    public Response listCsv(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
+    public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
         final Definition definition = recordsService.definition(recordsService.view(viewName));
 
         final Sequence<Record> result = errorOrResults.right();
 
         return ResponseBuilder.response().
-                header("Content-Disposition", String.format("filename=%s export %s.csv", viewName, Dates.LUCENE().format(new Date()))).
-                entity(new StreamingWriter(){
+                header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LUCENE().format(clock.now()))).
+                entity(new StreamingWriter() {
                     @Override
                     public void write(Writer writer) throws IOException {
-                        new CsvWriter().writeTo(definition, result, writer);
+                        writeTo(definition, result, writer);
                     }
                 }).build();
     }
