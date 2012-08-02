@@ -15,8 +15,8 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
@@ -42,16 +42,12 @@ public class PaginatedHttpJob extends HttpJob {
         return new PaginatedHttpJob(context);
     }
 
-    public static PaginatedHttpJob paginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
-        Map<String, Object> context = createContext(datasource, destination, checkpoint, moreXPath, mappings);
-
-        return paginatedHttpJob(context);
+    public static PaginatedHttpJob paginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited) {
+        return paginatedHttpJob(createContext(datasource, destination, checkpoint, moreXPath, mappings, visited));
     }
 
-    protected static Map<String, Object> createContext(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
-        Map<String, Object> context = new HashMap<String, Object>();
-        context.put("datasource", datasource);
-        context.put("destination", destination);
+    protected static Map<String, Object> createContext(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited) {
+        Map<String, Object> context = createContext(datasource, destination, visited);
 
         context.put("moreXPath", moreXPath);
         context.put("checkpoint", checkpoint);

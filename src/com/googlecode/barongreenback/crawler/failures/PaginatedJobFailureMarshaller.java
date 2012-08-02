@@ -2,9 +2,12 @@ package com.googlecode.barongreenback.crawler.failures;
 
 import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
+import com.googlecode.barongreenback.crawler.HttpDatasource;
 import com.googlecode.barongreenback.crawler.PaginatedHttpJob;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
+
+import java.util.HashSet;
 
 public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
     private final StringMappings mappings;
@@ -16,7 +19,7 @@ public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
 
     @Override
     public Failure unmarshal(Record record) {
-        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings);
+        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings, new HashSet<HttpDatasource>());
         return Failure.failure(job, record.get(FailureRepository.REASON));
     }
 }

@@ -38,8 +38,10 @@ public class SubfeedJobCreator {
     }
 
     private Sequence<StagedJob> createSubfeedJobs(Sequence<Record> records) {
-        Sequence<StagedJob> stagedJobs = records.flatMap(subfeedsKeywords());
-        return stagedJobs.filter(where(datasource(), not(in(visited)))).realise();
+        return records.flatMap(subfeedsKeywords()).
+                unique(datasource()).
+                filter(where(datasource(), not(in(visited)))).
+                realise();
     }
 
     private Callable1<Record, Sequence<StagedJob>> subfeedsKeywords() {
