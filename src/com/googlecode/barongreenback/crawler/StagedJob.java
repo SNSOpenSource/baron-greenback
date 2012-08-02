@@ -9,12 +9,16 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
+import java.util.Set;
+
 public interface StagedJob {
     HttpDatasource datasource();
 
     Definition destination();
 
     Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(Container crawlerScope);
+
+    Set<HttpDatasource> visited();
 
     public static class functions {
         public static Callable1<StagedJob, HttpDatasource> datasource() {

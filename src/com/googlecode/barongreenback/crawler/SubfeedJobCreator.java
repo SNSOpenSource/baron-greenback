@@ -10,21 +10,27 @@ import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
+import java.util.Set;
+
 import static com.googlecode.barongreenback.crawler.StagedJob.functions.datasource;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Keywords.metadata;
 import static com.googlecode.lazyrecords.Record.functions.merge;
+import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.one;
 
 public class SubfeedJobCreator {
     private final HttpDatasource parentDatasource;
     private final Definition destination;
+    private final Set<HttpDatasource> visited;
 
-    public SubfeedJobCreator(HttpDatasource parentDatasource, Definition destination) {
+    public SubfeedJobCreator(HttpDatasource parentDatasource, Definition destination, Set<HttpDatasource> visited) {
         this.parentDatasource = parentDatasource;
         this.destination = destination;
+        this.visited = visited;
     }
 
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(Sequence<Record> records) {
@@ -32,7 +38,8 @@ public class SubfeedJobCreator {
     }
 
     private Sequence<StagedJob> createSubfeedJobs(Sequence<Record> records) {
-        return records.flatMap(subfeedsKeywords()).unique(datasource()).realise();
+        Sequence<StagedJob> stagedJobs = records.flatMap(subfeedsKeywords());
+        return stagedJobs.filter(where(datasource(), not(in(visited)))).realise();
     }
 
     private Callable1<Record, Sequence<StagedJob>> subfeedsKeywords() {
@@ -59,6 +66,6 @@ public class SubfeedJobCreator {
         Record newRecord = one(record).map(merge(parentDatasource.record())).head();
         Definition subfeedDefinition = subfeedField.first().metadata().get(RECORD_DEFINITION).definition();
 
-        return HttpJob.httpJob(HttpDatasource.datasource(uri, parentDatasource.crawlerId(), subfeedDefinition, newRecord), destination);
+        return HttpJob.httpJob(HttpDatasource.datasource(uri, parentDatasource.crawlerId(), subfeedDefinition, newRecord), destination, visited);
     }
 }

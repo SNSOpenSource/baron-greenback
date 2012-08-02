@@ -14,8 +14,11 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 
@@ -24,6 +27,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
     private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
         super(context);
+        context.put("visited", Collections.newSetFromMap(new ConcurrentHashMap<HttpDatasource, Boolean>()));
         this.mappings = mappings;
     }
 

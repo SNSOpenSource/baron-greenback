@@ -82,7 +82,7 @@ public class PaginatedHttpJob extends HttpJob {
     protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document) {
         Sequence<Record> events = transformData(document, datasource().source());
         Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
-        Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(datasource(), destination()).process(filtered);
+        Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(datasource(), destination(), visited()).process(filtered);
         return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
     }
 

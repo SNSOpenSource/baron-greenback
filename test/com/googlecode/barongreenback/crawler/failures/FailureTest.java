@@ -22,6 +22,7 @@ import com.googlecode.yadic.SimpleContainer;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.HttpJob.httpJob;
@@ -51,7 +52,7 @@ public class FailureTest {
 
     @Test
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, new HashSet<HttpDatasource>()), "Bigtime failures"));
     }
 
     @Test
