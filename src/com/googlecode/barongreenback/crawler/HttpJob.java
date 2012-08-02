@@ -9,6 +9,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -23,10 +24,11 @@ public class HttpJob implements StagedJob {
         this.context = unmodifiableMap(context);
     }
 
-    public static HttpJob httpJob(HttpDatasource datasource, Definition destination) {
+    public static HttpJob httpJob(HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
         ConcurrentMap<String, Object> context = new ConcurrentHashMap<String, Object>();
         context.put("datasource", datasource);
         context.put("destination", destination);
+        context.put("visited", visited);
         return new HttpJob(context);
     }
 
@@ -41,11 +43,16 @@ public class HttpJob implements StagedJob {
     }
 
     @Override
+    public Set<HttpDatasource> visited() {
+        return (Set<HttpDatasource>) context.get("visited");
+    }
+
+    @Override
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                return new SubfeedJobCreator(datasource(), destination()).process(transformData(loadDocument(response), datasource().source()).realise());
+                return new SubfeedJobCreator(datasource(), destination(), visited()).process(transformData(loadDocument(response), datasource().source()).realise());
             }
         };
     }

@@ -22,6 +22,7 @@ import com.googlecode.yadic.Container;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.failures.Failure.failure;
@@ -51,7 +52,7 @@ public class FailureHandlerTest {
         Definition source = AbstractCrawler.sourceDefinition(crawler);
         Definition destination = AbstractCrawler.destinationDefinition(crawler);
         HttpDatasource datasource = HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, Record.constructors.record());
-        job = HttpJob.httpJob(datasource, destination);
+        job = HttpJob.httpJob(datasource, destination, new HashSet<HttpDatasource>());
     }
 
     @Test
