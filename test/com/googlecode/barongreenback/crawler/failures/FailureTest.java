@@ -52,17 +52,17 @@ public class FailureTest {
 
     @Test
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, new HashSet<HttpDatasource>()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(httpJob(crawlerId, HttpDatasource.datasource(uri("/any/uri"), source, record), destination, new HashSet<HttpDatasource>()), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), new HashSet<HttpDatasource>()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, HttpDatasource.datasource(uri("/any/uri"), source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), new HashSet<HttpDatasource>()), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, HttpDatasource.datasource(uri("/any/uri"), source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failures"));
     }
 
     private void assertCanPersistAndLoad(Failure failure) {

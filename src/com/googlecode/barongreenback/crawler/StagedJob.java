@@ -10,6 +10,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 import java.util.Set;
+import java.util.UUID;
 
 public interface StagedJob {
     HttpDatasource datasource();
@@ -19,6 +20,8 @@ public interface StagedJob {
     Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(Container crawlerScope);
 
     Set<HttpDatasource> visited();
+
+    UUID crawlerId();
 
     public static class functions {
         public static Callable1<StagedJob, HttpDatasource> datasource() {

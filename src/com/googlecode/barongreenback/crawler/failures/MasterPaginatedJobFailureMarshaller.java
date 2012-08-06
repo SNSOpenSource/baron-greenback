@@ -18,7 +18,7 @@ public class MasterPaginatedJobFailureMarshaller extends AbstractFailureMarshall
 
     @Override
     public Failure unmarshal(Record record) {
-        MasterPaginatedHttpJob job = MasterPaginatedHttpJob.masterPaginatedHttpJob(datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings);
+        MasterPaginatedHttpJob job = MasterPaginatedHttpJob.masterPaginatedHttpJob(crawlerId(record), datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings);
         return Failure.failure(job, record.get(FailureRepository.REASON));
     }
 }

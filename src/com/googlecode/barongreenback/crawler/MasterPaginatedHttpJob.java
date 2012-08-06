@@ -17,6 +17,7 @@ import org.w3c.dom.Document;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
@@ -29,8 +30,8 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         this.mappings = mappings;
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
-        return new MasterPaginatedHttpJob(createContext(datasource, destination, checkpoint, moreXPath, mappings, Collections.newSetFromMap(new ConcurrentHashMap<HttpDatasource, Boolean>())), mappings);
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+        return new MasterPaginatedHttpJob(createContext(crawlerId, datasource, destination, checkpoint, moreXPath, mappings, Collections.newSetFromMap(new ConcurrentHashMap<HttpDatasource, Boolean>())), mappings);
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
@@ -49,7 +50,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
             private void updateView(Container crawlerScope) {
                 ViewsRepository viewsRepository = crawlerScope.get(ViewsRepository.class);
                 CrawlerRepository crawlerRepository = crawlerScope.get(CrawlerRepository.class);
-                Model crawler = crawlerRepository.crawlerFor(datasource().crawlerId());
+                Model crawler = crawlerRepository.crawlerFor(crawlerId());
                 viewsRepository.ensureViewForCrawlerExists(crawler, AbstractCrawler.destinationDefinition(crawler).fields());
             }
         };

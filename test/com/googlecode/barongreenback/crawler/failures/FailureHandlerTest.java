@@ -5,10 +5,6 @@ import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.CrawlerTests;
 import com.googlecode.barongreenback.crawler.HttpDatasource;
 import com.googlecode.barongreenback.crawler.HttpJob;
-import com.googlecode.barongreenback.crawler.failures.FailureTest;
-import com.googlecode.barongreenback.crawler.failures.Failures;
-import com.googlecode.barongreenback.crawler.failures.Failure;
-import com.googlecode.barongreenback.crawler.failures.FailureHandler;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
@@ -51,8 +47,8 @@ public class FailureHandlerTest {
         Model crawler = crawlerRepository.crawlerFor(crawlerId);
         Definition source = AbstractCrawler.sourceDefinition(crawler);
         Definition destination = AbstractCrawler.destinationDefinition(crawler);
-        HttpDatasource datasource = HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, Record.constructors.record());
-        job = HttpJob.httpJob(datasource, destination, new HashSet<HttpDatasource>());
+        HttpDatasource datasource = HttpDatasource.datasource(uri("/any/uri"), source, Record.constructors.record());
+        job = HttpJob.httpJob(crawlerId, datasource, destination, new HashSet<HttpDatasource>());
     }
 
     @Test

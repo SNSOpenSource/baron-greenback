@@ -8,6 +8,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 
 import java.util.HashSet;
+import java.util.UUID;
 
 public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
     private final StringMappings mappings;
@@ -19,7 +20,7 @@ public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
 
     @Override
     public Failure unmarshal(Record record) {
-        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings, new HashSet<HttpDatasource>());
+        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(crawlerId(record), datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings, new HashSet<HttpDatasource>());
         return Failure.failure(job, record.get(FailureRepository.REASON));
     }
 }

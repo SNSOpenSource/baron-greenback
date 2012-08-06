@@ -11,6 +11,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
 import java.util.Set;
+import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.StagedJob.functions.datasource;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
@@ -26,11 +27,13 @@ public class SubfeedJobCreator {
     private final HttpDatasource parentDatasource;
     private final Definition destination;
     private final Set<HttpDatasource> visited;
+    private final UUID crawlerId;
 
-    public SubfeedJobCreator(HttpDatasource parentDatasource, Definition destination, Set<HttpDatasource> visited) {
+    public SubfeedJobCreator(HttpDatasource parentDatasource, Definition destination, Set<HttpDatasource> visited, UUID crawlerId) {
         this.parentDatasource = parentDatasource;
         this.destination = destination;
         this.visited = visited;
+        this.crawlerId = crawlerId;
     }
 
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(Sequence<Record> records) {
@@ -68,6 +71,6 @@ public class SubfeedJobCreator {
         Record newRecord = one(record).map(merge(parentDatasource.record())).head();
         Definition subfeedDefinition = subfeedField.first().metadata().get(RECORD_DEFINITION).definition();
 
-        return HttpJob.httpJob(HttpDatasource.datasource(uri, parentDatasource.crawlerId(), subfeedDefinition, newRecord), destination, visited);
+        return HttpJob.httpJob(crawlerId, HttpDatasource.datasource(uri, subfeedDefinition, newRecord), destination, visited);
     }
 }

@@ -34,12 +34,12 @@ public class QueuesCrawler extends AbstractCrawler {
         Definition destination = destinationDefinition(crawler);
         checkOnlyOne(destination);
 
-        HttpDatasource datasource = HttpDatasource.datasource(from(crawler), id, source, Record.constructors.record());
+        HttpDatasource datasource = HttpDatasource.datasource(from(crawler), source, Record.constructors.record());
 
         Container crawlerScope = crawlerScope(id, crawler);
 
         return crawlerScope.get(StagedJobExecutor.class).crawlAndWait(
-                masterPaginatedHttpJob(datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
+                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings));
     }
 
     private Container crawlerScope(UUID id, Model crawler) {

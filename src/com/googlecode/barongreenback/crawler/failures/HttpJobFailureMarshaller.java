@@ -17,7 +17,7 @@ public class HttpJobFailureMarshaller extends AbstractFailureMarshaller {
 
     @Override
     public Failure unmarshal(Record record) {
-        HttpJob job = HttpJob.httpJob(datasource(record), destination(record), new HashSet<HttpDatasource>());
+        HttpJob job = HttpJob.httpJob(crawlerId(record), datasource(record), destination(record), new HashSet<HttpDatasource>());
         return Failure.failure(job, record.get(FailureRepository.REASON));
     }
 }

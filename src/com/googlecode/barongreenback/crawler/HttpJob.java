@@ -10,6 +10,7 @@ import com.googlecode.yadic.Container;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -24,17 +25,23 @@ public class HttpJob implements StagedJob {
         this.context = unmodifiableMap(context);
     }
 
-    public static HttpJob httpJob(HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
-        ConcurrentMap<String, Object> context = createContext(datasource, destination, visited);
+    public static HttpJob httpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
+        ConcurrentMap<String, Object> context = createContext(crawlerId, datasource, destination, visited);
         return new HttpJob(context);
     }
 
-    protected static ConcurrentMap<String, Object> createContext(HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
+    protected static ConcurrentMap<String, Object> createContext(UUID crawlerId, HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
         ConcurrentMap<String, Object> context = new ConcurrentHashMap<String, Object>();
+        context.put("crawlerId", crawlerId);
         context.put("datasource", datasource);
         context.put("destination", destination);
         context.put("visited", visited);
         return context;
+    }
+
+    @Override
+    public UUID crawlerId() {
+        return (UUID) context.get("crawlerId");
     }
 
     @Override
@@ -57,7 +64,7 @@ public class HttpJob implements StagedJob {
         return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
             @Override
             public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                return new SubfeedJobCreator(datasource(), destination(), visited()).process(transformData(loadDocument(response), datasource().source()).realise());
+                return new SubfeedJobCreator(datasource(), destination(), visited(), crawlerId()).process(transformData(loadDocument(response), datasource().source()).realise());
             }
         };
     }
