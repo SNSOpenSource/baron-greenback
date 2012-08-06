@@ -8,7 +8,7 @@ import com.googlecode.lazyrecords.Record;
 
 import java.util.HashSet;
 
-import static com.googlecode.lazyrecords.Record.constructors.record;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.RECORD;
 
 public class HttpJobFailureMarshaller extends AbstractFailureMarshaller {
     public HttpJobFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler) {
@@ -17,7 +17,7 @@ public class HttpJobFailureMarshaller extends AbstractFailureMarshaller {
 
     @Override
     public Failure unmarshal(Record record) {
-        HttpJob job = HttpJob.httpJob(datasource(record), destination(record), new HashSet<HttpDatasource>());
+        HttpJob job = HttpJob.httpJob(crawlerId(record), crawledRecord(record), datasource(record), destination(record), visited(record));
         return Failure.failure(job, record.get(FailureRepository.REASON));
     }
 }

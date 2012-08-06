@@ -17,6 +17,7 @@ import org.w3c.dom.Document;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
@@ -42,13 +43,12 @@ public class PaginatedHttpJob extends HttpJob {
         return new PaginatedHttpJob(context);
     }
 
-    public static PaginatedHttpJob paginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited) {
-        return paginatedHttpJob(createContext(datasource, destination, checkpoint, moreXPath, mappings, visited));
+    public static PaginatedHttpJob paginatedHttpJob(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited) {
+        return paginatedHttpJob(createContext(crawlerId, record, datasource, destination, checkpoint, moreXPath, mappings, visited));
     }
 
-    protected static Map<String, Object> createContext(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited) {
-        Map<String, Object> context = createContext(datasource, destination, visited);
-
+    protected static Map<String, Object> createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited) {
+        Map<String, Object> context = createContext(crawlerId, record, datasource, destination, visited);
         context.put("moreXPath", moreXPath);
         context.put("checkpoint", checkpoint);
         context.put("checkpointXPath", checkpointXPath(datasource.source()));
@@ -78,7 +78,7 @@ public class PaginatedHttpJob extends HttpJob {
     protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document) {
         Sequence<Record> events = transformData(document, datasource().source());
         Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
-        Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(datasource(), destination(), visited()).process(filtered);
+        Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(destination(), visited(), crawlerId(), record()).process(filtered);
         return Pair.pair(pair.first(), pair.second().join(nextPageJob(document)));
     }
 

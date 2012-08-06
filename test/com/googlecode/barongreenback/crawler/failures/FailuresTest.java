@@ -16,6 +16,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
 import com.googlecode.yadic.SimpleContainer;
@@ -23,21 +24,29 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ENTRIES;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.USER;
+import static com.googlecode.barongreenback.crawler.HttpDatasource.httpDatasource;
 import static com.googlecode.barongreenback.crawler.HttpJob.httpJob;
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
 import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Sets.set;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class FailureTest {
+public class FailuresTest {
     private static final Record record = Record.constructors.record().set(Keywords.keyword("title", String.class), "Man eats dog");
     private static final Container scope = testScope();
-    private static final UUID crawlerId = UUID.randomUUID();
+    private static final Set<HttpDatasource> visited = set(
+            httpDatasource(uri("/road/to/nowhere"), ENTRIES),
+            httpDatasource(uri("/road/to/somewhere"), USER));
 
+    private static final UUID crawlerId = UUID.randomUUID();
     private Definition source;
     private Definition destination;
 
@@ -52,23 +61,27 @@ public class FailureTest {
 
     @Test
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(httpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, new HashSet<HttpDatasource>()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(httpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, visited), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), new HashSet<HttpDatasource>()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), new HashSet<HttpDatasource>()), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failures"));
     }
 
     private void assertCanPersistAndLoad(Failure failure) {
         Failures failures = scope.get(Failures.class);
         UUID failureId = failures.add(failure);
-        assertThat(failures.get(failureId), is(some(failure)));
+
+        Option<Failure> right = failures.get(failureId);
+        Option<Failure> left = some(failure);
+
+        assertThat(right, is(left));
     }
 
     public static Container testScope() {

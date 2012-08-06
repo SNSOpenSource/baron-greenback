@@ -11,6 +11,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
 import java.util.Set;
+import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.StagedJob.functions.datasource;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
@@ -23,18 +24,20 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.one;
 
 public class SubfeedJobCreator {
-    private final HttpDatasource parentDatasource;
     private final Definition destination;
     private final Set<HttpDatasource> visited;
+    private final UUID crawlerId;
+    private final Record crawledRecord;
 
-    public SubfeedJobCreator(HttpDatasource parentDatasource, Definition destination, Set<HttpDatasource> visited) {
-        this.parentDatasource = parentDatasource;
+    public SubfeedJobCreator(Definition destination, Set<HttpDatasource> visited, UUID crawlerId, Record crawledRecord) {
         this.destination = destination;
         this.visited = visited;
+        this.crawlerId = crawlerId;
+        this.crawledRecord = crawledRecord;
     }
 
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(Sequence<Record> records) {
-        return Pair.pair(records.map(merge(parentDatasource.record())), createSubfeedJobs(records));
+        return Pair.pair(records.map(merge(crawledRecord)), createSubfeedJobs(records));
     }
 
     private Sequence<StagedJob> createSubfeedJobs(Sequence<Record> records) {
@@ -65,9 +68,9 @@ public class SubfeedJobCreator {
 
     private HttpJob job(Pair<Keyword<?>, Object> subfeedField, Record record) {
         Uri uri = Uri.uri(subfeedField.second().toString());
-        Record newRecord = one(record).map(merge(parentDatasource.record())).head();
+        Record newRecord = one(record).map(merge(crawledRecord)).head();
         Definition subfeedDefinition = subfeedField.first().metadata().get(RECORD_DEFINITION).definition();
 
-        return HttpJob.httpJob(HttpDatasource.datasource(uri, parentDatasource.crawlerId(), subfeedDefinition, newRecord), destination, visited);
+        return HttpJob.httpJob(crawlerId, newRecord, HttpDatasource.httpDatasource(uri, subfeedDefinition), destination, visited);
     }
 }

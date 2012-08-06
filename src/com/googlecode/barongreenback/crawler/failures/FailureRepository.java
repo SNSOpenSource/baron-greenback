@@ -28,8 +28,9 @@ public class FailureRepository implements Repository<UUID, Record>, Finder<Recor
     public static final Keyword<String> SOURCE = keyword("source", String.class);
     public static final Keyword<UUID> CRAWLER_ID = keyword("crawlerId", UUID.class);
     public static final Keyword<String> RECORD = keyword("record", String.class);
+    public static final Keyword<String> VISITED = keyword("visited", String.class);
 
-    private static final Definition FAILURES = Definition.constructors.definition("failures", ID, JOB_TYPE, REASON, URI, CRAWLER_ID, SOURCE, RECORD);
+    private static final Definition FAILURES = Definition.constructors.definition("failures", ID, JOB_TYPE, REASON, URI, CRAWLER_ID, SOURCE, RECORD, VISITED);
 
     private final Records records;
 

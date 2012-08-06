@@ -17,20 +17,18 @@ import org.w3c.dom.Document;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
-    private final StringMappings mappings;
-
-    private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
+    private MasterPaginatedHttpJob(Map<String, Object> context) {
         super(context);
-        this.mappings = mappings;
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
-        return new MasterPaginatedHttpJob(createContext(datasource, destination, checkpoint, moreXPath, mappings, Collections.newSetFromMap(new ConcurrentHashMap<HttpDatasource, Boolean>())), mappings);
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
+        return new MasterPaginatedHttpJob(createContext(crawlerId, Record.constructors.record(), datasource, destination, checkpoint, moreXPath, mappings, Collections.newSetFromMap(new ConcurrentHashMap<HttpDatasource, Boolean>())));
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
@@ -41,7 +39,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
                 Option<Document> document = loadDocument(response);
 
-                for (Document doc : document) crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue()));
+                for (Document doc : document) crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(StringMappings.class))));
 
                 return processDocument(document);
             }
@@ -49,13 +47,13 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
             private void updateView(Container crawlerScope) {
                 ViewsRepository viewsRepository = crawlerScope.get(ViewsRepository.class);
                 CrawlerRepository crawlerRepository = crawlerScope.get(CrawlerRepository.class);
-                Model crawler = crawlerRepository.crawlerFor(datasource().crawlerId());
+                Model crawler = crawlerRepository.crawlerFor(crawlerId());
                 viewsRepository.ensureViewForCrawlerExists(crawler, AbstractCrawler.destinationDefinition(crawler).fields());
             }
         };
     }
 
-    private Callable1<String, Date> toDateValue() {
+    private Callable1<String, Date> toDateValue(final StringMappings mappings) {
         return new Callable1<String, Date>() {
             @Override
             public Date call(String value) throws Exception {

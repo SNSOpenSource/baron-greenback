@@ -60,8 +60,8 @@ public class CrawlerComparitorTest extends ApplicationTests {
         String bbc = ShowAndTell.bbcDefinition();
         Pair<String, String> results = compare(bbc, bbc, "news");
 
-        Files.write(results.first().getBytes(), new File("/home/dev/Desktop/sequential.csv"));
-        Files.write(results.second().getBytes(), new File("/home/dev/Desktop/queues.csv"));
+//        Files.write(results.first().getBytes(), new File("/home/dev/Desktop/sequential.csv"));
+//        Files.write(results.second().getBytes(), new File("/home/dev/Desktop/queues.csv"));
 
         assertEquals(results.first(), results.second());
     }

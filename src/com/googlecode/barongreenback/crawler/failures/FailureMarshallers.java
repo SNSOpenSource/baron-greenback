@@ -12,7 +12,7 @@ import com.googlecode.yadic.Container;
 import static com.googlecode.totallylazy.Predicates.where;
 
 public enum FailureMarshallers {
-    //please don't change enum names--these are stored in lucene
+    //please don't change enum names--these are used as records lookup keys
     http(HttpJob.class, HttpJobFailureMarshaller.class),
     paginated(PaginatedHttpJob.class, PaginatedJobFailureMarshaller.class),
     master(MasterPaginatedHttpJob.class, MasterPaginatedJobFailureMarshaller.class);
