@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Uri;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class PaginatedHttpJobTest {
         context.put("moreXPath", "/root/more");
         context.put("checkpointAsString", "Today");
         context.put("checkpointXPath", "/root/date");
-        context.put("datasource", HttpDatasource.datasource(Uri.uri("http://go.away.com"), null, Record.constructors.record()));
+        context.put("datasource", HttpDatasource.datasource(Uri.uri("http://go.away.com"), null));
         PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(context);
         Option<PaginatedHttpJob> more = job.nextPageJob(some(document("<root><date>Yesterday</date><more>next</more></root>")));
         assertThat(more.get().datasource().uri(), is(Uri.uri("next")));

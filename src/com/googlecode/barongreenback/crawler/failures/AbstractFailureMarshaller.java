@@ -41,11 +41,10 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     }
 
     public HttpDatasource datasource(Record record) {
-        UUID crawlerId = record.get(CRAWLER_ID);
         return HttpDatasource.datasource(
                 record.get(URI),
-                RecordDefinition.convert(Model.parse(record.get(SOURCE))).definition(),
-                fromJson(record.get(RECORD)));
+                RecordDefinition.convert(Model.parse(record.get(SOURCE))).definition()
+        );
     }
 
     @Override
@@ -54,7 +53,7 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
                 set(JOB_TYPE, FailureMarshallers.forJob(failure.job()).name()).
                 set(REASON, failure.reason()).
                 set(SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
-                set(RECORD, toJson(failure.job().datasource().record())).
+                set(RECORD, toJson(failure.job().record())).
                 set(CRAWLER_ID, failure.job().crawlerId()).
                 set(URI, failure.job().datasource().uri());
     }
@@ -113,5 +112,9 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
 
     protected UUID crawlerId(Record record) {
         return record.get(CRAWLER_ID);
+    }
+
+    protected Record crawledRecord(Record record) {
+        return fromJson(record.get(RECORD));
     }
 }

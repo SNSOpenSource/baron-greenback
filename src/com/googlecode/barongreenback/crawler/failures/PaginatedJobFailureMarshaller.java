@@ -20,7 +20,7 @@ public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
 
     @Override
     public Failure unmarshal(Record record) {
-        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(crawlerId(record), datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings, new HashSet<HttpDatasource>());
+        PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(crawlerId(record), crawledRecord(record), datasource(record), destination(record), lastCheckpointFor(record), moreUri(record), mappings, new HashSet<HttpDatasource>());
         return Failure.failure(job, record.get(FailureRepository.REASON));
     }
 }

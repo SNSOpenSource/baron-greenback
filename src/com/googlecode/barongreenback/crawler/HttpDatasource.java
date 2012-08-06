@@ -1,46 +1,37 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 
-import java.util.UUID;
-
 public class HttpDatasource {
     private final Uri uri;
     private final Definition source;
-    private final Record record;
 
-    private HttpDatasource(Uri uri, Definition source, Record record) {
+    private HttpDatasource(Uri uri, Definition source) {
         this.uri = uri;
         this.source = source;
-        this.record = record;
     }
 
-    public static HttpDatasource datasource(Uri uri, Definition source, Record record) {
-        return new HttpDatasource(uri, source, record);
+    public static HttpDatasource datasource(Uri uri, Definition source) {
+        return new HttpDatasource(uri, source);
     }
 
     public HttpDatasource uri(Uri uri) {
-        return datasource(uri, source, record);
+        return datasource(uri, source);
     }
 
     public Uri uri() {
         return uri;
     }
 
-    public Request request() {
-        return RequestBuilder.get(uri).build();
-    }
-
     public Definition source() {
         return source;
     }
 
-    public Record record() {
-        return record;
+    public Request request() {
+        return RequestBuilder.get(uri).build();
     }
 
     @Override
@@ -55,6 +46,6 @@ public class HttpDatasource {
 
     @Override
     public String toString() {
-        return String.format("uri: %s, source: %s, record: %s", uri, source, record);
+        return String.format("uri: %s, source: %s", uri, source);
     }
 }

@@ -47,8 +47,8 @@ public class FailureHandlerTest {
         Model crawler = crawlerRepository.crawlerFor(crawlerId);
         Definition source = AbstractCrawler.sourceDefinition(crawler);
         Definition destination = AbstractCrawler.destinationDefinition(crawler);
-        HttpDatasource datasource = HttpDatasource.datasource(uri("/any/uri"), source, Record.constructors.record());
-        job = HttpJob.httpJob(crawlerId, datasource, destination, new HashSet<HttpDatasource>());
+        HttpDatasource datasource = HttpDatasource.datasource(uri("/any/uri"), source);
+        job = HttpJob.httpJob(crawlerId, Record.constructors.record(), datasource, destination, new HashSet<HttpDatasource>());
     }
 
     @Test

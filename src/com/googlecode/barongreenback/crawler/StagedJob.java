@@ -23,6 +23,8 @@ public interface StagedJob {
 
     UUID crawlerId();
 
+    Record record();
+
     public static class functions {
         public static Callable1<StagedJob, HttpDatasource> datasource() {
             return new Callable1<StagedJob, HttpDatasource>() {
