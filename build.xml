@@ -62,7 +62,7 @@
     </target>
 
     <target name="package">
-        <mkdir dir="${artif acts}"/>
+        <mkdir dir="${artifacts}"/>
 
         <zip destfile="${artifacts}/${release.src}" basedir="src"/>
 
