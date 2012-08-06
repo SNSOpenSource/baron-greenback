@@ -43,6 +43,7 @@ import java.util.Map;
 import static com.googlecode.barongreenback.shared.CsvWriter.writeTo;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
+import static com.googlecode.barongreenback.views.ViewsRepository.viewModel;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
@@ -103,8 +104,8 @@ public class SearchResource {
     @Path("csv")
     public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findFromView(viewName, query);
-        final Definition definition = recordsService.definition(recordsService.view(viewName));
-
+        final Model view = recordsService.view(viewName);
+        final Definition definition = recordsService.definition(view);
         Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
         final Sequence<Record> result = errorOrResults.right().sortBy(descending(firstComparable));
 
@@ -113,7 +114,7 @@ public class SearchResource {
                 entity(new StreamingWriter() {
                     @Override
                     public void write(Writer writer) throws IOException {
-                        writeTo(definition, result, writer);
+                        writeTo(result, writer, view);
                     }
                 }).build();
     }

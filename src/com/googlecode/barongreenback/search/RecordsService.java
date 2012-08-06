@@ -129,7 +129,7 @@ public class RecordsService {
         return visibleHeaders(view(viewName));
     }
 
-    public Sequence<Keyword<?>> visibleHeaders(final Model view) {
+    public static Sequence<Keyword<?>> visibleHeaders(final Model view) {
         return visibleHeaders(headers(view));
     }
 

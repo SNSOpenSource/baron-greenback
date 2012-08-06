@@ -36,6 +36,25 @@ import static com.googlecode.utterlyidle.Response.methods.header;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SearchResourceTest extends ApplicationTests {
+
+    @Before
+    public void addSomeData() throws Exception {
+        Waitrest waitrest = CrawlerTests.serverWithDataFeed();
+        final Sequence<Record> recordSequence = CompositeCrawlerTest.crawlOnePageOnly().realise();
+
+        application.usingRequestScope(new Callable1<Container, Void>() {
+            public Void call(Container container) throws Exception {
+                Records records = container.get(BaronGreenbackRecords.class).value();
+                Definition users = Definition.constructors.definition("users", keywords(recordSequence));
+                records.add(users, recordSequence);
+                ModelRepository views = container.get(ModelRepository.class);
+                views.set(UUID.randomUUID(), ViewsRepository.convertToViewModel(users));
+                return VOID;
+            }
+        });
+        waitrest.close();
+    }
+
     @Test
     public void handlesInvalidQueriesInANiceWay() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "^&%$^%");
@@ -101,21 +120,4 @@ public class SearchResourceTest extends ApplicationTests {
         assertThat(response.entity().toString(), Matchers.is(expected));
     }
 
-    @Before
-    public void addSomeData() throws Exception {
-        Waitrest waitrest = CrawlerTests.serverWithDataFeed();
-        final Sequence<Record> recordSequence = CompositeCrawlerTest.crawlOnePageOnly().realise();
-
-        application.usingRequestScope(new Callable1<Container, Void>() {
-            public Void call(Container container) throws Exception {
-                Records records = container.get(BaronGreenbackRecords.class).value();
-                Definition users = Definition.constructors.definition("users", keywords(recordSequence));
-                records.add(users, recordSequence);
-                ModelRepository views = container.get(ModelRepository.class);
-                views.set(UUID.randomUUID(), ViewsRepository.convertToViewModel(users));
-                return VOID;
-            }
-        });
-        waitrest.close();
-    }
 }
