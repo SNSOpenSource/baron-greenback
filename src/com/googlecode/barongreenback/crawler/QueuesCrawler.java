@@ -33,7 +33,7 @@ public class QueuesCrawler extends AbstractCrawler {
         Definition destination = destinationDefinition(crawler);
         checkOnlyOne(destination);
 
-        HttpDatasource datasource = HttpDatasource.datasource(from(crawler), source);
+        HttpDatasource datasource = HttpDatasource.httpDatasource(from(crawler), source);
 
         Container crawlerScope = crawlerScope(id, crawler);
 

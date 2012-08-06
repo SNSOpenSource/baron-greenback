@@ -14,12 +14,12 @@ public class HttpDatasource {
         this.source = source;
     }
 
-    public static HttpDatasource datasource(Uri uri, Definition source) {
+    public static HttpDatasource httpDatasource(Uri uri, Definition source) {
         return new HttpDatasource(uri, source);
     }
 
     public HttpDatasource uri(Uri uri) {
-        return datasource(uri, source);
+        return httpDatasource(uri, source);
     }
 
     public Uri uri() {
