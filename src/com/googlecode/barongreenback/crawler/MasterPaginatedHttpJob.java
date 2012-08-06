@@ -16,7 +16,6 @@ import org.w3c.dom.Document;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,12 +26,11 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
 
     private MasterPaginatedHttpJob(Map<String, Object> context, StringMappings mappings) {
         super(context);
-        context.put("visited", Collections.newSetFromMap(new ConcurrentHashMap<HttpDatasource, Boolean>()));
         this.mappings = mappings;
     }
 
     public static MasterPaginatedHttpJob masterPaginatedHttpJob(HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings) {
-        return new MasterPaginatedHttpJob(createContext(datasource, destination, checkpoint, moreXPath, mappings), mappings);
+        return new MasterPaginatedHttpJob(createContext(datasource, destination, checkpoint, moreXPath, mappings, Collections.newSetFromMap(new ConcurrentHashMap<HttpDatasource, Boolean>())), mappings);
     }
 
     public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {

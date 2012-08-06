@@ -57,7 +57,7 @@ public class FailureTest {
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class)), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(HttpDatasource.datasource(uri("/any/uri"), crawlerId, source, record), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), new HashSet<HttpDatasource>()), "Bigtime failures"));
     }
 
     @Test

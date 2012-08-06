@@ -25,11 +25,16 @@ public class HttpJob implements StagedJob {
     }
 
     public static HttpJob httpJob(HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
+        ConcurrentMap<String, Object> context = createContext(datasource, destination, visited);
+        return new HttpJob(context);
+    }
+
+    protected static ConcurrentMap<String, Object> createContext(HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited) {
         ConcurrentMap<String, Object> context = new ConcurrentHashMap<String, Object>();
         context.put("datasource", datasource);
         context.put("destination", destination);
         context.put("visited", visited);
-        return new HttpJob(context);
+        return context;
     }
 
     @Override
