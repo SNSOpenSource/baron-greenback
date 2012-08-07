@@ -161,7 +161,7 @@ public class ViewsResource {
         String name = model.get("name", String.class);
         return model.set("id", key).
                 set("current", current.equals(name)).
-                set("itemsTotal", recordsService.count(name, model.<String>get("query") + " " + query)).
+                set("itemsTotal", recordsService.count(name, query)).
                 set("url", redirector.uriOf(method(on(SearchResource.class).list(name, query))));
     }
 }
