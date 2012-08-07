@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.CsvWriter;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
@@ -40,7 +41,6 @@ import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.googlecode.barongreenback.shared.CsvWriter.writeTo;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.barongreenback.views.ViewsRepository.viewModel;
@@ -114,7 +114,7 @@ public class SearchResource {
                 entity(new StreamingWriter() {
                     @Override
                     public void write(Writer writer) throws IOException {
-                        writeTo(result, writer, recordsService.visibleHeaders(view));
+                        CsvWriter.writeTo(result, writer, recordsService.visibleHeaders(view));
                     }
                 }).build();
     }
