@@ -38,9 +38,11 @@ import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.googlecode.barongreenback.search.RecordsService.visibleHeaders;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.barongreenback.views.ViewsRepository.viewModel;
@@ -107,14 +109,14 @@ public class SearchResource {
         final Model view = recordsService.view(viewName);
         final Definition definition = recordsService.definition(view);
         Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
-        final Sequence<Record> result = errorOrResults.right().sortBy(descending(firstComparable));
+        final Iterator<Record> result = errorOrResults.right().sortBy(descending(firstComparable)).iterator();
 
         return ResponseBuilder.response().
                 header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LUCENE().format(clock.now()))).
                 entity(new StreamingWriter() {
                     @Override
                     public void write(Writer writer) throws IOException {
-                        CsvWriter.writeTo(result.iterator(), writer, recordsService.visibleHeaders(view));
+                        CsvWriter.writeTo(result, writer, visibleHeaders(view));
                     }
                 }).build();
     }
