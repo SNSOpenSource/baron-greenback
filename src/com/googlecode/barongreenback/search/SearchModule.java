@@ -7,7 +7,11 @@ import com.googlecode.lazyrecords.parser.ParametrizedParser;
 import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.lazyrecords.parser.StandardParser;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.utterlyidle.HttpHandler;
+import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Resources;
+import com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.ModuleDefiner;
 import com.googlecode.utterlyidle.modules.ModuleDefinitions;
@@ -31,6 +35,8 @@ public class SearchModule implements ResourcesModule, RequestScopedModule, Modul
         container.decorate(PredicateParser.class, ParametrizedParser.class);
         container.add(PredicateBuilder.class);
         container.add(ParserParameters.class);
+        container.addInstance(ConvertExtensionToAcceptHeader.Replacements.class, ConvertExtensionToAcceptHeader.Replacements.replacements(Pair.pair("json", MediaType.APPLICATION_JSON)));
+        container.decorate(HttpHandler.class, ConvertExtensionToAcceptHeader.class);
         return this;
     }
 
