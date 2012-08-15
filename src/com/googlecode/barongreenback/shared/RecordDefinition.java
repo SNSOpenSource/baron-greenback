@@ -9,6 +9,7 @@ import com.googlecode.lazyrecords.ImmutableKeyword;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.CachedClassLoader;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
@@ -37,6 +38,8 @@ public class RecordDefinition {
     public static final Keyword<Boolean> SUBFEED = keyword("subfeed", Boolean.class);
     public static final Predicate<Keyword<?>> UNIQUE_FILTER = Predicates.and(where(metadata(Keywords.UNIQUE), is(notNullValue())), where(metadata(Keywords.UNIQUE), is(true)));
     private final Definition definition;
+
+    private static final CachedClassLoader cache = new CachedClassLoader(RecordDefinition.class.getClassLoader());
 
     public RecordDefinition(Definition definition) {
         this.definition = definition;
@@ -201,7 +204,7 @@ public class RecordDefinition {
         return new Callable1<Model, Keyword<?>>() {
             public Keyword<?> call(Model model) throws Exception {
                 Keyword<?> keyword = keyword(model.get("name", String.class),
-                        Class.forName(model.get("type", String.class)));
+                        cache.loadClass(model.get("type", String.class)));
 
                 String alias = model.get("alias", String.class);
                 if (!isEmpty(alias)) {
