@@ -18,8 +18,10 @@ import com.googlecode.utterlyidle.modules.ModuleDefinitions;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;
+import com.googlecode.yadic.Containers;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
+import static com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader.Replacements.replacements;
 
 public class SearchModule implements ResourcesModule, RequestScopedModule, ModuleDefiner {
     public Module addResources(Resources resources) {
@@ -35,7 +37,7 @@ public class SearchModule implements ResourcesModule, RequestScopedModule, Modul
         container.decorate(PredicateParser.class, ParametrizedParser.class);
         container.add(PredicateBuilder.class);
         container.add(ParserParameters.class);
-        container.addInstance(ConvertExtensionToAcceptHeader.Replacements.class, ConvertExtensionToAcceptHeader.Replacements.replacements(Pair.pair("json", MediaType.APPLICATION_JSON)));
+        Containers.addInstanceIfAbsent(container, ConvertExtensionToAcceptHeader.Replacements.class, replacements(Pair.pair("json", MediaType.APPLICATION_JSON)));
         container.decorate(HttpHandler.class, ConvertExtensionToAcceptHeader.class);
         return this;
     }
