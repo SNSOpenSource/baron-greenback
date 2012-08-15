@@ -13,10 +13,12 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
@@ -27,7 +29,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.Status;
-import com.googlecode.utterlyidle.StreamingWriter;
+import com.googlecode.utterlyidle.StreamingOutput;
 import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
@@ -37,8 +39,10 @@ import com.googlecode.utterlyidle.annotations.Priority;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,6 +52,7 @@ import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.totallylazy.Callables.descending;
+import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
 import static com.googlecode.totallylazy.Predicates.classAssignableTo;
 import static com.googlecode.totallylazy.Unchecked.cast;
@@ -119,14 +124,27 @@ public class SearchResource {
         Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
         final Iterator<Record> result = errorOrResults.right().sortBy(descending(firstComparable)).iterator();
 
+        final Sequence<Keyword<?>> visibleHeaders = visibleHeaders(view);
+
         return ResponseBuilder.response().
                 header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LUCENE().format(clock.now()))).
-                entity(new StreamingWriter() {
+                entity(new StreamingOutput() {
                     @Override
-                    public void write(Writer writer) throws IOException {
-                        CsvWriter.writeTo(result, writer, visibleHeaders(view));
+                    public void write(OutputStream outputStream) throws IOException {
+                        using(new OutputStreamWriter(new BufferedOutputStream(outputStream, 32768)), writeCsv());
                     }
-                }).build();
+
+                    private Function1<OutputStreamWriter, Void> writeCsv() {
+                        return new Function1<OutputStreamWriter, Void>() {
+                            @Override
+                            public Void call(OutputStreamWriter writer) throws Exception {
+                                CsvWriter.writeTo(result, writer, visibleHeaders);
+                                return Runnables.VOID;
+                            }
+                        };
+                    }
+                })
+                .build();
     }
 
     private Model results(String viewName, String query, Either<String, Sequence<Record>> errorOrResults) {

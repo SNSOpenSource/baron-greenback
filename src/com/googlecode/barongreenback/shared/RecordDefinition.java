@@ -9,7 +9,6 @@ import com.googlecode.lazyrecords.ImmutableKeyword;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.CachedClassLoader;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
@@ -19,6 +18,7 @@ import com.googlecode.totallylazy.Sequences;
 
 import java.util.List;
 
+import static com.googlecode.barongreenback.shared.RecordDefinition.ExpensiveModelToKeyword.expensiveModelToKeyword;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.funclate.Model.value;
 import static com.googlecode.lazyrecords.Keywords.keyword;
@@ -38,8 +38,6 @@ public class RecordDefinition {
     public static final Keyword<Boolean> SUBFEED = keyword("subfeed", Boolean.class);
     public static final Predicate<Keyword<?>> UNIQUE_FILTER = Predicates.and(where(metadata(Keywords.UNIQUE), is(notNullValue())), where(metadata(Keywords.UNIQUE), is(true)));
     private final Definition definition;
-
-    private static final CachedClassLoader cache = new CachedClassLoader(RecordDefinition.class.getClassLoader());
 
     public RecordDefinition(Definition definition) {
         this.definition = definition;
@@ -197,29 +195,28 @@ public class RecordDefinition {
     }
 
     public static Sequence<Keyword<?>> toKeywords(List<Model> keywords) {
-        return sequence(keywords).filter(where(value("name", String.class), is(not(empty())))).map(asKeyword());
+        return sequence(keywords).filter(where(value("name", String.class), is(not(empty())))).map(expensiveModelToKeyword()).realise();
     }
 
-    private static Callable1<Model, Keyword<?>> asKeyword() {
-        return new Callable1<Model, Keyword<?>>() {
-            public Keyword<?> call(Model model) throws Exception {
-                Keyword<?> keyword = keyword(model.get("name", String.class),
-                        cache.loadClass(model.get("type", String.class)));
+    public static class ExpensiveModelToKeyword implements Callable1<Model, Keyword<?>> {
+        private ExpensiveModelToKeyword() { }
 
-                String alias = model.get("alias", String.class);
-                if (!isEmpty(alias)) {
-                    keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
-                }
-                return keyword.metadata(Record.constructors.record().
-                        set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
-                        set(ViewsRepository.VISIBLE, model.get("visible", Boolean.class)).
-                        set(ViewsRepository.GROUP, model.get("group", String.class)).
-                        set(CompositeCrawler.CHECKPOINT, model.get("checkpoint", Boolean.class)).
-                        set(RecordDefinition.SUBFEED, model.get("subfeed", Boolean.class)).
-                        set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
+        public static ExpensiveModelToKeyword expensiveModelToKeyword() { return new ExpensiveModelToKeyword(); }
+
+        public Keyword<?> call(Model model) throws Exception {
+            Keyword<?> keyword = keyword(model.get("name", String.class), Class.forName(model.get("type", String.class)));
+
+            String alias = model.get("alias", String.class);
+            if (!isEmpty(alias)) {
+                keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
             }
-        };
+            return keyword.metadata(Record.constructors.record().
+                    set(Keywords.UNIQUE, model.get("unique", Boolean.class)).
+                    set(ViewsRepository.VISIBLE, model.get("visible", Boolean.class)).
+                    set(ViewsRepository.GROUP, model.get("group", String.class)).
+                    set(CompositeCrawler.CHECKPOINT, model.get("checkpoint", Boolean.class)).
+                    set(RecordDefinition.SUBFEED, model.get("subfeed", Boolean.class)).
+                    set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
+        }
     }
-
-
 }

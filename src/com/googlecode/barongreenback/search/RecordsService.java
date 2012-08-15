@@ -135,7 +135,7 @@ public class RecordsService {
 
 
     private static Sequence<Keyword<?>> visibleHeaders(Sequence<Keyword<?>> headers) {
-        return headers.filter(where(metadata(ViewsRepository.VISIBLE), is(notNullValue(Boolean.class).and(is(true)))));
+        return headers.filter(where(metadata(ViewsRepository.VISIBLE), is(notNullValue(Boolean.class).and(is(true))))).realise();
     }
 
     public static Sequence<Keyword<?>> headers(Model view) {
