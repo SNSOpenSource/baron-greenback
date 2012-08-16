@@ -8,7 +8,7 @@ mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.totallylazy:totallylazy:jar|sources:760
-mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:100
+mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:101
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:525
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.yadic:yadic:jar|sources:150
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.funclate:funclate:jar|sources:78
