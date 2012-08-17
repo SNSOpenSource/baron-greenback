@@ -131,17 +131,13 @@ public class SearchResource {
                 entity(new StreamingOutput() {
                     @Override
                     public void write(OutputStream outputStream) throws IOException {
-                        using(new OutputStreamWriter(new BufferedOutputStream(outputStream, 32768)), writeCsv());
-                    }
-
-                    private Function1<OutputStreamWriter, Void> writeCsv() {
-                        return new Function1<OutputStreamWriter, Void>() {
+                        using(new OutputStreamWriter(new BufferedOutputStream(outputStream, 32768)), new Function1<OutputStreamWriter, Void>() {
                             @Override
                             public Void call(OutputStreamWriter writer) throws Exception {
                                 CsvWriter.writeTo(result, writer, visibleHeaders);
                                 return Runnables.VOID;
                             }
-                        };
+                        });
                     }
                 })
                 .build();

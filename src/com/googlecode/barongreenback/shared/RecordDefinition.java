@@ -18,6 +18,7 @@ import com.googlecode.totallylazy.Sequences;
 
 import java.util.List;
 
+import static com.googlecode.barongreenback.shared.RecordDefinition.ExpensiveModelToKeyword.expensiveModelToKeyword;
 import static com.googlecode.funclate.Model.model;
 import static com.googlecode.funclate.Model.value;
 import static com.googlecode.lazyrecords.Keywords.keyword;
@@ -200,30 +201,33 @@ public class RecordDefinition {
         return toKeywords(model.getValues("keywords", Model.class));
     }
 
+
+
     public static Sequence<Keyword<?>> toKeywords(List<Model> keywords) {
-        return sequence(keywords).filter(where(value("name", String.class), is(not(empty())))).map(asKeyword());
+        return sequence(keywords).filter(where(value("name", String.class), is(not(empty())))).map(expensiveModelToKeyword()).realise();
     }
 
-    private static Callable1<Model, Keyword<?>> asKeyword() {
-        return new Callable1<Model, Keyword<?>>() {
-            public Keyword<?> call(Model model) throws Exception {
-                Keyword<?> keyword = keyword(model.get("name", String.class),
-                        Class.forName(model.get("type", String.class)));
+    public static class ExpensiveModelToKeyword implements Callable1<Model, Keyword<?>> {
+        private ExpensiveModelToKeyword() { }
 
-                String alias = model.get("alias", String.class);
-                if (!isEmpty(alias)) {
-                    keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
-                }
-                return keyword.metadata(Record.constructors.record().
-                        set(Keywords.UNIQUE, model.get(Keywords.UNIQUE.name(), Keywords.UNIQUE.forClass())).
-                        set(ViewsRepository.VISIBLE, model.get(ViewsRepository.VISIBLE.name(), ViewsRepository.VISIBLE.forClass())).
-                        set(ViewsRepository.GROUP, model.get(ViewsRepository.GROUP.name(), ViewsRepository.GROUP.forClass())).
-                        set(CompositeCrawler.CHECKPOINT, model.get(CompositeCrawler.CHECKPOINT.name(), CompositeCrawler.CHECKPOINT.forClass())).
-                        set(RecordDefinition.SUBFEED, model.get(RecordDefinition.SUBFEED.name(), RecordDefinition.SUBFEED.forClass())).
-                        set(RecordDefinition.PRIORITY, model.get(RecordDefinition.PRIORITY.name(), RecordDefinition.PRIORITY.forClass())).
-                        set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
+        public static ExpensiveModelToKeyword expensiveModelToKeyword() { return new ExpensiveModelToKeyword(); }
+
+        public Keyword<?> call(Model model) throws Exception {
+            Keyword<?> keyword = keyword(model.get("name", String.class), Class.forName(model.get("type", String.class)));
+
+            String alias = model.get("alias", String.class);
+            if (!isEmpty(alias)) {
+                keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
             }
-        };
+            return keyword.metadata(Record.constructors.record().
+                    set(Keywords.UNIQUE, model.get(Keywords.UNIQUE.name(), Keywords.UNIQUE.forClass())).
+                    set(ViewsRepository.VISIBLE, model.get(ViewsRepository.VISIBLE.name(), ViewsRepository.VISIBLE.forClass())).
+                    set(ViewsRepository.GROUP, model.get(ViewsRepository.GROUP.name(), ViewsRepository.GROUP.forClass())).
+                    set(CompositeCrawler.CHECKPOINT, model.get(CompositeCrawler.CHECKPOINT.name(), CompositeCrawler.CHECKPOINT.forClass())).
+                    set(RecordDefinition.SUBFEED, model.get(RecordDefinition.SUBFEED.name(), RecordDefinition.SUBFEED.forClass())).
+                    set(RecordDefinition.PRIORITY, model.get(RecordDefinition.PRIORITY.name(), RecordDefinition.PRIORITY.forClass())).
+                    set(RecordDefinition.RECORD_DEFINITION, convert(model.get("record", Model.class))));
+        }
     }
 
 
