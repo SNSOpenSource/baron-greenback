@@ -6,14 +6,17 @@ import com.googlecode.barongreenback.batch.BatchResourceTest;
 import com.googlecode.barongreenback.search.SearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.UUID;
 
 import static com.googlecode.totallylazy.Pair.pair;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -22,27 +25,24 @@ public class CrawlerComparitorTest extends ApplicationTests {
     private static final UUID CRAWLER_ID = UUID.fromString("77916239-0dfe-4217-9e2a-ceaa9e5bed42");
 
     public Pair<String, String> compareSequentialAndQueues(String sequentialDefinition, String queuesDefinition) throws Exception {
-        return compare(sequentialDefinition, SequentialCrawler.class, queuesDefinition, QueuesCrawler.class);
+        Sequence<String> compare = runDefinitionAndCrawler(sequence(Pair.<String, Class<? extends Crawler>>pair(sequentialDefinition, SequentialCrawler.class), Pair.<String, Class<? extends Crawler>>pair(queuesDefinition, QueuesCrawler.class)));
+        return Pair.pair(compare.first(), compare.second());
     }
 
-    public Pair<String, String> compare(String definitionA, Class<? extends Crawler> crawlerA,
-                                        String definitionB, Class<? extends Crawler> crawlerB) throws Exception {
-        deleteAll();
-        String nameA = extractName(definitionA);
-        changeCrawlerTo(crawlerA);
-        importAndCrawl(definitionA, nameA);
-        String sequentialResult = csvExport(nameA);
-
-        deleteAll();
-        String nameB = extractName(definitionA);
-        changeCrawlerTo(crawlerB);
-        importAndCrawl(definitionB, nameB);
-        String queuesResult = csvExport(nameB);
-
-        return pair(sequentialResult, queuesResult);
+    public Sequence<String> runDefinitionAndCrawler(Sequence<Pair<String, Class<? extends Crawler>>> definitionAndCrawlers) throws Exception {
+        return definitionAndCrawlers.map(new Function1<Pair<String, Class<? extends Crawler>>, String>() {
+            @Override
+            public String call(Pair<String, Class<? extends Crawler>> pair) throws Exception {
+                deleteAll();
+                String nameA = extractName(pair.first());
+                changeCrawlerTo(pair.second());
+                importAndCrawl(pair.first(), nameA);
+                return csvExport(nameA);
+            }
+        });
     }
 
-    private String extractName(String definition) {
+    public String extractName(String definition) {
         return Model.parse(definition).get("form", Model.class).get("update", String.class);
     }
 
