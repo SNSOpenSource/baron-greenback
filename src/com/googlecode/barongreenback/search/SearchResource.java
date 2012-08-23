@@ -23,6 +23,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.time.Clock;
+import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -58,6 +59,7 @@ import static com.googlecode.totallylazy.Predicates.classAssignableTo;
 import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.totallylazy.time.Dates.LEXICAL;
 import static com.googlecode.totallylazy.time.Dates.LUCENE;
 
 
@@ -127,7 +129,7 @@ public class SearchResource {
         final Sequence<Keyword<?>> visibleHeaders = visibleHeaders(view);
 
         return ResponseBuilder.response().
-                header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LUCENE().format(clock.now()))).
+                header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LEXICAL().format(clock.now()))).
                 entity(new StreamingOutput() {
                     @Override
                     public void write(OutputStream outputStream) throws IOException {

@@ -47,6 +47,7 @@ import static com.googlecode.totallylazy.Streams.copy;
 import static com.googlecode.totallylazy.Zip.zip;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.totallylazy.time.Dates.LEXICAL;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static java.lang.String.format;
 
@@ -211,7 +212,7 @@ public class BatchResource {
     }
 
     private static String backupName(Date date) {
-        return format("%s/%s.bgb", BACKUP_LOCATION, Dates.LUCENE().format(date));
+        return format("%s/%s.bgb", BACKUP_LOCATION, LEXICAL().format(date));
     }
 
     private void deleteAllData() throws Exception {
