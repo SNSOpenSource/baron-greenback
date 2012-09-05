@@ -11,11 +11,9 @@ import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
-import javax.sound.midi.SysexMessage;
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 
 public class LessCssHandler implements HttpHandler {
@@ -43,12 +41,17 @@ public class LessCssHandler implements HttpHandler {
     }
 
     private String processLess(Uri uri, String less) throws IOException {
-        if (cache.containsKey(uri) && config.useCache()) {
-            return cache.get(uri);
+        String key = uri.path();
+        if (cache.containsKey(key) && config.useCache() && noPurgeIn(uri)) {
+            return cache.get(key);
         }
         String result = lessCompiler.compile(less, new Loader(uri));
-        cache.put(uri, result);
+        cache.put(key, result);
         return result;
+    }
+
+    private boolean noPurgeIn(Uri uri) {
+        return !option(uri.query()).getOrElse("").contains("purge");
     }
 
     public class Loader implements Callable1<String, String> {
