@@ -132,8 +132,7 @@ public class SearchResource {
     }
 
     private Model results(String viewName, String query, Either<String, Sequence<Record>> errorOrResults) {
-        Uri uri = redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query)));
-        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query)).add("csvUrl", uri.toString());
+        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query));
     }
 
     private Keyword<? extends Comparable> findFirstComparable(Definition definition) {
