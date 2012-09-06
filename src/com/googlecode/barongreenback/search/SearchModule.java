@@ -26,7 +26,6 @@ import static com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader
 public class SearchModule implements ResourcesModule, RequestScopedModule, ModuleDefiner {
     public Module addResources(Resources resources) {
         resources.add(annotatedClass(SearchResource.class));
-        resources.add(annotatedClass(ExportResource.class));
         return this;
     }
 
