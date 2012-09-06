@@ -67,31 +67,17 @@ import static com.googlecode.totallylazy.time.Dates.LUCENE;
 @Path("{view}/search")
 public class SearchResource {
     private final Redirector redirector;
-    private final AdvancedMode mode;
     private final Pager pager;
     private final Sorter sorter;
     private final RecordsService recordsService;
     private final Clock clock;
 
-    public SearchResource(final Redirector redirector, final AdvancedMode mode,
-                          final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock) {
+    public SearchResource(final Redirector redirector, final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock) {
         this.redirector = redirector;
-        this.mode = mode;
         this.pager = pager;
         this.sorter = sorter;
         this.recordsService = recordsService;
         this.clock = clock;
-    }
-
-    @POST
-    @Path("delete")
-    public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        if (!mode.equals(AdvancedMode.Enable)) {
-            return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
-        }
-
-        recordsService.delete(viewName, query);
-        return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
 
     @GET

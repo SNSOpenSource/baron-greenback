@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback;
 
+import com.googlecode.barongreenback.actions.ActionsModule;
 import com.googlecode.barongreenback.batch.BatchModule;
 import com.googlecode.barongreenback.crawler.CrawlerModule;
 import com.googlecode.barongreenback.crawler.executor.ExecutorModule;
@@ -67,6 +68,7 @@ public class WebApplication extends RestApplication {
         application.add(new CrawlerModule());
         application.add(new FailureModule());
         application.add(new SearchModule());
+        application.add(new ActionsModule());
         application.add(new ViewsModule());
         application.add(new JobsModule());
         application.add(new QueuesModule());
