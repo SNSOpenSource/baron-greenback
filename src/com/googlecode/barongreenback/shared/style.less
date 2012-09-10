@@ -236,6 +236,14 @@ table {
         tfoot tr td {
             border-top: 1px solid #ddd;
         }
+        tr.selected, tr.selected:hover {
+            td {
+                background-color: lighten(@yellow, 35%);
+            }
+        }
+        tr:hover {
+            cursor: pointer;
+        }
     }
 }
 

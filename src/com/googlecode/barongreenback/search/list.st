@@ -21,6 +21,28 @@
 </div>
 
 $include.({/$view;format="url"$/actions/list?query=$query;format="url"$$if(advanced)$&advanced$endif$}).body;format="raw"$
-
+<div id="footer">
+    <script>
+        //<![CDATA[
+        jQuery(document).ready(function() {
+            jQuery("table.results tbody").click(function(event) {
+                if (event.target.nodeName === 'TD') {
+                    var target = jQuery(event.target);
+                    var rowId = target.siblings('td:first').text();
+                    var parent = jQuery(target.parent('tr')[0]);
+                    var selecting = !parent.hasClass('selected');
+                    if (selecting) {
+                        jQuery('div.actions form').append('<input type="hidden" name="id" value="' + rowId + '"/>')
+                        parent.addClass('selected');
+                    } else {
+                        jQuery('div.actions form input[value="' + rowId + '"]').remove();
+                        parent.removeClass('selected');
+                    }
+                }
+            });
+        });
+        //]]>
+    </script>
+</div>
 </body>
 </html>

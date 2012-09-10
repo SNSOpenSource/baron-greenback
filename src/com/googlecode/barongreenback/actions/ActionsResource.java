@@ -11,6 +11,7 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -65,7 +66,7 @@ public class ActionsResource {
 
     @POST
     @Path("delete")
-    public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query, @QueryParam("id") Iterable<String> id) {
+    public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query, @FormParam("id") Iterable<String> id) {
         String idName = unwrap(recordsService.view(viewName)).get("keywords", Model.class).get("name", String.class);
         delete(viewName, sequence(id).map(Strings.format(idName + ":%s")).toString(" OR "));
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));

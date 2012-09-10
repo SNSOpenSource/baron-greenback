@@ -43,6 +43,10 @@
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-ui-1.8.16.custom.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/subfeed.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/expander/expander.js"></script>
-$script$
+$if(footer)$
+<div id="footer">
+$footer$
+</div>
+$endif$
 </body>
 </html>
