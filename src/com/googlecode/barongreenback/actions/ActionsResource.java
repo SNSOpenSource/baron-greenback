@@ -41,10 +41,10 @@ public class ActionsResource {
     @GET
     @Path("list")
     public Model get(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        Sequence<Model> normalActions = Sequences.sequence(action(redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query))), "export", "GET"));
-        Sequence<Model> advancedActions = Sequences.sequence(action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query))), "delete", "POST"));
+        Sequence<Uri> normalActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).exportModel(viewName, query))));
+        Sequence<Uri> advancedActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query))));
 
-        Sequence<Model> actions = (AdvancedMode.Enable.equals(mode)) ? normalActions.join(advancedActions) : normalActions;
+        Sequence<Uri> actions = (AdvancedMode.Enable.equals(mode)) ? normalActions.join(advancedActions) : normalActions;
 
         return Model.model().add("actions", actions.toList());
     }
@@ -55,6 +55,19 @@ public class ActionsResource {
                 add("url", uri).
                 add("method", method);
     }
+
+    @GET
+    @Path("export")
+    public Model exportModel(@PathParam("view") String viewName, @QueryParam("query") String query) {
+        return action(redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query))), "export", "GET");
+    }
+
+    @GET
+    @Path("delete")
+    public Model deleteModel(@PathParam("view") String viewName, @QueryParam("query") String query) {
+        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query))), "delete", "POST");
+    }
+
 
     @POST
     @Path("delete")
