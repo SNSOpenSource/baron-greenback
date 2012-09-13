@@ -6,9 +6,11 @@
 </head>
 <body>
 <div class="actions">
-    $actions: {action |
-        <form action="$action.url$" method="$action.method$" class="$action.name$"><input type="submit" class="$action.name$" value="$action.name$"/></form>
+    <a href="#" class="selectPage">Select Page</a>
+    $actions: {url |
+        $include.({$url$}).body;format="raw"$
     }$
+    <div class="message"></div>
 </div>
 </body>
 </html>

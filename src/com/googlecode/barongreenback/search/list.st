@@ -28,8 +28,8 @@ $include.({/$view;format="url"$/actions/list?query=$query;format="url"$$if(advan
             jQuery("table.results tbody").click(function(event) {
                 if (event.target.nodeName === 'TD') {
                     var target = jQuery(event.target);
-                    var rowId = target.siblings('td:first').text();
                     var parent = jQuery(target.parent('tr')[0]);
+                    var rowId = parent.find(">td:first-child").text();
                     var selecting = !parent.hasClass('selected');
                     if (selecting) {
                         jQuery('div.actions form').append('<input type="hidden" name="id" value="' + rowId + '"/>')
@@ -39,7 +39,12 @@ $include.({/$view;format="url"$/actions/list?query=$query;format="url"$$if(advan
                         parent.removeClass('selected');
                     }
                 }
+                jQuery('.actions .message').text(jQuery('table.results tr.selected').size() + " rows are selected");
             });
+            jQuery('.actions a.selectPage').click(function() {
+                jQuery('table.results tbody td:first-child').click();
+                return false;
+            })
         });
         //]]>
     </script>
