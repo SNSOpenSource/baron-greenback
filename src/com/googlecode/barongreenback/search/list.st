@@ -30,6 +30,10 @@ $include.({/$view;format="url"$/actions/list?query=$query;format="url"$$if(advan
                 jQuery('div.actions form input[name="id"]').remove();
             };
 
+            var rowCount = function() {
+                return jQuery('ul.tabs li.active a.tab span.count').text().replace(/[^0-9]/g, '');
+            };
+
             jQuery("table.results tbody").click(function(event) {
                 if (event.target.nodeName === 'TD') {
                     var target = jQuery(event.target);
@@ -51,8 +55,12 @@ $include.({/$view;format="url"$/actions/list?query=$query;format="url"$$if(advan
                 jQuery('.actions a.selectPage').click();
                 removeAllIdentifiers();
                 jQuery('div.actions form').append('<input type="hidden" name="query" value="' + jQuery('meta[name="query"]').attr('content') + '">');
-                jQuery('.actions .message').text('ALL ' + jQuery('ul.tabs li.active a.tab span.count').text().replace(/[^0-9]/g, '') +' rows are selected');
+                jQuery('.actions .message').text('ALL ' + itemCount() +' rows are selected');
                 return false;
+            });
+            jQuery('div.actions form input[type="submit"]').click(function() {
+                var count = jQuery(this).siblings('input[name="id"]').size() || rowCount();
+                return confirm('You are about to ' + jQuery(this).val() + ' ' + count + ' rows. Are you sure?');
             });
         });
         //]]>
