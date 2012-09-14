@@ -11,6 +11,7 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
@@ -42,7 +43,7 @@ public class ActionsResource {
     @Path("list")
     public Model get(@PathParam("view") String viewName, @QueryParam("query") String query) {
         Sequence<Uri> normalActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).exportModel(viewName, query))));
-        Sequence<Uri> advancedActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query))));
+        Sequence<Uri> advancedActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).deleteModel(viewName, query))));
 
         Sequence<Uri> actions = (AdvancedMode.Enable.equals(mode)) ? normalActions.join(advancedActions) : normalActions;
 
@@ -71,7 +72,7 @@ public class ActionsResource {
 
     @POST
     @Path("delete")
-    public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query) {
+    public Response delete(@PathParam("view") String viewName, @FormParam("query") @DefaultValue("") String query) {
         recordsService.delete(viewName, query);
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }

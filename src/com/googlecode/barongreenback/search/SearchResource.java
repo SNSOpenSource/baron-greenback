@@ -56,6 +56,7 @@ import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
 import static com.googlecode.totallylazy.Predicates.classAssignableTo;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -102,6 +103,13 @@ public class SearchResource {
         return results(viewName, query, errorOrResults);
     }
 
+    @GET
+    @Produces(MediaType.TEXT_CSV)
+    @Path("csv")
+    public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("id") Iterable<String> id) {
+        String idName = unwrap(recordsService.view(viewName)).get("keywords", Model.class).get("name", String.class);
+        return exportCsv(viewName, sequence(id).map(Strings.format(idName + ":%s")).toString(" OR "));
+    }
     @GET
     @Produces(MediaType.TEXT_CSV)
     @Path("csv")
