@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
+    <file url="file://$USER_HOME$/branches/NETSTREAM_I172/raven" charset="UTF-8" />
+    <file url="file://$USER_HOME$/branches/NETSTREAM_I172/twig" charset="UTF-8" />
+    <file url="file://$USER_HOME$/branches/NETSTREAM_I172/twig/twig-core" charset="UTF-8" />
+    <file url="file://$USER_HOME$/branches/NETSTREAM_I172/twig/twig-properties" charset="UTF-8" />
+    <file url="file://$USER_HOME$/branches/NETSTREAM_I172/twig/twig-sql" charset="UTF-8" />
+    <file url="file://$USER_HOME$/branches/NETSTREAM_I172/twig/twig-webapp" charset="UTF-8" />
     <file url="file://$USER_HOME$/trunk/netstream/penfold" charset="UTF-8" />
     <file url="file://$USER_HOME$/trunk/netstream/penfold/ernest" charset="UTF-8" />
     <file url="file://$USER_HOME$/trunk/netstream/penfold/ernest/ernest-core" charset="UTF-8" />
@@ -8,6 +14,12 @@
     <file url="file://$USER_HOME$/trunk/netstream/penfold/penfold-core" charset="UTF-8" />
     <file url="file://$USER_HOME$/trunk/netstream/penfold/penfold-webapp" charset="UTF-8" />
     <file url="file://$USER_HOME$/trunk/netstream/raven" charset="UTF-8" />
+    <file url="file:///media/data/trunk/netstream/penfold" charset="UTF-8" />
+    <file url="file:///media/data/trunk/netstream/penfold/ernest" charset="UTF-8" />
+    <file url="file:///media/data/trunk/netstream/penfold/ernest/ernest-core" charset="UTF-8" />
+    <file url="file:///media/data/trunk/netstream/penfold/ernest/ernest-sql" charset="UTF-8" />
+    <file url="file:///media/data/trunk/netstream/penfold/penfold-core" charset="UTF-8" />
+    <file url="file:///media/data/trunk/netstream/penfold/penfold-webapp" charset="UTF-8" />
   </component>
 </project>
 
