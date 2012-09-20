@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.shared.RecordDefinitionActivator;
 import com.googlecode.totallylazy.StringPrintStream;
 import com.googlecode.utterlyidle.Resources;
+import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.ArgumentScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;

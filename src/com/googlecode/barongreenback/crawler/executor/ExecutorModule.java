@@ -17,8 +17,7 @@ public class ExecutorModule implements ResourcesModule, ApplicationScopedModule 
 
     @Override
     public Module addPerApplicationObjects(Container container) throws Exception {
-        container.add(CrawlerExecutorsActivator.class);
-        container.addActivator(CrawlerExecutors.class, container.get(CrawlerExecutorsActivator.class));
+        container.addActivator(CrawlerExecutors.class, CrawlerExecutorsActivator.class);
         return this;
     }
 }

@@ -4,7 +4,6 @@ import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
 import com.googlecode.barongreenback.crawler.failures.Failures;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callables;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -13,14 +12,12 @@ import com.googlecode.utterlyidle.annotations.Produces;
 import java.util.List;
 
 import static com.googlecode.funclate.Model.mutable.model;
-import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 @Path("crawler")
 @Produces(MediaType.TEXT_HTML)
 public class CrawlerStatusResource {
-
     private final Failures failures;
     private final CrawlerExecutors crawlerExecutors;
 

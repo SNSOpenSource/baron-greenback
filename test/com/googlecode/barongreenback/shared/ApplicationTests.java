@@ -26,7 +26,8 @@ public abstract class ApplicationTests {
 
     @Before
     public void deleteIndex() {
-        application = new WebApplication(BasePath.basePath("/"), new Properties());
+        application = new WebApplication(BasePath.basePath("/"), new Properties(){{
+        }});
         application.usingRequestScope(new Callable1<Container, Object>() {
             @Override
             public Object call(Container container) throws Exception {

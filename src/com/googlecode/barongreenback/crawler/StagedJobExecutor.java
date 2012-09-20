@@ -6,29 +6,30 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 import java.io.PrintStream;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.googlecode.barongreenback.crawler.DataWriter.write;
+import static com.googlecode.barongreenback.crawler.HttpReader.getInput;
 
 public class StagedJobExecutor {
     private final JobExecutor inputHandler;
     private final JobExecutor processHandler;
     private final JobExecutor outputHandler;
-    private final Application application;
-    private final CountLatch latch = new CountLatch();
+    private final CountLatch latch;
     private final Container crawlerScope;
 
-    public StagedJobExecutor(CrawlerExecutors executors, Application application, Container crawlerScope) {
+    public StagedJobExecutor(CrawlerExecutors executors, CountLatch latch, Container crawlerScope) {
+        this.latch = latch;
         this.crawlerScope = crawlerScope;
         this.inputHandler = executors.inputHandler();
         this.processHandler = executors.processHandler();
         this.outputHandler = executors.outputHandler();
-        this.application = application;
     }
 
     public int crawlAndWait(StagedJob job) throws InterruptedException {
@@ -37,22 +38,23 @@ public class StagedJobExecutor {
         return crawlerScope.get(AtomicInteger.class).get();
     }
 
-    public Future<?> crawl(StagedJob job) throws InterruptedException {
-        return submit(inputHandler, HttpReader.getInput(job, crawlerScope).then(
+    public void crawl(StagedJob job) throws InterruptedException {
+        submit(inputHandler, getInput(job, crawlerScope).then(
                 submit(processHandler, processJobs(job, crawlerScope).then(
-                        submit(outputHandler, DataWriter.write(application, job, crawlerScope))))));
+                        submit(outputHandler, write(job, crawlerScope))))));
     }
 
-    private Future<?> submit(JobExecutor jobExecutor, final Runnable function) {
+    private void submit(JobExecutor jobExecutor, final Runnable function) {
         latch.countUp();
-        return jobExecutor.executor.submit(logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class)));
+        jobExecutor.execute(logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class)));
     }
 
-    private <T> Function1<T, Future<?>> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable) {
-        return new Function1<T, Future<?>>() {
+    private <T> Function1<T, Void> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable) {
+        return new Function1<T, Void>() {
             @Override
-            public Future<?> call(T result) throws Exception {
-                return submit(jobExecutor, runnable.deferApply(result));
+            public Void call(T result) throws Exception {
+                submit(jobExecutor, runnable.deferApply(result));
+                return Runnables.VOID;
             }
         };
     }
