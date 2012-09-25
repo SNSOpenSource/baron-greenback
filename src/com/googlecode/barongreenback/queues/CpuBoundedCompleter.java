@@ -3,7 +3,7 @@ package com.googlecode.barongreenback.queues;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
-import static com.googlecode.totallylazy.Function.function;
+import static com.googlecode.totallylazy.Functions.function;
 import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.Executors.newFixedThreadPool;
