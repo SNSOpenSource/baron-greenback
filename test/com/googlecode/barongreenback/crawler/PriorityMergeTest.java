@@ -6,8 +6,10 @@ import com.googlecode.lazyrecords.Record;
 import org.junit.Test;
 
 import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMerge;
+import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMergeBy;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -45,4 +47,11 @@ public class PriorityMergeTest {
         assertThat(priorityMerge(hi).apply(low).get(baseKey), is("Tom"));
     }
 
+    @Test
+    public void shouldMergeEvenWithAliasedKeyword() throws Exception {
+        Keyword<String> name = keyword("name", String.class).as("FirstName");
+        Record dan = record().set(name, "Dan");
+        Record raymond = record().set(name, "Raymond");
+        assertThat(priorityMergeBy(sequence(dan, raymond), name).size(), is(2));
+    }
 }

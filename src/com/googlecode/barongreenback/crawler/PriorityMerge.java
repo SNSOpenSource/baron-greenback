@@ -16,7 +16,11 @@ import static com.googlecode.totallylazy.comparators.NullComparator.compare;
 
 public class PriorityMerge {
     public static Sequence<Record> priorityMergeBy(Sequence<Record> records, Keyword<?> keyword) {
-        return records.groupBy(keyword).map(reduce(priorityMerge));
+        return records.groupBy(unalias(keyword)).map(reduce(priorityMerge));
+    }
+
+    private static Keyword<Object> unalias(Keyword<?> keyword) {
+        return Keywords.keyword(keyword.name(), keyword.forClass());
     }
 
     public static final Function2<Record, Record, Record> priorityMerge = new Function2<Record, Record, Record>() {

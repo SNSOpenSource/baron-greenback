@@ -30,7 +30,7 @@
                     "keywords":[
                         {
                             "name":"userId",
-                            "alias":"",
+                            "alias":"user",
                             "group":"",
                             "type":"java.lang.String",
                             "unique":true,
