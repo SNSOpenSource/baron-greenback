@@ -1,0 +1,43 @@
+package com.googlecode.barongreenback.crawler;
+
+import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.barongreenback.shared.RecordDefinitionActivator;
+import com.googlecode.totallylazy.StringPrintStream;
+import com.googlecode.utterlyidle.Resources;
+import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
+import com.googlecode.utterlyidle.modules.ArgumentScopedModule;
+import com.googlecode.utterlyidle.modules.Module;
+import com.googlecode.utterlyidle.modules.RequestScopedModule;
+import com.googlecode.utterlyidle.modules.ResourcesModule;
+import com.googlecode.yadic.Container;
+
+import java.io.PrintStream;
+
+import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
+
+public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, RequestScopedModule {
+    public Module addResources(Resources resources) throws Exception {
+        resources.add(annotatedClass(CrawlerDefinitionResource.class));
+        resources.add(annotatedClass(CrawlerImplementationResource.class));
+        resources.add(annotatedClass(BatchCrawlerResource.class));
+        resources.add(annotatedClass(CrawlerStatusResource.class));
+        return this;
+    }
+
+    public Module addPerArgumentObjects(Container container) throws Exception {
+        container.addActivator(RecordDefinition.class, RecordDefinitionActivator.class);
+        return this;
+    }
+
+    public Module addPerRequestObjects(Container container) throws Exception {
+        container.add(CrawlerHttpClient.class);
+        container.add(CompositeCrawler.class);
+        container.add(CheckpointHandler.class);
+        container.add(CrawlerRepository.class);
+        container.add(CrawlerActivator.class);
+        container.addActivator(Crawler.class, container.get(CrawlerActivator.class));
+        container.add(CrawlInterval.class);
+        container.addInstance(PrintStream.class, new StringPrintStream());
+        return this;
+    }
+}
