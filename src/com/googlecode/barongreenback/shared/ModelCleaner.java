@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class ModelCleaner {
@@ -19,7 +20,7 @@ public class ModelCleaner {
 
     public Model clean(Model model) {
         Map<String, Object> map = filterMap(model.toMap());
-        return Model.fromMap(map);
+        return model(map);
     }
 
     private Map<String, Object> filterMap(Map<String, Object> map) {

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.Forms.functions.addTemplates;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.Response.functions.asResponse;

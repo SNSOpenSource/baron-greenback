@@ -7,7 +7,7 @@ import com.googlecode.totallylazy.Option;
 
 import java.util.UUID;
 
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 
 public class CheckpointHandler {
     private final StringMappings mappings;

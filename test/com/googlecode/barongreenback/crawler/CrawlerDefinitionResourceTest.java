@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.contentOf;
+import static com.googlecode.funclate.Model.mutable.parse;
 import static java.util.UUID.randomUUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -125,7 +126,7 @@ public class CrawlerDefinitionResourceTest extends ApplicationTests {
 
     private Model namedCrawler(String name, boolean disabled) {
         String crawler = contentOf("crawler.json");
-        Model model = Model.parse(crawler);
+        Model model = parse(crawler);
         model.get("form", Model.class).set("update", name);
         model.get("form", Model.class).set("disabled", disabled);
         return model;

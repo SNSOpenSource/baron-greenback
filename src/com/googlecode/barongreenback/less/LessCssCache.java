@@ -1,12 +1,10 @@
 package com.googlecode.barongreenback.less;
 
-import com.googlecode.totallylazy.Uri;
-
 public interface LessCssCache {
 
-    boolean containsKey(Uri uri);
+    boolean containsKey(String key);
 
-    String get(Uri uri);
+    String get(String key);
 
-    void put(Uri uri, String result);
+    void put(String key, String result);
 }

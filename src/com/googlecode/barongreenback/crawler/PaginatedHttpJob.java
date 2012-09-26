@@ -5,7 +5,6 @@ import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -67,13 +66,8 @@ public class PaginatedHttpJob extends HttpJob {
         return mappings.toString(checkpoint.getClass(), checkpoint);
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
-        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
-            @Override
-            public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                return processDocument(loadDocument(response));
-            }
-        };
+    public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
+        return processDocument(loadDocument(response));
     }
 
     protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document) {

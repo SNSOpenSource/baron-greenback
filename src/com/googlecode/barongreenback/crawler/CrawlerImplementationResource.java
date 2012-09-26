@@ -20,7 +20,7 @@ import com.googlecode.utterlyidle.annotations.Produces;
 
 import java.util.UUID;
 
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;

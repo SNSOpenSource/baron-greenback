@@ -23,6 +23,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.time.Clock;
+import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -50,14 +51,16 @@ import java.util.Map;
 import static com.googlecode.barongreenback.search.RecordsService.visibleHeaders;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
 import static com.googlecode.totallylazy.Predicates.classAssignableTo;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.totallylazy.time.Dates.LEXICAL;
 import static com.googlecode.totallylazy.time.Dates.LUCENE;
 
 
@@ -65,31 +68,17 @@ import static com.googlecode.totallylazy.time.Dates.LUCENE;
 @Path("{view}/search")
 public class SearchResource {
     private final Redirector redirector;
-    private final AdvancedMode mode;
     private final Pager pager;
     private final Sorter sorter;
     private final RecordsService recordsService;
     private final Clock clock;
 
-    public SearchResource(final Redirector redirector, final AdvancedMode mode,
-                          final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock) {
+    public SearchResource(final Redirector redirector, final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock) {
         this.redirector = redirector;
-        this.mode = mode;
         this.pager = pager;
         this.sorter = sorter;
         this.recordsService = recordsService;
         this.clock = clock;
-    }
-
-    @POST
-    @Path("delete")
-    public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        if (!mode.equals(AdvancedMode.Enable)) {
-            return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
-        }
-
-        recordsService.delete(viewName, query);
-        return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }
 
     @GET
@@ -117,6 +106,13 @@ public class SearchResource {
     @GET
     @Produces(MediaType.TEXT_CSV)
     @Path("csv")
+    public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("id") Iterable<String> id) {
+        String idName = unwrap(recordsService.view(viewName)).get("keywords", Model.class).get("name", String.class);
+        return exportCsv(viewName, sequence(id).map(Strings.format(idName + ":%s")).toString(" OR "));
+    }
+    @GET
+    @Produces(MediaType.TEXT_CSV)
+    @Path("csv")
     public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findFromView(viewName, query);
         final Model view = recordsService.view(viewName);
@@ -127,7 +123,7 @@ public class SearchResource {
         final Sequence<Keyword<?>> visibleHeaders = visibleHeaders(view);
 
         return ResponseBuilder.response().
-                header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LUCENE().format(clock.now()))).
+                header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LEXICAL().format(clock.now()))).
                 entity(new StreamingOutput() {
                     @Override
                     public void write(OutputStream outputStream) throws IOException {
@@ -144,8 +140,7 @@ public class SearchResource {
     }
 
     private Model results(String viewName, String query, Either<String, Sequence<Record>> errorOrResults) {
-        Uri uri = redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query)));
-        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query)).add("csvUrl", uri.toString());
+        return errorOrResults.map(handleError(viewName, query), listResults(viewName, query));
     }
 
     private Keyword<? extends Comparable> findFirstComparable(Definition definition) {

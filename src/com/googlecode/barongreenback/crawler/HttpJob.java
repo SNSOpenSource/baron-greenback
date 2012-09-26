@@ -66,13 +66,8 @@ public class HttpJob implements StagedJob {
     }
 
     @Override
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
-        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
-            @Override
-            public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                return new SubfeedJobCreator(destination(), visited(), crawlerId(), record()).process(transformData(loadDocument(response), datasource().source()).realise());
-            }
-        };
+    public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
+        return new SubfeedJobCreator(destination(), visited(), crawlerId(), record()).process(transformData(loadDocument(response), datasource().source()).realise());
     }
 
     @Override

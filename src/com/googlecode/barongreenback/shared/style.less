@@ -75,7 +75,7 @@ input.crawl, input.search, a.new, input.import, input.save, input.start, body.vi
     .btn.primary;
 }
 
-input.more, a.export, a.import, a.edit, a.cancel, a.download a.export{
+input.more, a.export, a.import, a.edit, a.cancel, a.download, a.selectPage, a.selectAll{
     .btn;
 }
 
@@ -236,6 +236,14 @@ table {
         tfoot tr td {
             border-top: 1px solid #ddd;
         }
+        tr.selected, tr.selected:hover {
+            td {
+                background-color: lighten(@yellow, 35%);
+            }
+        }
+        tr:hover {
+            cursor: pointer;
+        }
     }
 }
 
@@ -350,4 +358,8 @@ body.failures .Actions {
 div.crawler {
     vertical-align: top;
     margin: 0px;
+}
+
+div.actions form {
+    .inlineBlock;
 }

@@ -8,13 +8,14 @@ import org.junit.Test;
 import java.util.List;
 
 import static com.googlecode.totallylazy.Pair.pair;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class ParametersToModelTest {
     @Test
     public void canConvertRootElements() throws Exception {
-        FormParameters parameters = FormParameters.formParameters(pair("foo", "bar"), pair("baz", "dan"));
+        FormParameters parameters = FormParameters.formParameters(sequence(pair("foo", "bar"), pair("baz", "dan")));
         Model model = ParametersToModel.modelOf(parameters);
         assertThat(model.get("foo", String.class), is("bar"));
         assertThat(model.get("baz", String.class), is("dan"));
@@ -22,7 +23,7 @@ public class ParametersToModelTest {
 
     @Test
     public void canConvert1LevelNestedForm() throws Exception {
-        FormParameters parameters = FormParameters.formParameters(pair("parent.foo", "bar"), pair("parent.baz", "dan"));
+        FormParameters parameters = FormParameters.formParameters(sequence(pair("parent.foo", "bar"), pair("parent.baz", "dan")));
         Model model = ParametersToModel.modelOf(parameters).get("parent", Model.class);
         assertThat(model.get("foo", String.class), is("bar"));
         assertThat(model.get("baz", String.class), is("dan"));
@@ -30,10 +31,10 @@ public class ParametersToModelTest {
 
     @Test
     public void canConvert2LevelNestedForm() throws Exception {
-        FormParameters parameters = FormParameters.formParameters(pair("grandparent.parent.foo", "bar"), pair("grandparent.parent.baz", "dan"));
+        FormParameters parameters = FormParameters.formParameters(sequence(pair("grandparent.parent.foo", "bar"), pair("grandparent.parent.baz", "dan")));
         Object object = ParametersToModel.modelOf(parameters).
                 get("grandparent", Model.class).
-                getObject("parent");
+                get("parent");
 
         assertThat(object, Matchers.<Object>instanceOf(Model.class));
         Model model = (Model) object;
@@ -43,8 +44,8 @@ public class ParametersToModelTest {
 
     @Test
     public void canConvertListsNestedForm() throws Exception {
-        FormParameters parameters = FormParameters.formParameters(pair("list[1].foo", "bar"), pair("list[1].baz", "dan"),
-                pair("list[2].foo", "matt"), pair("list[2].baz", "bob"));
+        FormParameters parameters = FormParameters.formParameters(sequence(pair("list[1].foo", "bar"), pair("list[1].baz", "dan"),
+                pair("list[2].foo", "matt"), pair("list[2].baz", "bob")));
         List<Model> list = ParametersToModel.modelOf(parameters).
                 getValues("list", Model.class);
         assertThat(list.get(0).get("foo", String.class), is("bar"));
@@ -55,18 +56,16 @@ public class ParametersToModelTest {
 
     @Test
     public void canConvertListsEvenIfTheyOnlyContainOneItem() throws Exception {
-        FormParameters parameters = FormParameters.formParameters(pair("list[1].foo", "bar"), pair("list[1].baz", "dan"));
+        FormParameters parameters = FormParameters.formParameters(sequence(pair("list[1].foo", "bar"), pair("list[1].baz", "dan")));
         Model model = ParametersToModel.modelOf(parameters);
-        Object object = model.getObject("list");
-        assertThat(object, Matchers.<Object>instanceOf(List.class));
-        List<Model> list = (List<Model>) object;
+        List<Model> list = model.getValues("list");
         assertThat(list.get(0).get("foo", String.class), is("bar"));
         assertThat(list.get(0).get("baz", String.class), is("dan"));
     }
 
     @Test
     public void canConvertTrueAndFalse() throws Exception {
-        FormParameters parameters = FormParameters.formParameters(pair("foo", "true"), pair("baz", "false"));
+        FormParameters parameters = FormParameters.formParameters(sequence(pair("foo", "true"), pair("baz", "false")));
         Model model = ParametersToModel.modelOf(parameters);
         assertThat(model.get("foo", Boolean.class), is(true));
         assertThat(model.get("baz", Boolean.class), is(false));

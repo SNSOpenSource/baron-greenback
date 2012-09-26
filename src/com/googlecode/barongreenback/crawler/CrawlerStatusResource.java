@@ -11,8 +11,7 @@ import com.googlecode.utterlyidle.annotations.Produces;
 
 import java.util.List;
 
-import static com.googlecode.funclate.Model.model;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Sequences.sequence;
 

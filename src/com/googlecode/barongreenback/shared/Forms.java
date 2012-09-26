@@ -8,7 +8,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 
 public class Forms {
     public static final Integer NUMBER_OF_FIELDS = 3;

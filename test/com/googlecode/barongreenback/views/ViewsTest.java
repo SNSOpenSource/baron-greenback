@@ -6,7 +6,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Sequences;
 import org.junit.Test;
 
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static org.hamcrest.MatcherAssert.assertThat;

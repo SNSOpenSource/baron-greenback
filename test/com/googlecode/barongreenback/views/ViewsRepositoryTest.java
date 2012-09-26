@@ -12,6 +12,7 @@ import com.googlecode.totallylazy.Sequences;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.googlecode.funclate.Model.mutable.model;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -44,7 +45,7 @@ public class ViewsRepositoryTest {
     }
 
     private Model crawlerWithName(String crawlerName) {
-        return Model.model().add("name", crawlerName).add("update", "crawlerUpdate");
+        return model().add("name", crawlerName).add("update", "crawlerUpdate");
     }
 
     @Before

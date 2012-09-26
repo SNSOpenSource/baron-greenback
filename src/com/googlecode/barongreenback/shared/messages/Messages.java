@@ -2,7 +2,7 @@ package com.googlecode.barongreenback.shared.messages;
 
 import com.googlecode.funclate.Model;
 
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 
 public class Messages {
     public static Model messageModel(String message, Category category) {
