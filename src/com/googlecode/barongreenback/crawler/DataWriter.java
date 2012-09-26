@@ -38,7 +38,7 @@ import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class DataWriter implements JobExecutor {
-    private final BlockingQueue<Triple<Definition, Sequence<Record>, CountLatch>> data = new LinkedBlockingQueue<Triple<Definition, Sequence<Record>, CountLatch>>();
+    private final BlockingQueue<Triple<Definition, Sequence<Record>, CountLatch>> data;
     private final Application application;
     private final int threads;
     private final int seconds;
@@ -47,12 +47,13 @@ public class DataWriter implements JobExecutor {
     private volatile boolean running = false;
 
 
-    public DataWriter(final Application application, int threads, int seconds, String name) {
+    public DataWriter(final Application application, int threads, int seconds, String name, int capacity) {
         this.application = application;
         this.threads = threads;
         this.seconds = seconds;
         this.name = name;
         executor = createExecutor();
+        data = new LinkedBlockingQueue<Triple<Definition, Sequence<Record>, CountLatch>>(capacity);
     }
 
     private ExecutorService createExecutor() {

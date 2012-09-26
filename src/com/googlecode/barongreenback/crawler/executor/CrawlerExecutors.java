@@ -14,13 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.INPUT_HANDLER_CAPACITY;
 import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.INPUT_HANDLER_THREADS;
-import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.OUTPUT_HANDLER_SECONDS;
+import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.OUTPUT_HANDLER_CAPACITY;
 import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.OUTPUT_HANDLER_THREADS;
 import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.PROCESS_HANDLER_CAPACITY;
 import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.PROCESS_HANDLER_THREADS;
@@ -36,21 +35,21 @@ public class CrawlerExecutors implements Closeable {
     private final Application application;
 
     public CrawlerExecutors(Integer inputHandlerThreads, Integer inputHandlerCapacity, Integer processHandlerThreads, Integer processHandlerCapacity,
-                            Integer outputHandlerThreads, Integer outputHandlerSeconds, Application application) {
+                            Integer outputHandlerThreads, Integer outputHandlerCapacity, Application application) {
         this.application = application;
         configValues.put(INPUT_HANDLER_THREADS, inputHandlerThreads);
         configValues.put(INPUT_HANDLER_CAPACITY, inputHandlerCapacity);
         configValues.put(PROCESS_HANDLER_THREADS, processHandlerThreads);
         configValues.put(PROCESS_HANDLER_CAPACITY, processHandlerCapacity);
         configValues.put(OUTPUT_HANDLER_THREADS, outputHandlerThreads);
-        configValues.put(OUTPUT_HANDLER_SECONDS, outputHandlerSeconds);
+        configValues.put(OUTPUT_HANDLER_CAPACITY, outputHandlerCapacity);
         initialise();
     }
 
     private void initialise() {
         this.inputHandler = jobExecutor(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY), "Incoming");
         this.processHandler = jobExecutor(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY), "Processing");
-        this.outputHandler = createDataWrite(configValues.get(OUTPUT_HANDLER_THREADS), configValues.get(OUTPUT_HANDLER_SECONDS), "Writing");
+        this.outputHandler = createDataWriter(configValues.get(OUTPUT_HANDLER_THREADS), configValues.get(OUTPUT_HANDLER_CAPACITY), 1, "Writing");
     }
 
     public void resetExecutors() {
@@ -58,28 +57,28 @@ public class CrawlerExecutors implements Closeable {
         initialise();
     }
 
-    public Integer getInputHandlerThreads() {
+    public Integer inputHandlerThreads() {
         return configValues.get(INPUT_HANDLER_THREADS);
     }
 
-    public Integer getProcessHandlerThreads() {
+    public Integer processHandlerThreads() {
         return configValues.get(PROCESS_HANDLER_THREADS);
     }
 
-    public Integer getOutputHandlerThreads() {
+    public Integer outputHandlerThreads() {
         return configValues.get(OUTPUT_HANDLER_THREADS);
     }
 
-    public Integer getInputHandlerCapacity() {
+    public Integer inputHandlerCapacity() {
         return configValues.get(INPUT_HANDLER_CAPACITY);
     }
 
-    public Integer getProcessHandlerCapacity() {
+    public Integer processHandlerCapacity() {
         return configValues.get(PROCESS_HANDLER_CAPACITY);
     }
 
-    public Integer getOutputHandlerCapacity() {
-        return configValues.get(OUTPUT_HANDLER_SECONDS);
+    public Integer outputHandlerCapacity() {
+        return configValues.get(OUTPUT_HANDLER_CAPACITY);
     }
 
     public JobExecutor inputHandler() {
@@ -104,19 +103,19 @@ public class CrawlerExecutors implements Closeable {
         sequence(inputHandler, processHandler, outputHandler).each(safeClose());
     }
 
-    public static ThreadPoolExecutor executor(int threads, int capacity, Class<? extends BlockingQueue> queueClass) {
+    private static ThreadPoolExecutor executor(int threads, int capacity, Class<? extends BlockingQueue> queueClass) {
         return new ThreadPoolExecutor(threads, threads == 0 ? Integer.MAX_VALUE : threads,
                 60L, TimeUnit.SECONDS,
                 queue(queueClass, capacity),
                 new BlockingRetryRejectedExecutionHandler());
     }
 
-    public static ThreadPoolJobExecutor jobExecutor(int threads, int capacity, String name) {
+    private static ThreadPoolJobExecutor jobExecutor(int threads, int capacity, String name) {
         return new ThreadPoolJobExecutor(executor(threads, capacity, LinkedBlockingQueue.class), name);
     }
 
-    public DataWriter createDataWrite(int threads, int seconds, String name) {
-        return new DataWriter(application, threads, seconds, name);
+    private DataWriter createDataWriter(int threads, int capacity, int seconds, String name) {
+        return new DataWriter(application, threads, seconds, name, capacity);
     }
 
     private static BlockingQueue<Runnable> queue(Class<? extends BlockingQueue> queueClass, int capacity) {

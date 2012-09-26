@@ -43,12 +43,12 @@ public class CrawlerExecutorConfigResource {
     @GET
     @Path("list")
     public Model list() {
-        return model().add("InputHandlerThreads", crawlerExecutors.getInputHandlerThreads()).
-                add("InputHandlerCapacity", crawlerExecutors.getInputHandlerCapacity()).
-                add("ProcessHandlerThreads", crawlerExecutors.getProcessHandlerThreads()).
-                add("ProcessHandlerCapacity", crawlerExecutors.getProcessHandlerCapacity()).
-                add("OutputHandlerThreads", crawlerExecutors.getOutputHandlerThreads()).
-                add("OutputHandlerCapacity", crawlerExecutors.getOutputHandlerCapacity());
+        return model().add("InputHandlerThreads", crawlerExecutors.inputHandlerThreads()).
+                add("InputHandlerCapacity", crawlerExecutors.inputHandlerCapacity()).
+                add("ProcessHandlerThreads", crawlerExecutors.processHandlerThreads()).
+                add("ProcessHandlerCapacity", crawlerExecutors.processHandlerCapacity()).
+                add("OutputHandlerThreads", crawlerExecutors.outputHandlerThreads()).
+                add("OutputHandlerCapacity", crawlerExecutors.outputHandlerCapacity());
     }
 
     @GET

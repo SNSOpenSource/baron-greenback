@@ -12,7 +12,7 @@ enum CrawlerConfigValues {
     PROCESS_HANDLER_THREADS("processHandlerThreads"),
     PROCESS_HANDLER_CAPACITY("processHandlerCapacity"),
     OUTPUT_HANDLER_THREADS("outputHandlerThreads"),
-    OUTPUT_HANDLER_SECONDS("outputHandlerSeconds");
+    OUTPUT_HANDLER_CAPACITY("outputHandlerCapacity");
 
     private String displayName;
 

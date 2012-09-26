@@ -16,18 +16,18 @@ public class CrawlerExecutorsActivator implements Callable<CrawlerExecutors> {
 
     @Override
     public CrawlerExecutors call() {
-        Integer inputHandlerThreads = setProperty("input.handler.threads", "10");
-        Integer inputHandlerCapacity = setProperty("input.handler.capacity", "0");
-        Integer processHandlerThreads = setProperty("process.handler.threads", "10");
-        Integer processHandlerCapacity = setProperty("process.handler.capacity", "0");
-        Integer outputHandlerThreads = setProperty("output.handler.threads", "1");
-        Integer outputHandlerCapacity = setProperty("output.handler.seconds", "1");
+        Integer inputHandlerThreads = getProperty("input.handler.threads", "10");
+        Integer inputHandlerCapacity = getProperty("input.handler.capacity", "0");
+        Integer processHandlerThreads = getProperty("process.handler.threads", "10");
+        Integer processHandlerCapacity = getProperty("process.handler.capacity", "0");
+        Integer outputHandlerThreads = getProperty("output.handler.threads", "1");
+        Integer outputHandlerCapacity = getProperty("output.handler.capacity", "1000");
 
         return new CrawlerExecutors(inputHandlerThreads, inputHandlerCapacity, processHandlerThreads, processHandlerCapacity,
                 outputHandlerThreads, outputHandlerCapacity, application);
     }
 
-    private Integer setProperty(String propertyName, String value) {
+    private Integer getProperty(String propertyName, String value) {
         return Integer.valueOf(properties.getProperty(propertyName, value));
     }
 }
