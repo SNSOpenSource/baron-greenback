@@ -19,7 +19,7 @@ public class CrawlerExecutorsActivator implements Callable<CrawlerExecutors> {
         Integer inputHandlerThreads = getProperty("input.handler.threads", "10");
         Integer inputHandlerCapacity = getProperty("input.handler.capacity", "0");
         Integer processHandlerThreads = getProperty("process.handler.threads", "10");
-        Integer processHandlerCapacity = getProperty("process.handler.capacity", "0");
+        Integer processHandlerCapacity = getProperty("process.handler.capacity", "1000");
         Integer outputHandlerThreads = getProperty("output.handler.threads", "1");
         Integer outputHandlerCapacity = getProperty("output.handler.capacity", "1000");
 
