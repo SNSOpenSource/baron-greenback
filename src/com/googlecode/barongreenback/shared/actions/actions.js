@@ -32,8 +32,4 @@ jQuery(document).ready(function() {
         jQuery('.actions .message').text('ALL ' + rowCount() +' rows are selected');
         return false;
     });
-    jQuery('div.actions form input[type="submit"]').click(function() {
-        var count = jQuery(this).siblings('input[name="id"]').size() || rowCount();
-        return confirm('You are about to ' + jQuery(this).val() + ' ' + count + ' rows. Are you sure?');
-    });
 });
