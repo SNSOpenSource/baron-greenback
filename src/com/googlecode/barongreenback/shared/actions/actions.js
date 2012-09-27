@@ -1,7 +1,13 @@
-BGB.namespace('search.bulk.actions').removeAllIdentifiers = function() {
-    jQuery('div.actions form input[name="query"]').remove();
-    jQuery('div.actions form input[name="id"]').remove();
-};
+(function() {
+    var actions = BGB.namespace('search.bulk.actions');
+    actions.allIdentifiers = function() {
+        return jQuery('div.actions form input').filter('[name="id"], [name="query"]');
+    };
+    actions.removeAllIdentifiers = function() {
+        jQuery(actions.allIdentifiers()).remove();
+    };
+})();
+
 
 jQuery(document).ready(function() {
     jQuery('table.results tbody').click(function(event) {
