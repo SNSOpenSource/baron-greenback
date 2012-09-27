@@ -9,6 +9,7 @@ import com.googlecode.yadic.Container;
 import java.util.concurrent.Callable;
 
 import static com.googlecode.barongreenback.crawler.CrawlerImplementationResource.ACTIVE_CRAWLER_ID;
+import static com.googlecode.funclate.Model.functions.value;
 
 public class CrawlerActivator implements Callable<Crawler> {
     static final String PROPERTY_NAME = "crawler.class.name";
@@ -33,7 +34,7 @@ public class CrawlerActivator implements Callable<Crawler> {
     }
 
     public Class crawlerClass() throws ClassNotFoundException {
-        Option<String> fromRepo = modelRepository.get(ACTIVE_CRAWLER_ID).map(Model.value("crawler", String.class));
+        Option<String> fromRepo = modelRepository.get(ACTIVE_CRAWLER_ID).map(value("crawler", String.class));
         return Class.forName(fromRepo.getOrElse(properties.getProperty(PROPERTY_NAME, DEFAULT.getName())));
     }
 }

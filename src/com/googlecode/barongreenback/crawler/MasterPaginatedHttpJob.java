@@ -6,7 +6,6 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -29,27 +28,19 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         return new MasterPaginatedHttpJob(createContext(crawlerId, Record.constructors.record(), datasource, destination, checkpoint, moreXPath, mappings, visitedFactory.value()));
     }
 
-    public Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>> process(final Container crawlerScope) {
-        return new Function1<Response, Pair<Sequence<Record>, Sequence<StagedJob>>>() {
-            @Override
-            public Pair<Sequence<Record>, Sequence<StagedJob>> call(Response response) throws Exception {
-                updateView(crawlerScope);
+    public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
+        updateView(crawlerScope);
+        Option<Document> document = loadDocument(response);
+        for (Document doc : document)
+            crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(StringMappings.class))));
+        return processDocument(document);
+    }
 
-                Option<Document> document = loadDocument(response);
-
-                for (Document doc : document)
-                    crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(StringMappings.class))));
-
-                return processDocument(document);
-            }
-
-            private void updateView(Container crawlerScope) {
-                ViewsRepository viewsRepository = crawlerScope.get(ViewsRepository.class);
-                CrawlerRepository crawlerRepository = crawlerScope.get(CrawlerRepository.class);
-                Model crawler = crawlerRepository.crawlerFor(crawlerId());
-                viewsRepository.ensureViewForCrawlerExists(crawler, AbstractCrawler.destinationDefinition(crawler).fields());
-            }
-        };
+    private void updateView(Container crawlerScope) {
+        ViewsRepository viewsRepository = crawlerScope.get(ViewsRepository.class);
+        CrawlerRepository crawlerRepository = crawlerScope.get(CrawlerRepository.class);
+        Model crawler = crawlerRepository.crawlerFor(crawlerId());
+        viewsRepository.ensureViewForCrawlerExists(crawler, AbstractCrawler.destinationDefinition(crawler).fields());
     }
 
     private Callable1<String, Date> toDateValue(final StringMappings mappings) {

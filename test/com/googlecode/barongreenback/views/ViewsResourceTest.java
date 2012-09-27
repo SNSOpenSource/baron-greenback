@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Arrays.list;
 import static com.googlecode.totallylazy.numbers.Numbers.subtract;
 import static com.googlecode.totallylazy.proxy.Call.method;

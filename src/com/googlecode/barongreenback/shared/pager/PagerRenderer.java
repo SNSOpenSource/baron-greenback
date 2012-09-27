@@ -10,7 +10,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class PagerRenderer implements Renderer<Pager> {

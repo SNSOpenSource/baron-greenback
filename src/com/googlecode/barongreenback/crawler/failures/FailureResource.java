@@ -33,7 +33,7 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.ID;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REASON;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.URI;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.all;
 import static com.googlecode.totallylazy.proxy.Call.method;

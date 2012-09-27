@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
+import static com.googlecode.funclate.Model.mutable.parse;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -76,7 +77,7 @@ public class CrawlerRepository {
     }
 
     public void importCrawler(Option<UUID> id, String model) {
-        modelRepository.set(id.getOrElse(randomUUID()), Model.parse(model));
+        modelRepository.set(id.getOrElse(randomUUID()), parse(model));
     }
 
     public void remove(UUID id) {

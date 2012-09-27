@@ -16,6 +16,8 @@ import com.googlecode.utterlyidle.Requests;
 import java.util.List;
 import java.util.Map;
 
+import static com.googlecode.funclate.Model.functions.asMap;
+import static com.googlecode.funclate.Model.mutable;
 import static com.googlecode.lazyrecords.Keywords.keywords;
 import static com.googlecode.lazyrecords.Keywords.name;
 import static com.googlecode.totallylazy.Callables.descending;
@@ -48,20 +50,16 @@ public class Sorter {
 
     private static List<Map<String, Object>> toModel(Sequence<Keyword<?>> keywords) {
         return keywords.map(asHeader()).
-                map(Model.asMap()).
+                map(asMap()).
                 toList();
     }
 
     private static Callable1<? super Keyword, Model> asHeader() {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {
-                return Model.model().add("name", keyword.name());
+                return mutable.model().add("name", keyword.name());
             }
         };
-    }
-
-    private static String escape(String name) {
-        return name.replace(' ', '_');
     }
 
     public Sequence<Record> sort(Sequence<Record> results, Sequence<Keyword<?>> allHeaders) {

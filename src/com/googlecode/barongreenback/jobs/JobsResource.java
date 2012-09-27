@@ -27,7 +27,7 @@ import static com.googlecode.barongreenback.jobs.Job.REQUEST;
 import static com.googlecode.barongreenback.jobs.Job.RESPONSE;
 import static com.googlecode.barongreenback.jobs.Job.RUNNING;
 import static com.googlecode.barongreenback.jobs.Job.STARTED;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;

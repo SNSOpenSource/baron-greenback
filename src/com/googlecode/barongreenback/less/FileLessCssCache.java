@@ -15,22 +15,22 @@ public class FileLessCssCache implements LessCssCache {
     }
 
     @Override
-    public boolean containsKey(Uri uri) {
-        return new File(cacheLocation, fileNameFor(uri)).exists();
+    public boolean containsKey(String key) {
+        return new File(cacheLocation, fileNameFor(key)).exists();
     }
 
     @Override
-    public String get(Uri uri) {
-        return Strings.toString(Files.file(cacheLocation, fileNameFor(uri)));
+    public String get(String key) {
+        return Strings.toString(Files.file(cacheLocation, fileNameFor(key)));
     }
 
     @Override
-    public void put(Uri uri, String result) {
-        File file = Files.file(cacheLocation, fileNameFor(uri));
+    public void put(String key, String result) {
+        File file = Files.file(cacheLocation, fileNameFor(key));
         Files.write(file).apply(new ByteArrayInputStream(result.getBytes()));
     }
 
-    private String fileNameFor(Uri uri) {
-        return "cache-" + String.valueOf(uri.hashCode()) + ".css";
+    private String fileNameFor(String key) {
+        return "cache-" + key + ".css";
     }
 }

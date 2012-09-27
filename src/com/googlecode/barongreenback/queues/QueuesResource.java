@@ -19,7 +19,7 @@ import java.util.List;
 
 import static com.googlecode.barongreenback.queues.CompletedJob.completed;
 import static com.googlecode.barongreenback.queues.RunningJob.started;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;

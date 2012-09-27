@@ -42,7 +42,7 @@ public class RecordsService {
 
     public void delete(String viewName, String query) {
         Model view = view(viewName);
-        Predicate<Record> predicate = predicateBuilder.build(query, visibleHeaders(view)).right();
+        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithImplicitViewQuery(view, query), visibleHeaders(view)).right();
         records.remove(Definition.constructors.definition(viewName(view), Sequences.<Keyword<?>>empty()), predicate);
     }
 
@@ -89,7 +89,7 @@ public class RecordsService {
         return getRecords(view, query, visibleHeaders(headers(view)));
     }
 
-    private static String prefix(Model view, final String query) {
+    public static String prefixQueryWithImplicitViewQuery(Model view, final String query) {
         return sequence(queryFrom(view)).add(query).toString(" ");
     }
 
@@ -98,7 +98,7 @@ public class RecordsService {
     }
 
     private Either<String, Sequence<Record>> getRecords(Model view, String query, Sequence<Keyword<?>> visibleHeaders) {
-        return getRecordsWithQuery(view, prefix(view, query), visibleHeaders);
+        return getRecordsWithQuery(view, prefixQueryWithImplicitViewQuery(view, query), visibleHeaders);
     }
 
     private Either<String, Sequence<Record>> getRecordsWithQuery(Model view, String query, Sequence<Keyword<?>> visibleHeaders) {

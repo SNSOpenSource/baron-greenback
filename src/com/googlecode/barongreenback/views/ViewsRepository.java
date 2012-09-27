@@ -20,7 +20,7 @@ import com.googlecode.totallylazy.numbers.Numbers;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.lazyrecords.Keywords.keyword;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.in;
@@ -102,7 +102,7 @@ public class ViewsRepository {
     public static Model copy(Model model) {
         Model copy = model.copy();
         Model root = copy.get(ROOT);
-        String oldName = root.remove("name", String.class);
+        String oldName = root.remove("name", String.class).second().get();
         root.add("name", "copy of " + oldName);
         root.remove("visible", Boolean.class);
         root.add("visible", false);

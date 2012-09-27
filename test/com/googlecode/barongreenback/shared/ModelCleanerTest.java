@@ -4,7 +4,7 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Predicates;
 import org.junit.Test;
 
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Predicates.in;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

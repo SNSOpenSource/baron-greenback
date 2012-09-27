@@ -26,8 +26,8 @@ import static com.googlecode.barongreenback.crawler.failures.FailureRepository.R
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.SOURCE;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.URI;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
-import static com.googlecode.funclate.Model.model;
-import static com.googlecode.funclate.Model.parse;
+import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.funclate.Model.mutable.parse;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Sequences.sequence;
 

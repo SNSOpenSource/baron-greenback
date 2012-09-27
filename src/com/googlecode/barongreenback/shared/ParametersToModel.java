@@ -8,12 +8,13 @@ import com.googlecode.totallylazy.regex.Regex;
 
 import java.util.regex.MatchResult;
 
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Sequences.repeat;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class ParametersToModel {
     public static Model modelOf(Iterable<Pair<String, String>> parameters) {
-        return sequence(parameters).fold(Model.model(), new Callable2<Model, Pair<String, String>, Model>() {
+        return sequence(parameters).fold(model(), new Callable2<Model, Pair<String, String>, Model>() {
             public Model call(Model model, Pair<String, String> pair) throws Exception {
                 String key = pair.first();
                 Object value = toValue(pair.second());
@@ -55,14 +56,14 @@ public class ParametersToModel {
     private static Model fixMeModel(Model model, String name, Integer index) {
         int numb = numberOfModelsNeeded(model, name, index + 1);
         for (int i = 0; i < numb; i++) {
-            model.add(name, Model.model());
+            model.add(name, model());
         }
         return model.getValues(name, Model.class).get(index);
     }
 
     private static Model getModel(Model model, String name, Integer index) {
         int numb = numberOfModelsNeeded(model, name, index + 1);
-        model.add(name, repeat(Model.model()).take(numb).toList());
+        model.add(name, repeat(model()).take(numb).toList());
         return model.getValues(name, Model.class).get(index);
     }
 

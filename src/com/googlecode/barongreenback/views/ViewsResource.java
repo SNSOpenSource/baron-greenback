@@ -33,7 +33,8 @@ import static com.googlecode.barongreenback.views.ViewsRepository.clean;
 import static com.googlecode.barongreenback.views.ViewsRepository.name;
 import static com.googlecode.barongreenback.views.ViewsRepository.priority;
 import static com.googlecode.barongreenback.views.ViewsRepository.valueFor;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.funclate.Model.mutable.parse;
 import static com.googlecode.totallylazy.Callables.ascending;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -130,7 +131,7 @@ public class ViewsResource {
     @POST
     @Path("import")
     public Response importJson(@FormParam("model") String model, @FormParam("id") Option<UUID> id) {
-        modelRepository.set(id.getOrElse(randomUUID()), Model.parse(model));
+        modelRepository.set(id.getOrElse(randomUUID()), parse(model));
         return redirectToList();
     }
 

@@ -8,6 +8,7 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 import java.io.PrintStream;
@@ -39,7 +40,7 @@ public class StagedJobExecutor {
 
     public void crawl(StagedJob job) throws InterruptedException {
         submit(inputHandler, getInput(job, crawlerScope).then(
-                submit(processHandler, processJobs(job.process(crawlerScope)).then(
+                submit(processHandler, processJobs(job, crawlerScope).then(
                         submit(outputHandler, write(job, crawlerScope))))));
     }
 
@@ -85,11 +86,11 @@ public class StagedJobExecutor {
         };
     }
 
-    private <T> Function1<T, Sequence<Record>> processJobs(final Function1<T, Pair<Sequence<Record>, Sequence<StagedJob>>> function) {
-        return new Function1<T, Sequence<Record>>() {
+    private Function1<Response, Sequence<Record>> processJobs(final StagedJob job, final Container scope) {
+        return new Function1<Response, Sequence<Record>>() {
             @Override
-            public Sequence<Record> call(T t) throws Exception {
-                Pair<Sequence<Record>, Sequence<StagedJob>> pair = function.call(t);
+            public Sequence<Record> call(Response t) throws Exception {
+                Pair<Sequence<Record>, Sequence<StagedJob>> pair = job.process(scope, t);
                 for (StagedJob job : pair.second()) {
                     crawl(job);
                 }

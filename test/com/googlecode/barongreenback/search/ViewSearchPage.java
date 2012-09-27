@@ -6,6 +6,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Link;
 
+import static com.googlecode.barongreenback.shared.pager.Pager.ROWS_PER_PAGE_PARAM;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
@@ -20,7 +21,7 @@ public class ViewSearchPage {
     private final Html html;
 
     public ViewSearchPage(HttpHandler httpHandler, String view, int rowsPerPage) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, "")))).query(Pager.ROWS_PER_PAGE_PARAM, rowsPerPage).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, "")))).query(ROWS_PER_PAGE_PARAM, rowsPerPage).build()));
     }
 
     public ViewSearchPage(HttpHandler httpHandler, String view, String searchQuery) throws Exception {

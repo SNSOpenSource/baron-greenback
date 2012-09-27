@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,7 +34,7 @@ public class CachingModelRepositoryTest {
         records = new MemoryRecords(new StringMappings().add(Model.class, new ModelMapping()));
         cache = new ModelCache();
         cachingModelRepository = new CachingModelRepository(new RecordsModelRepository(BaronGreenbackRecords.records(records)), cache);
-        model = Model.model().add("key", "someValue");
+        model = model().add("key", "someValue");
         key = UUID.randomUUID();
     }
 

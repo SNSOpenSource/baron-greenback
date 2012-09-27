@@ -17,7 +17,6 @@ import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.time.Clock;
-import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -40,13 +39,15 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.messages.Messages.error;
 import static com.googlecode.barongreenback.shared.messages.Messages.success;
-import static com.googlecode.funclate.Model.model;
+import static com.googlecode.funclate.Model.mutable;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Files.files;
 import static com.googlecode.totallylazy.Files.hasSuffix;
 import static com.googlecode.totallylazy.Streams.copy;
 import static com.googlecode.totallylazy.Zip.zip;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.totallylazy.time.Dates.LEXICAL;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static java.lang.String.format;
 
@@ -114,7 +115,7 @@ public class BatchResource {
         try {
             Map<String, Object> uuidsAndModels = Json.parse(batchModel);
             for (Map.Entry<String, Object> entry : uuidsAndModels.entrySet()) {
-                modelRepository.set(UUID.fromString(entry.getKey()), Model.fromMap((Map<String, Object>) entry.getValue()));
+                modelRepository.set(UUID.fromString(entry.getKey()), model((Map<String, Object>) entry.getValue()));
             }
             return success(format("Imported %s items", uuidsAndModels.size()));
         } catch (Exception e) {
@@ -211,7 +212,7 @@ public class BatchResource {
     }
 
     private static String backupName(Date date) {
-        return format("%s/%s.bgb", BACKUP_LOCATION, Dates.LUCENE().format(date));
+        return format("%s/%s.bgb", BACKUP_LOCATION, LEXICAL().format(date));
     }
 
     private void deleteAllData() throws Exception {
