@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.search;
 
-import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
@@ -23,7 +22,6 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.time.Clock;
-import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
@@ -33,7 +31,6 @@ import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.StreamingOutput;
 import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.GET;
-import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Priority;
@@ -61,7 +58,6 @@ import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.time.Dates.LEXICAL;
-import static com.googlecode.totallylazy.time.Dates.LUCENE;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -110,6 +106,7 @@ public class SearchResource {
         String idName = unwrap(recordsService.view(viewName)).get("keywords", Model.class).get("name", String.class);
         return exportCsv(viewName, sequence(id).map(Strings.format(idName + ":%s")).toString(" OR "));
     }
+
     @GET
     @Produces(MediaType.TEXT_CSV)
     @Path("csv")
@@ -215,7 +212,7 @@ public class SearchResource {
             public Model call(Record record) throws Exception {
                 Sequence<Keyword<?>> headers = visibleHeaders.isEmpty() ? record.keywords() : visibleHeaders;
                 Model model = model();
-                for (Keyword header : headers) {
+                for (Keyword<?> header : headers) {
                     Model field = model().
                             add("value", record.get(header));
 
@@ -230,7 +227,7 @@ public class SearchResource {
         };
     }
 
-    private Uri uniqueUrlOf(Record record, Keyword visibleHeader, String viewName) {
+    private Uri uniqueUrlOf(Record record, Keyword<?> visibleHeader, String viewName) {
         return redirector.uriOf(method(on(SearchResource.class).
                 unique(viewName, String.format("%s:\"%s\"", visibleHeader.name(), record.get(visibleHeader))))).
                 dropScheme().dropAuthority();

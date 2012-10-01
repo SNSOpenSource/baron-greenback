@@ -10,14 +10,12 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 
 public class ExecutorModule implements ResourcesModule, ApplicationScopedModule {
     @Override
-    public Module addResources(Resources resources) throws Exception {
-        resources.add(annotatedClass(CrawlerExecutorConfigResource.class));
-        return this;
+    public Resources addResources(Resources resources) throws Exception {
+        return resources.add(annotatedClass(CrawlerExecutorConfigResource.class));
     }
 
     @Override
-    public Module addPerApplicationObjects(Container container) throws Exception {
-        container.addActivator(CrawlerExecutors.class, CrawlerExecutorsActivator.class);
-        return this;
+    public Container addPerApplicationObjects(Container container) throws Exception {
+        return container.addActivator(CrawlerExecutors.class, CrawlerExecutorsActivator.class);
     }
 }

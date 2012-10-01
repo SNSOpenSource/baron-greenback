@@ -1,12 +1,10 @@
 package com.googlecode.barongreenback.shared;
 
-import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.handlers.ResponseHandlers;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.ArgumentScopedModule;
-import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.modules.ResponseHandlersModule;
@@ -22,35 +20,31 @@ import static com.googlecode.utterlyidle.handlers.HandlerRule.entity;
 import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.renderer;
 
 public class SharedModule implements ApplicationScopedModule, ResponseHandlersModule, RequestScopedModule, ResourcesModule, ArgumentScopedModule {
-    public Module addResponseHandlers(ResponseHandlers handlers) {
-        handlers.add(where(entity(), is(instanceOf(Model.class))), renderer(ModelRenderer.class));
-        return this;
+    public ResponseHandlers addResponseHandlers(ResponseHandlers handlers) {
+        return handlers.add(where(entity(), is(instanceOf(Model.class))), renderer(ModelRenderer.class));
     }
 
-    public Module addPerRequestObjects(Container container) throws Exception {
-        container.addActivator(TemplateName.class, TemplateNameActivator.class);
-        container.addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class);
-        container.add(ModelRepository.class, RecordsModelRepository.class);
-        container.decorate(ModelRepository.class, CachingModelRepository.class);
-        container.addActivator(AdvancedMode.class, AdvancedModeActivator.class);
-        container.add(InvocationHandler.class, InternalInvocationHandler.class);
-        return this;
+    public Container addPerRequestObjects(Container container) throws Exception {
+        return container.
+                addActivator(TemplateName.class, TemplateNameActivator.class).
+                addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class).
+                add(ModelRepository.class, RecordsModelRepository.class).
+                decorate(ModelRepository.class, CachingModelRepository.class).
+                addActivator(AdvancedMode.class, AdvancedModeActivator.class).
+                add(InvocationHandler.class, InternalInvocationHandler.class);
     }
 
-    public Module addResources(Resources resources) throws Exception {
-        resources.add(annotatedClass(HomeResource.class));
-        return this;
+    public Resources addResources(Resources resources) throws Exception {
+        return resources.add(annotatedClass(HomeResource.class));
     }
 
-    public Module addPerArgumentObjects(Container container) throws Exception {
-        container.addActivator(Model.class, ModelActivator.class);
-        return this;
+    public Container addPerArgumentObjects(Container container) throws Exception {
+        return container.addActivator(Model.class, ModelActivator.class);
     }
 
     @Override
-    public Module addPerApplicationObjects(Container container) throws Exception {
-        container.add(BaronGreenbackProperties.class);
-        container.add(ModelCache.class);
-        return this;
+    public Container addPerApplicationObjects(Container container) throws Exception {
+        return container.add(BaronGreenbackProperties.class).
+                add(ModelCache.class);
     }
 }

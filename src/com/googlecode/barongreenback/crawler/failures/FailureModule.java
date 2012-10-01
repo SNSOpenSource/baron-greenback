@@ -11,24 +11,21 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 
 public class FailureModule implements ResourcesModule, RequestScopedModule, ApplicationScopedModule {
     @Override
-    public Module addResources(Resources resources) throws Exception {
-        resources.add(annotatedClass(FailureResource.class));
-        return this;
+    public Resources addResources(Resources resources) throws Exception {
+        return resources.add(annotatedClass(FailureResource.class));
     }
 
     @Override
-    public Module addPerRequestObjects(Container container) throws Exception {
-        container.add(HttpJobFailureMarshaller.class);
-        container.add(PaginatedJobFailureMarshaller.class);
-        container.add(MasterPaginatedJobFailureMarshaller.class);
-        container.add(FailureRepository.class);
-        container.add(Failures.class);
-        return this;
+    public Container addPerRequestObjects(Container container) throws Exception {
+        return container.add(HttpJobFailureMarshaller.class).
+                add(PaginatedJobFailureMarshaller.class).
+                add(MasterPaginatedJobFailureMarshaller.class).
+                add(FailureRepository.class).
+                add(Failures.class);
     }
 
     @Override
-    public Module addPerApplicationObjects(Container container) throws Exception {
-        container.add(Failures.class);
-        return this;
+    public Container addPerApplicationObjects(Container container) throws Exception {
+        return container.add(Failures.class);
     }
 }

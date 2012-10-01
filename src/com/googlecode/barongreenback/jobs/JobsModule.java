@@ -11,27 +11,25 @@ import com.googlecode.yadic.Container;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
 public class JobsModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, StartupModule {
-    public Module addResources(Resources resources) throws Exception {
-        resources.add(annotatedClass(JobsResource.class));
-        resources.add(annotatedClass(BatchJobsResource.class));
-        return this;
+    public Resources addResources(Resources resources) throws Exception {
+        return resources.
+                add(annotatedClass(JobsResource.class)).
+                add(annotatedClass(BatchJobsResource.class));
     }
 
 
-    public Module addPerRequestObjects(Container container) throws Exception {
-        container.add(HttpScheduler.class);
-        container.add(Jobs.class);
-        return this;
+    public Container addPerRequestObjects(Container container) throws Exception {
+        return container.
+                add(HttpScheduler.class).
+                add(Jobs.class);
     }
 
-    public Module addPerApplicationObjects(Container container) throws Exception {
-        container.add(Scheduler.class, FixedScheduler.class);
-        return this;
+    public Container addPerApplicationObjects(Container container) throws Exception {
+        return container.add(Scheduler.class, FixedScheduler.class);
     }
 
     public Container start(Container container){
-        BatchJobsResource batchJobsResource = container.get(BatchJobsResource.class);
-        batchJobsResource.start();
+        container.get(BatchJobsResource.class).start();
         return container;
     }
 }
