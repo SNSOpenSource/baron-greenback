@@ -53,10 +53,10 @@ public class WebApplication extends RestApplication {
         // must come after sitemesh
         add(new PerformanceModule() {
             @Override
-            public Module addPerRequestObjects(Container container) throws Exception {
+            public Container addPerRequestObjects(Container container) throws Exception {
                 super.addPerRequestObjects(container);
                 container.get(GZipPolicy.class).add(contentType(TEXT_HTML));
-                return this;
+                return container;
             }
         });
     }

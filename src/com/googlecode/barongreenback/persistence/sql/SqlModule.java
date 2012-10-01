@@ -19,7 +19,7 @@ import static com.googlecode.yadic.Containers.addIfAbsent;
 
 public class SqlModule implements RequestScopedModule {
     @Override
-    public Module addPerRequestObjects(Container requestScope) throws Exception {
+    public Container addPerRequestObjects(Container requestScope) throws Exception {
         final Container container = requestScope.get(PersistenceRequestScope.class).value();
         addActivatorIfAbsent(container, Connection.class, ConnectionActivator.class);
         addIfAbsent(container, Persistence.class, SqlPersistence.class);
@@ -30,6 +30,6 @@ public class SqlModule implements RequestScopedModule {
             container.addActivator(Records.class, container.getActivator(SqlRecords.class));
             container.decorate(Records.class, SchemaGeneratingRecords.class);
         }
-        return this;
+        return container;
     }
 }

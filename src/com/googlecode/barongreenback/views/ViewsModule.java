@@ -10,15 +10,12 @@ import com.googlecode.yadic.Container;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
 public class ViewsModule implements ResourcesModule, RequestScopedModule{
-    public Module addResources(Resources resources) throws Exception {
-        resources.add(annotatedClass(ViewsResource.class));
-        resources.add(annotatedClass(BatchViewsResource.class));
-        return this;
+    public Resources addResources(Resources resources) throws Exception {
+        return resources.add(annotatedClass(ViewsResource.class)).
+                add(annotatedClass(BatchViewsResource.class));
     }
 
-    public Module addPerRequestObjects(Container container) throws Exception {
-        container.add(RecordsService.class);
-        container.add(ViewsRepository.class);
-        return this;
+    public Container addPerRequestObjects(Container container) throws Exception {
+        return container.add(RecordsService.class).add(ViewsRepository.class);
     }
 }

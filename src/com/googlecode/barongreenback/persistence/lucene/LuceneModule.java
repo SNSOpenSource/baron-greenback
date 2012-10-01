@@ -20,20 +20,20 @@ import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
 import static com.googlecode.yadic.Containers.addIfAbsent;
 
 public class LuceneModule implements ApplicationScopedModule, RequestScopedModule {
-    public Module addPerApplicationObjects(Container applicationScope) {
+    public Container addPerApplicationObjects(Container applicationScope) {
         final Container container = applicationScope.get(PersistenceApplicationScope.class).value();
         addActivatorIfAbsent(container, Directory.class, DirectoryActivator.class);
         addIfAbsent(container, LuceneStorage.class, OptimisedStorage.class);
         addActivatorIfAbsent(container, SearcherPool.class, SearcherPoolActivator.class);
-        return this;
+        return applicationScope;
     }
 
-    public Module addPerRequestObjects(final Container requestScope) {
+    public Container addPerRequestObjects(final Container requestScope) {
         final Container container = requestScope.get(PersistenceRequestScope.class).value();
         addIfAbsent(container, Persistence.class, LucenePersistence.class);
         addIfAbsent(container, LuceneMappings.class);
         addActivatorIfAbsent(container, Records.class, RecordsActivator.class);
-        return this;
+        return requestScope;
     }
 
     public static class RecordsActivator implements Callable<Records>, Closeable {

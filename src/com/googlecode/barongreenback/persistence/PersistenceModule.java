@@ -22,22 +22,22 @@ import static com.googlecode.yadic.Containers.addInstanceIfAbsent;
 
 public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule {
 
-    public Module addPerRequestObjects(final Container container) throws Exception {
+    public Container addPerRequestObjects(final Container container) throws Exception {
         addInstanceIfAbsent(container, StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
         addIfAbsent(container, Logger.class, IgnoreLogger.class);
         addIfAbsent(container, PersistenceRequestScope.class);
         addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
         addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
-        return this;
+        return container;
     }
 
     @Override
-    public Module addPerApplicationObjects(Container container) throws Exception {
+    public Container addPerApplicationObjects(Container container) throws Exception {
         addIfAbsent(container, PersistenceUri.class);
         addIfAbsent(container, PersistenceUser.class);
         addIfAbsent(container, PersistencePassword.class);
         addIfAbsent(container, PersistenceApplicationScope.class);
-        return this;
+        return container;
     }
 
     // TODO: Make reflective so we don't need lucene deps

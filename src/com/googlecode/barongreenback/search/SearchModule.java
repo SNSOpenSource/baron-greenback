@@ -24,25 +24,22 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 import static com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader.Replacements.replacements;
 
 public class SearchModule implements ResourcesModule, RequestScopedModule, ModuleDefiner {
-    public Module addResources(Resources resources) {
-        resources.add(annotatedClass(SearchResource.class));
-        return this;
+    public Resources addResources(Resources resources) {
+        return resources.add(annotatedClass(SearchResource.class));
     }
 
-    public Module addPerRequestObjects(Container container) throws Exception {
-		container.add(Pager.class, RequestPager.class);
-        container.add(Sorter.class, Sorter.class);
-        container.add(PredicateParser.class, StandardParser.class);
-        container.decorate(PredicateParser.class, ParametrizedParser.class);
-        container.add(PredicateBuilder.class);
-        container.add(ParserParameters.class);
-        Containers.addInstanceIfAbsent(container, ConvertExtensionToAcceptHeader.Replacements.class, replacements(Pair.pair("json", MediaType.APPLICATION_JSON)));
-        container.decorate(HttpHandler.class, ConvertExtensionToAcceptHeader.class);
-        return this;
+    public Container addPerRequestObjects(Container container) throws Exception {
+		container.add(Pager.class, RequestPager.class).
+                add(Sorter.class, Sorter.class).
+                add(PredicateParser.class, StandardParser.class).
+                decorate(PredicateParser.class, ParametrizedParser.class).
+                add(PredicateBuilder.class).
+                add(ParserParameters.class);
+        return Containers.addInstanceIfAbsent(container, ConvertExtensionToAcceptHeader.Replacements.class, replacements(Pair.pair("json", MediaType.APPLICATION_JSON))).
+                decorate(HttpHandler.class, ConvertExtensionToAcceptHeader.class);
     }
 
-    public Module defineModules(ModuleDefinitions moduleDefinitions) throws Exception {
-        moduleDefinitions.addRequestModule(ParserParametersModule.class);
-        return this;
+    public ModuleDefinitions defineModules(ModuleDefinitions moduleDefinitions) throws Exception {
+        return moduleDefinitions.addRequestModule(ParserParametersModule.class);
     }
 }

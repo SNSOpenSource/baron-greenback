@@ -18,15 +18,14 @@ public class ActionsModule implements ResourcesModule, RequestScopedModule {
     private static final String ANY_ACTION_APART_FROM_LIST = "^\\/[^\\/]+\\/actions\\/(?!list).*";
 
     @Override
-    public Module addResources(Resources resources) throws Exception {
-        resources.add(annotatedClass(ActionsResource.class));
-        return this;
+    public Resources addResources(Resources resources) throws Exception {
+        return resources.add(annotatedClass(ActionsResource.class));
     }
 
     @Override
-    public Module addPerRequestObjects(final Container container) throws Exception {
+    public Container addPerRequestObjects(final Container container) throws Exception {
         final Resolver<TemplateName> templateNameResolver = container.remove(TemplateName.class);
-        container.addActivator(TemplateName.class, new Callable<TemplateName>() {
+        return container.addActivator(TemplateName.class, new Callable<TemplateName>() {
             @Override
             public TemplateName call() throws Exception {
                 final Resolver<Request> requestResolver = container.getResolver(Request.class);
@@ -39,7 +38,6 @@ public class ActionsModule implements ResourcesModule, RequestScopedModule {
                 return templateNameResolver.resolve(TemplateName.class);
             }
         });
-        return this;
     }
 
 
