@@ -27,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMergeBy;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
@@ -67,7 +68,9 @@ public class DataWriter implements JobExecutor {
             @Override
             public Number call(final Sequence<Record> newData) throws Exception {
                 CountLatch latch = container.get(CountLatch.class);
-                return container.get(CrawlerExecutors.class).outputHandler().queue(job, newData, latch);
+                int count = container.get(CrawlerExecutors.class).outputHandler().queue(job, newData, latch);
+                container.get(AtomicInteger.class).addAndGet(count);
+                return count;
             }
         };
     }
