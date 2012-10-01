@@ -2,14 +2,12 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.totallylazy.Value;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import static com.googlecode.totallylazy.Sets.fifoSet;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
-import static java.util.Collections.newSetFromMap;
 
 public class VisitedFactory implements Value<Set<HttpDatasource>> {
     private static final String NAME = "crawler.visited.size";
@@ -29,15 +27,6 @@ public class VisitedFactory implements Value<Set<HttpDatasource>> {
     }
 
     public Set<HttpDatasource> value() {
-        return fixedSizeSet(size);
-    }
-
-    public static <T> Set<T> fixedSizeSet(final int capacity) {
-        return newSetFromMap(new LinkedHashMap<T, Boolean>(capacity) {
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<T, Boolean> eldest) {
-                return size() > capacity;
-            }
-        });
+        return fifoSet(size);
     }
 }
