@@ -12,7 +12,7 @@ import static com.googlecode.barongreenback.crawler.CrawlerImplementationResourc
 import static com.googlecode.funclate.Model.functions.value;
 
 public class CrawlerActivator implements Callable<Crawler> {
-    static final String PROPERTY_NAME = "crawler.class.name";
+    public static final String PROPERTY_NAME = "crawler.class.name";
     private static final Class<?> DEFAULT = QueuesCrawler.class;
     private final BaronGreenbackProperties properties;
     private final Container container;

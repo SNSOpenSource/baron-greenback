@@ -11,6 +11,8 @@ import com.googlecode.yadic.Container;
 import org.junit.Test;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.CrawlerActivator.PROPERTY_NAME;
+
 public class QueuesCrawlerTest extends ApplicationTests {
     @Test(expected = IllegalStateException.class)
     public void shouldBeExactlyOneUniqueField() throws Exception {
@@ -23,7 +25,7 @@ public class QueuesCrawlerTest extends ApplicationTests {
     }
 
     private void importAndCrawl(String filename) throws Exception {
-        application.applicationScope().get(BaronGreenbackProperties.class).setProperty(CrawlerActivator.PROPERTY_NAME, QueuesCrawler.class.getName());
+        application.applicationScope().get(BaronGreenbackProperties.class).setProperty(PROPERTY_NAME, QueuesCrawler.class.getName());
 
         CrawlerImportPage importer = new CrawlerImportPage(browser);
         UUID id = UUID.randomUUID();

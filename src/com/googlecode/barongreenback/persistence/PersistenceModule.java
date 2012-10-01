@@ -33,7 +33,6 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
 
     @Override
     public Module addPerApplicationObjects(Container container) throws Exception {
-        addIfAbsent(container, PersistenceProperties.class);
         addIfAbsent(container, PersistenceUri.class);
         addIfAbsent(container, PersistenceUser.class);
         addIfAbsent(container, PersistencePassword.class);

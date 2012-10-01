@@ -6,18 +6,18 @@ import com.googlecode.totallylazy.Uri;
 import java.util.Properties;
 
 public class PersistenceUri extends Uri {
-    public static final String NAME = "uri";
+    public static final String PROPERTY_NAME = "persistence.uri";
 
     public PersistenceUri(CharSequence value) {
         super(value);
     }
 
-    public PersistenceUri(PersistenceProperties properties) {
-        super(properties.getProperty(NAME, "lucene:mem"));
+    public PersistenceUri(BaronGreenbackProperties properties) {
+        super(properties.getProperty(PROPERTY_NAME, "lucene:mem"));
     }
 
     public static String name() {
-        return String.format("%s.%s.%s", BaronGreenbackProperties.PREFIX, PersistenceProperties.PREFIX, NAME);
+        return String.format("%s.%s", BaronGreenbackProperties.PREFIX, PROPERTY_NAME);
     }
 
     public static String set(Properties properties, String value) {

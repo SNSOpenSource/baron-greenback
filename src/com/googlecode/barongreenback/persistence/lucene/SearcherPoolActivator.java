@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.persistence.lucene;
 
 import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
-import com.googlecode.lazyrecords.lucene.LucenePool;
 import com.googlecode.lazyrecords.lucene.OptimisedPool;
 import com.googlecode.lazyrecords.lucene.SearcherPool;
 import com.googlecode.yadic.Container;
@@ -10,7 +9,7 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 
 public class SearcherPoolActivator implements Callable<SearcherPool> {
-    private static final String PROPERTY_NAME = "searcher.pool.class.name";
+    public static final String PROPERTY_NAME = "searcher.pool.class.name";
     private final BaronGreenbackProperties properties;
     private final Container container;
 
@@ -29,7 +28,7 @@ public class SearcherPoolActivator implements Callable<SearcherPool> {
         }
     }
 
-    public static void setSearchPool(Properties properties, Class<? extends SearcherPool> aClass){
+    public static void setSearchPool(Properties properties, Class<? extends SearcherPool> aClass) {
         new BaronGreenbackProperties(properties).setProperty(PROPERTY_NAME, aClass.getName());
     }
 }
