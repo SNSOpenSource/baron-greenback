@@ -58,6 +58,8 @@ import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.totallylazy.time.Dates.LEXICAL;
+import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
+import static com.googlecode.utterlyidle.MediaType.TEXT_CSV;
 
 
 @Produces(MediaType.TEXT_HTML)
@@ -120,7 +122,8 @@ public class SearchResource {
         final Sequence<Keyword<?>> visibleHeaders = visibleHeaders(view);
 
         return ResponseBuilder.response().
-                header("Content-Disposition", String.format("filename=%s-export-%s.csv", viewName, LEXICAL().format(clock.now()))).
+                header(CONTENT_TYPE, TEXT_CSV).
+                header("Content-Disposition", String.format("attachment; filename=%s-export-%s.csv", viewName, LEXICAL().format(clock.now()))).
                 entity(new StreamingOutput() {
                     @Override
                     public void write(OutputStream outputStream) throws IOException {
