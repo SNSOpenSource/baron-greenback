@@ -33,7 +33,7 @@ public class PagerRenderer implements Renderer<Pager> {
         attributes.put("pages", model.pages(pager));
         attributes.put("pager", pager);
 
-        Model pageOptions = sequence("10", "20", "50", "100", "ALL").fold(model().add("currentRowsPerPage", String.valueOf(pager.getRowsPerPage())), new Callable2<Model, String, Model>() {
+        Model pageOptions = sequence("10", "20", "50", "100").fold(model().add("currentRowsPerPage", String.valueOf(pager.getRowsPerPage())), new Callable2<Model, String, Model>() {
             public Model call(Model model, String key) throws Exception {
                 model.add("rowsPerPage", model().
                         add("name", key).
