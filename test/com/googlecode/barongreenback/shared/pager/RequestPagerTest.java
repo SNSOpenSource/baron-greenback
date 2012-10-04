@@ -71,28 +71,6 @@ public class RequestPagerTest {
     }
 
     @Test
-    public void supportsAllParameter() throws Exception {
-        Pager pager = new RequestPager(RequestBuilder.get("/somePage").query(Pager.ROWS_PER_PAGE_PARAM, "ALL").build());
-        Sequence<Number> sequence = range(1, 100000).realise();
-
-        Sequence<Number> paginatedSequence = pager.paginate(sequence);
-        assertThat(paginatedSequence, is(sequence));
-        assertThat(pager.getTotalRows(), is(sequence.size()));
-        assertThat(pager.getNumberOfPages(), NumberMatcher.is(1));
-    }
-
-    @Test
-    public void ignoredPagesNumbersWhenShowingAllRecords() throws Exception {
-        Pager pager = new RequestPager(RequestBuilder.get("/somePage").query(Pager.CURRENT_PAGE_PARAM, 25).query(Pager.ROWS_PER_PAGE_PARAM, "ALL").build());
-        Sequence<Number> sequence = range(1, 100000).realise();
-
-        Sequence<Number> paginatedSequence = pager.paginate(sequence);
-        assertThat(paginatedSequence, is(sequence));
-        assertThat(pager.getTotalRows(), is(sequence.size()));
-        assertThat(pager.getNumberOfPages(), NumberMatcher.is(1));
-    }
-
-    @Test
     public void calculatesCorrectPagesWhenAllRowsAreOnOnePage() throws Exception {
         Pager pager = new RequestPager(requestForCurrentPageAndRows(1, 20).build());
         Sequence<Number> sequence = range(1, 10);

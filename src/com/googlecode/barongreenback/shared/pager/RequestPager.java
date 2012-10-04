@@ -46,22 +46,10 @@ public class RequestPager implements Pager {
 
     public <T> Sequence<T> paginate(Sequence<T> sequence) {
         totalRows = sequence.size();
-        if (isShowingAllPages()) {
-            currentPage(1);
-            return sequence;
-        }
 
         int rowsPerPage = getRowsPerPageAsInteger();
 
         return sequence.drop(rowsPerPage * (currentPage - 1)).take(rowsPerPage);
-    }
-
-    private boolean isShowingAllPages() {
-        return "ALL".equalsIgnoreCase(numberOfRowsPerPage) || getCalculatedNumberOfPages() == 1;
-    }
-
-    private int getCalculatedNumberOfPages() {
-        return (int) Math.ceil((double) totalRows / getRowsPerPageAsInteger());
     }
 
     private int getRowsPerPageAsInteger() {
@@ -81,10 +69,7 @@ public class RequestPager implements Pager {
     }
 
     public int getNumberOfPages() {
-        if (isShowingAllPages()) {
-            return 1;
-        }
-        return getCalculatedNumberOfPages();
+        return (int) Math.ceil((double) totalRows / getRowsPerPageAsInteger());
     }
 
     public String getQueryStringForPage(int pageNumber) {
