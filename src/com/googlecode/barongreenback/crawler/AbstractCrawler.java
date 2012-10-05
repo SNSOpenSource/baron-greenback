@@ -18,19 +18,13 @@ import static com.googlecode.totallylazy.Uri.uri;
 
 public abstract class AbstractCrawler implements Crawler {
     private final CrawlerRepository crawlerRepository;
-    protected final ViewsRepository viewRepository;
 
-    public AbstractCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewRepository) {
+    public AbstractCrawler(CrawlerRepository crawlerRepository) {
         this.crawlerRepository = crawlerRepository;
-        this.viewRepository = viewRepository;
     }
 
     protected Model crawlerFor(UUID id) {
         return crawlerRepository.crawlerFor(id);
-    }
-
-    protected void updateView(Model crawler, Sequence<Keyword<?>> keywords) {
-        viewRepository.ensureViewForCrawlerExists(crawler, keywords);
     }
 
     public static Sequence<Keyword<?>> keywords(RecordDefinition recordDefinition) {

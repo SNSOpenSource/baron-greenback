@@ -22,7 +22,7 @@ public class QueuesCrawler extends AbstractCrawler {
     public QueuesCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository,
                          CheckpointHandler checkpointHandler, StringMappings mappings, Container requestContainer,
                          VisitedFactory visitedFactory) {
-        super(crawlerRepository, viewsRepository);
+        super(crawlerRepository);
         this.checkpointHandler = checkpointHandler;
         this.mappings = mappings;
         this.requestContainer = requestContainer;

@@ -149,7 +149,7 @@ public class EndToEndTest extends ApplicationTests {
                 decorate(Scheduler.class, CountDownScheduler.class).
                 decorate(Completer.class, CountDownCompleter.class);
 
-        JobsListPage jobs = listPage.crawl(name);
+        JobsListPage jobs = listPage.crawlAndCreateView(name);
         latch.await();
         return jobs;
     }

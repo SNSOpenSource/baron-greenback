@@ -67,6 +67,10 @@ public class CrawlerListPage {
         return goToJobsList(html.form(formFor(name, "crawl")).submit(button("crawl")));
     }
 
+    public JobsListPage crawlAndCreateView(String name) throws Exception {
+        return goToJobsList(html.form(formFor(name, "crawl-and-create-view")).submit(button("crawl-and-create-view")));
+    }
+
     public JobsListPage crawlAll() throws Exception {
         return goToJobsList(html.form(singleForm("crawlAll")).submit(button("crawlAll")));
     }
