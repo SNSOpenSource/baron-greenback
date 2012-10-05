@@ -14,9 +14,10 @@
     }$
 </table>
 
-<ul>
-    <li><a href="$base$crawler/failures/list">Failures</a></li>
-</ul>
+<div class="actions">
+    $get(url={$base$crawler/failures/list}, class="crawler-failures", name="Failures")$
+</div>
+
 
 </body>
 </html>

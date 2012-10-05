@@ -28,12 +28,10 @@ $message()$
     $endif$
 
     $include.({$base$crawler/active}).body;format="raw"$
-</div>
 
-<ul>
-    <li><a href="$base$crawler/status">Status</a></li>
-    <li><a href="$base$crawler/failures/list">Failures</a></li>
-</ul>
+    $get(url={$base$crawler/status}, class="crawler-status", name="Status")$
+    $get(url={$base$crawler/failures/list}, class="crawler-failures", name="Failures")$
+</div>
 
 </body>
 </html>

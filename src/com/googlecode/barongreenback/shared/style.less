@@ -53,7 +53,7 @@ h1, h2, h3, h4, h5, h6, .btn, a.update {
 }
 
 .btn {
-    &.primary, &.danger, &.success {
+    &.primary, &.danger, &.success, &.info {
         &:hover {
             color: #fff;
         }
@@ -89,7 +89,7 @@ input.delete, input.stop, input.reset, input.resetAll, input.deleteAll, input.ig
     .btn.danger;
 }
 
-input.enable {
+input.enable, a.crawler-status, a.crawler-failures {
     .btn;
     .btn.success;
 }
@@ -380,7 +380,6 @@ div.actions form {
 
 .bgb { // BGB Only Styles
     .dropdown-menu {
-        z-index: -1;
         display: none;
         position: absolute;
         padding-top: 1em;

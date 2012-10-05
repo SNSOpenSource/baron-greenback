@@ -20,18 +20,15 @@ $message()$
 $pager$
 
 <div class="actions">
+    $get(url={$base$crawler/status}, class="crawler-status", name="Status")$
     $if(anyExists)$
-        $post(name="retryAll", value="Retry All", url=retryAll)$
-        $post(name="ignoreAll", value="Ignore All", url=ignoreAll)$
+        $post(name="retryAll", value="Retry All")$
+        $post(name="deleteAll", value="Delete All")$
     $else$
         $post(name="retryAll", value="Retry All", disabled="true")$
-        $post(name="ignoreAll", value="Ignore All", disabled="true")$
+        $post(name="deleteAll", value="Delete All", disabled="true")$
     $endif$
 </div>
-
-<ul>
-    <li><a href="$base$crawler/status">Status</a></li>
-</ul>
 
 </body>
 </html>

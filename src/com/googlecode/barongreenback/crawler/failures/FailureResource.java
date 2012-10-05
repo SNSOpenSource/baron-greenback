@@ -72,9 +72,9 @@ public class FailureResource {
                 add("items", paged.map(toModel()).toList()), headers, paged));
         return message.fold(model, toMessageModel()).
                 add("retryUrl", redirector.absoluteUriOf(method(on(FailureResource.class).retry(null)))).
-                add("ignoreUrl", redirector.absoluteUriOf(method(on(FailureResource.class).ignore(null)))).
+                add("deleteUrl", redirector.absoluteUriOf(method(on(FailureResource.class).delete(null)))).
                 add("retryAll", redirector.absoluteUriOf(method(on(FailureResource.class).retryAll()))).
-                add("ignoreAll", redirector.absoluteUriOf(method(on(FailureResource.class).ignoreAll())));
+                add("deleteAll", redirector.absoluteUriOf(method(on(FailureResource.class).deleteAll())));
     }
 
     private Callable2<Model, String, Model> toMessageModel() {
@@ -93,9 +93,9 @@ public class FailureResource {
     }
 
     @POST
-    @Path("ignore")
-    public Response ignore(@FormParam("id") UUID id) {
-        return failures.get(id).map(toIgnore(id)).getOrElse(response(Status.NOT_FOUND));
+    @Path("delete")
+    public Response delete(@FormParam("id") UUID id) {
+        return failures.get(id).map(toDelete(id)).getOrElse(response(Status.NOT_FOUND));
     }
 
     @POST
@@ -108,16 +108,16 @@ public class FailureResource {
     }
 
     @POST
-    @Path("ignoreAll")
-    public Response ignoreAll() {
-        return backToMe(failures.removeAll() + " failures(s) have been ignored");
+    @Path("deleteAll")
+    public Response deleteAll() {
+        return backToMe(failures.removeAll() + " failures(s) have been deleted");
     }
 
     private Callable1<UUID, Void> ignore() {
         return new Callable1<UUID, Void>() {
             @Override
             public Void call(UUID uuid) throws Exception {
-                ignore(uuid);
+                delete(uuid);
                 return Runnables.VOID;
             }
         };
@@ -134,12 +134,12 @@ public class FailureResource {
     }
 
 
-    private Callable1<Failure, Response> toIgnore(final UUID id) {
+    private Callable1<Failure, Response> toDelete(final UUID id) {
         return new Callable1<Failure, Response>() {
             @Override
             public Response call(Failure stagedJobResponsePair) throws Exception {
                 failures.delete(id);
-                return backToMe("Job ignored");
+                return backToMe("Job deleted");
             }
         };
     }
