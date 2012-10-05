@@ -4,6 +4,7 @@
     <td><a href="$item.model.form.from$" class="from">$item.model.form.from$</a></td>
     <td>
         $post(url=item.jobUrl, name="crawl", id=item.id)$
+        $post(url=item.jobUrl + "-and-create-view", name="crawl-and-create-view", value="Crawl + View", id=item.id)$
         $if(item.model.form.disabled)$
             $post(name="enable", id=item.id)$
         $else$

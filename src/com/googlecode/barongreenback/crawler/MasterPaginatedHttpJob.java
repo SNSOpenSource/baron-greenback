@@ -1,7 +1,5 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.views.ViewsRepository;
-import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
@@ -29,18 +27,10 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
     }
 
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
-        updateView(crawlerScope);
         Option<Document> document = loadDocument(response);
         for (Document doc : document)
             crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(StringMappings.class))));
         return processDocument(document);
-    }
-
-    private void updateView(Container crawlerScope) {
-        ViewsRepository viewsRepository = crawlerScope.get(ViewsRepository.class);
-        CrawlerRepository crawlerRepository = crawlerScope.get(CrawlerRepository.class);
-        Model crawler = crawlerRepository.crawlerFor(crawlerId());
-        viewsRepository.ensureViewForCrawlerExists(crawler, AbstractCrawler.destinationDefinition(crawler).fields());
     }
 
     private Callable1<String, Date> toDateValue(final StringMappings mappings) {

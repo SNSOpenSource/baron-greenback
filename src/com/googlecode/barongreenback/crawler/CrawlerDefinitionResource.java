@@ -3,12 +3,16 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.barongreenback.queues.QueuesResource;
 import com.googlecode.barongreenback.shared.Forms;
+import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.proxy.Invocation;
@@ -27,6 +31,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.AbstractCrawler.extractRecordDefinition;
 import static com.googlecode.barongreenback.shared.Forms.functions.addTemplates;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -45,13 +50,15 @@ public class CrawlerDefinitionResource {
     private final Crawler crawler;
     private final PrintStream log;
     private final CrawlerRepository repository;
+    private final ViewsRepository viewsRepository;
 
-    public CrawlerDefinitionResource(CrawlerRepository repository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log) {
+    public CrawlerDefinitionResource(CrawlerRepository repository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log, ViewsRepository viewsRepository) {
         this.interval = interval;
         this.redirector = redirector;
         this.crawler = crawler;
         this.log = log;
         this.repository = repository;
+        this.viewsRepository = viewsRepository;
     }
 
     @GET
@@ -141,6 +148,21 @@ public class CrawlerDefinitionResource {
     public Response edit(@QueryParam("id") UUID id, final Model root) throws Exception {
         repository.edit(id, root);
         return redirectToCrawlerList();
+    }
+
+    @POST
+    @Path("crawl-and-create-view")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response crawlAndCreateView(@FormParam("id") final UUID id) throws Exception {
+        createView(id);
+        return crawl(id);
+    }
+
+    private void createView(UUID id) {
+        final Model crawler = repository.crawlerFor(id);
+        final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
+        Sequence<Keyword<?>> keywords = AbstractCrawler.keywords(recordDefinition);
+        viewsRepository.ensureViewForCrawlerExists(crawler, keywords);
     }
 
     @POST
