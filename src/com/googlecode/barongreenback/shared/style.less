@@ -4,7 +4,11 @@
 @basefont:          12px;
 @baseline:          14px;
 
-@grayDark:          lighten(@black, 15%);
+select, input[type=file] {
+    height: @baseline * 2;
+}
+
+    @grayDark:          lighten(@black, 15%);
 @gray:              lighten(@black, 30%);
 
 .t+l{
