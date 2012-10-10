@@ -6,6 +6,7 @@ import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
@@ -15,6 +16,7 @@ import com.googlecode.totallylazy.comparators.Comparators;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.annotations.DefaultValue;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
@@ -35,10 +37,14 @@ import static com.googlecode.barongreenback.views.ViewsRepository.priority;
 import static com.googlecode.barongreenback.views.ViewsRepository.valueFor;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.funclate.Model.mutable.parse;
+import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.ascending;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
+import static com.googlecode.utterlyidle.Response.functions.asResponse;
+import static com.googlecode.utterlyidle.ResponseBuilder.response;
+import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
 @Produces(MediaType.TEXT_HTML)
@@ -111,8 +117,8 @@ public class ViewsResource {
     @GET
     @Path("export")
     @Produces("application/json")
-    public String export(@QueryParam("id") UUID id) {
-        return modelRepository.get(id).get().toString();
+    public Response export(@QueryParam("id") UUID id) {
+        return modelRepository.get(id).map(asString()).map(asResponse()).getOrElse(viewNotFound(id));
     }
 
     @GET
@@ -164,5 +170,9 @@ public class ViewsResource {
                 set("current", current.equals(name)).
                 set("itemsTotal", recordsService.count(name, query)).
                 set("url", redirector.uriOf(method(on(SearchResource.class).list(name, query))));
+    }
+
+    private Response viewNotFound(UUID id) {
+        return response(Status.NOT_FOUND).entity(format("View %s not found", id)).build();
     }
 }
