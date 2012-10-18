@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Strings;
 
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class CheckpointHandler {
     }
 
     private Object convertFromString(String checkpoint, String checkpointType) throws Exception {
-        Class<?> aClass = checkpointType == null ? String.class : Class.forName(checkpointType);
+        Class<?> aClass = Strings.isEmpty(checkpointType) ? String.class : Class.forName(checkpointType);
         return mappings.get(aClass).toValue(checkpoint);
     }
 
