@@ -1,30 +1,41 @@
 package com.googlecode.barongreenback.jobs;
 
+import com.googlecode.totallylazy.time.Clock;
+
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static com.googlecode.totallylazy.Functions.function;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.time.Seconds.between;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class FixedScheduler implements Scheduler, Closeable {
     private final Map<UUID, Cancellable> jobs = new HashMap<UUID, Cancellable>();
     private final ScheduledExecutorService service;
+    private final Clock clock;
 
-    public FixedScheduler() {
+    public FixedScheduler(Clock clock) {
+        this.clock = clock;
         this.service = Executors.newScheduledThreadPool(5);
     }
 
-    public void schedule(UUID id, Callable<?> command, long numberOfSeconds) {
+    @Override
+    public void schedule(UUID id, Callable<?> command, Date start, long numberOfSeconds) {
         cancel(id);
-        FutureJob job = new FutureJob(service.scheduleWithFixedDelay(function(command), 0, numberOfSeconds, TimeUnit.SECONDS));
+        FutureJob job = new FutureJob(service.scheduleWithFixedDelay(function(command), between(clock.now(), start), numberOfSeconds, SECONDS));
         jobs.put(id, job);
+    }
+
+    public void schedule(UUID id, Callable<?> command, long numberOfSeconds) {
+        schedule(id, command, clock.now(), numberOfSeconds);
     }
 
     public void cancel(UUID id) {
@@ -36,7 +47,7 @@ public class FixedScheduler implements Scheduler, Closeable {
 
     @Override
     public void close() throws IOException {
-        while(!jobs.keySet().isEmpty()) {
+        while (!jobs.keySet().isEmpty()) {
             cancel(sequence(jobs.keySet()).first());
         }
     }

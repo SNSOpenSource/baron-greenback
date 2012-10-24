@@ -7,6 +7,7 @@ import com.googlecode.utterlyidle.RequestBuilder;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -52,12 +53,13 @@ public class HttpSchedulerTest {
     private static class StubScheduler implements Scheduler {
         public long delay;
 
+        @Override
+        public void schedule(UUID id, Callable<?> command, Date start, long numberOfSeconds) {}
+
         public void schedule(UUID id, Callable<?> command, final long numberOfSeconds) {
             this.delay = numberOfSeconds;
         }
 
-        public void cancel(UUID id) {
-        }
+        public void cancel(UUID id) {}
     }
-
 }
