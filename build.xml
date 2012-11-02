@@ -74,7 +74,7 @@
         </jstest>
     </target>
 
-    <target name="testjs64">
+    <target name="testjs64" if="64bits">
         <chmod file="${build.dependencies.dir}/phantomjs-linux-x86_64" perm="u+x"/>
         <jstest dir="${basedir}/test" includes="**/*.html" phantomlinux="${build.dependencies.dir}/phantomjs-linux-x86_64" phantomWin="${build.dependencies.dir}/phantomjs-windows.exe">
             <report type="plain" destFile="${reports}/qunit-results.txt"/>
