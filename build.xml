@@ -64,24 +64,22 @@
         <test jar="${tests.jar.path}" classpathref="all.jars" reports="${reports}"/>
     </target>
 
-    <taskdef name="jstest" classname="com.philmander.jstest.ant.JsTestRunnerTask"
-             classpath="${build}/ant-jstestrunner-0.1-deps.jar" />
-
     <target name="testjs32" unless="64bits">
-        <chmod file="${build.dependencies.dir}/phantomjs-linux-x86_32" perm="u+x"/>
-        <jstest dir="${basedir}/test" includes="**/*.html" phantomlinux="${build.dependencies.dir}/phantomjs-linux-x86_32" phantomWin="${build.dependencies.dir}/phantomjs-windows.exe">
-            <report type="plain" destFile="${reports}/qunit-results.txt"/>
-        </jstest>
+        <property name="phantomlinux" value="${build.dependencies.dir}/phantomjs-linux-x86_32"/>
     </target>
 
     <target name="testjs64" if="64bits">
-        <chmod file="${build.dependencies.dir}/phantomjs-linux-x86_64" perm="u+x"/>
-        <jstest dir="${basedir}/test" includes="**/*.html" phantomlinux="${build.dependencies.dir}/phantomjs-linux-x86_64" phantomWin="${build.dependencies.dir}/phantomjs-windows.exe">
+        <property name="phantomlinux" value="${build.dependencies.dir}/phantomjs-linux-x86_64"/>
+    </target>
+
+    <target name="testjs" depends="testjs32, testjs64">
+        <taskdef name="jstest" classname="com.philmander.jstest.ant.JsTestRunnerTask"
+                 classpath="${build.dependencies.dir}/ant-jstestrunner-spmiller-deps-0.2.jar"/>
+        <chmod file="${phantomlinux}" perm="u+x"/>
+        <jstest dir="${basedir}/test" includes="**/*.html" phantomlinux="${phantomlinux}" phantomWin="${build.dependencies.dir}/phantomjs-windows.exe">
             <report type="plain" destFile="${reports}/qunit-results.txt"/>
         </jstest>
     </target>
-
-    <target name="testjs" depends="testjs32, testjs64"/>
 
     <target name="package">
         <mkdir dir="${artifacts}"/>

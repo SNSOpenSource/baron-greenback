@@ -4,6 +4,7 @@ mvn:junit:junit-dep:jar:4.8.2
 
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.waitrest:waitrest:jar|sources:83
 
+mvn://repo.bodar.com.s3.amazonaws.com/com.philmander.jstest.ant:ant-jstestrunner-spmiller-deps:jar:0.2
 http://repo.bodar.com.s3.amazonaws.com/org/phantomjs/1.7/phantomjs-linux-x86_32
 http://repo.bodar.com.s3.amazonaws.com/org/phantomjs/1.7/phantomjs-linux-x86_64
 http://repo.bodar.com.s3.amazonaws.com/org/phantomjs/1.7/phantomjs-windows.exe
