@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Actions test</title>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.10.0.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script src="http://code.jquery.com/qunit/qunit-1.10.0.js"></script>
+<script>
+    var addProdFiles = function(files, callback) {
+        if (files.length == 1) {
+            var testUri = document.location.href.replace('test', 'src');
+            var resourceUri = testUri.slice(0, testUri.lastIndexOf('/') + 1) + files[0];
+            var scriptNode = document.createElement("script");
+            scriptNode.setAttribute("src", resourceUri);
+            scriptNode.onload = callback;
+            document.head.appendChild(scriptNode);
+        } else {
+            // [fileA, fileB] CB -> addProdFiles ([fileA], addProdFile([fileB], CB))
+            var nextFile = files.pop();
+            addProdFiles(files, function() {addProdFiles([nextFile], callback)});
+        }
+    };
+
+    addProdFiles(['jquery-1.6.4.js', 'bgb.js', 'actions/actions.js'], function() {
+        QUnit.test("API provided", function () {
+            QUnit.ok(BGB.search.bulk.actions.allIdentifiers, "Finds all ids used for bulk actions");
+            QUnit.ok(BGB.search.bulk.actions.removeAllIdentifiers, "Removes all ids used for bulk actions");
+        });
+    });
+
+</script>
+</body>
+</html>
