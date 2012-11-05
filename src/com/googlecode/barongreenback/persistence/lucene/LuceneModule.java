@@ -23,7 +23,7 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
     public Container addPerApplicationObjects(Container applicationScope) {
         final Container container = applicationScope.get(PersistenceApplicationScope.class).value();
         addActivatorIfAbsent(container, Directory.class, DirectoryActivator.class);
-        addIfAbsent(container, LuceneStorage.class, OptimisedStorage.class);
+        addActivatorIfAbsent(container, LuceneStorage.class, LuceneStorageActivator.class);
         addActivatorIfAbsent(container, SearcherPool.class, SearcherPoolActivator.class);
         return applicationScope;
     }
