@@ -94,15 +94,18 @@ public class DataWriter implements JobExecutor {
         return newData.size();
     }
 
-    private void batchWrite(Records records) {
+    private void batchWrite(final Records records) {
         List<Triple<Definition, Sequence<Record>, CountLatch>> newData = new ArrayList<Triple<Definition, Sequence<Record>, CountLatch>>();
         data.drainTo(newData);
-        for (Group<Definition, Triple<Definition, Sequence<Record>, CountLatch>> group : sequence(newData).groupBy(first(Definition.class))) {
-            Definition definition = group.key();
-            Keyword<?> unique = uniqueFields(definition).head();
-            Sequence<Record> mergedRecords = priorityMergeBy(group.flatMap(Callables.<Sequence<Record>>second()), unique);
-            records.put(definition, update(using(unique), mergedRecords));
-        }
+        sequence(newData).groupBy(first(Definition.class)).mapConcurrently(new Function1<Group<Definition, Triple<Definition, Sequence<Record>, CountLatch>>, Number>() {
+            @Override
+            public Number call(Group<Definition, Triple<Definition, Sequence<Record>, CountLatch>> group) throws Exception {
+                Definition definition = group.key();
+                Keyword<?> unique = uniqueFields(definition).head();
+                Sequence<Record> mergedRecords = priorityMergeBy(group.flatMap(Callables.<Sequence<Record>>second()), unique);
+                return records.put(definition, update(using(unique), mergedRecords));
+            }
+        }).realise();
         for (Triple<Definition, Sequence<Record>, CountLatch> aNewData : newData) {
             aNewData.third().countDown();
         }
