@@ -125,7 +125,7 @@ public class BatchResource {
 
     @POST
     @Path("deleteAll")
-    public Response deleteAll() throws IOException {
+    public Response deleteAll() {
         try {
             String pathname = backupNow();
             persistence.backup(new File(pathname));
