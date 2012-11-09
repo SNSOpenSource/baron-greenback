@@ -1,8 +1,6 @@
 package com.googlecode.barongreenback.persistence.sql;
 
-import com.googlecode.barongreenback.persistence.Persistence;
-import com.googlecode.barongreenback.persistence.PersistenceModule;
-import com.googlecode.barongreenback.persistence.lucene.DirectoryActivator;
+import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.lazyrecords.sql.SqlRecords;
 import com.googlecode.totallylazy.Files;
 
@@ -12,7 +10,7 @@ import static com.googlecode.lazyrecords.sql.expressions.Expressions.expression;
 import static com.googlecode.lazyrecords.sql.expressions.Expressions.textOnly;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 
-public class SqlPersistence implements Persistence{
+public class SqlPersistence implements Persistence {
     private final SqlRecords sqlRecords;
 
     public SqlPersistence(SqlRecords sqlRecords) {
@@ -20,7 +18,7 @@ public class SqlPersistence implements Persistence{
     }
 
     @Override
-    public void delete() throws Exception {
+    public void deleteAll() {
         sqlRecords.update(textOnly("drop all objects"));
     }
 

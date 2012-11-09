@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.persistence.sql.SqlModule;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.IgnoreLogger;
 import com.googlecode.lazyrecords.Logger;
+import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
@@ -13,7 +14,6 @@ import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.yadic.Containers.addActivatorIfAbsent;

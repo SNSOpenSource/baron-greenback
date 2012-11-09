@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.persistence.Persistence;
+import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
@@ -31,7 +31,7 @@ public abstract class ApplicationTests {
         application.usingRequestScope(new Callable1<Container, Object>() {
             @Override
             public Object call(Container container) throws Exception {
-                container.get(Persistence.class).delete();
+                container.get(Persistence.class).deleteAll();
                 return null;
             }
         });

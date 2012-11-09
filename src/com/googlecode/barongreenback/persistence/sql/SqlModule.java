@@ -1,14 +1,13 @@
 package com.googlecode.barongreenback.persistence.sql;
 
-import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.persistence.PersistenceRequestScope;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.Schema;
 import com.googlecode.lazyrecords.SchemaGeneratingRecords;
+import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.lazyrecords.sql.SqlRecords;
 import com.googlecode.lazyrecords.sql.SqlSchema;
 import com.googlecode.lazyrecords.sql.mappings.SqlMappings;
-import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 

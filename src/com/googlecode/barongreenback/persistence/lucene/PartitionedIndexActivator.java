@@ -2,9 +2,7 @@ package com.googlecode.barongreenback.persistence.lucene;
 
 import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.persistence.PersistenceUri;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.NIOFSDirectory;
-import org.apache.lucene.store.RAMDirectory;
+import com.googlecode.lazyrecords.lucene.PartitionedIndex;
 
 import java.io.Closeable;
 import java.io.File;
@@ -12,26 +10,26 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.lazyrecords.lucene.PartitionedIndex.partitionedIndex;
 import static com.googlecode.totallylazy.URLs.uri;
 
-public class DirectoryActivator implements Callable<Directory>, Closeable {
+public class PartitionedIndexActivator implements Callable<PartitionedIndex>, Closeable {
     public static final String FILE = "file";
     public static final String MEMORY = "mem";
     private final String persistenceUri;
-    private Directory directory;
+    private PartitionedIndex partitionedIndex;
 
-    public DirectoryActivator(PersistenceUri uri) {
+    public PartitionedIndexActivator(PersistenceUri uri) {
         this.persistenceUri = uri.toString();
     }
 
-    public Directory call() throws Exception {
+    public PartitionedIndex call() throws Exception {
         if (persistenceUri.startsWith(prefix(MEMORY))) {
-            return directory = new RAMDirectory();
+            return partitionedIndex = partitionedIndex();
         }
         if (persistenceUri.startsWith(prefix(FILE))) {
             URI fileUri = extractFileUri();
-            return directory = new NIOFSDirectory(new File(fileUri));
+            return partitionedIndex = partitionedIndex(new File(fileUri));
         }
         throw new UnsupportedOperationException();
     }
@@ -45,7 +43,7 @@ public class DirectoryActivator implements Callable<Directory>, Closeable {
     }
 
     public void close() throws IOException {
-        directory.close();
+        partitionedIndex.close();
     }
 
 }

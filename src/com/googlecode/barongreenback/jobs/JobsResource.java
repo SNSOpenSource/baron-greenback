@@ -4,6 +4,7 @@ import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.utterlyidle.InternalRequestMarker;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
@@ -44,9 +45,9 @@ public class JobsResource {
     private final Request request;
     private final Redirector redirector;
 
-    public JobsResource(HttpScheduler scheduler, Request request, Redirector redirector) {
+    public JobsResource(HttpScheduler scheduler, Request request, Redirector redirector, InternalRequestMarker internalRequestMarker) {
         this.scheduler = scheduler;
-        this.request = request;
+        this.request = internalRequestMarker.markAsInternal(request);
         this.redirector = redirector;
     }
 

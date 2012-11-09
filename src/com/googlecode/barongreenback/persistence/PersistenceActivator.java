@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.persistence;
 
+import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.yadic.Container;
 
 import java.util.concurrent.Callable;

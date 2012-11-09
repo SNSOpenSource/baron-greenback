@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.batch;
 
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
 import com.googlecode.barongreenback.jobs.HttpScheduler;
-import com.googlecode.barongreenback.persistence.Persistence;
 import com.googlecode.barongreenback.queues.Queues;
 import com.googlecode.barongreenback.shared.ModelCache;
 import com.googlecode.barongreenback.shared.ModelRepository;
@@ -11,6 +10,7 @@ import com.googlecode.barongreenback.shared.messages.Messages;
 import com.googlecode.funclate.Model;
 import com.googlecode.funclate.json.Json;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Files;
@@ -120,7 +120,6 @@ public class BatchResource {
         } catch (Exception e) {
             return error(format("Import error: %s", e.getMessage())).add("model", batchModel);
         }
-
     }
 
     @POST
@@ -216,10 +215,10 @@ public class BatchResource {
     }
 
     private void deleteAllData() throws Exception {
-        persistence.delete(); // Delete data twice so that no new jobs will be created
+        persistence.deleteAll(); // Delete data twice so that no new jobs will be created
         scheduler.stop();
         queues.deleteAll();
-        persistence.delete();
+        persistence.deleteAll();
         crawlerExecutors.resetExecutors();
         cache.clear();
     }
