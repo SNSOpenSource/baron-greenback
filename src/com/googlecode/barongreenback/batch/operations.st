@@ -29,7 +29,7 @@ $message()$
     $get(name="import")$
     $get(name="export")$
     $post(name="deleteAll", value="Delete All")$
-    $post(name="scheduleBackup", value="Schedule Backup", url={$base$jobs/schedule/$id$/$start$/$interval$/backup})$
+    $post(name="scheduleBackup", value="Schedule Backup", url={$base$jobs/schedule/$id$/$start$/$interval$/queues/queue/batch/autobackup}, noid="true")$
 </div>
 
 <script>

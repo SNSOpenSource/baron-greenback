@@ -9,7 +9,6 @@ import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.Sequence;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -95,8 +94,5 @@ public class CachingModelRepositoryTest {
         assertThat(result, is(model));
         assertThat(cache.containsKey(key), is(true));
         assertThat(cache.containsValue(model), is(true));
-
     }
-
-
 }

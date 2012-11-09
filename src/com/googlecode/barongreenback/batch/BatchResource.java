@@ -13,6 +13,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Callers;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
@@ -40,8 +41,10 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.shared.messages.Messages.error;
 import static com.googlecode.barongreenback.shared.messages.Messages.success;
 import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.totallylazy.Files.directory;
 import static com.googlecode.totallylazy.Files.files;
 import static com.googlecode.totallylazy.Files.hasSuffix;
+import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Streams.copy;
 import static com.googlecode.totallylazy.Zip.zip;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -53,7 +56,8 @@ import static java.lang.String.format;
 @Path("batch")
 @Produces(MediaType.TEXT_HTML)
 public class BatchResource {
-    public static final File BACKUP_LOCATION = Files.temporaryDirectory();
+    public static final File BACKUP_LOCATION = temporaryDirectory();
+    public static final File AUTOBACKUP_LOCATION = directory(BACKUP_LOCATION, "autobackup");
     private static final UUID BACKUP_JOB_ID = UUID.fromString("70203355-d7d3-4477-85ef-d3309f21fae0");
     private final ModelRepository modelRepository;
     private final Redirector redirector;
@@ -63,9 +67,13 @@ public class BatchResource {
     private final ModelCache cache;
     private final Clock clock;
     private final CrawlerExecutors crawlerExecutors;
+    private final FileRoller fileRoller;
+    private final BackupStart backupStart;
+    private final BackupInterval backupInterval;
 
     public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final Persistence persistence, final HttpScheduler scheduler,
-                         final Queues queues, final ModelCache cache, final Clock clock, CrawlerExecutors crawlerExecutors) {
+                         final Queues queues, final ModelCache cache, final Clock clock, final CrawlerExecutors crawlerExecutors, final FileRoller fileRoller,
+                         final BackupStart backupStart, final BackupInterval backupInterval) {
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.persistence = persistence;
@@ -74,6 +82,9 @@ public class BatchResource {
         this.cache = cache;
         this.clock = clock;
         this.crawlerExecutors = crawlerExecutors;
+        this.fileRoller = fileRoller;
+        this.backupStart = backupStart;
+        this.backupInterval = backupInterval;
     }
 
     @GET
@@ -120,13 +131,14 @@ public class BatchResource {
         } catch (Exception e) {
             return error(format("Import error: %s", e.getMessage())).add("model", batchModel);
         }
+
     }
 
     @POST
     @Path("deleteAll")
     public Response deleteAll() throws IOException {
         try {
-            String pathname = backupNow();
+            String pathname = backupNow(BACKUP_LOCATION);
             persistence.backup(new File(pathname));
             deleteAllData();
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Index has been deleted and a backup has been created: %s", pathname), Category.SUCCESS)));
@@ -140,10 +152,19 @@ public class BatchResource {
     public Response backup(@FormParam("location") String location) {
         try {
             persistence.backup(new File(location));
-            return redirector.seeOther(method(on(BatchResource.class).operations(format("Index has been backed up to '%s'", location), Category.SUCCESS)));
+            Response response = redirector.seeOther(method(on(BatchResource.class).operations(format("Index has been backed up to '%s'", location), Category.SUCCESS)));
+            return response;
         } catch (Exception e) {
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Error occurred when backing up the index: '%s'", e.getMessage()), Category.ERROR)));
         }
+    }
+
+    @POST
+    @Path("autobackup")
+    public Response autobackup() {
+        Response backup = backup(backupNow(AUTOBACKUP_LOCATION));
+        Callers.call(fileRoller);
+        return backup;
     }
 
     @POST
@@ -198,20 +219,21 @@ public class BatchResource {
 
     private Model addBackups(Model model) {
         return model.
-                add("backupLocation", backupNow()).
+                add("backupLocation", backupNow(BACKUP_LOCATION)).
                 add("backups", files(BACKUP_LOCATION).filter(hasSuffix("bgb")).map(asModel()).toList()).
                 add("id", BACKUP_JOB_ID).
-                add("start", "0200").
-                add("interval", "86400");
+                add("start", backupStart.value()).
+                add("interval", backupInterval.value()).
+                add("nullHack", null);
 
     }
 
-    private String backupNow() {
-        return backupName(clock.now());
+    private String backupNow(File backupLocation) {
+        return backupName(backupLocation, clock.now());
     }
 
-    private static String backupName(Date date) {
-        return format("%s/%s.bgb", BACKUP_LOCATION, LEXICAL().format(date));
+    private static String backupName(File backupLocation, Date date) {
+        return format("%s/%s.bgb", backupLocation, LEXICAL().format(date));
     }
 
     private void deleteAllData() throws Exception {
