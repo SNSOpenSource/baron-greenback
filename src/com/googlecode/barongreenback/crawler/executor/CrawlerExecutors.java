@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler.executor;
 
 import com.googlecode.barongreenback.crawler.BlockingRetryRejectedExecutionHandler;
 import com.googlecode.barongreenback.crawler.DataWriter;
+import com.googlecode.barongreenback.crawler.StagedJob;
 import com.googlecode.barongreenback.crawler.StatusMonitor;
 import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Pair;
@@ -83,20 +84,20 @@ public class CrawlerExecutors implements Closeable {
         return configValues.get(OUTPUT_HANDLER_CAPACITY);
     }
 
-    public JobExecutor inputHandler() {
+    public JobExecutor inputHandler(StagedJob job) {
         return inputHandler;
     }
 
-    public JobExecutor processHandler() {
+    public JobExecutor processHandler(StagedJob job) {
         return processHandler;
     }
 
-    public DataWriter outputHandler() {
+    public DataWriter outputHandler(StagedJob job) {
         return outputHandler;
     }
 
     public Sequence<StatusMonitor> statusMonitors() {
-        return Sequences.<StatusMonitor>sequence(inputHandler(), processHandler(), outputHandler());
+        return Sequences.<StatusMonitor>sequence(inputHandler, processHandler, outputHandler);
     }
 
     public void handlerValues(Sequence<Pair<CrawlerConfigValues, Integer>> executorValues) {

@@ -18,18 +18,14 @@ import static com.googlecode.barongreenback.crawler.DataWriter.write;
 import static com.googlecode.barongreenback.crawler.HttpReader.getInput;
 
 public class StagedJobExecutor {
-    private final JobExecutor inputHandler;
-    private final JobExecutor processHandler;
-    private final JobExecutor outputHandler;
+    private final CrawlerExecutors executors;
     private final CountLatch latch;
     private final Container crawlerScope;
 
     public StagedJobExecutor(CrawlerExecutors executors, CountLatch latch, Container crawlerScope) {
+        this.executors = executors;
         this.latch = latch;
         this.crawlerScope = crawlerScope;
-        this.inputHandler = executors.inputHandler();
-        this.processHandler = executors.processHandler();
-        this.outputHandler = executors.outputHandler();
     }
 
     public int crawlAndWait(StagedJob job) throws InterruptedException {
@@ -39,9 +35,9 @@ public class StagedJobExecutor {
     }
 
     public void crawl(StagedJob job) throws InterruptedException {
-        submit(inputHandler, getInput(job, crawlerScope).then(
-                submit(processHandler, processJobs(job, crawlerScope).then(
-                        submit(outputHandler, write(job, crawlerScope))))));
+        submit(executors.inputHandler(job), getInput(job, crawlerScope).then(
+                submit(executors.processHandler(job), processJobs(job, crawlerScope).then(
+                        submit(executors.outputHandler(job), write(job, crawlerScope))))));
     }
 
     private void submit(JobExecutor jobExecutor, final Runnable function) {

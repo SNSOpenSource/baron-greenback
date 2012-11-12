@@ -68,7 +68,7 @@ public class DataWriter implements JobExecutor {
             @Override
             public Number call(final Sequence<Record> newData) throws Exception {
                 CountLatch latch = container.get(CountLatch.class);
-                int count = container.get(CrawlerExecutors.class).outputHandler().queue(job, newData, latch);
+                int count = container.get(CrawlerExecutors.class).outputHandler(job).queue(job, newData, latch);
                 container.get(AtomicInteger.class).addAndGet(count);
                 return count;
             }
