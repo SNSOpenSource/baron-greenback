@@ -29,7 +29,7 @@ public class CrawlerStatusResource {
     @GET
     @Path("status")
     public Model status() {
-        List<Model> executors = sequence(crawlerExecutors.inputHandler(), crawlerExecutors.processHandler(), crawlerExecutors.outputHandler(), failures).safeCast(StatusMonitor.class).map(toModel()).toList();
+        List<Model> executors = crawlerExecutors.statusMonitors().add(failures).map(toModel()).toList();
         return model().add("executors", executors);
     }
 
