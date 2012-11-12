@@ -2,9 +2,11 @@ package com.googlecode.barongreenback.crawler.executor;
 
 import com.googlecode.barongreenback.crawler.BlockingRetryRejectedExecutionHandler;
 import com.googlecode.barongreenback.crawler.DataWriter;
+import com.googlecode.barongreenback.crawler.StatusMonitor;
 import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
@@ -91,6 +93,10 @@ public class CrawlerExecutors implements Closeable {
 
     public DataWriter outputHandler() {
         return outputHandler;
+    }
+
+    public Sequence<StatusMonitor> statusMonitors() {
+        return Sequences.<StatusMonitor>sequence(inputHandler(), processHandler(), outputHandler());
     }
 
     public void handlerValues(Sequence<Pair<CrawlerConfigValues, Integer>> executorValues) {
