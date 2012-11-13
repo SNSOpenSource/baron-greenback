@@ -22,10 +22,7 @@ public class FileRoller implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        Sequence<File> files = files(directory);
-        Sequence<File> files1 = files.sortBy(descending(lastModified()));
-        Sequence<File> drop = files1.drop(keep);
-        drop.each(delete());
+        files(directory).sortBy(descending(lastModified())).drop(keep).each(delete());
         return Runnables.VOID;
     }
 }
