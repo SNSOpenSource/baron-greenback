@@ -58,7 +58,7 @@ import static java.lang.String.format;
 public class BatchResource {
     public static final File BACKUP_LOCATION = temporaryDirectory();
     public static final File AUTOBACKUP_LOCATION = directory(BACKUP_LOCATION, "autobackup");
-    private static final UUID BACKUP_JOB_ID = UUID.fromString("70203355-d7d3-4477-85ef-d3309f21fae0");
+    public static final UUID BACKUP_JOB_ID = UUID.fromString("70203355-d7d3-4477-85ef-d3309f21fae0");
     private final ModelRepository modelRepository;
     private final Redirector redirector;
     private final Persistence persistence;
