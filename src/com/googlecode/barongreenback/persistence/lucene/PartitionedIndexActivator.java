@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.persistence.lucene;
 
 import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.persistence.PersistenceUri;
+import com.googlecode.lazyrecords.lucene.LucenePartitionedIndex;
 import com.googlecode.lazyrecords.lucene.PartitionedIndex;
 
 import java.io.Closeable;
@@ -10,14 +11,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.lazyrecords.lucene.PartitionedIndex.partitionedIndex;
+import static com.googlecode.lazyrecords.lucene.LucenePartitionedIndex.partitionedIndex;
 import static com.googlecode.totallylazy.URLs.uri;
 
 public class PartitionedIndexActivator implements Callable<PartitionedIndex>, Closeable {
     public static final String FILE = "file";
     public static final String MEMORY = "mem";
     private final String persistenceUri;
-    private PartitionedIndex partitionedIndex;
+    private LucenePartitionedIndex partitionedIndex;
 
     public PartitionedIndexActivator(PersistenceUri uri) {
         this.persistenceUri = uri.toString();
