@@ -8,6 +8,7 @@
 <body>
 <div id="qunit"></div>
 <div id="qunit-fixture">
+    <meta name="query" content="queryForTest"/>
     <div id="results">
         <table class="results paged zebra-striped">
             <thead>
@@ -86,17 +87,37 @@
         }
     };
 
-    var firstRow = function () {
-        return $('td.description:first');
-    };
-
-    var selectedRowsFor = function () {
-        return $.map($('#qunit-fixture div.actions form.export input[name="id"]'), function (input) {
-            return $(input).attr('value');
-        });
-    };
 
     addProdFiles(['jquery-1.6.4.js', 'bgb.js', 'actions/actions.js'], function () {
+        var firstRow = function () {
+            return $('td.description:first');
+        };
+
+        var selectPage = function() {
+            return $('.selectors a.selectPage');
+        };
+
+        var selectAll = function() {
+            return $('.selectors a.selectAll');
+        };
+
+        var clearSelection = function() {
+            return $('.selectors a.clearSelection');
+        };
+
+        var selectedRowsFor = function (name) {
+            return $.map($('#qunit-fixture div.actions form.' + name + ' input[name="id"]'), function (input) {
+                return $(input).attr('value');
+            });
+        };
+
+        var selectedQueryFor = function (name) {
+            return $.map($('#qunit-fixture div.actions form.' + name + ' input[name="query"]'), function (input) {
+                return $(input).attr('value');
+            });
+        };
+
+        QUnit.config.reorder = false;
         QUnit.testStart(BGB.search.bulk.actions.attach);
 
         module('API');
@@ -116,25 +137,59 @@
 
         test('Clicking a row and puts its id into all bulk forms', function () {
             firstRow().click();
-            QUnit.equal(firstRow().parent().hasClass('selected'), true);
-            QUnit.deepEqual(selectedRowsFor(), ['id1']);
+            QUnit.deepEqual(selectedRowsFor('export'), ['id1']);
+            QUnit.deepEqual(selectedRowsFor('json'), ['id1']);
         });
 
-//        module('Selecting multiple');
-        // Clicking select all adds the query to all bulk forms
+        module('Selecting multiple');
+        test('Clicking select all adds the query to all bulk forms', function () {
+            selectAll().click();
+            QUnit.deepEqual(selectedQueryFor('export'), ['queryForTest']);
+            QUnit.deepEqual(selectedQueryFor('json'), ['queryForTest']);
+        });
 
-        // Clicking select page adds all ids on page into all bulk forms
+        test('Clicking select page adds all ids on page into all bulk forms', function () {
+            selectPage().click();
+            QUnit.deepEqual(selectedRowsFor('export'), ['id1', 'id2', 'id3', 'id4']);
+            QUnit.deepEqual(selectedRowsFor('json'), ['id1', 'id2', 'id3', 'id4']);
+        });
 
-        // Clicking select page adds highlighting to all page rows
+        test('Clicking select page adds highlighting to all page rows', function () {
+            selectPage().click();
+            $('table.results tbody tr').each(function(index, element){
+                QUnit.equal($(element).hasClass('selected'), true);
+            });
+        });
 
+        test('Clicking select all adds highlighting to all page rows', function () {
+            selectAll().click();
+            $('table.results tbody tr').each(function(index, element){
+                QUnit.equal($(element).hasClass('selected'), true);
+            });
+        });
 
-//        module('Clearing selection');
-        // Clicking clear selection removes all ids from all bulk forms
+        module('Clearing selection');
+        test('Clicking clear selection removes all ids from all bulk forms', function () {
+            selectPage().click();
+            clearSelection().click();
+            QUnit.deepEqual(selectedRowsFor('export'), []);
+            QUnit.deepEqual(selectedRowsFor('json'), []);
+        });
 
-        // Clicking clear selection removes all highlighting
+        test('Clicking clear selection after select all removes the query from all bulk forms', function () {
+            selectPage().click();
+            clearSelection().click();
+            QUnit.deepEqual(selectedQueryFor('export'), []);
+            QUnit.deepEqual(selectedQueryFor('json'), []);
+        });
 
-        // Clicking clear selection after select all removes the query from all bulk forms
-
+        test('Clicking clear selection removes all highlighting', function () {
+            selectPage().click();
+            clearSelection().click();
+            $('table.results tbody tr').each(function(index, element){
+                QUnit.equal($(element).hasClass('selected'), false);
+            });
+        });
     });
 
 </script>
