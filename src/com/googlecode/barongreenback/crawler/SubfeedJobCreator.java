@@ -10,6 +10,7 @@ import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,12 +29,14 @@ public class SubfeedJobCreator {
     private final Set<HttpDatasource> visited;
     private final UUID crawlerId;
     private final Record crawledRecord;
+    private final Date createdDate;
 
-    public SubfeedJobCreator(Definition destination, Set<HttpDatasource> visited, UUID crawlerId, Record crawledRecord) {
+    public SubfeedJobCreator(Definition destination, Set<HttpDatasource> visited, UUID crawlerId, Record crawledRecord, Date createdDate) {
         this.destination = destination;
         this.visited = visited;
         this.crawlerId = crawlerId;
         this.crawledRecord = crawledRecord;
+        this.createdDate = createdDate;
     }
 
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(Sequence<Record> records) {
@@ -72,6 +75,6 @@ public class SubfeedJobCreator {
         Record newRecord = one(record).map(priorityMerge(crawledRecord)).head();
         Definition subfeedDefinition = subfeedField.first().metadata().get(RECORD_DEFINITION).definition();
 
-        return HttpJob.httpJob(crawlerId, newRecord, HttpDatasource.httpDatasource(uri, subfeedDefinition), destination, visited);
+        return HttpJob.httpJob(crawlerId, newRecord, HttpDatasource.httpDatasource(uri, subfeedDefinition), destination, visited, createdDate);
     }
 }

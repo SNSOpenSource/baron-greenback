@@ -17,6 +17,9 @@ import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.time.Clock;
+import com.googlecode.totallylazy.time.Dates;
+import com.googlecode.totallylazy.time.FixedClock;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
 import com.googlecode.yadic.SimpleContainer;
@@ -33,6 +36,7 @@ import static com.googlecode.barongreenback.crawler.VisitedFactory.visitedFactor
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
+import static com.googlecode.totallylazy.time.Dates.date;
 import static org.junit.Assert.assertThat;
 
 public class FailuresTest {
@@ -54,17 +58,17 @@ public class FailuresTest {
 
     @Test
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(httpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, visitedFactory().value()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(httpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, visitedFactory().value(), scope.get(Clock.class).now()), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), visitedFactory().value()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), visitedFactory().value(), scope.get(Clock.class).now()), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), visitedFactory()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), visitedFactory(), scope.get(Clock.class)), "Bigtime failures"));
     }
 
     private void assertCanPersistAndLoad(Failure failure) {
@@ -90,6 +94,7 @@ public class FailuresTest {
         scope.add(PaginatedJobFailureMarshaller.class);
         scope.add(MasterPaginatedJobFailureMarshaller.class);
         scope.add(Failures.class);
+        scope.addInstance(Clock.class, new FixedClock(date(2001, 1, 1)));
         scope.add(VisitedFactory.class);
         Containers.selfRegister(scope);
         return scope;

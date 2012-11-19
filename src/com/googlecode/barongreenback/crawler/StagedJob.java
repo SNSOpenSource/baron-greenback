@@ -9,6 +9,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,6 +25,8 @@ public interface StagedJob {
     UUID crawlerId();
 
     Record record();
+
+    Date createdDate();
 
     public static class functions {
         public static Callable1<StagedJob, HttpDatasource> datasource() {
