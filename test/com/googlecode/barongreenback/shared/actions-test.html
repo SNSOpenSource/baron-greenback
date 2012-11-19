@@ -93,6 +93,10 @@
             return $('td.description:first');
         };
 
+        var allRows = function() {
+            return $('table.results tbody tr');
+        }
+
         var selectPage = function() {
             return $('.selectors a.selectPage');
         };
@@ -115,6 +119,12 @@
             return $.map($('#qunit-fixture div.actions form.' + name + ' input[name="query"]'), function (input) {
                 return $(input).attr('value');
             });
+        };
+
+        var hasSelectedSetTo = function (selected) {
+            return function (index, element) {
+                QUnit.equal($(element).hasClass('selected'), selected);
+            };
         };
 
         QUnit.config.reorder = false;
@@ -156,16 +166,12 @@
 
         test('Clicking select page adds highlighting to all page rows', function () {
             selectPage().click();
-            $('table.results tbody tr').each(function(index, element){
-                QUnit.equal($(element).hasClass('selected'), true);
-            });
+            allRows().each(hasSelectedSetTo(true));
         });
 
         test('Clicking select all adds highlighting to all page rows', function () {
             selectAll().click();
-            $('table.results tbody tr').each(function(index, element){
-                QUnit.equal($(element).hasClass('selected'), true);
-            });
+            allRows().each(hasSelectedSetTo(true));
         });
 
         module('Clearing selection');
@@ -186,9 +192,7 @@
         test('Clicking clear selection removes all highlighting', function () {
             selectPage().click();
             clearSelection().click();
-            $('table.results tbody tr').each(function(index, element){
-                QUnit.equal($(element).hasClass('selected'), false);
-            });
+            allRows().each(hasSelectedSetTo(false));
         });
     });
 
