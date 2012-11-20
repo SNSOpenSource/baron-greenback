@@ -7,6 +7,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.yadic.Container;
 
 import java.util.UUID;
@@ -19,8 +20,8 @@ public class QueuesCrawler extends AbstractCrawler {
     private final Container requestContainer;
     private final VisitedFactory visitedFactory;
 
-    public QueuesCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository,
-                         CheckpointHandler checkpointHandler, StringMappings mappings, Container requestContainer,
+    public QueuesCrawler(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler,
+                         StringMappings mappings, Container requestContainer,
                          VisitedFactory visitedFactory) {
         super(crawlerRepository);
         this.checkpointHandler = checkpointHandler;
@@ -41,7 +42,7 @@ public class QueuesCrawler extends AbstractCrawler {
         Container crawlerScope = crawlerScope(id, crawler);
 
         return crawlerScope.get(StagedJobExecutor.class).crawlAndWait(
-                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings, visitedFactory));
+                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckPointFor(crawler), more(crawler), mappings, visitedFactory, crawlerScope.get(Clock.class)));
     }
 
     private Container crawlerScope(UUID id, Model crawler) {

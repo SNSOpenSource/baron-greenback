@@ -10,6 +10,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.ResponseBuilder;
@@ -48,7 +49,7 @@ public class FailureHandlerTest {
         Definition source = AbstractCrawler.sourceDefinition(crawler);
         Definition destination = AbstractCrawler.destinationDefinition(crawler);
         HttpDatasource datasource = HttpDatasource.httpDatasource(uri("/any/uri"), source);
-        job = HttpJob.httpJob(crawlerId, Record.constructors.record(), datasource, destination, new HashSet<HttpDatasource>());
+        job = HttpJob.httpJob(crawlerId, Record.constructors.record(), datasource, destination, new HashSet<HttpDatasource>(), scope.get(Clock.class).now());
     }
 
     @Test

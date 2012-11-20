@@ -14,6 +14,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Function2;
 import com.googlecode.totallylazy.LazyException;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.time.Clock;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,11 +36,13 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     private final CrawlerRepository crawlerRepository;
     private final CheckpointHandler checkpointHandler;
     protected final VisitedFactory visited;
+    protected final Clock clock;
 
-    public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, VisitedFactory visited) {
+    public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, VisitedFactory visited, Clock clock) {
         this.crawlerRepository = crawlerRepository;
         this.checkpointHandler = checkpointHandler;
         this.visited = visited;
+        this.clock = clock;
     }
 
     public Definition destination(Record record) {

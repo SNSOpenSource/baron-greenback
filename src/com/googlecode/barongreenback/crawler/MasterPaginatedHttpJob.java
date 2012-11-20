@@ -8,6 +8,7 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 import org.w3c.dom.Document;
@@ -22,8 +23,12 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         super(context);
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, VisitedFactory visitedFactory) {
-        return new MasterPaginatedHttpJob(createContext(crawlerId, Record.constructors.record(), datasource, destination, checkpoint, moreXPath, mappings, visitedFactory.value()));
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, VisitedFactory visitedFactory, Clock clock) {
+        return masterPaginatedHttpJob(createContext(crawlerId, Record.constructors.record(), datasource, destination, checkpoint, moreXPath, mappings, visitedFactory.value(), clock.now()));
+    }
+
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(Model model) {
+        return new MasterPaginatedHttpJob(model);
     }
 
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {

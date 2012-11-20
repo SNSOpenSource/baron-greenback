@@ -9,6 +9,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,12 +26,23 @@ public interface StagedJob {
 
     Record record();
 
+    Date createdDate();
+
     public static class functions {
-        public static Callable1<StagedJob, HttpDatasource> datasource() {
-            return new Callable1<StagedJob, HttpDatasource>() {
+        public static Function1<StagedJob, HttpDatasource> datasource() {
+            return new Function1<StagedJob, HttpDatasource>() {
                 @Override
                 public HttpDatasource call(StagedJob job) throws Exception {
                     return job.datasource();
+                }
+            };
+        }
+
+        public static Function1<StagedJob, Date> createdDate() {
+            return new Function1<StagedJob, Date>() {
+                @Override
+                public Date call(StagedJob stagedJob) throws Exception {
+                    return stagedJob.createdDate();
                 }
             };
         }
