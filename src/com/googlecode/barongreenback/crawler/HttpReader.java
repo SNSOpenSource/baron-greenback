@@ -14,7 +14,7 @@ import static com.googlecode.utterlyidle.handlers.Handlers.asFunction;
 public class HttpReader {
     public static Function<Response> getInput(final StagedJob job, Container crawlerScope) {
         Uri uri = job.datasource().uri();
-        HttpClient httpClient = crawlerScope.get(HttpClient.class);
+        HttpClient httpClient = crawlerScope.get(CrawlerHttpClient.class);
         FailureHandler failureHandler = crawlerScope.get(FailureHandler.class);
         return failureHandler.captureFailures(asFunction(httpClient), job).deferApply(get(uri).build()).then(recordVisit(job));
     }
