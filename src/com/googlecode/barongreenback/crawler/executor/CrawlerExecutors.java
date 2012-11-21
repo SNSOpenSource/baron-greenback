@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -158,7 +159,7 @@ public class CrawlerExecutors implements Closeable {
     }
 
     private static ThreadPoolJobExecutor jobExecutor(int threads, int capacity, String name) {
-        return new ThreadPoolJobExecutor(executor(threads, capacity, LinkedBlockingQueue.class), name);
+        return new ThreadPoolJobExecutor(executor(threads, capacity, PriorityBlockingQueue.class), name);
     }
 
     private DataWriter createDataWriter(int threads, int capacity, int seconds, String name) {
