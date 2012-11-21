@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
 import com.googlecode.barongreenback.crawler.executor.JobExecutor;
+import com.googlecode.barongreenback.crawler.executor.PriorityJobRunnable;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -76,7 +77,7 @@ public class DataWriter implements JobExecutor {
     }
 
     @Override
-    public void execute(Runnable command) {
+    public void execute(PriorityJobRunnable command) {
         command.run();
     }
 

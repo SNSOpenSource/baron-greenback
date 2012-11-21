@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
 import com.googlecode.barongreenback.crawler.executor.JobExecutor;
+import com.googlecode.barongreenback.crawler.executor.PriorityJobRunnable;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Function1;
@@ -37,19 +38,21 @@ public class StagedJobExecutor {
     public void crawl(StagedJob job) throws InterruptedException {
         submit(executors.inputHandler(job), getInput(job, crawlerScope).then(
                 submit(executors.processHandler(job), processJobs(job, crawlerScope).then(
-                        submit(executors.outputHandler(job), write(job, crawlerScope))))));
+                        submit(executors.outputHandler(job), write(job, crawlerScope), job)), job)), job);
     }
 
-    private void submit(JobExecutor jobExecutor, final Runnable function) {
+    private void submit(JobExecutor jobExecutor, final Runnable function, StagedJob job) {
         latch.countUp();
-        jobExecutor.execute(logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class)));
+        Runnable logExceptionsRunnable = logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class));
+        PriorityJobRunnable priorityJobRunnable = new PriorityJobRunnable(job, logExceptionsRunnable); 
+		jobExecutor.execute(priorityJobRunnable);
     }
 
-    private <T> Function1<T, Void> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable) {
+    private <T> Function1<T, Void> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable, final StagedJob job) {
         return new Function1<T, Void>() {
             @Override
             public Void call(T result) throws Exception {
-                submit(jobExecutor, runnable.deferApply(result));
+                submit(jobExecutor, runnable.deferApply(result), job);
                 return Runnables.VOID;
             }
         };
