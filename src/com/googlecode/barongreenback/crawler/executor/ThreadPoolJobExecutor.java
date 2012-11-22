@@ -30,7 +30,7 @@ public class ThreadPoolJobExecutor implements JobExecutor {
     }
 
     @Override
-    public void execute(Runnable command) {
+    public void execute(PriorityJobRunnable command) {
         executor.execute(command);
     }
 
