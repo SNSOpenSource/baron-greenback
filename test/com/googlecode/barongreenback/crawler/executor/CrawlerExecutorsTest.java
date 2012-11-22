@@ -73,7 +73,8 @@ public class CrawlerExecutorsTest {
 				processHandlerCapacity, 
 				outputHandlerThreads, 
 				outputHandlerCapacity, 
-				application);
+				application,
+				new ThreadPoolExecutorFactory());
 	}
 	
 	@Before
@@ -137,15 +138,14 @@ public class CrawlerExecutorsTest {
 
 	private void putNonMasterJobsOnQueue(JobExecutor jobExecutor) {
 	    for (int i = 0 ; i < numNonMasterJobs  ; i++) {
-	    	NonMasterJob 		stagedJob 	= createJobWithDefinition();
+	    	NonMasterJob 		stagedJob 	= new NonMasterJob();
 	    	PriorityJobRunnable command 	= new BlockingPriorityJobRunnable(stagedJob);
 			jobExecutor.execute(command);
 		}
     }
 	
 	private JobExecutor getJobExecutor() {
-		StagedJob 	discarded 	= createJobWithDefinition();
-		JobExecutor jobExecutor = crawlerExecutors.inputHandler(discarded);
+		JobExecutor jobExecutor = crawlerExecutors.inputExecutor("unused suffix");
 		return jobExecutor;
 	}
 
@@ -233,10 +233,6 @@ public class CrawlerExecutorsTest {
 	private synchronized int getNumberOfProcessedNonMasterJobs() {
 		return nonMasterProcessedCount;
 	}
-
-	private NonMasterJob createJobWithDefinition() {
-		return new NonMasterJob();
-	}
 	
 	private class NonMasterJob implements StagedJob {
 
@@ -251,32 +247,16 @@ public class CrawlerExecutorsTest {
 				Response response) throws Exception {  return null; }
 		
 		@Override
-		public Definition destination() { return initDefinition(); }
+		public Definition destination() { return null; }
 		
 		@Override
-		public HttpDatasource datasource() { 
-				Uri uri = new Uri("http", "authority", "path", "query", "fragment");
-				return HttpDatasource.httpDatasource(uri, null);
-		}
+		public HttpDatasource datasource() { return null; }
 		
 		@Override
 		public UUID crawlerId() { return null; }
 
 		@Override
 		public Date createdDate() { return null; }
-	}
-	
-	private Definition initDefinition() {
-		return new Definition() {
-			@Override
-			public String name() { return null; }
-
-			@Override
-			public int compareTo(Definition o) { return 0; }
-
-			@Override
-			public Sequence<Keyword<?>> fields() { return null; }
-		};
 	}
 
 }

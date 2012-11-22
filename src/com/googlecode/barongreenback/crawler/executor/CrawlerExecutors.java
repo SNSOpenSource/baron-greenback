@@ -45,9 +45,10 @@ public class CrawlerExecutors implements Closeable {
     private ConcurrentHashMap<Definition, Lazy<DataWriter>> outputHandler = new ConcurrentHashMap<Definition, Lazy<DataWriter>>();
     private Map<CrawlerConfigValues, Integer> configValues = new HashMap<CrawlerConfigValues, Integer>();
     private final Application application;
+    private final ExecutorFactory executorFactory;
 
     public CrawlerExecutors(Integer inputHandlerThreads, Integer inputHandlerCapacity, Integer processHandlerThreads, Integer processHandlerCapacity,
-                            Integer outputHandlerThreads, Integer outputHandlerCapacity, Application application) {
+                            Integer outputHandlerThreads, Integer outputHandlerCapacity, Application application, ExecutorFactory executorFactory) {
         this.application = application;
         configValues.put(INPUT_HANDLER_THREADS, inputHandlerThreads);
         configValues.put(INPUT_HANDLER_CAPACITY, inputHandlerCapacity);
@@ -55,6 +56,7 @@ public class CrawlerExecutors implements Closeable {
         configValues.put(PROCESS_HANDLER_CAPACITY, processHandlerCapacity);
         configValues.put(OUTPUT_HANDLER_THREADS, outputHandlerThreads);
         configValues.put(OUTPUT_HANDLER_CAPACITY, outputHandlerCapacity);
+        this.executorFactory = executorFactory;
     }
 
     private DataWriter outputExecutor(String suffix) {
@@ -62,11 +64,11 @@ public class CrawlerExecutors implements Closeable {
     }
 
     private ThreadPoolJobExecutor processExecutor(String suffix) {
-        return jobExecutor(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY), "Processing " + suffix);
+        return executorFactory.jobExecutor(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY), "Processing " + suffix);
     }
 
-    private ThreadPoolJobExecutor inputExecutor(String suffix) {
-        return jobExecutor(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY), "Reading " + suffix);
+    ThreadPoolJobExecutor inputExecutor(String suffix) {
+        return executorFactory.jobExecutor(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY), "Reading " + suffix);
     }
 
     public void resetExecutors() {
@@ -150,28 +152,11 @@ public class CrawlerExecutors implements Closeable {
     public void close() {
         statusMonitors().each(safeClose());
     }
-
-    private static ThreadPoolExecutor executor(int threads, int capacity, Class<? extends BlockingQueue> queueClass) {
-        return new ThreadPoolExecutor(threads, threads == 0 ? Integer.MAX_VALUE : threads,
-                60L, TimeUnit.SECONDS,
-                queue(queueClass, capacity),
-                new BlockingRetryRejectedExecutionHandler());
-    }
-
-    private static ThreadPoolJobExecutor jobExecutor(int threads, int capacity, String name) {
-        return new ThreadPoolJobExecutor(executor(threads, capacity, PriorityBlockingQueue.class), name);
-    }
-
+    
     private DataWriter createDataWriter(int threads, int capacity, int seconds, String name) {
-        return new DataWriter(application, threads, seconds, name, capacity);
+    	return new DataWriter(application, threads, seconds, name, capacity);
     }
+    
 
-    private static BlockingQueue<Runnable> queue(Class<? extends BlockingQueue> queueClass, int capacity) {
-        Container container = Containers.container().add(BlockingQueue.class, queueClass);
-        if (capacity > 0) {
-            container.addInstance(int.class, capacity);
-        }
-        return cast(container.get(BlockingQueue.class));
-    }
 }
 
