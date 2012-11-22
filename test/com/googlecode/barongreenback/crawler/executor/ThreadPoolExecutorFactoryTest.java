@@ -3,48 +3,23 @@ package com.googlecode.barongreenback.crawler.executor;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.io.PrintStream;
 import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Callable;
+import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.RuntimeErrorException;
-
 import org.hamcrest.CoreMatchers;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.googlecode.barongreenback.crawler.CrawlerHttpClient;
-import com.googlecode.barongreenback.crawler.HttpDatasource;
+import com.googlecode.barongreenback.crawler.HttpJob;
 import com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob;
-import com.googlecode.barongreenback.crawler.StagedJob;
-import com.googlecode.barongreenback.crawler.StagedJobExecutor;
-import com.googlecode.barongreenback.crawler.failures.FailureHandler;
-import com.googlecode.barongreenback.crawler.failures.FailureRepository;
-import com.googlecode.barongreenback.crawler.failures.Failures;
 import com.googlecode.funclate.Model;
-import com.googlecode.funclate.ModelFactory;
-import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Uri;
-import com.googlecode.utterlyidle.Application;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.yadic.Container;
-import com.googlecode.yadic.SimpleContainer;
 
-public class CrawlerExecutorsTest {
+public class ThreadPoolExecutorFactoryTest {
 
-	private CrawlerExecutors crawlerExecutors;
-	
 	private CountDownLatch overallCountDownLatch;
 	
 	private Semaphore setupComplete = new Semaphore(1);
@@ -58,35 +33,10 @@ public class CrawlerExecutorsTest {
 	private CountDownLatch subsequentNonMasterJobsLatch = new CountDownLatch(1);
 	
 	private final int inputHandlerCapacity = numNonMasterJobs + 1;
-
-	@Before
-	public void setUp() {
-		Integer processHandlerThreads = 1;
-		Integer processHandlerCapacity = 1;
-		Integer outputHandlerThreads = 1;
-		Integer outputHandlerCapacity = 1;
-		Application application = null;
-		crawlerExecutors = new CrawlerExecutors(
-				inputHandlerThreads, 
-				inputHandlerCapacity, 
-				processHandlerThreads, 
-				processHandlerCapacity, 
-				outputHandlerThreads, 
-				outputHandlerCapacity, 
-				application,
-				new ThreadPoolExecutorFactory());
-	}
 	
 	@Before
 	public void initLatch() {
 		overallCountDownLatch = new CountDownLatch(numNonMasterJobs);
-	}
-	
-	@After 
-	public void tearDown() {
-		if (crawlerExecutors != null) {
-			crawlerExecutors.close();
-		}
 	}
 	
 	@Test
@@ -138,14 +88,22 @@ public class CrawlerExecutorsTest {
 
 	private void putNonMasterJobsOnQueue(JobExecutor jobExecutor) {
 	    for (int i = 0 ; i < numNonMasterJobs  ; i++) {
-	    	NonMasterJob 		stagedJob 	= new NonMasterJob();
+	    	HttpJob stagedJob = createHttpJob();
 	    	PriorityJobRunnable command 	= new BlockingPriorityJobRunnable(stagedJob);
 			jobExecutor.execute(command);
 		}
     }
+
+	private HttpJob createHttpJob() {
+	    HashSet<Pair<String, Object>> values = new HashSet<Pair<String,Object>>();
+	    values.add(Pair.pair("createdDate", (Object)(new Date())));
+	    Model context = Model.immutable.model(values);
+	    HttpJob 			stagedJob 	= HttpJob.httpJob(context );
+	    return stagedJob;
+    }
 	
 	private JobExecutor getJobExecutor() {
-		JobExecutor jobExecutor = crawlerExecutors.inputExecutor("unused suffix");
+		JobExecutor jobExecutor = new ThreadPoolExecutorFactory().jobExecutor(inputHandlerThreads, inputHandlerCapacity, "test name");
 		return jobExecutor;
 	}
 
@@ -177,7 +135,7 @@ public class CrawlerExecutorsTest {
 	}
 	
 	private class BlockingPriorityJobRunnable extends PriorityJobRunnable {
-		public BlockingPriorityJobRunnable(NonMasterJob stagedJob) {
+		public BlockingPriorityJobRunnable(HttpJob stagedJob) {
 			super(stagedJob, new NullRunnable());
 		}
 
@@ -234,29 +192,5 @@ public class CrawlerExecutorsTest {
 		return nonMasterProcessedCount;
 	}
 	
-	private class NonMasterJob implements StagedJob {
-
-		@Override
-		public Set<HttpDatasource> visited() { return null; }
-		
-		@Override
-		public Record record() { return null; }
-		
-		@Override
-		public Pair<Sequence<Record>, Sequence<StagedJob>> process(Container scope,
-				Response response) throws Exception {  return null; }
-		
-		@Override
-		public Definition destination() { return null; }
-		
-		@Override
-		public HttpDatasource datasource() { return null; }
-		
-		@Override
-		public UUID crawlerId() { return null; }
-
-		@Override
-		public Date createdDate() { return null; }
-	}
 
 }
