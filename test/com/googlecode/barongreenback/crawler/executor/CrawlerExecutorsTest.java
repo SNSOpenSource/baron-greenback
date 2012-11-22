@@ -99,7 +99,7 @@ public class CrawlerExecutorsTest {
 		ListeningPriorityJobRunnable masterCommand 
 			= putMasterJobOnQueue(jobExecutor);
 		
-		startQueueProcessing();
+		releaseFirstQueueItem();
 		
 		assertTrue(masterCommand.isProcessingFinished());
 		
@@ -119,7 +119,7 @@ public class CrawlerExecutorsTest {
 	    subsequentNonMasterJobsLatch.countDown();
     }
 
-	private void startQueueProcessing() {
+	private void releaseFirstQueueItem() {
 	    setupComplete.release();
     }
 

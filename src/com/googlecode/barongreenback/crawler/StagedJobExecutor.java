@@ -36,23 +36,23 @@ public class StagedJobExecutor {
     }
 
     public void crawl(StagedJob job) throws InterruptedException {
-        submit(executors.inputHandler(job), getInput(job, crawlerScope).then(
-                submit(executors.processHandler(job), processJobs(job, crawlerScope).then(
-                        submit(executors.outputHandler(job), write(job, crawlerScope), job)), job)), job);
+        submit(job, executors.inputHandler(job), getInput(job, crawlerScope).then(
+						        submit(job, executors.processHandler(job), processJobs(job, crawlerScope).then(
+										        submit(job, executors.outputHandler(job), write(job, crawlerScope))))));
     }
 
-    private void submit(JobExecutor jobExecutor, final Runnable function, StagedJob job) {
+    private void submit(StagedJob job, JobExecutor jobExecutor, final Runnable function) {
         latch.countUp();
         Runnable logExceptionsRunnable = logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class));
         PriorityJobRunnable priorityJobRunnable = new PriorityJobRunnable(job, logExceptionsRunnable); 
 		jobExecutor.execute(priorityJobRunnable);
     }
 
-    private <T> Function1<T, Void> submit(final JobExecutor jobExecutor, final Function1<T, ?> runnable, final StagedJob job) {
+    private <T> Function1<T, Void> submit(final StagedJob job, final JobExecutor jobExecutor, final Function1<T, ?> runnable) {
         return new Function1<T, Void>() {
             @Override
             public Void call(T result) throws Exception {
-                submit(jobExecutor, runnable.deferApply(result), job);
+                submit(job, jobExecutor, runnable.deferApply(result));
                 return Runnables.VOID;
             }
         };
