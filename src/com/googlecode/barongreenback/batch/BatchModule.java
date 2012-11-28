@@ -17,6 +17,8 @@ public class BatchModule implements ResourcesModule, RequestScopedModule {
     @Override
     public Container addPerRequestObjects(Container container) throws Exception {
         return container.
+                add(BackupsLocation.class).
+                add(AutoBackupsLocation.class).
                 add(KeepBackups.class).
                 add(BackupStart.class).
                 add(BackupInterval.class).

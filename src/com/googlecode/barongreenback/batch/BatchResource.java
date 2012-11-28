@@ -41,10 +41,9 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.shared.messages.Messages.error;
 import static com.googlecode.barongreenback.shared.messages.Messages.success;
 import static com.googlecode.funclate.Model.mutable.model;
-import static com.googlecode.totallylazy.Files.directory;
 import static com.googlecode.totallylazy.Files.files;
 import static com.googlecode.totallylazy.Files.hasSuffix;
-import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.totallylazy.Files.recursiveFiles;
 import static com.googlecode.totallylazy.Streams.copy;
 import static com.googlecode.totallylazy.Zip.zip;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -56,8 +55,6 @@ import static java.lang.String.format;
 @Path("batch")
 @Produces(MediaType.TEXT_HTML)
 public class BatchResource {
-    public static final File BACKUP_LOCATION = temporaryDirectory();
-    public static final File AUTOBACKUP_LOCATION = directory(BACKUP_LOCATION, "autobackup");
     public static final UUID BACKUP_JOB_ID = UUID.fromString("70203355-d7d3-4477-85ef-d3309f21fae0");
     private final ModelRepository modelRepository;
     private final Redirector redirector;
@@ -70,10 +67,12 @@ public class BatchResource {
     private final FileRoller fileRoller;
     private final BackupStart backupStart;
     private final BackupInterval backupInterval;
+    private final BackupsLocation backupsLocation;
+    private AutoBackupsLocation autoBackupsLocation;
 
     public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final Persistence persistence, final HttpScheduler scheduler,
                          final Queues queues, final ModelCache cache, final Clock clock, final CrawlerExecutors crawlerExecutors, final FileRoller fileRoller,
-                         final BackupStart backupStart, final BackupInterval backupInterval) {
+                         final BackupStart backupStart, final BackupInterval backupInterval, final BackupsLocation backupsLocation, final AutoBackupsLocation autoBackupsLocation) {
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.persistence = persistence;
@@ -85,6 +84,8 @@ public class BatchResource {
         this.fileRoller = fileRoller;
         this.backupStart = backupStart;
         this.backupInterval = backupInterval;
+        this.backupsLocation = backupsLocation;
+        this.autoBackupsLocation = autoBackupsLocation;
     }
 
     @GET
@@ -138,7 +139,7 @@ public class BatchResource {
     @Path("deleteAll")
     public Response deleteAll() {
         try {
-            String pathname = backupNow(BACKUP_LOCATION);
+            String pathname = backupNow(backupsLocation.value());
             persistence.backup(new File(pathname));
             deleteAllData();
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Index has been deleted and a backup has been created: %s", pathname), Category.SUCCESS)));
@@ -161,7 +162,7 @@ public class BatchResource {
     @POST
     @Path("autobackup")
     public Response autobackup() {
-        Response backup = backup(backupNow(AUTOBACKUP_LOCATION));
+        Response backup = backup(backupNow(autoBackupsLocation.value()));
         Callers.call(fileRoller);
         return backup;
     }
@@ -170,7 +171,7 @@ public class BatchResource {
     @Path("delete")
     public Response delete(@FormParam("id") String id) {
         try {
-            Files.delete(new File(BACKUP_LOCATION, id));
+            Files.delete(new File(backupsLocation.value(), id));
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Deleted backed '%s'", id), Category.SUCCESS)));
         } catch (Exception e) {
             return redirector.seeOther(method(on(BatchResource.class).operations(format("Error occurred when deleting backup: '%s'", e.getMessage()), Category.ERROR)));
@@ -181,7 +182,7 @@ public class BatchResource {
     @Path("download")
     @Produces("application/zip")
     public Response download(@QueryParam("id") String id) {
-        final File file = new File(BACKUP_LOCATION, id);
+        final File file = new File(backupsLocation.value(), id);
         if (!file.exists()) {
             return redirector.seeOther(method(on(BatchResource.class).operations(format("File not found: '%s'", id), Category.ERROR)));
         }
@@ -218,8 +219,8 @@ public class BatchResource {
 
     private Model addBackups(Model model) {
         return model.
-                add("backupLocation", backupNow(BACKUP_LOCATION)).
-                add("backups", files(BACKUP_LOCATION).filter(hasSuffix("bgb")).map(asModel()).toList()).
+                add("backupLocation", backupNow(backupsLocation.value())).
+                add("backups", recursiveFiles(backupsLocation.value()).filter(hasSuffix("bgb")).map(asModel(backupsLocation.value())).toList()).
                 add("id", BACKUP_JOB_ID).
                 add("start", backupStart.value()).
                 add("interval", backupInterval.value()).
@@ -244,12 +245,12 @@ public class BatchResource {
         cache.clear();
     }
 
-    private Callable1<File, Model> asModel() {
+    private Callable1<File, Model> asModel(final File root) {
         return new Callable1<File, Model>() {
             @Override
             public Model call(File file) throws Exception {
                 return model().
-                        add("name", file.getName()).
+                        add("name", Files.relativePath(root, file)).
                         add("location", file.getAbsolutePath()).
                         add("size", humanReadable(file.length())).
                         add("date", new Date(file.lastModified()));
