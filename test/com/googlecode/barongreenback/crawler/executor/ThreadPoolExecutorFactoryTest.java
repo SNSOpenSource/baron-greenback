@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler.executor;
 
+import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -8,6 +9,8 @@ import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import junit.framework.Assert;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -34,13 +37,10 @@ public class ThreadPoolExecutorFactoryTest {
 	
 	private final int inputHandlerCapacity = numNonMasterJobs + 1;
 	
-	@Before
-	public void initLatch() {
-		overallCountDownLatch = new CountDownLatch(numNonMasterJobs);
-	}
-	
 	@Test
 	public void masterJobsJumpQueue() throws Exception {
+	    overallCountDownLatch = new CountDownLatch(numNonMasterJobs);
+	    
 		JobExecutor jobExecutor = getJobExecutor();
 		
 		stopQueueFromProcessing();
@@ -54,13 +54,66 @@ public class ThreadPoolExecutorFactoryTest {
 		
 		assertTrue(masterCommand.isProcessingFinished());
 		
-		allowAllJobsToRun();
-		
-		waitForQueueToDrain();
+        allowAllJobsToRun();
+        
+        waitForQueueToDrain();
 		
 		assertThat(getNumberOfProcessedNonMasterJobs(), CoreMatchers.is(numNonMasterJobs));
 		assertTrue(masterCommand.hasRun);
 	}
+
+    private void cleanUp() throws InterruptedException {
+        releaseFirstQueueItem();
+        allowAllJobsToRun();
+		waitForQueueToDrain();
+    }
+	
+	@Test
+	public void surplusMessagesCauseErrors() throws Exception {
+	    int totalJobs = numNonMasterJobs + numOfAdditionalJobsNeededToExceedCapacity();
+	    overallCountDownLatch = new CountDownLatch(totalJobs);
+	    
+	    JobExecutor jobExecutor = getJobExecutor();
+		
+		stopQueueFromProcessing();
+		
+		putNonMasterJobsOnQueue(jobExecutor);
+		
+		CountDownLatch excessLatch = exceedQueueCapacityInAnotherThread(jobExecutor);
+		
+		assertFalse(isThreadAddingExcessJobsFinished(excessLatch));
+		
+		cleanUp();
+        assertThat(getNumberOfProcessedNonMasterJobs(), CoreMatchers.is(totalJobs));
+        assertTrue(isThreadAddingExcessJobsFinished(excessLatch));
+	}
+
+    private boolean isThreadAddingExcessJobsFinished(CountDownLatch excessLatch)
+            throws InterruptedException {
+        return excessLatch.await(2, TimeUnit.SECONDS);
+    }
+
+    private CountDownLatch exceedQueueCapacityInAnotherThread(final JobExecutor jobExecutor) {
+        int numExcessJobs = numOfAdditionalJobsNeededToExceedCapacity();
+        final CountDownLatch excessLatch = new CountDownLatch(numExcessJobs);
+        Thread producerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < numOfAdditionalJobsNeededToExceedCapacity() ; i++) {
+                    putANonMasterJobOnQueue(jobExecutor);
+                    excessLatch.countDown();
+                }
+            }
+        });
+        producerThread.start();
+        return excessLatch;
+    }
+
+    
+    private int numOfAdditionalJobsNeededToExceedCapacity() {
+        int excess = inputHandlerCapacity - numNonMasterJobs + 2; // 2 = 1 to exceed limit + 1 because the single thread of the executor has removed an element
+        return excess > 0 ? excess : 0;
+    }
 
 	private void waitForQueueToDrain() throws InterruptedException {
 	    assertTrue(overallCountDownLatch.await(1, TimeUnit.SECONDS));
@@ -88,10 +141,14 @@ public class ThreadPoolExecutorFactoryTest {
 
 	private void putNonMasterJobsOnQueue(JobExecutor jobExecutor) {
 	    for (int i = 0 ; i < numNonMasterJobs  ; i++) {
-	    	HttpJob stagedJob = createHttpJob();
-	    	PriorityJobRunnable command 	= new BlockingPriorityJobRunnable(stagedJob);
-			jobExecutor.execute(command);
+	    	putANonMasterJobOnQueue(jobExecutor);
 		}
+    }
+
+    private void putANonMasterJobOnQueue(JobExecutor jobExecutor) {
+        HttpJob stagedJob = createHttpJob();
+        PriorityJobRunnable command 	= new BlockingPriorityJobRunnable(stagedJob);
+        jobExecutor.execute(command);
     }
 
 	private HttpJob createHttpJob() {

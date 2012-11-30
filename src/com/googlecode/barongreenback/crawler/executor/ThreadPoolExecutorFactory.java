@@ -22,7 +22,7 @@ public class ThreadPoolExecutorFactory implements ExecutorFactory {
 
     @Override
     public ThreadPoolJobExecutor jobExecutor(int threads, int capacity, String name) {
-        return new ThreadPoolJobExecutor(executor(threads, capacity, PriorityBlockingQueue.class), name);
+        return new ThreadPoolJobExecutor(executor(threads, capacity, BoundedPriorityBlockingQueue.class), name);
     }
 
     private BlockingQueue<Runnable> queue(Class<? extends BlockingQueue> queueClass, int capacity) {
