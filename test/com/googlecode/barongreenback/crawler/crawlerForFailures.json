@@ -1,0 +1,33 @@
+{"form":{
+    "update":"news",
+    "more":"/some/xpath",
+    "checkpoint":"checkpoint",
+    "checkpointType":"java.lang.String",
+    "record":{
+        "keywords":[
+            {
+                "record":null,
+                "unique":false,
+                "visible":true,
+                "alias":"",
+                "name":"title",
+                "subfeed":false,
+                "group":"",
+                "type":"java.lang.String"
+            },
+            {
+                "name":"pubDate",
+                "alias":"",
+                "group":"",
+                "type":"java.util.Date",
+                "unique":false,
+                "visible":true,
+                "subfeed":false,
+                "record":null,
+                "checkpoint":true
+            }
+        ],
+        "name":"/rss/channel/item"
+    },
+    "from":"http://feeds.bbci.co.uk/news/rss.xml"
+}}
