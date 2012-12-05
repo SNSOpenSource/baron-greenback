@@ -40,7 +40,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
                 return false;
             }
         } finally {
-            empty.signalAll();
+            empty.signal();
             lock.unlock();
         }
     }
@@ -55,7 +55,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.remove();
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
     }
@@ -66,7 +66,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.poll();
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
     }
@@ -77,7 +77,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.addAll(c);
         } finally {
-            empty.signalAll();
+            empty.signal();
             lock.unlock();
         }
     }
@@ -88,7 +88,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.removeAll(c);
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
     }
@@ -99,7 +99,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.retainAll(c);
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
     }
@@ -110,7 +110,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             decorated.clear();
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
     }
@@ -121,7 +121,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.add(e);
         } finally {
-            empty.signalAll();
+            empty.signal();
             lock.unlock();
         }
     }
@@ -134,7 +134,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
                 full.await();
             }
         } finally {
-            empty.signalAll();
+            empty.signal();
             lock.unlock();
         }
     }
@@ -145,7 +145,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.remove(o);
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
     }
@@ -163,7 +163,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             }
             return decorated.offer(e);
         } finally {
-            empty.signalAll();
+            empty.signal();
             lock.unlock();
         }
     }
@@ -177,7 +177,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             }
             return decorated.poll();
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
     }
@@ -194,7 +194,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             }
             return decorated.poll();
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
     }
@@ -210,7 +210,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
                 c.add(e);
             }
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
         return changes;
@@ -229,7 +229,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
                 c.add(e);
             }
         } finally {
-            full.signalAll();
+            full.signal();
             lock.unlock();
         }
         return changes;
