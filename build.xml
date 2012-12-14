@@ -75,11 +75,13 @@
     <target name="testjs" depends="testjs32, testjs64">
         <taskdef name="jstest" classname="com.philmander.jstest.ant.JsTestRunnerTask"
                  classpath="${build.dependencies.dir}/ant-jstestrunner-spmiller-deps-0.2.jar"/>
+        <property name="phantomosx" value="${build.dependencies.dir}/phantomjs-osx"/>
         <chmod file="${phantomlinux}" perm="u+x"/>
+        <chmod file="${phantomosx}" perm="u+x"/>
         <jstest dir="${basedir}/test" includes="**/*.html"
                 phantomlinux="${phantomlinux}"
                 phantomWin="${build.dependencies.dir}/phantomjs-windows.exe"
-                phantommac="${build.dependencies.dir}/phantomjs-osx">
+                phantommac="${phantomosx}">
             <report type="plain" destFile="${reports}/qunit-results.txt"/>
         </jstest>
     </target>
