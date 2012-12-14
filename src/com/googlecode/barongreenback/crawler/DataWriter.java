@@ -8,14 +8,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.CountLatch;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Group;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Runnables;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Triple;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.yadic.Container;
 
@@ -117,11 +110,10 @@ public class DataWriter implements JobExecutor {
             @Override
             public void run() {
                 running = true;
-                application.usingRequestScope(new Function1<Container, Void>() {
+                application.usingRequestScope(new Block<Container>() {
                     @Override
-                    public Void call(Container container) throws Exception {
+                    protected void execute(Container container) throws Exception {
                         batchWrite(container.get(BaronGreenbackRecords.class).value());
-                        return Runnables.VOID;
                     }
                 }.optional());
                 running = false;

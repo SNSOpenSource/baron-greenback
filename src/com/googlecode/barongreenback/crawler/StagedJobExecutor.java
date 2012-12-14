@@ -4,11 +4,7 @@ import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
 import com.googlecode.barongreenback.crawler.executor.JobExecutor;
 import com.googlecode.barongreenback.crawler.executor.PriorityJobRunnable;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.CountLatch;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Runnables;
-import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
@@ -48,12 +44,11 @@ public class StagedJobExecutor {
 		jobExecutor.execute(priorityJobRunnable);
     }
 
-    private <T> Function1<T, Void> submit(final StagedJob job, final JobExecutor jobExecutor, final Function1<T, ?> runnable) {
-        return new Function1<T, Void>() {
+    private <T> Block<T> submit(final StagedJob job, final JobExecutor jobExecutor, final Function1<T, ?> runnable) {
+        return new Block<T>() {
             @Override
-            public Void call(T result) throws Exception {
+            public void execute(T result) throws Exception {
                 submit(job, jobExecutor, runnable.deferApply(result));
-                return Runnables.VOID;
             }
         };
     }

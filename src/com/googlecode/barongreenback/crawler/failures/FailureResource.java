@@ -11,13 +11,7 @@ import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Runnables;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -113,22 +107,20 @@ public class FailureResource {
         return backToMe(failures.removeAll() + " failures(s) have been deleted");
     }
 
-    private Callable1<UUID, Void> ignore() {
-        return new Callable1<UUID, Void>() {
+    private Block<UUID> ignore() {
+        return new Block<UUID>() {
             @Override
-            public Void call(UUID uuid) throws Exception {
+            protected void execute(UUID uuid) throws Exception {
                 delete(uuid);
-                return Runnables.VOID;
             }
         };
     }
 
-    private Callable1<UUID, Void> retry() {
-        return new Callable1<UUID, Void>() {
+    private Block<UUID> retry() {
+        return new Block<UUID>() {
             @Override
-            public Void call(UUID uuid) throws Exception {
+            protected void execute(UUID uuid) throws Exception {
                 retry(uuid);
-                return Runnables.VOID;
             }
         };
     }

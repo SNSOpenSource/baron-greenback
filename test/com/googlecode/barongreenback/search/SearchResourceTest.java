@@ -9,7 +9,7 @@ import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.RequestBuilder;
@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.util.UUID;
 
 import static com.googlecode.lazyrecords.Keywords.keywords;
-import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -42,14 +41,13 @@ public class SearchResourceTest extends ApplicationTests {
         Waitrest waitrest = CrawlerTests.serverWithDataFeed();
         final Sequence<Record> recordSequence = CompositeCrawlerTest.crawlOnePageOnly().realise();
 
-        application.usingRequestScope(new Callable1<Container, Void>() {
-            public Void call(Container container) throws Exception {
+        application.usingRequestScope(new Block<Container>() {
+            public void execute(Container container) throws Exception {
                 Records records = container.get(BaronGreenbackRecords.class).value();
                 Definition users = Definition.constructors.definition("users", keywords(recordSequence));
                 records.add(users, recordSequence);
                 ModelRepository views = container.get(ModelRepository.class);
                 views.set(UUID.randomUUID(), ViewsRepository.convertToViewModel(users));
-                return VOID;
             }
         });
         waitrest.close();

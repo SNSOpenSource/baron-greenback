@@ -1,36 +1,29 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.totallylazy.time.Seconds;
-import com.googlecode.utterlyidle.Application;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.ResponseBuilder;
-import com.googlecode.utterlyidle.Status;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
+import com.googlecode.utterlyidle.services.Service;
 import com.googlecode.yadic.Container;
 
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.barongreenback.jobs.Job.INTERVAL;
-import static com.googlecode.barongreenback.jobs.Job.JOB_ID;
-import static com.googlecode.barongreenback.jobs.Job.REQUEST;
-import static com.googlecode.barongreenback.jobs.Job.START;
+import static com.googlecode.barongreenback.jobs.Job.*;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.Strings.isEmpty;
 import static com.googlecode.utterlyidle.HttpMessageParser.parseRequest;
 
-public class HttpScheduler {
+public class HttpScheduler implements Service {
     private final Jobs jobs;
     private final Scheduler scheduler;
     private final Application application;
@@ -98,30 +91,29 @@ public class HttpScheduler {
         };
     }
 
-    private Callable1<Container, Void> updateJob(final Job job) {
-        return new Callable1<Container, Void>() {
-            public Void call(Container container) throws Exception {
+    private Block<Container> updateJob(final Job job) {
+        return new Block<Container>() {
+            public void execute(Container container) throws Exception {
                 Jobs newTransaction = container.get(Jobs.class);
                 newTransaction.createOrUpdate(job);
-                return VOID;
             }
         };
     }
 
-    private Callable1<Record, Void> cancel() {
-        return new Callable1<Record, Void>() {
-            public Void call(Record record) throws Exception {
+    private Block<Record> cancel() {
+        return new Block<Record>() {
+            @Override
+            protected void execute(Record record) throws Exception {
                 scheduler.cancel(record.get(JOB_ID));
-                return VOID;
             }
         };
     }
 
-    private Callable1<Record, Void> schedule() {
-        return new Callable1<Record, Void>() {
-            public Void call(Record record) throws Exception {
+    private Block<Record> schedule() {
+        return new Block<Record>() {
+            @Override
+            protected void execute(Record record) throws Exception {
                 HttpScheduler.this.schedule(record);
-                return VOID;
             }
         };
     }

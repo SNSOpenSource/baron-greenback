@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.batch;
 
+import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.Sequence;
 
@@ -11,7 +12,7 @@ import static com.googlecode.totallylazy.Files.delete;
 import static com.googlecode.totallylazy.Files.files;
 import static com.googlecode.totallylazy.Files.lastModified;
 
-public class FileRoller implements Callable<Void> {
+public class FileRoller extends Function<Void> {
     private final File directory;
     private final int keep;
 
