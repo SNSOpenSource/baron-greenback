@@ -12,7 +12,6 @@ import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader;
-import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.ModuleDefiner;
 import com.googlecode.utterlyidle.modules.ModuleDefinitions;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;

@@ -163,7 +163,7 @@ public class BatchResource {
     @Path("autobackup")
     public Response autobackup() {
         Response backup = backup(backupNow(autoBackupsLocation.value()));
-        Callers.call(fileRoller);
+        fileRoller.apply();
         return backup;
     }
 

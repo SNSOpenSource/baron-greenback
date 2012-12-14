@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
+import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
@@ -28,8 +29,8 @@ public class ViewsResourceTest extends ApplicationTests {
 
     @Before
     public void createView() {
-        application.usingRequestScope(new Callable1<Container, Void>() {
-            public Void call(Container container) throws Exception {
+        application.usingRequestScope(new Block<Container>() {
+            public void execute(Container container) throws Exception {
                 ModelRepository repository = container.get(ModelRepository.class);
                 repository.set(VIEW_ID, model().
                         add("view", model().
@@ -70,7 +71,6 @@ public class ViewsResourceTest extends ApplicationTests {
                                         add("type", "java.lang.String").
                                         add("visible", true).
                                         add("unique", false)))));
-                return Runnables.VOID;
             }
         });
     }

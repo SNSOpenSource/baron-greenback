@@ -9,18 +9,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.Runnables;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
@@ -127,11 +116,10 @@ public class SearchResource {
                 entity(new StreamingOutput() {
                     @Override
                     public void write(OutputStream outputStream) throws IOException {
-                        using(new OutputStreamWriter(new BufferedOutputStream(outputStream, 32768)), new Function1<OutputStreamWriter, Void>() {
+                        using(new OutputStreamWriter(new BufferedOutputStream(outputStream, 32768)), new Block<OutputStreamWriter>() {
                             @Override
-                            public Void call(OutputStreamWriter writer) throws Exception {
+                            public void execute(OutputStreamWriter writer) throws Exception {
                                 CsvWriter.writeTo(result, writer, visibleHeaders);
-                                return Runnables.VOID;
                             }
                         });
                     }
