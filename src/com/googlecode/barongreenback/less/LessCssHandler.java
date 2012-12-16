@@ -1,0 +1,77 @@
+package com.googlecode.barongreenback.less;
+
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Uri;
+import com.googlecode.utterlyidle.HttpHandler;
+import com.googlecode.utterlyidle.HttpHeaders;
+import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.ResponseBuilder;
+import com.googlecode.utterlyidle.Status;
+import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
+
+import java.io.IOException;
+
+import static com.googlecode.totallylazy.Option.option;
+import static com.googlecode.utterlyidle.RequestBuilder.get;
+
+public class LessCssHandler implements HttpHandler {
+    private final LessCssCache cache;
+    private final HttpHandler httpHandler;
+    private final LessCompiler lessCompiler;
+    private final LessCssConfig config;
+
+    public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler, LessCssConfig config, LessCssCache cache) {
+        this.httpHandler = httpHandler;
+        this.lessCompiler = lessCompiler;
+        this.config = config;
+        this.cache = cache;
+    }
+
+    public Response handle(Request request) throws Exception {
+        Response response = httpHandler.handle(request);
+        if (true) {
+            return response;
+        }
+
+        Uri uri = request.uri();
+        if (!(uri.path().endsWith(".less") && response.status().equals(Status.OK))) {
+            return response;
+        }
+        String less = response.entity().toString();
+        return ResponseBuilder.modify(response).entity(processLess(uri, less)).build();
+    }
+
+    private String processLess(Uri uri, String less) throws IOException {
+        String key = uri.path();
+        if (cache.containsKey(key) && config.useCache() && noPurgeIn(uri)) {
+            return cache.get(key);
+        }
+        String result = lessCompiler.compile(less, new Loader(uri));
+        cache.put(key, result);
+        return result;
+    }
+
+    private boolean noPurgeIn(Uri uri) {
+        return !option(uri.query()).getOrElse("").contains("purge");
+    }
+
+    public class Loader implements Callable1<String, String> {
+        private Uri uri;
+
+        public Loader(Uri uri) {
+            this.uri = uri;
+        }
+
+        public String call(String newUri) throws Exception {
+            try {
+                uri = uri.mergePath(newUri);
+                Response response = httpHandler.handle(get(uri).header(HttpHeaders.ACCEPT, MediaType.TEXT_CSS).build());
+                return response.entity().toString();
+            } catch (Exception e) {
+                return ExceptionRenderer.toString(e);
+            }
+        }
+    }
+}
