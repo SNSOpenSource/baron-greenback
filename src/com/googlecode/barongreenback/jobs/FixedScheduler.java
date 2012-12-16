@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.time.Clock;
+import com.googlecode.utterlyidle.services.Service;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -16,24 +17,28 @@ import java.util.concurrent.ScheduledExecutorService;
 import static com.googlecode.totallylazy.Functions.function;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.time.Seconds.between;
+import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-public class FixedScheduler implements Scheduler, Closeable {
+public class FixedScheduler implements Scheduler, Closeable, Service {
     private final Map<UUID, Cancellable> jobs = new HashMap<UUID, Cancellable>();
-    private final ScheduledExecutorService service;
+    private volatile ScheduledExecutorService service;
     private final Clock clock;
 
     public FixedScheduler(Clock clock) {
         this.clock = clock;
-        this.service = Executors.newScheduledThreadPool(5);
     }
 
     @Override
     public void schedule(UUID id, Callable<?> command, Option<Date> start, long numberOfSeconds) {
         cancel(id);
         Date now = clock.now();
-        FutureJob job = new FutureJob(service.scheduleAtFixedRate(function(command), between(now, start.getOrElse(now)), numberOfSeconds, SECONDS));
+        FutureJob job = new FutureJob(service().scheduleAtFixedRate(function(command), between(now, start.getOrElse(now)), numberOfSeconds, SECONDS));
         jobs.put(id, job);
+    }
+
+    synchronized private ScheduledExecutorService service() {
+        return service == null ? this.service = Executors.newScheduledThreadPool(5) : service;
     }
 
     public void cancel(UUID id) {
@@ -47,6 +52,21 @@ public class FixedScheduler implements Scheduler, Closeable {
     public void close() throws IOException {
         while (!jobs.keySet().isEmpty()) {
             cancel(sequence(jobs.keySet()).first());
+        }
+    }
+
+    @Override
+    public void start() throws Exception {
+        service();
+    }
+
+    @Override
+    synchronized public void stop() throws Exception {
+        try {
+            service.shutdown();
+            service.awaitTermination(1, DAYS);
+        } finally {
+            service = null;
         }
     }
 }

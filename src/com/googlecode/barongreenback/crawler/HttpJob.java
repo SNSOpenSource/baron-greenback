@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
-import static com.googlecode.funclate.Model.immutable.model;
+import static com.googlecode.funclate.Model.persistent.model;
 
 public class HttpJob implements StagedJob {
     protected final Model context;

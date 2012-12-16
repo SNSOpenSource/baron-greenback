@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static com.googlecode.barongreenback.crawler.HttpDatasource.httpDatasource;
 import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
-import static com.googlecode.funclate.Model.immutable.model;
+import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Uri.uri;

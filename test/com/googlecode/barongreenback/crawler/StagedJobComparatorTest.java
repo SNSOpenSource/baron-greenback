@@ -13,7 +13,7 @@ import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHt
 import static com.googlecode.barongreenback.crawler.StagedJobComparator.masterJobsFirst;
 import static com.googlecode.barongreenback.crawler.StagedJobComparator.masterJobsThenNewest;
 import static com.googlecode.barongreenback.crawler.StagedJobComparator.newestJobsFirst;
-import static com.googlecode.funclate.Model.immutable.model;
+import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.time.Dates.date;
 import static org.hamcrest.MatcherAssert.assertThat;

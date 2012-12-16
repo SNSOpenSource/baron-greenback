@@ -4,12 +4,13 @@ import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
-import com.googlecode.utterlyidle.modules.StartupModule;
+import com.googlecode.utterlyidle.services.Services;
+import com.googlecode.utterlyidle.services.ServicesModule;
 import com.googlecode.yadic.Container;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
-public class JobsModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, StartupModule {
+public class JobsModule implements ResourcesModule, ApplicationScopedModule, RequestScopedModule, ServicesModule {
     public Resources addResources(Resources resources) throws Exception {
         return resources.
                 add(annotatedClass(JobsResource.class)).
@@ -23,11 +24,13 @@ public class JobsModule implements ResourcesModule, ApplicationScopedModule, Req
     }
 
     public Container addPerApplicationObjects(Container container) throws Exception {
-        return container.add(Scheduler.class, FixedScheduler.class);
+        return container.
+                add(FixedScheduler.class).
+                addActivator(Scheduler.class, container.getActivator(FixedScheduler.class));
     }
 
-    public Container start(Container container){
-        container.get(BatchJobsResource.class).start();
-        return container;
+    @Override
+    public Services add(Services services) throws Exception {
+        return services.add(FixedScheduler.class).add(HttpScheduler.class);
     }
 }
