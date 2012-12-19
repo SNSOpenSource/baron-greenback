@@ -57,7 +57,7 @@ public class FailureResource {
     @GET
     @Path("list")
     public Model list(@QueryParam("message") Option<String> message) {
-        Sequence<Keyword<?>> headers = Sequences.sequence(URI, REASON);
+        Sequence<Keyword<?>> headers = Sequences.<Keyword<?>>sequence(URI, REASON);
         Sequence<Record> unpaged = failureRepository.find(all());
         Sequence<Record> sorted = sorter.sort(unpaged, headers);
         Sequence<Record> paged = pager.paginate(sorted);

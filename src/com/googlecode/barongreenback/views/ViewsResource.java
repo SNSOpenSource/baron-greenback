@@ -27,6 +27,7 @@ import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
 
 import static com.googlecode.barongreenback.shared.Forms.NUMBER_OF_FIELDS;
 import static com.googlecode.barongreenback.shared.Forms.addTemplates;
@@ -149,7 +150,7 @@ public class ViewsResource {
         List<Model> models = modelRepository.
                 find(Predicates.where(MODEL_TYPE, is("view"))).
                 filter(predicate).
-                map(asModel(current, query)).
+                mapConcurrently(asModel(current, query)).
                 sortBy(Comparators.comparators(ascending(priority()), ascending(name()))).
                 toList();
         return model().add("views", models).add("anyExists", !models.isEmpty());
