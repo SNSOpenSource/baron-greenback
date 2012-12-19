@@ -5,7 +5,7 @@
 </head>
 <body class="list views">
 
-<table class="results zebra-striped">
+<table class="results">
     $thead(headers=["Name", "action" ])$
     <tbody>
     $views:item(item=it)$

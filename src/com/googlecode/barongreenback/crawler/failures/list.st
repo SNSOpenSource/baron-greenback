@@ -6,7 +6,7 @@
 <body class="failures">
 
 $message()$
-<table class="$if(pager.paged)$paged$endif$ shouldExpand results zebra-striped">
+<table class="$if(pager.paged)$paged$endif$ shouldExpand results">
     <thead>
     <tr>
         $sorter/th(headers=headers, sortedHeaders=sortedHeaders)$

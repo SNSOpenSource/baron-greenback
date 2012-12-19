@@ -1,8 +1,8 @@
 @import "/baron-greenback/shared/expander/expander.less";
 @import "/baron-greenback/shared/twitter/bootstrap.less";
 
-@basefont:          12px;
-@baseline:          14px;
+@baseFontSize:          12px;
+@baseLineHeight:          14px;
 @blur-radius: 3px;
 
 .border-radius {
@@ -10,7 +10,7 @@
 }
 
 select, input[type=file] {
-    height: @baseline * 2;
+    height: @baseLineHeight * 2;
 }
 
 @grayDark:          lighten(@black, 15%);
@@ -69,10 +69,10 @@ h1, h2, h3, h4, h5, h6, .btn, a.update {
             color: #fff;
         }
     }
-    &.success {
+    &-success {
         .gradientBar(lighten(@green, 15%), @green);
     }
-    &.danger {
+    &-danger {
         .gradientBar(lighten(@red, 15%), @red);
     }
 }
@@ -164,7 +164,7 @@ div.fieldset {
         margin: 0;
         padding: 0.3ex 0.6ex 0.4ex;
         position: absolute;
-        top: @baseline * -0.8;
+        top: @baseLineHeight * -0.8;
         font-size: 110%;
         font-weight: bold;
         text-transform: capitalize;
@@ -263,11 +263,14 @@ table {
         }
         tr.selected, tr.selected:hover {
             td {
-                background-color: lighten(@yellow, 35%);
+                background-color: lighten(@yellow, 35%) !important;
             }
         }
         tr:hover {
             cursor: pointer;
+            td {
+                background-color: lighten(@yellow, 42%) !important;
+            }
         }
     }
 }
@@ -340,11 +343,6 @@ form div.error {
   }
 }
 
-.results.paged .header a {
-  .inlineBlock;
-  width: 95%;
-}
-
 div.pagination div.control {
     vertical-align: top;
 }
@@ -402,7 +400,13 @@ div.actions form {
     .dropdown-menu {
         display: none;
         position: absolute;
-        padding-top: 1em;
+        margin: 0;
+        padding: 0;
+        padding-bottom: 1em;
+        background-color: @navbarInverseBackground;
+        li a {
+            color: @navbarInverseLinkColor !important;
+        }
     }
 
     .dropdown-menu:hover {
@@ -411,6 +415,9 @@ div.actions form {
 
     .dropdown:hover .dropdown-menu {
         display: block;
+        li a:hover {
+            color: @navbarInverseLinkColorHover !important;
+        }
     }
 
     .dropdown {

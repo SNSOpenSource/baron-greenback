@@ -6,7 +6,7 @@
 <body class="list">
 
 $message()$
-<table class="results zebra-striped">
+<table class="results">
     $thead(headers=["name", "updates", "from", "action" ])$
     <tbody>
     $items:item(item=it)$

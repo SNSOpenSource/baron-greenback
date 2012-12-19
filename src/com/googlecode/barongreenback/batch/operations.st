@@ -6,7 +6,7 @@
 <body>
 $message()$
 
-<table class="results zebra-striped">
+<table class="results">
     $thead(headers=["Name", "Size", "Date", "Action" ])$
     <tbody>
     $backups:items(item=it)$

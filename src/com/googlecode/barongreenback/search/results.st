@@ -1,6 +1,6 @@
 $if(results)$
 <div id="results">
-    <table class="results $if(pager.paged)$paged$endif$ zebra-striped">
+    <table class="results $if(pager.paged)$paged$endif$ table table-striped">
         <thead>
         <tr>
             $sorter/th(headers=headers, sortedHeaders=sortedHeaders)$

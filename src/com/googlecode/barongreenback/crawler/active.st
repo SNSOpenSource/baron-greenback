@@ -5,7 +5,7 @@
     <meta name="decorator" content="none"/>
 </head>
 <body>
-<form method="POST" action="change" class="activeCrawler">
+<form method="POST" action="change" class="activeCrawler form-inline">
     $select(name="crawler", label="Active Crawler", value=activeCrawler, values=crawlers)$
     <input type="submit" value="change"/>
 </form>
