@@ -37,7 +37,7 @@ public class ThreadPoolExecutorFactoryTest {
     public void masterJobsJumpQueue() throws Exception {
         overallCountDownLatch = new CountDownLatch(numNonMasterJobs);
 
-        JobExecutor jobExecutor = getJobExecutor();
+        JobExecutor<PriorityJobRunnable> jobExecutor = getJobExecutor();
 
         stopQueueFromProcessing();
 
@@ -69,7 +69,7 @@ public class ThreadPoolExecutorFactoryTest {
         int totalJobs = numNonMasterJobs + numOfAdditionalJobsNeededToExceedCapacity();
         overallCountDownLatch = new CountDownLatch(totalJobs);
 
-        JobExecutor jobExecutor = getJobExecutor();
+        JobExecutor<PriorityJobRunnable> jobExecutor = getJobExecutor();
 
         stopQueueFromProcessing();
 
@@ -89,7 +89,7 @@ public class ThreadPoolExecutorFactoryTest {
         return excessLatch.await(2, TimeUnit.SECONDS);
     }
 
-    private CountDownLatch exceedQueueCapacityInAnotherThread(final JobExecutor jobExecutor) {
+    private CountDownLatch exceedQueueCapacityInAnotherThread(final JobExecutor<PriorityJobRunnable> jobExecutor) {
         int numExcessJobs = numOfAdditionalJobsNeededToExceedCapacity();
         final CountDownLatch excessLatch = new CountDownLatch(numExcessJobs);
         Thread producerThread = new Thread(new Runnable() {
@@ -127,7 +127,7 @@ public class ThreadPoolExecutorFactoryTest {
         setupComplete.acquire();
     }
 
-    private ListeningPriorityJobRunnable putMasterJobOnQueue(JobExecutor jobExecutor) {
+    private ListeningPriorityJobRunnable putMasterJobOnQueue(JobExecutor<PriorityJobRunnable> jobExecutor) {
         Model model = Model.persistent.model();
         MasterPaginatedHttpJob masterJob = MasterPaginatedHttpJob.masterPaginatedHttpJob(model);
         ListeningPriorityJobRunnable masterCommand = new ListeningPriorityJobRunnable(masterJob);
@@ -135,13 +135,13 @@ public class ThreadPoolExecutorFactoryTest {
         return masterCommand;
     }
 
-    private void putNonMasterJobsOnQueue(JobExecutor jobExecutor) {
+    private void putNonMasterJobsOnQueue(JobExecutor<PriorityJobRunnable> jobExecutor) {
         for (int i = 0; i < numNonMasterJobs; i++) {
             putANonMasterJobOnQueue(jobExecutor);
         }
     }
 
-    private void putANonMasterJobOnQueue(JobExecutor jobExecutor) {
+    private void putANonMasterJobOnQueue(JobExecutor<PriorityJobRunnable> jobExecutor) {
         HttpJob stagedJob = createHttpJob();
         PriorityJobRunnable command = new BlockingPriorityJobRunnable(stagedJob);
         jobExecutor.execute(command);
@@ -151,13 +151,11 @@ public class ThreadPoolExecutorFactoryTest {
         HashSet<Pair<String, Object>> values = new HashSet<Pair<String, Object>>();
         values.add(Pair.pair("createdDate", (Object) (new Date())));
         Model context = Model.persistent.model(values);
-        HttpJob stagedJob = HttpJob.httpJob(context);
-        return stagedJob;
+        return HttpJob.httpJob(context);
     }
 
-    private JobExecutor getJobExecutor() {
-        JobExecutor jobExecutor = new ThreadPoolExecutorFactory().jobExecutor(inputHandlerThreads, inputHandlerCapacity, "test name");
-        return jobExecutor;
+    private JobExecutor<PriorityJobRunnable> getJobExecutor() {
+        return new ThreadPoolExecutorFactory().executor(inputHandlerThreads, inputHandlerCapacity, "test name", BoundedPriorityBlockingQueue.class);
     }
 
     private class ListeningPriorityJobRunnable extends PriorityJobRunnable {
@@ -176,10 +174,6 @@ public class ThreadPoolExecutorFactoryTest {
             hasRun = true;
             finishedProcessingLatch.countDown();
             System.out.println("Master finished. Number of non masters processed: " + getNumberOfProcessedNonMasterJobs());
-        }
-
-        public boolean hasRun() {
-            return hasRun;
         }
 
         public boolean isProcessingFinished() throws InterruptedException {

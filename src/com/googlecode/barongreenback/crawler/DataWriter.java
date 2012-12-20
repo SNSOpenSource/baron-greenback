@@ -32,7 +32,7 @@ import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
-public class DataWriter implements JobExecutor {
+public class DataWriter implements JobExecutor<PriorityJobRunnable> {
     private final BlockingQueue<Triple<Definition, Sequence<Record>, CountLatch>> data;
     private final Application application;
     private final int threads;

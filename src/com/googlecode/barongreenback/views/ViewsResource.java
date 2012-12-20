@@ -54,11 +54,13 @@ public class ViewsResource {
     private final Redirector redirector;
     private final ModelRepository modelRepository;
     private final RecordsService recordsService;
+    private final ViewsExecutor viewsExecutor;
 
-    public ViewsResource(Redirector redirector, ModelRepository modelRepository, RecordsService recordsService) {
+    public ViewsResource(Redirector redirector, ModelRepository modelRepository, RecordsService recordsService, ViewsExecutor viewsExecutor) {
         this.redirector = redirector;
         this.modelRepository = modelRepository;
         this.recordsService = recordsService;
+        this.viewsExecutor = viewsExecutor;
     }
 
     @GET
@@ -150,7 +152,7 @@ public class ViewsResource {
         List<Model> models = modelRepository.
                 find(Predicates.where(MODEL_TYPE, is("view"))).
                 filter(predicate).
-                mapConcurrently(asModel(current, query)).
+                mapConcurrently(asModel(current, query), viewsExecutor).
                 sortBy(Comparators.comparators(ascending(priority()), ascending(name()))).
                 toList();
         return model().add("views", models).add("anyExists", !models.isEmpty());

@@ -18,8 +18,8 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class CrawlerExecutors implements Closeable {
 
-    private ConcurrentHashMap<String, Lazy<JobExecutor>> inputHandler = new ConcurrentHashMap<String, Lazy<JobExecutor>>();
-    private ConcurrentHashMap<String, Lazy<JobExecutor>> processHandler = new ConcurrentHashMap<String, Lazy<JobExecutor>>();
+    private ConcurrentHashMap<String, Lazy<JobExecutor<PriorityJobRunnable>>> inputHandler = new ConcurrentHashMap<String, Lazy<JobExecutor<PriorityJobRunnable>>>();
+    private ConcurrentHashMap<String, Lazy<JobExecutor<PriorityJobRunnable>>> processHandler = new ConcurrentHashMap<String, Lazy<JobExecutor<PriorityJobRunnable>>>();
     private ConcurrentHashMap<String, Lazy<DataWriter>> outputHandler = new ConcurrentHashMap<String, Lazy<DataWriter>>();
     private Map<CrawlerConfigValues, Integer> configValues = new HashMap<CrawlerConfigValues, Integer>();
     private final Application application;
@@ -41,12 +41,12 @@ public class CrawlerExecutors implements Closeable {
         return createDataWriter(configValues.get(OUTPUT_HANDLER_THREADS), configValues.get(OUTPUT_HANDLER_CAPACITY), 1, "Writing " + suffix);
     }
 
-    private ThreadPoolJobExecutor processExecutor(String suffix) {
-        return executorFactory.jobExecutor(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY), "Processing " + suffix);
+    private ThreadPoolJobExecutor<PriorityJobRunnable> processExecutor(String suffix) {
+        return executorFactory.executor(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY), "Processing " + suffix, BoundedPriorityBlockingQueue.class);
     }
 
-    ThreadPoolJobExecutor inputExecutor(String suffix) {
-        return executorFactory.jobExecutor(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY), "Reading " + suffix);
+    ThreadPoolJobExecutor<PriorityJobRunnable>  inputExecutor(String suffix) {
+        return executorFactory.executor(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY), "Reading " + suffix, BoundedPriorityBlockingQueue.class);
     }
 
     public void resetExecutors() {
@@ -80,9 +80,9 @@ public class CrawlerExecutors implements Closeable {
         return configValues.get(OUTPUT_HANDLER_CAPACITY);
     }
 
-    public JobExecutor inputHandler(StagedJob job) {
+    public JobExecutor<PriorityJobRunnable> inputHandler(StagedJob job) {
         final String authority = job.datasource().uri().authority();
-        inputHandler.putIfAbsent(authority, new Lazy<JobExecutor>() {
+        inputHandler.putIfAbsent(authority, new Lazy<JobExecutor<PriorityJobRunnable>>() {
             @Override
             protected JobExecutor get() throws Exception {
                 return inputExecutor(authority);
@@ -91,9 +91,9 @@ public class CrawlerExecutors implements Closeable {
         return inputHandler.get(authority).value();
     }
 
-    public JobExecutor processHandler(StagedJob job) {
+    public JobExecutor<PriorityJobRunnable> processHandler(StagedJob job) {
         final Definition definition = job.destination();
-        processHandler.putIfAbsent(definition.name(), new Lazy<JobExecutor>() {
+        processHandler.putIfAbsent(definition.name(), new Lazy<JobExecutor<PriorityJobRunnable>>() {
             @Override
             protected JobExecutor get() throws Exception {
                 return processExecutor(definition.name());
@@ -113,9 +113,9 @@ public class CrawlerExecutors implements Closeable {
         return outputHandler.get(definition.name()).value();
     }
 
-    public Sequence<JobExecutor> statusMonitors() {
-        Sequence<JobExecutor> inputHandlers = sequence(inputHandler.values()).map(value(JobExecutor.class));
-        Sequence<JobExecutor> processHandlers = sequence(processHandler.values()).map(value(JobExecutor.class));
+    public Sequence<JobExecutor<PriorityJobRunnable>> statusMonitors() {
+        Sequence<JobExecutor<PriorityJobRunnable>> inputHandlers = sequence(inputHandler.values()).map(Callables.<JobExecutor<PriorityJobRunnable>>value());
+        Sequence<JobExecutor<PriorityJobRunnable>> processHandlers = sequence(processHandler.values()).map(Callables.<JobExecutor<PriorityJobRunnable>>value());
         Sequence<DataWriter> outputHandlers = sequence(outputHandler.values()).map(value(DataWriter.class));
 
         return Sequences.flatten(sequence(inputHandlers, processHandlers, outputHandlers));

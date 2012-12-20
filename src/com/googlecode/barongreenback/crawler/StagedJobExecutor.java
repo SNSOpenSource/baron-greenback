@@ -37,14 +37,14 @@ public class StagedJobExecutor {
 										        submit(job, executors.outputHandler(job), write(job, crawlerScope))))));
     }
 
-    private void submit(StagedJob job, JobExecutor jobExecutor, final Runnable function) {
+    private void submit(StagedJob job, JobExecutor<PriorityJobRunnable> jobExecutor, final Runnable function) {
         latch.countUp();
         Runnable logExceptionsRunnable = logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class));
         PriorityJobRunnable priorityJobRunnable = new PriorityJobRunnable(job, logExceptionsRunnable); 
 		jobExecutor.execute(priorityJobRunnable);
     }
 
-    private <T> Block<T> submit(final StagedJob job, final JobExecutor jobExecutor, final Function1<T, ?> runnable) {
+    private <T> Block<T> submit(final StagedJob job, final JobExecutor<PriorityJobRunnable> jobExecutor, final Function1<T, ?> runnable) {
         return new Block<T>() {
             @Override
             public void execute(T result) throws Exception {
