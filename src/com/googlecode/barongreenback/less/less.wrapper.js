@@ -1,5 +1,5 @@
 function parseLess(content, loader) {
-    this.readFile = function(path) {
+    BGBreadFile = function(path) {
         return String(loader.call(path.href));
     };
     var parser = new less.Parser;

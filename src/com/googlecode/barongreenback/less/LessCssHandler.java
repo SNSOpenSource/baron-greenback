@@ -31,9 +31,6 @@ public class LessCssHandler implements HttpHandler {
 
     public Response handle(Request request) throws Exception {
         Response response = httpHandler.handle(request);
-        if (true) {
-            return response;
-        }
 
         Uri uri = request.uri();
         if (!(uri.path().endsWith(".less") && response.status().equals(Status.OK))) {

@@ -14,4 +14,4 @@ mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.yadic:yadic:jar|sources:153
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.funclate:funclate:jar|sources:93
 mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:10
 
-mvn:rhino:js:jar:1.6R7
+mvn:org.mozilla:rhino:jar|sources:1.7R4

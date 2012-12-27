@@ -4,7 +4,7 @@
     <title>$title$ - Baron Greenback</title>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
     <link rel="shortcut icon" href="$base$baron-greenback/shared/favicon.ico"/>
-    <link rel="stylesheet/less" type="text/css" href="$base$baron-greenback/shared/style.less"/>
+    <link rel="stylesheet" type="text/css" href="$base$baron-greenback/shared/style.less"/>
     <script src="$base$baron-greenback/shared/less-1.3.1.js"></script>
     $head$
 </head>
