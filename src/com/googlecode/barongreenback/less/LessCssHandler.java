@@ -61,6 +61,10 @@ public class LessCssHandler implements HttpHandler {
             this.uri = uri;
         }
 
+        public Uri uri() {
+            return uri;
+        }
+
         public String call(String newUri) throws Exception {
             try {
                 uri = uri.mergePath(newUri);

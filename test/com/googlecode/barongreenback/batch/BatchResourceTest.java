@@ -50,7 +50,7 @@ public class BatchResourceTest extends ApplicationTests {
     }
 
     private File extractFile(Message message) {
-        return new File(message.message().split(":")[1].trim());
+        return new File(message.message().substring(message.message().indexOf(':') + 1).trim());
     }
 
     private BatchOperationsPage restoreFrom(File backupLocation) throws Exception {

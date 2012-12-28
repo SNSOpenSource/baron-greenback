@@ -533,12 +533,12 @@ less.Parser = function Parser(env) {
                         frames = [new(tree.Ruleset)(null, variables)];
                     }
 
-//                    try {
+                    try {
                         var css = evaluate.call(this, { frames: frames })
                                           .toCSS([], { compress: options.compress || false, dumpLineNumbers: env.dumpLineNumbers });
-//                    } catch (e) {
-//                        throw new(LessError)(e, env);
-//                    }
+                    } catch (e) {
+                        throw new(LessError)(e, env);
+                    }
 
                     if ((importError = parser.imports.error)) { // Check if there was an error during importing
                         if (importError instanceof LessError) throw importError;

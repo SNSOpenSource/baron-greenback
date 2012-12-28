@@ -13,7 +13,8 @@ import static com.googlecode.yadic.Containers.addIfAbsent;
 
 public class LessCssModule implements RequestScopedModule, ApplicationScopedModule {
     public Container addPerApplicationObjects(Container container) throws Exception {
-        addIfAbsent(container, LessCompiler.class, RhinoLessCompiler.class);
+//        addIfAbsent(container, LessCompiler.class, RhinoLessCompiler.class);
+        addIfAbsent(container, LessCompiler.class, OfficialLessCompiler.class);
         addIfAbsent(container, LessCssCache.class, InMemoryLessCssCache.class);
         return container;
     }

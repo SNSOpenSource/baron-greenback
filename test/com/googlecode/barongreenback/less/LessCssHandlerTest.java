@@ -62,7 +62,7 @@ public class LessCssHandlerTest {
     private LessCompiler stubCompiler() {
         return new LessCompiler() {
             @Override
-            public String compile(String less, Callable1<String, String> loader) throws IOException {
+            public String compile(String less, LessCssHandler.Loader loader) throws IOException {
                 return "";
             }
         };
@@ -71,7 +71,7 @@ public class LessCssHandlerTest {
     private LessCompiler exceptionThrowingCompiler() {
         return new LessCompiler() {
             @Override
-            public String compile(String less, Callable1<String, String> loader) throws IOException {
+            public String compile(String less, LessCssHandler.Loader loader) throws IOException {
                 throw new RuntimeException("This compiler likes to blow up");
             }
         };
