@@ -16,6 +16,4 @@ mvn://repo.bodar.com.s3.amazonaws.com/com.googlecode.lazyparsec:lazyparsec:jar|s
 
 mvn:org.mozilla:rhino:jar|sources:1.7R4
 
-file:///C:/Users/millerst/code/frido37-lesscss-java-master/target/lesscss-1.3.1.patch.jar
-mvn:commons-io:commons-io:jar:2.4
-mvn:commons-logging:commons-logging:jar:1.1.1
+s3://repo.bodar.com/net.spmiller.org.lesscss:lesscss-deps:jar:1.3.2-SNAPSHOT

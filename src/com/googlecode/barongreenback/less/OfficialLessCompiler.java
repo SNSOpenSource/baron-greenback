@@ -5,12 +5,14 @@ import com.googlecode.totallylazy.Callers;
 import org.lesscss.LessException;
 import org.lesscss.LessResolver;
 import org.lesscss.LessSource;
+import org.lesscss.logger.LastMessageLogger;
+import org.lesscss.logger.StdLogger;
 
 import java.io.IOException;
 
 public class OfficialLessCompiler implements LessCompiler {
 
-    private final org.lesscss.LessCompiler compiler = new org.lesscss.LessCompiler();
+    private final org.lesscss.LessCompiler compiler = new org.lesscss.LessCompiler(new StdLogger());
     @Override
     public String compile(String less, LessCssHandler.Loader loader) throws IOException {
         try {
