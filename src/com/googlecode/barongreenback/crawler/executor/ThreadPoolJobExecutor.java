@@ -5,7 +5,7 @@ import com.googlecode.totallylazy.Option;
 import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class ThreadPoolJobExecutor implements JobExecutor {
+public class ThreadPoolJobExecutor<R extends Runnable> implements JobExecutor<R> {
     private final ThreadPoolExecutor executor;
     private final String name;
 
@@ -30,7 +30,7 @@ public class ThreadPoolJobExecutor implements JobExecutor {
     }
 
     @Override
-    public void execute(PriorityJobRunnable command) {
+    public void execute(R command) {
         executor.execute(command);
     }
 

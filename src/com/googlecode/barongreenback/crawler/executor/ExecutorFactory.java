@@ -1,8 +1,9 @@
 package com.googlecode.barongreenback.crawler.executor;
 
-public interface ExecutorFactory {
+import java.util.concurrent.BlockingQueue;
 
-	public abstract ThreadPoolJobExecutor jobExecutor(int threads,
-	        int capacity, String name);
+public interface ExecutorFactory {
+	public <R extends Runnable> ThreadPoolJobExecutor<R> executor(
+            int threads, int capacity, String name, Class<? extends BlockingQueue> queueClass);
 
 }
