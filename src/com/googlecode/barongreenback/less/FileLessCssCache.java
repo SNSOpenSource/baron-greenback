@@ -2,10 +2,10 @@ package com.googlecode.barongreenback.less;
 
 import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.Uri;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.Date;
 
 public class FileLessCssCache implements LessCssCache {
     private final File cacheLocation;
@@ -20,14 +20,15 @@ public class FileLessCssCache implements LessCssCache {
     }
 
     @Override
-    public String get(String key) {
-        return Strings.toString(Files.file(cacheLocation, fileNameFor(key)));
+    public CachedLessCss get(String key) {
+        File file = Files.file(cacheLocation, fileNameFor(key));
+        return new CachedLessCss(Strings.toString(file), new Date(file.lastModified()));
     }
 
     @Override
-    public void put(String key, String result) {
+    public void put(String key, CachedLessCss result) {
         File file = Files.file(cacheLocation, fileNameFor(key));
-        Files.write(file).apply(new ByteArrayInputStream(result.getBytes()));
+        Files.write(file).apply(new ByteArrayInputStream(result.less().getBytes()));
     }
 
     private String fileNameFor(String key) {

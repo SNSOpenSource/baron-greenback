@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.less;
 
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.HttpHeaders;
 import com.googlecode.utterlyidle.MediaType;
@@ -12,9 +13,12 @@ import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static com.googlecode.totallylazy.Option.option;
+import static com.googlecode.utterlyidle.HttpHeaders.LAST_MODIFIED;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
+import static com.googlecode.utterlyidle.Response.methods.header;
 
 public class LessCssHandler implements HttpHandler {
     private final LessCssCache cache;
@@ -37,21 +41,19 @@ public class LessCssHandler implements HttpHandler {
             return response;
         }
         String less = response.entity().toString();
-        return ResponseBuilder.modify(response).entity(processLess(uri, less)).build();
+        Date lastModified = Dates.RFC822().parse(header(response, LAST_MODIFIED));
+        return ResponseBuilder.modify(response).entity(processLess(uri, less, lastModified)).build();
     }
 
-    private String processLess(Uri uri, String less) throws IOException {
+    private String processLess(Uri uri, String less, Date lastModified) throws IOException {
         String key = uri.path();
-        if (cache.containsKey(key) && config.useCache() && noPurgeIn(uri)) {
-            return cache.get(key);
+
+        if (cache.containsKey(key) && config.useCache() && !cache.get(key).modifiedSince(lastModified)) {
+            return cache.get(key).less();
         }
         String result = lessCompiler.compile(less, new Loader(uri));
-        cache.put(key, result);
+        cache.put(key, new CachedLessCss(result, lastModified));
         return result;
-    }
-
-    private boolean noPurgeIn(Uri uri) {
-        return !option(uri.query()).getOrElse("").contains("purge");
     }
 
     public class Loader implements Callable1<String, String> {

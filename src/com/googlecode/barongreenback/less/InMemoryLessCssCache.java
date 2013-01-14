@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryLessCssCache implements LessCssCache {
     
-    static private Map<String, String> cache = new ConcurrentHashMap<String, String>();
+    static private Map<String, CachedLessCss> cache = new ConcurrentHashMap<String, CachedLessCss>();
     
     @Override
     public boolean containsKey(String key) {
@@ -13,12 +13,12 @@ public class InMemoryLessCssCache implements LessCssCache {
     }
 
     @Override
-    public String get(String key) {
+    public CachedLessCss get(String key) {
         return cache.get(key);
     }
 
     @Override
-    public void put(String key, String result) {
+    public void put(String key, CachedLessCss result) {
         cache.put(key, result);
     }
 }

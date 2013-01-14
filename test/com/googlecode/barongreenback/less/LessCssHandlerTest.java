@@ -1,15 +1,12 @@
 package com.googlecode.barongreenback.less;
 
 import com.googlecode.totallylazy.Callable1;
-import com.googlecode.utterlyidle.HttpHandler;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.RequestBuilder;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.ResponseBuilder;
+import com.googlecode.utterlyidle.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,7 +36,8 @@ public class LessCssHandlerTest {
     @Test(expected = RuntimeException.class)
     public void ignoresCacheWhenPurging() throws Exception {
         ensureCacheContains("something.less");
-        new LessCssHandler(stubHandler(), exceptionThrowingCompiler(), alwaysCache(), cache).handle(get("something.less?purge").build());
+        Request request = get("something.less?purge").build();
+        new LessCssHandler(stubHandler(), exceptionThrowingCompiler(), new CacheUnlessPurge(request), cache).handle(request);
         fail("Cache should have been ignored and compiler should have been called");
     }
 
@@ -81,7 +79,7 @@ public class LessCssHandlerTest {
         return new HttpHandler() {
             @Override
             public Response handle(Request request) throws Exception {
-                return ResponseBuilder.response().build();
+                return ResponseBuilder.response().header(HttpHeaders.LAST_MODIFIED, new Date()).build();
             }
         };
     }

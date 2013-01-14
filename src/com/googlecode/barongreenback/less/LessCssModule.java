@@ -19,7 +19,7 @@ public class LessCssModule implements RequestScopedModule, ApplicationScopedModu
     }
 
     public Container addPerRequestObjects(Container container) throws Exception {
-        addIfAbsent(container, LessCssConfig.class, CacheUnlessInDebug.class);
+        addIfAbsent(container, LessCssConfig.class, CacheUnlessPurge.class);
         container.decorate(HttpHandler.class, LessCssHandler.class);
         return container;
     }

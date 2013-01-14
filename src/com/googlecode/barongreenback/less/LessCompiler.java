@@ -1,7 +1,5 @@
 package com.googlecode.barongreenback.less;
 
-import com.googlecode.totallylazy.Callable1;
-
 import java.io.IOException;
 
 public interface LessCompiler {
