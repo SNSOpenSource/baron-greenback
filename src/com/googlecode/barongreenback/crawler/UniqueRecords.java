@@ -23,7 +23,7 @@ public class UniqueRecords implements Predicate<Record> {
     }
 
     public boolean matches(final Record record) {
-        Sequence<Object> compoundUniqueKey = record.getValuesFor(uniqueFields);
+        Sequence<Object> compoundUniqueKey = record.valuesFor(uniqueFields);
         if(compoundUniqueKey.isEmpty()){
             return true;
         }
