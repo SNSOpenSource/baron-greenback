@@ -62,7 +62,7 @@ public class CrawlerComparitorTest extends ApplicationTests {
     public String importAndCrawl(String definition, String name) throws Exception {
         CrawlerListPage crawlerListPage = new CrawlerImportPage(browser).importCrawler(definition, Option.some(CRAWLER_ID));
         assertThat(crawlerListPage.contains(name), is(true));
-        return crawlerListPage.crawlAndWait(CRAWLER_ID);
+        return crawlerListPage.crawlAndCreateViewAndWait(CRAWLER_ID);
     }
 
     @Test

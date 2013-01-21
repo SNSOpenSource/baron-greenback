@@ -63,6 +63,14 @@ public class CrawlerListPage {
         return response.entity().toString();
     }
 
+    public String crawlAndCreateViewAndWait(UUID id) throws Exception {
+        Response response = httpHandler.handle(post("/" + relativeUriOf(method(on(CrawlerDefinitionResource.class).crawlAndCreateView(id)))).form("id", id).build());
+        if (response.status().code() >= 400) {
+            throw new RuntimeException(String.format("Problem crawling \n%s", response));
+        }
+        return response.entity().toString();
+    }
+
     public JobsListPage crawl(String name) throws Exception {
         return goToJobsList(html.form(formFor(name, "crawl")).submit(button("crawl")));
     }
