@@ -37,7 +37,7 @@ public class RecordDefinition {
     public static final Keyword<RecordDefinition> RECORD_DEFINITION = keyword(RecordDefinition.class.getName(), RecordDefinition.class);
     public static final Keyword<Boolean> SUBFEED = keyword("subfeed", Boolean.class);
     public static final Keyword<String> PRIORITY = keyword("priority", String.class);
-    public static final Predicate<Keyword<?>> UNIQUE_FILTER = Predicates.and(where(metadata(Keywords.UNIQUE), is(notNullValue())), where(metadata(Keywords.UNIQUE), is(true)));
+    public static final Predicate<Keyword<?>> UNIQUE_FILTER = Predicates.and(where(metadata(Keywords.unique), is(notNullValue())), where(metadata(Keywords.unique), is(true)));
     private final Definition definition;
 
     public RecordDefinition(Definition definition) {
@@ -131,7 +131,7 @@ public class RecordDefinition {
     }
 
     private static boolean unique(Keyword keyword) {
-        return booleanValueOf(keyword, Keywords.UNIQUE);
+        return booleanValueOf(keyword, Keywords.unique);
     }
 
     private static String name(Keyword keyword) {
@@ -166,7 +166,7 @@ public class RecordDefinition {
                 add("alias", alias).
                 add(ViewsRepository.GROUP.name(), group).
                 add("type", type).
-                add(Keywords.UNIQUE.name(), unique).
+                add(Keywords.unique.name(), unique).
                 add(ViewsRepository.VISIBLE.name(), visible).
                 add(RecordDefinition.SUBFEED.name(), subfeed).
                 add("record", subfeed ? recordDefinition.getOrNull() : null).
@@ -220,7 +220,7 @@ public class RecordDefinition {
                 keyword = ((ImmutableKeyword) keyword).as((Keyword) keyword(alias, keyword.forClass()));
             }
             return keyword.metadata(Record.constructors.record().
-                    set(Keywords.UNIQUE, model.get(Keywords.UNIQUE.name(), Keywords.UNIQUE.forClass())).
+                    set(Keywords.unique, model.get(Keywords.unique.name(), Keywords.unique.forClass())).
                     set(ViewsRepository.VISIBLE, model.get(ViewsRepository.VISIBLE.name(), ViewsRepository.VISIBLE.forClass())).
                     set(ViewsRepository.GROUP, model.get(ViewsRepository.GROUP.name(), ViewsRepository.GROUP.forClass())).
                     set(CompositeCrawler.CHECKPOINT, model.get(CompositeCrawler.CHECKPOINT.name(), CompositeCrawler.CHECKPOINT.forClass())).

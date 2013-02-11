@@ -31,7 +31,7 @@ public class ViewsTest {
         Record metadata = record().
                 set(ViewsRepository.GROUP, "someGroup").
                 set(ViewsRepository.VISIBLE, false).
-                set(Keywords.UNIQUE, true);
+                set(Keywords.unique, true);
         Model model = model().add(ViewsRepository.ROOT, model().
                 add("name", "news").
                 add("records", "news").

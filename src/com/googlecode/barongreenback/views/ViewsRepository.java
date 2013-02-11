@@ -79,7 +79,7 @@ public class ViewsRepository {
                         add("name", keyword.name()).
                         add("group", metadata.get(GROUP)).
                         add("type", keyword.forClass().getName()).
-                        add("unique", metadata.get(Keywords.UNIQUE)).
+                        add("unique", metadata.get(Keywords.unique)).
                         add("visible", metadata.get(VISIBLE));
             }
         };

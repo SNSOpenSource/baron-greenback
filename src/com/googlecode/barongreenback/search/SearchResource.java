@@ -152,7 +152,7 @@ public class SearchResource {
         return visibleHeaders.find(new Predicate<Keyword<?>>() {
             @Override
             public boolean matches(Keyword<?> other) {
-                return Boolean.TRUE.equals(other.metadata().get(Keywords.UNIQUE));
+                return Boolean.TRUE.equals(other.metadata().get(Keywords.unique));
             }
         });
     }
@@ -207,7 +207,7 @@ public class SearchResource {
                     Model field = model().
                             add("value", record.get(header));
 
-                    if (Boolean.TRUE.equals(header.metadata().get(Keywords.UNIQUE))) {
+                    if (Boolean.TRUE.equals(header.metadata().get(Keywords.unique))) {
                         field.add("url", uniqueUrlOf(record, header, viewName));
                     }
 

@@ -15,9 +15,9 @@ import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class UniqueRecordsTest {
-    private final Keyword<Integer> ID = keyword("ID", Integer.class).setMetadata(Keywords.UNIQUE, true);
-    private final Keyword<Integer> SOME_OTHER_KEY = keyword("SOME_OTHER_KEY", Integer.class).setMetadata(Keywords.UNIQUE, true);
-    private final Keyword<Uri> URI = keyword("URI", Uri.class).setMetadata(Keywords.UNIQUE, true);
+    private final Keyword<Integer> ID = keyword("ID", Integer.class).metadata(Keywords.unique, true);
+    private final Keyword<Integer> SOME_OTHER_KEY = keyword("SOME_OTHER_KEY", Integer.class).metadata(Keywords.unique, true);
+    private final Keyword<Uri> URI = keyword("URI", Uri.class).metadata(Keywords.unique, true);
 
     @Test
     public void removesRecordsWithSameUniqueField() throws Exception{

@@ -21,6 +21,7 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
+        properties.setProperty("some.title", "Work to start on 93 flood defences");
         PersistenceUri.set(properties, luceneTemporaryDirectory("bazza"));
         SearcherPoolActivator.setSearchPool(properties, LucenePool.class);
         Application application = new WebApplication(BasePath.basePath("/"), properties);
