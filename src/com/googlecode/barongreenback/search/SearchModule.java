@@ -7,15 +7,18 @@ import com.googlecode.funclate.Funclate;
 import com.googlecode.funclate.Model;
 import com.googlecode.funclate.StringFunclate;
 import com.googlecode.lazyrecords.parser.ParametrizedParser;
+import com.googlecode.lazyrecords.parser.ParserFunctions;
 import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.lazyrecords.parser.StandardParser;
 import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.UnaryFunction;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader;
+import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.ModuleDefiner;
 import com.googlecode.utterlyidle.modules.ModuleDefinitions;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
@@ -30,7 +33,7 @@ import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader.Replacements.replacements;
 
-public class SearchModule implements ParserParametersModule, ResourcesModule, RequestScopedModule, ModuleDefiner {
+public class SearchModule implements ParserFunctionsModule, ResourcesModule, ApplicationScopedModule, RequestScopedModule, ModuleDefiner {
     public Resources addResources(Resources resources) {
         return resources.add(annotatedClass(SearchResource.class));
     }
@@ -42,23 +45,29 @@ public class SearchModule implements ParserParametersModule, ResourcesModule, Re
                 decorate(PredicateParser.class, ParametrizedParser.class).
                 add(PredicateBuilder.class).
                 add(ParserParameters.class).
-                add(Properties.class);
+                add(ParserFunctions.class);
         return Containers.addInstanceIfAbsent(container, ConvertExtensionToAcceptHeader.Replacements.class, replacements(Pair.pair("json", MediaType.APPLICATION_JSON))).
                 decorate(HttpHandler.class, ConvertExtensionToAcceptHeader.class);
     }
 
     public ModuleDefinitions defineModules(ModuleDefinitions moduleDefinitions) throws Exception {
-        return moduleDefinitions.addRequestModule(ParserParametersModule.class);
+        return moduleDefinitions.addRequestModule(ParserParametersModule.class).addRequestModule(ParserFunctionsModule.class);
     }
 
     @Override
-    public ParserParameters addParameters(ParserParameters parameters, Container container) {
+    public ParserFunctions addFunctions(ParserFunctions parserFunctions, Container container) {
         final Properties properties = container.get(Properties.class);
-        return parameters.add("properties", StringFunclate.functions.first(new UnaryFunction<String>() {
+        return parserFunctions.add("properties", Predicates.always(), StringFunclate.functions.first(new UnaryFunction<String>() {
             @Override
             public String call(String key) throws Exception {
                 return properties.getProperty(key);
             }
         }));
+    }
+
+    @Override
+    public Container addPerApplicationObjects(Container container) throws Exception {
+        Containers.addIfAbsent(container, Properties.class);
+        return container;
     }
 }

@@ -91,7 +91,7 @@ public class EndToEndTest extends ApplicationTests {
     @Test
     public void createCrawlerViaImportWithSubfeedAndThenViewAllRecords() throws Exception {
 //        crawlSampleData(importCrawler("testCrawler.json"), "test");
-        crawlSampleData(importCrawler("testQueuesCrawler.json"), "test");
+        crawlSampleData(importCrawler(EndToEndTest.class.getResourceAsStream("testQueuesCrawler.json")), "test");
         ViewSearchPage viewSearchPage = view("test");
 
         assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(2));
@@ -135,22 +135,6 @@ public class EndToEndTest extends ApplicationTests {
 
     private ViewSearchPage view(String name) throws Exception {
         return new ViewSearchPage(browser, name, "");
-    }
-
-    private CrawlerListPage importCrawler(String filename) throws Exception {
-        CrawlerImportPage crawlerImportPage = new CrawlerImportPage(browser);
-        return crawlerImportPage.importCrawler(Strings.toString(EndToEndTest.class.getResourceAsStream(filename)), Option.<UUID>none());
-    }
-
-    private JobsListPage crawlSampleData(CrawlerListPage listPage, String name) throws Exception {
-        final CountDownLatch latch = new CountDownLatch(2);
-        application.applicationScope().addInstance(CountDownLatch.class, latch).
-                decorate(Scheduler.class, CountDownScheduler.class).
-                decorate(Completer.class, CountDownCompleter.class);
-
-        JobsListPage jobs = listPage.crawlAndCreateView(name);
-        latch.await();
-        return jobs;
     }
 
     private CrawlerListPage createCrawler(Date checkpointValue) throws Exception {

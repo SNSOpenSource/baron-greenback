@@ -20,7 +20,11 @@ public class ViewEditPage {
     private final Html html;
 
     public ViewEditPage(HttpHandler httpHandler, UUID id) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(ViewsResource.class).edit(id)))).build()));
+        this(httpHandler, get("/" + relativeUriOf(method(on(ViewsResource.class).edit(id)))).build());
+    }
+
+    public ViewEditPage(HttpHandler httpHandler, Request request) throws Exception {
+        this(httpHandler, httpHandler.handle(request));
     }
 
     public ViewEditPage(HttpHandler httpHandler, Response response) throws Exception {
