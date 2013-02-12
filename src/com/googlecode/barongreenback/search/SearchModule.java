@@ -11,11 +11,9 @@ import com.googlecode.lazyrecords.parser.ParserFunctions;
 import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.lazyrecords.parser.StandardParser;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.UnaryFunction;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.time.Clock;
+import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Resources;
@@ -28,6 +26,8 @@ import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
 
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -66,6 +66,23 @@ public class SearchModule implements ParserFunctionsModule, ResourcesModule, App
                 return properties.getProperty(key);
             }
         }));
+    }
+
+    static final Callable2<String, String, String> addHoursFunction = new Callable2<String, String, String>() {
+        @Override
+        public String call(String s, String s2) throws Exception {
+            DateFormat dateFormatter = getDateFormat();
+            Date parsedDate = dateFormatter.parse(s);
+            return dateFormatter.format(Dates.add(parsedDate, Calendar.HOUR, Integer.parseInt(s2)));
+        }
+    };
+
+    static DateFormat getDateFormat() {
+        return Dates.javaUtilDateToString();
+    }
+
+    public ParserFunctions addHoursFunction(ParserFunctions parserFunctions) {
+        return parserFunctions.add("addHours", Predicates.always(), StringFunclate.functions.both(addHoursFunction));
     }
 
     @Override
