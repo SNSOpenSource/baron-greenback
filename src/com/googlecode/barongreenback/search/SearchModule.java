@@ -11,9 +11,11 @@ import com.googlecode.lazyrecords.parser.ParserFunctions;
 import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.lazyrecords.parser.StandardParser;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.UnaryFunction;
+import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Resources;
@@ -26,6 +28,7 @@ import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -33,7 +36,7 @@ import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader.Replacements.replacements;
 
-public class SearchModule implements ParserFunctionsModule, ResourcesModule, ApplicationScopedModule, RequestScopedModule, ModuleDefiner {
+public class SearchModule implements ParserFunctionsModule, ResourcesModule, ApplicationScopedModule, RequestScopedModule, ModuleDefiner, ParserParametersModule {
     public Resources addResources(Resources resources) {
         return resources.add(annotatedClass(SearchResource.class));
     }
@@ -69,5 +72,10 @@ public class SearchModule implements ParserFunctionsModule, ResourcesModule, App
     public Container addPerApplicationObjects(Container container) throws Exception {
         Containers.addIfAbsent(container, Properties.class);
         return container;
+    }
+
+    @Override
+    public ParserParameters addParameters(ParserParameters parameters, Container container) {
+        return parameters.add("now", container.get(Clock.class).now());
     }
 }
