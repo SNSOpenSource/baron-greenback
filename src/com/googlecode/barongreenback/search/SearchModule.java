@@ -4,15 +4,9 @@ import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.pager.RequestPager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.StringFunclate;
-import com.googlecode.lazyrecords.parser.ParametrizedParser;
-import com.googlecode.lazyrecords.parser.ParserFunctions;
-import com.googlecode.lazyrecords.parser.ParserParameters;
-import com.googlecode.lazyrecords.parser.PredicateParser;
-import com.googlecode.lazyrecords.parser.StandardParser;
+import com.googlecode.lazyrecords.parser.*;
 import com.googlecode.totallylazy.*;
-import com.googlecode.totallylazy.time.Clock;
-import com.googlecode.totallylazy.time.DateFormatConverter;
-import com.googlecode.totallylazy.time.Dates;
+import com.googlecode.totallylazy.time.*;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Resources;
@@ -25,7 +19,6 @@ import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
 
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
@@ -39,8 +32,9 @@ public class SearchModule implements ParserFunctionsModule, ResourcesModule, App
     }
 
     public Container addPerRequestObjects(Container container) throws Exception {
-		container.add(Pager.class, RequestPager.class).
+        container.add(Pager.class, RequestPager.class).
                 add(Sorter.class, Sorter.class).
+                add(ParserDateConverter.class).
                 add(PredicateParser.class, StandardParser.class).
                 decorate(PredicateParser.class, ParametrizedParser.class).
                 add(PredicateBuilder.class).
@@ -57,33 +51,25 @@ public class SearchModule implements ParserFunctionsModule, ResourcesModule, App
     @Override
     public ParserFunctions addFunctions(ParserFunctions parserFunctions, Container container) {
         final Properties properties = container.get(Properties.class);
+        final DateConverter dateConverter = container.get(ParserDateConverter.class);
 
-        parserFunctions.add("addHours", Predicates.always(), StringFunclate.functions.both(addHoursFunction));
-
-        return parserFunctions.add("properties", Predicates.always(), StringFunclate.functions.first(new UnaryFunction<String>() {
-            @Override
-            public String call(String key) throws Exception {
-                return properties.getProperty(key);
-            }
-        }));
+        return parserFunctions.
+                add("addHours", Predicates.always(), StringFunclate.functions.both(Functions.<String, String, String>uncurry2(addHours.apply(dateConverter)))).
+                add("properties", Predicates.always(), StringFunclate.functions.first(new UnaryFunction<String>() {
+                    @Override
+                    public String call(String key) throws Exception {
+                        return properties.getProperty(key);
+                    }
+                }));
     }
 
-    static final Callable2<String, String, String> addHoursFunction = new Callable2<String, String, String>() {
+    private static final Function3<DateConverter, String, String, String> addHours = new Function3<DateConverter, String, String, String>() {
         @Override
-        public String call(String s, String s2) throws Exception {
-            DateFormatConverter dateFormatter = getInputDateFormat();
-            Date parsedDate = dateFormatter.parse(s);
-            return getOutputDateFormat().format(Dates.add(parsedDate, Calendar.HOUR, Integer.parseInt(s2)));
+        public String call(DateConverter dateConverter, String dateAsString, String hoursAsString) throws Exception {
+            Date parsedDate = dateConverter.parse(dateAsString);
+            return dateConverter.format(Hours.add(parsedDate, Integer.parseInt(hoursAsString)));
         }
     };
-
-    static DateFormatConverter getInputDateFormat() {
-        return DateFormatConverter.defaultConverter();
-    }
-    
-    static DateFormat getOutputDateFormat() {
-        return Dates.RFC3339withMilliseconds();
-    }
 
     @Override
     public Container addPerApplicationObjects(Container container) throws Exception {
