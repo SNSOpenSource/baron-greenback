@@ -10,29 +10,51 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.matchers.Matchers;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.totallylazy.time.FixedClock;
+import com.googlecode.totallylazy.time.Hours;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.yadic.Container;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import java.util.Calendar;
 import java.util.Date;
 
-import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ParserFunctionsTest extends ApplicationTests {
 
+    private Keyword<Date> timeKeyword = Keyword.constructors.keyword("timeKeyword", Date.class);
+
     @Test
     public void shouldBeAbleToAddToDates() throws Exception {
-        final Date now = new Date();
-        setClockTo(new FixedClock(now));
+        final Date threeHoursLater = Hours.add(aFixedTime(), 3);
 
-        final Date threeHoursAgo = Dates.subtract(now, Calendar.HOUR, 3);
+        assertThat(parseQuery("\"$addHours(now, \"3\")$\""), parsesTo(threeHoursLater));
+    }
 
+    @Test
+    public void shouldBeAbleToSubtractFromDates() throws Exception {
+        final Date threeHoursAgo = Hours.subtract(aFixedTime(), 3);
+
+        assertThat(parseQuery("\"$subtractHours(now, \"3\")$\""), parsesTo(threeHoursAgo));
+    }
+
+    private Matcher<Predicate<Record>> parsesTo(Date threeHoursLater1) {
+        Predicate<Record> where = Predicates.where(timeKeyword, Grammar.is(threeHoursLater1));
+        return Matchers.is(where);
+    }
+
+    private Date aFixedTime() {
+        final Date fixedTime = Dates.date(1983, 7, 10, 0);
+        setClockTo(new FixedClock(fixedTime));
+        return fixedTime;
+    }
+
+    private Predicate<Record> parseQuery(String query) {
         PredicateParser parser = application.usingRequestScope(new Callable1<Container, PredicateParser>() {
             @Override
             public PredicateParser call(Container container) throws Exception {
@@ -40,12 +62,7 @@ public class ParserFunctionsTest extends ApplicationTests {
             }
         });
 
-        Keyword<Date> timeKeyword = Keyword.constructors.keyword("timeKeyword", Date.class);
-        Predicate<Record> predicate = parser.parse("\"$addHours(now, \"-3\")$\"", Sequences.one(timeKeyword));
-
-        Predicate<Record> expected = Predicates.where(timeKeyword, Grammar.is(threeHoursAgo));
-        assertThat(predicate, is(expected));
-
+        return parser.parse(query, Sequences.one(timeKeyword));
     }
 
 
