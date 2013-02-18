@@ -22,12 +22,20 @@ import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.Properties;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ParserFunctionsTest extends ApplicationTests {
 
     private Keyword<Date> timeKeyword = Keyword.constructors.keyword("timeKeyword", Date.class);
+
+    @Override
+    protected Properties getProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("some.property.value.of.three", "3");
+        return properties;
+    }
 
     @Test
     public void shouldBeAbleToAddToDates() throws Exception {
@@ -41,6 +49,13 @@ public class ParserFunctionsTest extends ApplicationTests {
         final Date threeHoursAgo = Hours.subtract(aFixedTime(), 3);
 
         assertThat(parseQuery("\"$subtractHours(now, \"3\")$\""), parsesTo(threeHoursAgo));
+    }
+
+    @Test
+    public void shouldBeAbleToUsePropertyValueAsArgument() throws Exception {
+        final Date threeHoursLater = Hours.add(aFixedTime(), 3);
+
+        assertThat(parseQuery("\"$addHours(now, properties(\"some.property.value.of.three\"))$\""), parsesTo(threeHoursLater));
     }
 
     private Matcher<Predicate<Record>> parsesTo(Date threeHoursLater1) {
