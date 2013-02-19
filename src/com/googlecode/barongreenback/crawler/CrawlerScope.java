@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.failures.FailureHandler;
 import com.googlecode.totallylazy.CountLatch;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.handlers.Auditor;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import com.googlecode.yadic.Container;
@@ -100,6 +101,11 @@ public class CrawlerScope implements Container {
     @Override
     public <T> Resolver<T> remove(Type type) {
         return container.remove(type);
+    }
+
+    @Override
+    public <T> Option<Resolver<T>> removeOption(Type type) {
+        return container.removeOption(type);
     }
 
     @Override
