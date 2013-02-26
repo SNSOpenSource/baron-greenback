@@ -19,5 +19,5 @@ BGB.namespace = function() {
 };
 
 BGB.namespace('search').rowCount = function() {
-    return jQuery('ul.tabs li.active a.tab span.count').text().replace(/[^0-9]/g, '');
+    return jQuery('ul.nav-tabs li.active a.tab span.count').text().replace(/[^0-9]/g, '');
 };
