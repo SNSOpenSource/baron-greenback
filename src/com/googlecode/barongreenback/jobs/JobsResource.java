@@ -6,10 +6,7 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.utterlyidle.InternalRequestMarker;
-import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.annotations.ANY;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.GET;
@@ -41,7 +38,7 @@ import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 import static com.googlecode.utterlyidle.RequestBuilder.modify;
 
 @Path("jobs")
-@Produces(TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class JobsResource {
     private final HttpScheduler scheduler;
     private final Request request;

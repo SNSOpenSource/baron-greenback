@@ -53,7 +53,7 @@ import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static java.lang.String.format;
 
 @Path("batch")
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class BatchResource {
     public static final UUID BACKUP_JOB_ID = UUID.fromString("70203355-d7d3-4477-85ef-d3309f21fae0");
     private final ModelRepository modelRepository;

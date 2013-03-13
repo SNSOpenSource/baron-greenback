@@ -26,7 +26,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 @Path("{view}/actions")
 public class ActionsResource {
     private final AdvancedMode mode;

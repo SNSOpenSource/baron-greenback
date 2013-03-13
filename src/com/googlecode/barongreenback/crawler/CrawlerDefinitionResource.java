@@ -43,7 +43,7 @@ import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
 @Path("crawler")
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class CrawlerDefinitionResource {
     private final Redirector redirector;
     private final CrawlInterval interval;

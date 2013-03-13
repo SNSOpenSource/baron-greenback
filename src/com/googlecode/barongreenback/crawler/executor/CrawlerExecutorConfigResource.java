@@ -29,7 +29,7 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 
 @Path("crawler/executor")
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class CrawlerExecutorConfigResource {
 
     private final CrawlerExecutors crawlerExecutors;

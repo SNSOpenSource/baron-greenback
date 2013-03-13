@@ -30,7 +30,7 @@ import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 
 @Path("crawler")
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class CrawlerImplementationResource {
     public static final Sequence<Pair<String,String>> CRAWLERS = sequence(
             pair("Sequential Crawler", SequentialCrawler.class.getName()),

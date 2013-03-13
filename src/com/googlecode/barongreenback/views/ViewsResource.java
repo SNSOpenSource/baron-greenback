@@ -48,7 +48,7 @@ import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 @Path("views")
 public class ViewsResource {
     private final Redirector redirector;

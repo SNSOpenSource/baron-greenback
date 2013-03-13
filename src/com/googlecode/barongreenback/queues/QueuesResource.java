@@ -3,11 +3,7 @@ package com.googlecode.barongreenback.queues;
 import com.googlecode.barongreenback.jobs.JobsResource;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
-import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.Request;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.ResponseBuilder;
-import com.googlecode.utterlyidle.Status;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.annotations.GET;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
@@ -28,7 +24,7 @@ import static com.googlecode.utterlyidle.MediaType.TEXT_PLAIN;
 import static com.googlecode.utterlyidle.RequestBuilder.modify;
 
 @Path("queues")
-@Produces(TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class QueuesResource {
     private final Queues queues;
     private final Redirector redirector;

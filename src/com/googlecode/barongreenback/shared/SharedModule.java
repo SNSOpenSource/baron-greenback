@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.funclate.Model;
+import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.handlers.ResponseHandlers;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
@@ -8,20 +9,21 @@ import com.googlecode.utterlyidle.modules.ArgumentScopedModule;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.modules.ResponseHandlersModule;
+import com.googlecode.utterlyidle.rendering.ObjectRenderer;
 import com.googlecode.utterlyidle.sitemesh.TemplateName;
 import com.googlecode.yadic.Container;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
-import static com.googlecode.totallylazy.Predicates.instanceOf;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.handlers.HandlerRule.entity;
 import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.renderer;
+import static com.googlecode.utterlyidle.sitemesh.ContentTypePredicate.contentType;
 
 public class SharedModule implements ApplicationScopedModule, ResponseHandlersModule, RequestScopedModule, ResourcesModule, ArgumentScopedModule {
     public ResponseHandlers addResponseHandlers(ResponseHandlers handlers) {
-        return handlers.add(where(entity(), is(instanceOf(Model.class))), renderer(ModelRenderer.class));
+        return handlers.add(and(where(entity(), is(instanceOf(Model.class))), contentType(MediaType.APPLICATION_JSON)), renderer(ObjectRenderer.class)).
+            add(where(entity(), is(instanceOf(Model.class))), renderer(ModelRenderer.class));
     }
 
     public Container addPerRequestObjects(Container container) throws Exception {

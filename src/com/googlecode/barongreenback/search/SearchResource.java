@@ -51,7 +51,7 @@ import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
 import static com.googlecode.utterlyidle.MediaType.TEXT_CSV;
 
 
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 @Path("{view}/search")
 public class SearchResource {
     private final Redirector redirector;
@@ -74,13 +74,6 @@ public class SearchResource {
     public Model list(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findFromView(viewName, query);
         return results(viewName, query, errorOrResults);
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("list")
-    public String listJson(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
-        return list(viewName, query).toString();
     }
 
     @GET

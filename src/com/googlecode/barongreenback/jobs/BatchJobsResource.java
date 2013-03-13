@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.jobs;
 import com.googlecode.barongreenback.shared.InvocationHandler;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.POST;
@@ -18,7 +19,7 @@ import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.MediaType.TEXT_HTML;
 
 @Path("jobs")
-@Produces(TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class BatchJobsResource {
     private InvocationHandler invocationHandler;
     private Jobs jobs;

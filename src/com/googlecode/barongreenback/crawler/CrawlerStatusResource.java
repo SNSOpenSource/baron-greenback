@@ -17,7 +17,7 @@ import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 @Path("crawler")
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class CrawlerStatusResource {
     private final Failures failures;
     private final ViewsExecutor viewsExecutor;

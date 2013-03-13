@@ -26,7 +26,7 @@ import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 
 @Path("crawler")
-@Produces(MediaType.TEXT_HTML)
+@Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
 public class BatchCrawlerResource {
 
     private InvocationHandler invocationHandler;
