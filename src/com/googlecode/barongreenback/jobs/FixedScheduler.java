@@ -50,9 +50,14 @@ public class FixedScheduler implements Scheduler, Closeable, Service {
 
     @Override
     public void close() throws IOException {
-        while (!jobs.keySet().isEmpty()) {
-            cancel(sequence(jobs.keySet()).first());
+        try {
+            while (!jobs.keySet().isEmpty()) {
+                cancel(sequence(jobs.keySet()).first());
+            }
+        } catch (Exception ignore) {
         }
+        if(service !=  null) service.shutdownNow();
+        service = null;
     }
 
     @Override
@@ -62,11 +67,6 @@ public class FixedScheduler implements Scheduler, Closeable, Service {
 
     @Override
     synchronized public void stop() throws Exception {
-        try {
-            service.shutdown();
-            service.awaitTermination(1, DAYS);
-        } finally {
-            service = null;
-        }
+        close();
     }
 }
