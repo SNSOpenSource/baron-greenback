@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.jobs;
 
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.concurrent.NamedExecutors;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.services.Service;
 
@@ -38,7 +39,7 @@ public class FixedScheduler implements Scheduler, Closeable, Service {
     }
 
     synchronized private ScheduledExecutorService service() {
-        return service == null ? this.service = Executors.newScheduledThreadPool(5) : service;
+        return service == null ? this.service = NamedExecutors.newScheduledThreadPool(5, getClass().getName()) : service;
     }
 
     public void cancel(UUID id) {

@@ -9,6 +9,7 @@ import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.concurrent.NamedExecutors;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.yadic.Container;
 
@@ -52,7 +53,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
     }
 
     private ExecutorService createExecutor() {
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(threads);
+        ScheduledExecutorService service = NamedExecutors.newScheduledThreadPool(threads, getClass().getName());
         service.scheduleWithFixedDelay(processWork(application), 0, seconds, TimeUnit.SECONDS);
         return service;
     }

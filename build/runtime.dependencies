@@ -7,9 +7,9 @@ mvn:org.sitemesh:sitemesh:jar:3.0-alpha-2
 mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
-mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1025
-mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:214
-mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:608
+mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1052
+mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:220
+mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:622
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:155
 mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:102
 mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:10

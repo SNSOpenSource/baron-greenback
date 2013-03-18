@@ -1,17 +1,17 @@
 package com.googlecode.barongreenback.crawler.executor;
 
-import static com.googlecode.totallylazy.Unchecked.cast;
+import com.googlecode.totallylazy.CloseableList;
+import com.googlecode.totallylazy.concurrent.BlockingRetryRejectedExecutionHandler;
+import com.googlecode.totallylazy.concurrent.NamedExecutors;
+import com.googlecode.yadic.Container;
+import com.googlecode.yadic.Containers;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.googlecode.barongreenback.crawler.BlockingRetryRejectedExecutionHandler;
-import com.googlecode.totallylazy.CloseableList;
-import com.googlecode.yadic.Container;
-import com.googlecode.yadic.Containers;
+import static com.googlecode.totallylazy.Unchecked.cast;
 
 public class ThreadPoolExecutorFactory implements ExecutorFactory {
     private final CloseableList executors = new CloseableList();
@@ -25,7 +25,7 @@ public class ThreadPoolExecutorFactory implements ExecutorFactory {
         return new ThreadPoolExecutor(threads, threads == 0 ? Integer.MAX_VALUE : threads,
                 60L, TimeUnit.SECONDS,
                 queue(queueClass, capacity),
-                new NamedThreadFactory(Executors.defaultThreadFactory(), name),
+                NamedExecutors.namedThreadFactory(name),
                 new BlockingRetryRejectedExecutionHandler());
     }
 
