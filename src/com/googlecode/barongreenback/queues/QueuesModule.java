@@ -4,11 +4,13 @@ import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
+import com.googlecode.utterlyidle.services.Services;
+import com.googlecode.utterlyidle.services.ServicesModule;
 import com.googlecode.yadic.Container;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
-public class QueuesModule implements ResourcesModule, ApplicationScopedModule {
+public class QueuesModule implements ResourcesModule, ApplicationScopedModule, ServicesModule {
     public Resources addResources(Resources resources) throws Exception {
         return resources.add(annotatedClass(QueuesResource.class));
     }
@@ -18,5 +20,10 @@ public class QueuesModule implements ResourcesModule, ApplicationScopedModule {
         return container.
                 add(Queues.class, RequestQueues.class).
                 add(Completer.class, CpuBoundedCompleter.class);
+    }
+
+    @Override
+    public Services add(Services services) throws Exception {
+        return services.add(CpuBoundedCompleter.class);
     }
 }
