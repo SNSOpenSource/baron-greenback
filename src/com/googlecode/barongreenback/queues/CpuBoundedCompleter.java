@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.queues;
 
+import com.googlecode.totallylazy.concurrent.NamedExecutors;
 import com.googlecode.utterlyidle.services.Service;
 
 import java.io.Closeable;
@@ -9,16 +10,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 import static com.googlecode.totallylazy.Functions.function;
-import static com.googlecode.totallylazy.concurrent.NamedExecutors.newFixedThreadPool;
-import static java.lang.Math.max;
-import static java.lang.Runtime.getRuntime;
 
 public class CpuBoundedCompleter implements Completer, Service, Closeable {
     private volatile ExecutorService executor;
-
-    public static ExecutorService cpuBoundExecutorService() {
-        return newFixedThreadPool(max(1, getRuntime().availableProcessors()), CpuBoundedCompleter.class);
-    }
 
     @Override
     public void complete(Callable<?> task) {
@@ -46,7 +40,7 @@ public class CpuBoundedCompleter implements Completer, Service, Closeable {
 
     @Override
     public synchronized void start() {
-        if(executor == null) executor = cpuBoundExecutorService();
+        if (executor == null) executor = NamedExecutors.newCpuThreadPool(CpuBoundedCompleter.class);
     }
 
     @Override
