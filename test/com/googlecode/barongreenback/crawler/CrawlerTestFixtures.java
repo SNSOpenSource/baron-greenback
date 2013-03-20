@@ -14,13 +14,13 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class CrawlerTestFixtures {
     public static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(Keywords.unique, true);
-    public static final Keyword<String> FIRST = Keywords.keyword("first", String.class);
+    public static final Keyword<String> FIRST = keyword("first", String.class);
     public static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class).as(FIRST);
     public static final Definition USER = definition("/user", USER_ID, FIRST_NAME);
     public static final RecordDefinition ENTRY_DEFINITION = new RecordDefinition(USER);

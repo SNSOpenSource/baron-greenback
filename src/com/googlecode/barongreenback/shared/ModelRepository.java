@@ -7,7 +7,7 @@ import com.googlecode.totallylazy.Pair;
 
 import java.util.UUID;
 
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 
 public interface ModelRepository extends Repository<UUID, Model>, Finder<Pair<UUID, Model>> {
     Keyword<UUID> ID = keyword("models_id", UUID.class);

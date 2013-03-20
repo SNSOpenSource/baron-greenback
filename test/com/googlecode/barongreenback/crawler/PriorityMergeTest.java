@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMerge;
 import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMergeBy;
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static org.hamcrest.MatcherAssert.assertThat;

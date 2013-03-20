@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.totallylazy.Xml.document;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static org.hamcrest.Matchers.is;

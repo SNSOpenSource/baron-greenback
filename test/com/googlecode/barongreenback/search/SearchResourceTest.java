@@ -25,7 +25,7 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.util.UUID;
 
-import static com.googlecode.lazyrecords.Keywords.keywords;
+import static com.googlecode.lazyrecords.Keyword.methods.keywords;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;

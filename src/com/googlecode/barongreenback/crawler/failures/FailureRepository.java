@@ -14,7 +14,7 @@ import com.googlecode.totallylazy.Uri;
 
 import java.util.UUID;
 
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Record.methods.update;
 import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Predicates.is;

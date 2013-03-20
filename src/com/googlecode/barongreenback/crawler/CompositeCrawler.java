@@ -15,7 +15,7 @@ import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import java.io.PrintStream;
 import java.util.Date;
 
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 
 
 public class CompositeCrawler {

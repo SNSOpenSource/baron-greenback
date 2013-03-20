@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.jobs.NextTime.nextTime;
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 
 public class Job {

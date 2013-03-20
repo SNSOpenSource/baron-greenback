@@ -18,7 +18,7 @@ import java.util.Map;
 
 import static com.googlecode.funclate.Model.functions.asMap;
 import static com.googlecode.funclate.Model.mutable;
-import static com.googlecode.lazyrecords.Keywords.keywords;
+import static com.googlecode.lazyrecords.Keyword.methods.keywords;
 import static com.googlecode.lazyrecords.Keywords.name;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Predicates.is;

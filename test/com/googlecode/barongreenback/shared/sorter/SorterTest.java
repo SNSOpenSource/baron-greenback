@@ -14,7 +14,7 @@ import java.util.Date;
 
 import static com.googlecode.barongreenback.shared.sorter.Sorter.SORT_COLUMN_QUERY_PARAM;
 import static com.googlecode.barongreenback.shared.sorter.Sorter.SORT_DIRECTION_QUERY_PARAM;
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Triple.triple;
 import static org.hamcrest.MatcherAssert.assertThat;

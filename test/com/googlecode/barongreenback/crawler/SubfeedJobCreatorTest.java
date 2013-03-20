@@ -18,7 +18,7 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
-import static com.googlecode.lazyrecords.Keywords.keyword;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keywords.unique;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.lazyrecords.Record.functions.merge;
@@ -29,12 +29,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SubfeedJobCreatorTest {
     public static final Keyword<String> PERSON_NAME = keyword("person/name", String.class);
-    public static final Keyword<Uri> LINK = Keywords.keyword("link", Uri.class).
+    public static final Keyword<Uri> LINK = keyword("link", Uri.class).
             metadata(RECORD_DEFINITION, new RecordDefinition(definition("/subfeed", PERSON_NAME))).
             metadata(unique, true);
     public static final Definition SOME_DESTINATION = Definition.constructors.definition("foo", Sequences.<Keyword<?>>empty());
     public static final Uri URI = Uri.uri("http://hello.com/");
-    public static final Keyword<String> PREV_UNIQUE = Keywords.keyword("foo", String.class).metadata(unique, true);
+    public static final Keyword<String> PREV_UNIQUE = keyword("foo", String.class).metadata(unique, true);
     private final Date createdDate = date(2001,1,1);
 
     @Test
