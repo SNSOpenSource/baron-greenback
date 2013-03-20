@@ -2,6 +2,10 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Uri;
+import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
+import com.googlecode.utterlyidle.handlers.HttpClient;
+import com.googlecode.utterlyidle.handlers.RoutingClient;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -15,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 public class CompositeCrawlerTest extends CrawlerTests {
     @Test
     public void shouldGetTheContentsOfAUrlAndExtractContent() throws Exception {
-        Sequence<Record> records = crawl();
+        Sequence<Record> records = crawl(feedClient(), feed());
         Record entry = records.head();
 
         assertThat(entry.get(ID), is("urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1"));
@@ -25,22 +29,24 @@ public class CompositeCrawlerTest extends CrawlerTests {
 
     @Test
     public void shouldNotGoPastTheCheckpoint_checkpointValue() throws Exception {
-        Sequence<Record> records = crawl("2011-07-19T12:43:25.000Z");
+        Sequence<Record> records = crawl(feedClient(), "2011-07-19T12:43:25.000Z", feed());
         assertThat(records.size(), Matchers.<Number>is(1));
     }
 
-    public static Sequence<Record> crawl() throws Exception {
-        return crawl(null);
+    public static Sequence<Record> crawl(HttpClient httpClient, Uri feed) throws Exception {
+        return crawl(httpClient, null, feed);
     }
 
-    public static Sequence<Record> crawlOnePageOnly() throws Exception {
-        return new CompositeCrawler().crawl(atomXml, "", null, ATOM_DEFINITION);
+    public static Sequence<Record> crawlOnePageOnly(Uri feed, HttpClient httpClient) throws Exception {
+        return crawler(httpClient).crawl(feed, "", null, ATOM_DEFINITION);
     }
 
-    public static Sequence<Record> crawl(Object checkpoint) throws Exception {
-        return new CompositeCrawler().crawl(atomXml, "/feed/link/@href", checkpoint, ATOM_DEFINITION);
+    private static CompositeCrawler crawler(HttpClient httpClient) {
+        return new CompositeCrawler(httpClient, System.out);
     }
 
-
+    public static Sequence<Record> crawl(HttpClient httpClient, Object checkpoint, Uri feed) throws Exception {
+        return crawler(httpClient).crawl(feed, "/feed/link/@href", checkpoint, ATOM_DEFINITION);
+    }
 
 }

@@ -23,7 +23,9 @@ import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class DocumentFeederTest extends CrawlerTests {
-    private final HttpHandler client = new AuditHandler(new ClientHttpHandler(), new PrintAuditor(System.out));
+    private HttpHandler client() {
+        return  new AuditHandler(feedClient(), new PrintAuditor(System.out));
+    }
 
     @Test
     public void supportsAliases() throws Exception{
@@ -36,43 +38,43 @@ public class DocumentFeederTest extends CrawlerTests {
 
     @Test
     public void ignoresInvalidXml() throws Exception {
-        Feeder<Uri> feeder = new UriFeeder(client, "");
+        Feeder<Uri> feeder = new UriFeeder(client(), "");
         Sequence<Record> records = feeder.get(uri("http://localhost:9001/invalid.xml"), null);
         assertThat(records.isEmpty(), CoreMatchers.is(true));
     }
 
     @Test
     public void supportsGettingRecords() throws Exception {
-        Feeder<Uri> feeder = new UriFeeder(client, "");
-        Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
+        Feeder<Uri> feeder = new UriFeeder(client(), "");
+        Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
         assertThat(records.size(), is(2));
     }
 
     @Test
     public void supportsStoppingWhenCheckpointIsReached() throws Exception {
-        Feeder<Uri> feeder = new CheckPointStopper("2011-07-19T12:43:25.000Z", new UriFeeder(client, ""));
-        Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
+        Feeder<Uri> feeder = new CheckPointStopper("2011-07-19T12:43:25.000Z", new UriFeeder(client(), ""));
+        Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
         assertThat(records.size(), is(1));
     }
 
     @Test
     public void supportsFollowingMore() throws Exception {
-        Feeder<Uri> feeder = new UriFeeder(client, "/feed/link/@href");
-        Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
+        Feeder<Uri> feeder = new UriFeeder(client(), "/feed/link/@href");
+        Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
         assertThat(records.size(), is(4));
     }
 
     @Test
     public void supportsSubFeeds() throws Exception {
-        Feeder<Uri> feeder = new SubFeeder(new UriFeeder(client, "/feed/link/@href"));
-        Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
+        Feeder<Uri> feeder = new SubFeeder(new UriFeeder(client(), "/feed/link/@href"));
+        Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
         assertThat(records.map(FIRST).filter(Predicates.notNullValue()).realise(), IterableMatcher.hasExactly("Dan", "Matt"));
     }
 
     @Test
     public void filtersDuplicates() throws Exception {
-        Feeder<Uri> feeder = new DuplicateRemover(new UriFeeder(client, ""));
-        Sequence<Record> records = feeder.get(atomXml, ATOM_DEFINITION);
+        Feeder<Uri> feeder = new DuplicateRemover(new UriFeeder(client(), ""));
+        Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
         assertThat(records.size(), is(2));
     }
 }

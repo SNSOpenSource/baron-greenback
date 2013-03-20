@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
@@ -14,22 +15,9 @@ import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
 import static com.googlecode.utterlyidle.MediaType.TEXT_XML;
 import static com.googlecode.utterlyidle.RequestBuilder.put;
 
-public abstract class CrawlerTests {
-    protected Waitrest waitrest;
-    public static Uri atomXml = Uri.uri("http://localhost:9001/data");
-
-    @Before
-    public void startWaitrest() throws Exception {
-        waitrest = serverWithDataFeed();
-    }
-
-    @After
-    public void stopWaitrest() throws IOException {
-        waitrest.close();
-    }
-
+public abstract class CrawlerTests extends ApplicationTests {
     public static Waitrest serverWithDataFeed() throws Exception {
-        Waitrest waitrest = new Waitrest("/", 9001);
+        Waitrest waitrest = new Waitrest();
         ClientHttpHandler restClient = new ClientHttpHandler();
         final URL waitrestURL = waitrest.getURL();
         restClient.handle(put(uri(waitrestURL, "data")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("atom.xml")).build());

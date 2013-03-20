@@ -16,6 +16,8 @@ import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.annotations.AnnotatedBindings;
+import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
+import com.googlecode.utterlyidle.handlers.RoutingClient;
 import com.googlecode.waitrest.Waitrest;
 import com.googlecode.yadic.Container;
 import org.hamcrest.Matchers;
@@ -39,7 +41,7 @@ public class SearchResourceTest extends ApplicationTests {
     @Before
     public void addSomeData() throws Exception {
         Waitrest waitrest = CrawlerTests.serverWithDataFeed();
-        final Sequence<Record> recordSequence = CompositeCrawlerTest.crawlOnePageOnly().realise();
+        final Sequence<Record> recordSequence = CompositeCrawlerTest.crawlOnePageOnly(feed(), feedClient()).realise();
 
         application.usingRequestScope(new Block<Container>() {
             public void execute(Container container) throws Exception {

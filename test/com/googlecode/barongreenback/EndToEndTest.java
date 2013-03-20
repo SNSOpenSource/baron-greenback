@@ -17,6 +17,7 @@ import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.waitrest.Waitrest;
+import com.googlecode.waitrest.internal.totallylazy.$Uri;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,8 +33,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class EndToEndTest extends ApplicationTests {
-    private Waitrest waitrest;
-
     @Test
     public void paginationWorksCorrectly() throws Exception {
         crawlSampleData(createCrawler(Dates.RFC3339().parse("2011-07-19T12:43:21Z")), "newsfeed");
@@ -112,16 +111,6 @@ public class EndToEndTest extends ApplicationTests {
         assertThat(checkpointValue(), matcher(Predicates.not(empty())));
     }
 
-    @Before
-    public void setupFeed() throws Exception {
-        waitrest = serverWithDataFeed();
-    }
-
-    @After
-    public void shutDownFeed() throws Exception {
-        waitrest.close();
-    }
-
     private String checkpointValue() throws Exception {
         CrawlerListPage crawlerListPage = new CrawlerListPage(browser);
         final Request request = crawlerListPage.editButtonFor("newsfeed").click();
@@ -140,7 +129,7 @@ public class EndToEndTest extends ApplicationTests {
     private CrawlerListPage createCrawler(Date checkpointValue) throws Exception {
         CrawlerPage newPage = new CrawlerPage(browser);
         newPage.update().value("newsfeed");
-        newPage.from().value("http://localhost:9001/data");
+        newPage.from().value(feed().toString());
         newPage.more().value("//link[@rel='prev-archive']/@href");
         newPage.checkpoint().value(checkpointValue == null ? "" : Dates.RFC3339().format(checkpointValue));
         newPage.checkpointType().value(checkpointValue == null ? String.class.getName() : checkpointValue.getClass().getName());
@@ -167,4 +156,5 @@ public class EndToEndTest extends ApplicationTests {
 
         return newPage.save();
     }
+
 }

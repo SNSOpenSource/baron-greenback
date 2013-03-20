@@ -16,18 +16,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class PropertiesInViewsTest extends ApplicationTests {
-    private Waitrest waitrest;
-
-    @Before
-    public void setupFeed() throws Exception {
-        waitrest = serverWithDataFeed();
-    }
-
-    @After
-    public void shutDownFeed() throws Exception {
-        waitrest.close();
-    }
-
     @Override
     protected Properties getProperties() {
         Properties properties = new Properties();
