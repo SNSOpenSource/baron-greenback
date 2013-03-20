@@ -48,7 +48,7 @@ public class StagedJobExecutor {
         return new Block<T>() {
             @Override
             public void execute(T result) throws Exception {
-                submit(job, jobExecutor, runnable.deferApply(result));
+                submit(job, jobExecutor, runnable.interruptable().deferApply(result));
             }
         };
     }
@@ -85,7 +85,7 @@ public class StagedJobExecutor {
             @Override
             public Sequence<Record> call(Response t) throws Exception {
                 Pair<Sequence<Record>, Sequence<StagedJob>> pair = job.process(scope, t);
-                for (StagedJob job : pair.second()) {
+                for (StagedJob job : pair.second().interruptable()) {
                     crawl(job);
                 }
                 return pair.first();
