@@ -88,7 +88,7 @@ public class StagedJobExecutor {
                 for (StagedJob job : pair.second().interruptable()) {
                     crawl(job);
                 }
-                return pair.first();
+                return pair.first().interruptable();
             }
         };
     }
