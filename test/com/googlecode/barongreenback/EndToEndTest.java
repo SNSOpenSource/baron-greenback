@@ -1,32 +1,17 @@
 package com.googlecode.barongreenback;
 
-import com.googlecode.barongreenback.crawler.CountDownScheduler;
-import com.googlecode.barongreenback.crawler.CrawlerImportPage;
 import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.CrawlerPage;
-import com.googlecode.barongreenback.jobs.JobsListPage;
-import com.googlecode.barongreenback.jobs.Scheduler;
-import com.googlecode.barongreenback.queues.Completer;
-import com.googlecode.barongreenback.queues.CountDownCompleter;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
-import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.Request;
-import com.googlecode.waitrest.Waitrest;
-import com.googlecode.waitrest.internal.totallylazy.$Uri;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.matchers.Matchers.matcher;
 import static org.hamcrest.MatcherAssert.assertThat;

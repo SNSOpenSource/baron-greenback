@@ -12,7 +12,7 @@ import com.googlecode.totallylazy.time.Dates;
 
 import java.util.Date;
 
-import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -58,7 +58,9 @@ public class CheckPointStopper implements Feeder<Uri> {
                     return false;
                 }
                 if (currentCheckPoint instanceof Date) {
-                    return (Dates.parse(instance.toString())).before((Date) currentCheckPoint);
+                    Date updatedDate = Dates.parse(instance.toString());
+                    Date checkPointDate = (Date) currentCheckPoint;
+                    return updatedDate.before(checkPointDate) || (updatedDate.equals(checkPointDate));
                 }
                 return currentCheckPoint.equals(instance);
             }
@@ -70,15 +72,6 @@ public class CheckPointStopper implements Feeder<Uri> {
         return new Callable1<Keyword, Object>() {
             public Object call(Keyword keyword) throws Exception {
                 return record.get(keyword);
-            }
-        };
-    }
-
-    public static Callable1<Record, Object> extractCheckPoint() {
-        return new Callable1<Record, Object>() {
-            @Override
-            public Object call(Record record) throws Exception {
-                return extractCheckpoint(record);
             }
         };
     }
