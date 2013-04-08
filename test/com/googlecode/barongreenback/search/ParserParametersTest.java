@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.shared.ApplicationTests;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.time.Clock;
@@ -48,7 +49,7 @@ public class ParserParametersTest extends ApplicationTests {
         return application.usingRequestScope(new Callable1<Container, Date>() {
             @Override
             public Date call(Container container) throws Exception {
-                ParserParameters parserParameters = container.get(ParserParameters.class);
+                ParserParameters parserParameters = container.get(BaronGreenbackRequestScope.class).value().get(ParserParameters.class);
                 return (Date) parserParameters.values().get("now");
             }
         });

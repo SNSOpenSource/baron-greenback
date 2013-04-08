@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.search;
 
 
 import com.googlecode.barongreenback.shared.ApplicationTests;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Grammar;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -73,7 +74,7 @@ public class ParserFunctionsTest extends ApplicationTests {
         PredicateParser parser = application.usingRequestScope(new Callable1<Container, PredicateParser>() {
             @Override
             public PredicateParser call(Container container) throws Exception {
-                return container.get(PredicateParser.class);
+                return container.get(BaronGreenbackRequestScope.class).value().get(PredicateParser.class);
             }
         });
 
