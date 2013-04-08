@@ -37,7 +37,7 @@ public class SearchModule implements ParserFunctionsModule, ResourcesModule, App
         container.add(Pager.class, RequestPager.class).
                 add(Sorter.class, Sorter.class).
                 add(ParserDateConverter.class).
-                add(PredicateParser.class, StandardParser.class).
+                addActivator(PredicateParser.class, StandardParserActivator.class).
                 decorate(PredicateParser.class, ParametrizedParser.class).
                 add(PredicateBuilder.class).
                 add(ParserParameters.class).

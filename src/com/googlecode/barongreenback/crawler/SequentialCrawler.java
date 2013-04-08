@@ -31,7 +31,7 @@ public class SequentialCrawler extends AbstractCrawler {
     private final CheckpointHandler checkpointHandler;
     private final PrintStream log;
 
-    public SequentialCrawler(CrawlerRepository crawlerRepository, ViewsRepository viewsRepository, StringMappings mappings, CrawlerHttpClient httpClient, BaronGreenbackRecords records, CheckpointHandler checkpointHandler, PrintStream log) {
+    public SequentialCrawler(CrawlerRepository crawlerRepository, StringMappings mappings, CrawlerHttpClient httpClient, BaronGreenbackRecords records, CheckpointHandler checkpointHandler, PrintStream log) {
         super(crawlerRepository);
         this.mappings = mappings;
         this.httpClient = httpClient;
