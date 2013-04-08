@@ -19,6 +19,7 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotated
 import static com.googlecode.utterlyidle.handlers.HandlerRule.entity;
 import static com.googlecode.utterlyidle.handlers.RenderingResponseHandler.renderer;
 import static com.googlecode.utterlyidle.sitemesh.ContentTypePredicate.contentType;
+import static com.googlecode.yadic.Containers.addIfAbsent;
 
 public class SharedModule implements ApplicationScopedModule, ResponseHandlersModule, RequestScopedModule, ResourcesModule, ArgumentScopedModule {
     public ResponseHandlers addResponseHandlers(ResponseHandlers handlers) {
@@ -27,6 +28,7 @@ public class SharedModule implements ApplicationScopedModule, ResponseHandlersMo
     }
 
     public Container addPerRequestObjects(Container container) throws Exception {
+        addIfAbsent(container, BaronGreenbackRequestScope.class);
         return container.
                 addActivator(TemplateName.class, TemplateNameActivator.class).
                 addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class).
@@ -46,7 +48,7 @@ public class SharedModule implements ApplicationScopedModule, ResponseHandlersMo
 
     @Override
     public Container addPerApplicationObjects(Container container) throws Exception {
-        return container.add(BaronGreenbackProperties.class).
-                add(ModelCache.class);
+        addIfAbsent(container, BaronGreenbackApplicationScope.class);
+        return container.add(BaronGreenbackProperties.class).add(ModelCache.class);
     }
 }

@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.persistence.lucene;
 
-import com.googlecode.barongreenback.persistence.PersistenceApplicationScope;
-import com.googlecode.barongreenback.persistence.PersistenceRequestScope;
+import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.lucene.*;
 import com.googlecode.lazyrecords.lucene.mappings.LuceneMappings;
@@ -16,13 +16,13 @@ import static com.googlecode.yadic.Containers.addIfAbsent;
 
 public class LuceneModule implements ApplicationScopedModule, RequestScopedModule {
     public Container addPerApplicationObjects(Container applicationScope) {
-        final Container container = applicationScope.get(PersistenceApplicationScope.class).value();
+        final Container container = applicationScope.get(BaronGreenbackApplicationScope.class).value();
         addActivatorIfAbsent(container, PartitionedIndex.class, PartitionedIndexActivator.class);
         return applicationScope;
     }
 
     public Container addPerRequestObjects(final Container requestScope) {
-        final Container container = requestScope.get(PersistenceRequestScope.class).value();
+        final Container container = requestScope.get(BaronGreenbackRequestScope.class).value();
         addIfAbsent(container, LuceneMappings.class);
         addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
         addIfAbsent(container, Records.class, LucenePartitionedRecords.class);

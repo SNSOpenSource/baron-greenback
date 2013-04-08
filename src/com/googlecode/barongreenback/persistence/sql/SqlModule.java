@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.persistence.sql;
 
-import com.googlecode.barongreenback.persistence.PersistenceRequestScope;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.Schema;
 import com.googlecode.lazyrecords.SchemaGeneratingRecords;
@@ -19,7 +19,7 @@ import static com.googlecode.yadic.Containers.addIfAbsent;
 public class SqlModule implements RequestScopedModule {
     @Override
     public Container addPerRequestObjects(Container requestScope) throws Exception {
-        final Container container = requestScope.get(PersistenceRequestScope.class).value();
+        final Container container = requestScope.get(BaronGreenbackRequestScope.class).value();
         addActivatorIfAbsent(container, Connection.class, ConnectionActivator.class);
         addIfAbsent(container, Persistence.class, SqlPersistence.class);
         addIfAbsent(container, SqlMappings.class);

@@ -2,6 +2,8 @@ package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
 import com.googlecode.barongreenback.persistence.sql.SqlModule;
+import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.IgnoreLogger;
 import com.googlecode.lazyrecords.Logger;
@@ -25,7 +27,6 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
     public Container addPerRequestObjects(final Container container) throws Exception {
         addInstanceIfAbsent(container, StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
         addIfAbsent(container, Logger.class, IgnoreLogger.class);
-        addIfAbsent(container, PersistenceRequestScope.class);
         addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
         addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
         return container;
@@ -36,7 +37,6 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         addIfAbsent(container, PersistenceUri.class);
         addIfAbsent(container, PersistenceUser.class);
         addIfAbsent(container, PersistencePassword.class);
-        addIfAbsent(container, PersistenceApplicationScope.class);
         return container;
     }
 
