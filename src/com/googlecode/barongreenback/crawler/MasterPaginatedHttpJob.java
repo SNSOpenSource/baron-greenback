@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
@@ -34,7 +35,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
         Option<Document> document = loadDocument(response);
         for (Document doc : document)
-            crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(StringMappings.class))));
+            crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(BaronGreenbackStringMappings.class).value())));
         return processDocument(document);
     }
 

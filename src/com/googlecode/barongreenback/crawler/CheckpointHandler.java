@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.mappings.StringMappings;
@@ -14,8 +15,8 @@ public class CheckpointHandler {
     private final StringMappings mappings;
     private final ModelRepository modelRepository;
 
-    public CheckpointHandler(StringMappings mappings, ModelRepository modelRepository) {
-        this.mappings = mappings;
+    public CheckpointHandler(BaronGreenbackStringMappings mappings, ModelRepository modelRepository) {
+        this.mappings = mappings.value();
         this.modelRepository = modelRepository;
     }
 

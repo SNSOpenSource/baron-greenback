@@ -2,8 +2,8 @@ package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
 import com.googlecode.barongreenback.persistence.sql.SqlModule;
-import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
 import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScopedModule;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.IgnoreLogger;
 import com.googlecode.lazyrecords.Logger;
@@ -22,13 +22,13 @@ import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
 import static com.googlecode.yadic.Containers.addIfAbsent;
 import static com.googlecode.yadic.Containers.addInstanceIfAbsent;
 
-public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule {
+public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule, BaronGreenbackRequestScopedModule {
 
     public Container addPerRequestObjects(final Container container) throws Exception {
-        addInstanceIfAbsent(container, StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
         addIfAbsent(container, Logger.class, IgnoreLogger.class);
         addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
         addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
+        addActivatorIfAbsent(container, BaronGreenbackStringMappings.class, BaronGreenbackStringMappingsActivator.class);
         return container;
     }
 
@@ -54,5 +54,12 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         PersistenceUri persistenceUri = application.applicationScope().get(PersistenceUri.class);
         application.add(modules.get(persistenceUri.scheme()));
         return application;
+    }
+
+    @Override
+    public BaronGreenbackRequestScope addBaronGreenbackPerRequestObjects(BaronGreenbackRequestScope bgbRequestScope) {
+        Container container = bgbRequestScope.value();
+        addInstanceIfAbsent(container, StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
+        return bgbRequestScope;
     }
 }

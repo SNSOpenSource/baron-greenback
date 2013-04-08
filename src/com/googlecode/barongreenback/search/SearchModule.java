@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScopeModule;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScopedModule;
 import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.pager.RequestPager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
@@ -27,7 +27,7 @@ import static com.googlecode.totallylazy.time.Hours.functions.subtract;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader.Replacements.replacements;
 
-public class SearchModule implements BaronGreenbackRequestScopeModule, ResourcesModule, ApplicationScopedModule, RequestScopedModule {
+public class SearchModule implements BaronGreenbackRequestScopedModule, ResourcesModule, ApplicationScopedModule, RequestScopedModule {
     public Resources addResources(Resources resources) {
         return resources.add(annotatedClass(SearchResource.class));
     }

@@ -6,6 +6,7 @@ import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.CrawlerTests;
 import com.googlecode.barongreenback.crawler.VisitedFactory;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.barongreenback.persistence.ModelMapping;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordsModelRepository;
@@ -18,7 +19,6 @@ import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.time.Clock;
-import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.totallylazy.time.FixedClock;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
@@ -33,6 +33,7 @@ import static com.googlecode.barongreenback.crawler.HttpJob.httpJob;
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
 import static com.googlecode.barongreenback.crawler.VisitedFactory.visitedFactory;
+import static com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
@@ -63,12 +64,12 @@ public class FailuresTest {
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), visitedFactory().value(), scope.get(Clock.class).now()), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(BaronGreenbackStringMappings.class).value(), visitedFactory().value(), scope.get(Clock.class).now()), "Bigtime failures"));
     }
 
     @Test
     public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(StringMappings.class), visitedFactory(), scope.get(Clock.class)), "Bigtime failures"));
+        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(BaronGreenbackStringMappings.class).value(), visitedFactory(), scope.get(Clock.class)), "Bigtime failures"));
     }
 
     private void assertCanPersistAndLoad(Failure failure) {
@@ -85,8 +86,9 @@ public class FailuresTest {
         Container scope = new SimpleContainer();
         scope.add(FailureRepository.class);
         scope.add(BaronGreenbackRecords.class);
-        scope.add(Records.class, MemoryRecords.class);
-        scope.addInstance(StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
+        StringMappings mappings = new StringMappings().add(Model.class, new ModelMapping());
+        scope.addInstance(Records.class, new MemoryRecords(mappings));
+        scope.addInstance(BaronGreenbackStringMappings.class, baronGreenbackStringMappings(mappings));
         scope.add(CrawlerRepository.class);
         scope.add(ModelRepository.class, RecordsModelRepository.class);
         scope.add(CheckpointHandler.class);

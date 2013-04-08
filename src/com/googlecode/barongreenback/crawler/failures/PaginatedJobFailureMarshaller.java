@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.PaginatedHttpJob;
 import com.googlecode.barongreenback.crawler.VisitedFactory;
+import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.time.Clock;
@@ -11,9 +12,9 @@ import com.googlecode.totallylazy.time.Clock;
 public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
     private final StringMappings mappings;
 
-    public PaginatedJobFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, StringMappings mappings, VisitedFactory visitedFactory, Clock clock) {
+    public PaginatedJobFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, BaronGreenbackStringMappings mappings, VisitedFactory visitedFactory, Clock clock) {
         super(crawlerRepository, checkpointHandler, visitedFactory, clock);
-        this.mappings = mappings;
+        this.mappings = mappings.value();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
@@ -21,11 +22,11 @@ public class QueuesCrawler extends AbstractCrawler {
     private final VisitedFactory visitedFactory;
 
     public QueuesCrawler(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler,
-                         StringMappings mappings, Container requestContainer,
+                         BaronGreenbackStringMappings mappings, Container requestContainer,
                          VisitedFactory visitedFactory) {
         super(crawlerRepository);
         this.checkpointHandler = checkpointHandler;
-        this.mappings = mappings;
+        this.mappings = mappings.value();
         this.requestContainer = requestContainer;
         this.visitedFactory = visitedFactory;
     }

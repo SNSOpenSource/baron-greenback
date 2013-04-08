@@ -61,7 +61,7 @@ public class SharedModule implements ApplicationScopedModule, ResponseHandlersMo
     @Override
     public ModuleDefinitions defineModules(ModuleDefinitions moduleDefinitions) throws Exception {
         return moduleDefinitions.addApplicationModule(BaronGreenbackApplicationScopedModule.class).
-                addRequestModule(BaronGreenbackRequestScopeModule.class);
+                addRequestModule(BaronGreenbackRequestScopedModule.class);
     }
 
 
