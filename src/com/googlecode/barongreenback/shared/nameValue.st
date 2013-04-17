@@ -1,4 +1,4 @@
 <div class="nameValue">
-    <span class="label">$html(name)$:</span>
-    <span class="value">$html(value)$</span>
+    <span class="label">$name$:</span>
+    <span class="value">$value$</span>
 </div>
