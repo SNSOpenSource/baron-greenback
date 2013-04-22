@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 
 import static com.googlecode.totallylazy.Functions.function;
 
-public class CpuBoundedCompleter implements Completer, Service, Closeable {
+public class CpuBoundedCompleter implements Completer, Closeable {
     private volatile ExecutorService executor;
 
     @Override
@@ -30,7 +30,6 @@ public class CpuBoundedCompleter implements Completer, Service, Closeable {
         start();
     }
 
-    @Override
     public synchronized void stop() {
         if (executor != null) {
             executor.shutdownNow();
@@ -38,7 +37,6 @@ public class CpuBoundedCompleter implements Completer, Service, Closeable {
         }
     }
 
-    @Override
     public synchronized void start() {
         if (executor == null) executor = NamedExecutors.newCpuThreadPool(CpuBoundedCompleter.class);
     }
