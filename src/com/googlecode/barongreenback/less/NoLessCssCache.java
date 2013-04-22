@@ -7,7 +7,7 @@ import static com.googlecode.totallylazy.None.none;
 public class NoLessCssCache implements LessCssCache {
 
     @Override
-    public Option<CachedLessCss> getOption(String key) {
+    public Option<CachedLessCss> get(String key) {
         return none(CachedLessCss.class);
     }
 

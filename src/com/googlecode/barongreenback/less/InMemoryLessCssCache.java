@@ -9,7 +9,7 @@ public class InMemoryLessCssCache implements LessCssCache {
     private static final Map<String, CachedLessCss> cache = new ConcurrentHashMap<String, CachedLessCss>();
 
     @Override
-    public Option<CachedLessCss> getOption(String key) {
+    public Option<CachedLessCss> get(String key) {
         return Option.option(cache.get(key));
     }
 

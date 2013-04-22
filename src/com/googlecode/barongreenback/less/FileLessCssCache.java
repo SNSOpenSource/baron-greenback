@@ -19,7 +19,7 @@ public class FileLessCssCache implements LessCssCache {
     }
 
     @Override
-    public Option<CachedLessCss> getOption(String key) {
+    public Option<CachedLessCss> get(String key) {
         return fileOption(cacheLocation, fileNameFor(key)).map(toCached());
     }
 

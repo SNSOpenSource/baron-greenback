@@ -48,7 +48,7 @@ public class LessCssHandler implements HttpHandler {
     private String processLess(final Uri uri, final String rawLess, final Date lastModified) throws IOException {
         final String key = uri.path();
 
-        return cache.getOption(key).
+        return cache.get(key).
                 filter(modifiedSince(lastModified)).
                 map(less).
                 getOrElse(compileAndCache(uri, rawLess, lastModified, key));
