@@ -1,20 +1,16 @@
 package com.googlecode.barongreenback.less;
 
+import com.googlecode.totallylazy.Option;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryLessCssCache implements LessCssCache {
-    
-    static private Map<String, CachedLessCss> cache = new ConcurrentHashMap<String, CachedLessCss>();
-    
-    @Override
-    public boolean containsKey(String key) {
-        return cache.containsKey(key);
-    }
+    private static final Map<String, CachedLessCss> cache = new ConcurrentHashMap<String, CachedLessCss>();
 
     @Override
-    public CachedLessCss get(String key) {
-        return cache.get(key);
+    public Option<CachedLessCss> getOption(String key) {
+        return Option.option(cache.get(key));
     }
 
     @Override

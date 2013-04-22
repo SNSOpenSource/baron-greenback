@@ -1,10 +1,9 @@
 package com.googlecode.barongreenback.less;
 
+import com.googlecode.totallylazy.Option;
+
 public interface LessCssCache {
-
-    boolean containsKey(String key);
-
-    CachedLessCss get(String key);
+    Option<CachedLessCss> getOption(String key);
 
     void put(String key, CachedLessCss result);
 }

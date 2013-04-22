@@ -14,8 +14,10 @@ import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.Callable;
 
-import static com.googlecode.totallylazy.Option.option;
+import static com.googlecode.barongreenback.less.CachedLessCss.functions.less;
+import static com.googlecode.barongreenback.less.CachedLessCss.functions.modifiedSince;
 import static com.googlecode.utterlyidle.HttpHeaders.LAST_MODIFIED;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
@@ -24,13 +26,11 @@ public class LessCssHandler implements HttpHandler {
     private final LessCssCache cache;
     private final HttpHandler httpHandler;
     private final LessCompiler lessCompiler;
-    private final LessCssConfig config;
 
     public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler, LessCssConfig config, LessCssCache cache) {
         this.httpHandler = httpHandler;
         this.lessCompiler = lessCompiler;
-        this.config = config;
-        this.cache = cache;
+        this.cache = config.useCache() ? cache : new NoLessCssCache();
     }
 
     public Response handle(Request request) throws Exception {
@@ -45,15 +45,24 @@ public class LessCssHandler implements HttpHandler {
         return ResponseBuilder.modify(response).entity(processLess(uri, less, lastModified)).build();
     }
 
-    private String processLess(Uri uri, String less, Date lastModified) throws IOException {
-        String key = uri.path();
+    private String processLess(final Uri uri, final String rawLess, final Date lastModified) throws IOException {
+        final String key = uri.path();
 
-        if (cache.containsKey(key) && config.useCache() && !cache.get(key).modifiedSince(lastModified)) {
-            return cache.get(key).less();
-        }
-        String result = lessCompiler.compile(less, new Loader(uri));
-        cache.put(key, new CachedLessCss(result, lastModified));
-        return result;
+        return cache.getOption(key).
+                filter(modifiedSince(lastModified)).
+                map(less).
+                getOrElse(compileAndCache(uri, rawLess, lastModified, key));
+    }
+
+    private Callable<String> compileAndCache(final Uri uri, final String rawLess, final Date lastModified, final String key) {
+        return new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                String result = lessCompiler.compile(rawLess, new Loader(uri));
+                cache.put(key, new CachedLessCss(result, lastModified));
+                return result;
+            }
+        };
     }
 
     public class Loader implements Callable1<String, String> {
