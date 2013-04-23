@@ -30,7 +30,7 @@ public class LessCssHandler implements HttpHandler {
     public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler, LessCssConfig config, LessCssCache cache) {
         this.httpHandler = httpHandler;
         this.lessCompiler = lessCompiler;
-        this.cache = config.useCache() ? cache : new NoLessCssCache();
+        this.cache = config.useCache() ? cache : NoLessCssCache.instance;
     }
 
     public Response handle(Request request) throws Exception {
