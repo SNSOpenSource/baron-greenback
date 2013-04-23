@@ -10,11 +10,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static org.junit.Assert.fail;
 
 public class LessCssHandlerTest {
+    private static final Date LAST_MODIFIED = Dates.date(2000, 1, 1);
     private InMemoryCompiledLessCache cache;
 
     @Before
@@ -42,7 +44,7 @@ public class LessCssHandlerTest {
 
 
     private void ensureCacheContains(final String path) throws Exception {
-        cache.put(path, new CompiledLess("", Dates.date(2000, 1, 1)));
+        cache.put(path, new CompiledLess("", LAST_MODIFIED));
     }
 
     private LessCssConfig alwaysCache() {
@@ -67,7 +69,7 @@ public class LessCssHandlerTest {
         return new HttpHandler() {
             @Override
             public Response handle(Request request) throws Exception {
-                return ResponseBuilder.response().header(HttpHeaders.LAST_MODIFIED, Dates.date(2000, 1, 2)).build();
+                return ResponseBuilder.response().header(HttpHeaders.LAST_MODIFIED, LAST_MODIFIED).build();
             }
         };
     }

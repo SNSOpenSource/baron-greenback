@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.less;
 
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.HttpHandler;
@@ -14,10 +15,10 @@ import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 import static com.googlecode.barongreenback.less.CompiledLess.functions.less;
 import static com.googlecode.barongreenback.less.CompiledLess.functions.stale;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.utterlyidle.HttpHeaders.LAST_MODIFIED;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
@@ -49,13 +50,13 @@ public class LessCssHandler implements HttpHandler {
         final String key = uri.path();
 
         return cache.get(key).
-                filter(stale(rawModifiedDate)).
+                filter(not(stale(rawModifiedDate))).
                 map(less).
                 getOrElse(compileAndCache(uri, rawLess, rawModifiedDate, key));
     }
 
-    private Callable<String> compileAndCache(final Uri uri, final String rawLess, final Date lastModified, final String key) {
-        return new Callable<String>() {
+    private Function<String> compileAndCache(final Uri uri, final String rawLess, final Date lastModified, final String key) {
+        return new Function<String>() {
             @Override
             public String call() throws Exception {
                 String result = lessCompiler.compile(rawLess, new Loader(uri));
