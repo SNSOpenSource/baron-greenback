@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Date;
 
@@ -33,12 +32,13 @@ public class FileLessCssCache implements LessCssCache {
     }
 
     @Override
-    public void put(String key, CachedLessCss result) {
+    public boolean put(String key, CachedLessCss result) {
         File file = Files.file(cacheLocation, fileNameFor(key));
-        Files.write(file).apply(new ByteArrayInputStream(result.less().getBytes()));
+        Files.write(Strings.bytes(result.less()), file);
+        return file.exists();
     }
 
     private String fileNameFor(String key) {
-        return "cache-" + key + ".css";
+        return key + ".css";
     }
 }

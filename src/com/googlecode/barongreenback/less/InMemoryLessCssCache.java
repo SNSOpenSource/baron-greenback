@@ -14,7 +14,8 @@ public class InMemoryLessCssCache implements LessCssCache {
     }
 
     @Override
-    public void put(String key, CachedLessCss result) {
+    public boolean put(String key, CachedLessCss result) {
         cache.put(key, result);
+        return true;
     }
 }
