@@ -13,26 +13,28 @@ import static com.googlecode.totallylazy.Uri.packageUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class UriLessCssCacheTest {
+public class UriCompiledLessCssCacheTest {
     @Test
     public void shouldGetFromCache() throws Exception {
-        CompiledLessCache cache = new UriCompiledLessCache(packageUri(UriLessCssCacheTest.class));
-        assertThat(cache.get("test-style.less").isEmpty(), is(false));
-        assertThat(cache.get("not-found.less").isEmpty(), is(true));
+        CompiledLessCache cache = new UriCompiledLessCache(packageUri(UriCompiledLessCssCacheTest.class));
+        assertThat(cache.get("/test-style.less").isEmpty(), is(false));
+        assertThat(cache.get("/not-found.less").isEmpty(), is(true));
     }
 
     @Test
     public void shouldPutIntoCache() throws Exception {
-        Uri root = packageUri(UriLessCssCacheTest.class);
+        Uri root = packageUri(UriCompiledLessCssCacheTest.class);
         CompiledLessCache cache = new UriCompiledLessCache(root);
         Date lastModified = Dates.date(2000, 1, 1);
-        boolean added = cache.put("put.less", new CompiledLess("", lastModified));
-        if (Uri.JAR_URL.matches(root.toString())) assertThat(added, is(false));
-        else {
+        CompiledLess compiledLess = new CompiledLess("", lastModified);
+        if (Uri.JAR_URL.matches(root.toString())) {
+            assertThat(cache.put("/put.less", compiledLess), is(false));
+        } else {
             File cacheFile = root.mergePath("put.less.css").toFile();
+            System.out.println("cacheFile = " + cacheFile);
             delete(cacheFile);
 
-            assertThat(added, is(true));
+            assertThat(cache.put("/put.less", compiledLess), is(true));
 
             assertThat(cacheFile.exists(), is(true));
             assertThat(new Date(cacheFile.lastModified()), is(lastModified));
