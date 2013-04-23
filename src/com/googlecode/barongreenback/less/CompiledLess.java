@@ -26,8 +26,8 @@ public class CompiledLess extends Eq {
         return lastModified;
     }
 
-    public boolean modifiedSince(Date lastModified) {
-        return lastModified.after(lastModified());
+    public boolean stale(Date date) {
+        return lastModified.before(date);
     }
 
     @multimethod
@@ -46,11 +46,11 @@ public class CompiledLess extends Eq {
     }
 
     public static class functions {
-        public static LogicalPredicate<CompiledLess> modifiedSince(final Date lastModified) {
+        public static LogicalPredicate<CompiledLess> stale(final Date date) {
             return new LogicalPredicate<CompiledLess>() {
                 @Override
                 public boolean matches(CompiledLess other) {
-                    return other.modifiedSince(lastModified);
+                    return other.stale(date);
                 }
             };
         }

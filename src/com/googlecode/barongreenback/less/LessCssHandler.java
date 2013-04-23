@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 
 import static com.googlecode.barongreenback.less.CompiledLess.functions.less;
-import static com.googlecode.barongreenback.less.CompiledLess.functions.modifiedSince;
+import static com.googlecode.barongreenback.less.CompiledLess.functions.stale;
 import static com.googlecode.utterlyidle.HttpHeaders.LAST_MODIFIED;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
@@ -45,13 +45,13 @@ public class LessCssHandler implements HttpHandler {
         return ResponseBuilder.modify(response).entity(processLess(uri, less, lastModified)).build();
     }
 
-    private String processLess(final Uri uri, final String rawLess, final Date lastModified) throws IOException {
+    private String processLess(final Uri uri, final String rawLess, final Date rawModifiedDate) throws IOException {
         final String key = uri.path();
 
         return cache.get(key).
-                filter(modifiedSince(lastModified)).
+                filter(stale(rawModifiedDate)).
                 map(less).
-                getOrElse(compileAndCache(uri, rawLess, lastModified, key));
+                getOrElse(compileAndCache(uri, rawLess, rawModifiedDate, key));
     }
 
     private Callable<String> compileAndCache(final Uri uri, final String rawLess, final Date lastModified, final String key) {
