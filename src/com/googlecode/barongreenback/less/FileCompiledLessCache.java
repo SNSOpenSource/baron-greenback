@@ -10,29 +10,29 @@ import java.util.Date;
 
 import static com.googlecode.totallylazy.Files.fileOption;
 
-public class FileLessCssCache implements LessCssCache {
+public class FileCompiledLessCache implements CompiledLessCache {
     private final File cacheLocation;
 
-    public FileLessCssCache(File cacheLocation) {
+    public FileCompiledLessCache(File cacheLocation) {
         this.cacheLocation = cacheLocation;
     }
 
     @Override
-    public Option<CachedLessCss> get(String key) {
+    public Option<CompiledLess> get(String key) {
         return fileOption(cacheLocation, fileNameFor(key)).map(toCached());
     }
 
-    private Mapper<File, CachedLessCss> toCached() {
-        return new Mapper<File, CachedLessCss>() {
+    private Mapper<File, CompiledLess> toCached() {
+        return new Mapper<File, CompiledLess>() {
             @Override
-            public CachedLessCss call(File file) throws Exception {
-                return new CachedLessCss(Strings.toString(file), new Date(file.lastModified()));
+            public CompiledLess call(File file) throws Exception {
+                return new CompiledLess(Strings.toString(file), new Date(file.lastModified()));
             }
         };
     }
 
     @Override
-    public boolean put(String key, CachedLessCss result) {
+    public boolean put(String key, CompiledLess result) {
         File file = Files.file(cacheLocation, fileNameFor(key));
         Files.write(Strings.bytes(result.less()), file);
         return file.exists();

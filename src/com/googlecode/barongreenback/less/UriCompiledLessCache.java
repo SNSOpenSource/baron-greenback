@@ -12,21 +12,21 @@ import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.time.Dates.parse;
 import static com.googlecode.utterlyidle.HttpHeaders.LAST_MODIFIED;
 
-public class UriLessCssCache implements LessCssCache {
+public class UriCompiledLessCache implements CompiledLessCache {
     private final Uri root;
     private final HttpClient httpClient;
 
-    public UriLessCssCache(Uri root, HttpClient httpClient) {
+    public UriCompiledLessCache(Uri root, HttpClient httpClient) {
         this.root = root;
         this.httpClient = httpClient;
     }
 
     @Override
-    public Option<CachedLessCss> get(String key) {
+    public Option<CompiledLess> get(String key) {
         try {
             Response response = httpClient.handle(RequestBuilder.get(cached(key)).build());
             if (response.status().isSuccessful()) {
-                return some(new CachedLessCss(response.entity().toString(), parse(response.headers().getValue(LAST_MODIFIED))));
+                return some(new CompiledLess(response.entity().toString(), parse(response.headers().getValue(LAST_MODIFIED))));
             }
         } catch (Exception ignore) {
         }
@@ -36,7 +36,7 @@ public class UriLessCssCache implements LessCssCache {
     private Uri cached(String key) {return root.mergePath(key + ".css");}
 
     @Override
-    public boolean put(String key, CachedLessCss result) {
+    public boolean put(String key, CompiledLess result) {
         try {
             Request request = RequestBuilder.put(cached(key)).
                     header(LAST_MODIFIED, result.lastModified()).

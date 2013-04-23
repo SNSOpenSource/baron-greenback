@@ -5,16 +5,16 @@ import com.googlecode.totallylazy.Option;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InMemoryLessCssCache implements LessCssCache {
-    private static final Map<String, CachedLessCss> cache = new ConcurrentHashMap<String, CachedLessCss>();
+public class InMemoryCompiledLessCache implements CompiledLessCache {
+    private static final Map<String, CompiledLess> cache = new ConcurrentHashMap<String, CompiledLess>();
 
     @Override
-    public Option<CachedLessCss> get(String key) {
+    public Option<CompiledLess> get(String key) {
         return Option.option(cache.get(key));
     }
 
     @Override
-    public boolean put(String key, CachedLessCss result) {
+    public boolean put(String key, CompiledLess result) {
         cache.put(key, result);
         return true;
     }

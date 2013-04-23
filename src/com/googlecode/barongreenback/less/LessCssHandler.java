@@ -16,21 +16,21 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
-import static com.googlecode.barongreenback.less.CachedLessCss.functions.less;
-import static com.googlecode.barongreenback.less.CachedLessCss.functions.modifiedSince;
+import static com.googlecode.barongreenback.less.CompiledLess.functions.less;
+import static com.googlecode.barongreenback.less.CompiledLess.functions.modifiedSince;
 import static com.googlecode.utterlyidle.HttpHeaders.LAST_MODIFIED;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
 
 public class LessCssHandler implements HttpHandler {
-    private final LessCssCache cache;
+    private final CompiledLessCache cache;
     private final HttpHandler httpHandler;
     private final LessCompiler lessCompiler;
 
-    public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler, LessCssConfig config, LessCssCache cache) {
+    public LessCssHandler(HttpHandler httpHandler, LessCompiler lessCompiler, LessCssConfig config, CompiledLessCache cache) {
         this.httpHandler = httpHandler;
         this.lessCompiler = lessCompiler;
-        this.cache = config.useCache() ? cache : NoLessCssCache.instance;
+        this.cache = config.useCache() ? cache : NoCompiledLessCache.instance;
     }
 
     public Response handle(Request request) throws Exception {
@@ -59,7 +59,7 @@ public class LessCssHandler implements HttpHandler {
             @Override
             public String call() throws Exception {
                 String result = lessCompiler.compile(rawLess, new Loader(uri));
-                cache.put(key, new CachedLessCss(result, lastModified));
+                cache.put(key, new CompiledLess(result, lastModified));
                 return result;
             }
         };

@@ -9,11 +9,11 @@ import java.util.Date;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 
-public class CachedLessCss extends Eq {
+public class CompiledLess extends Eq {
     private String less;
     private Date lastModified;
 
-    public CachedLessCss(String less, Date lastModified) {
+    public CompiledLess(String less, Date lastModified) {
         this.less = less;
         this.lastModified = lastModified;
     }
@@ -31,7 +31,7 @@ public class CachedLessCss extends Eq {
     }
 
     @multimethod
-    public boolean equals(CachedLessCss other) {
+    public boolean equals(CompiledLess other) {
         return less.equals(other.less) && lastModified.equals(other.lastModified);
     }
 
@@ -46,19 +46,19 @@ public class CachedLessCss extends Eq {
     }
 
     public static class functions {
-        public static LogicalPredicate<CachedLessCss> modifiedSince(final Date lastModified) {
-            return new LogicalPredicate<CachedLessCss>() {
+        public static LogicalPredicate<CompiledLess> modifiedSince(final Date lastModified) {
+            return new LogicalPredicate<CompiledLess>() {
                 @Override
-                public boolean matches(CachedLessCss other) {
+                public boolean matches(CompiledLess other) {
                     return other.modifiedSince(lastModified);
                 }
             };
         }
 
-        public static Mapper<CachedLessCss, String> less = new Mapper<CachedLessCss, String>() {
+        public static Mapper<CompiledLess, String> less = new Mapper<CompiledLess, String>() {
             @Override
-            public String call(CachedLessCss cachedLessCss) throws Exception {
-                return cachedLessCss.less();
+            public String call(CompiledLess compiledLess) throws Exception {
+                return compiledLess.less();
             }
         };
     }

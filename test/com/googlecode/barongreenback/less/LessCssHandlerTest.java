@@ -15,11 +15,11 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static org.junit.Assert.fail;
 
 public class LessCssHandlerTest {
-    private InMemoryLessCssCache cache;
+    private InMemoryCompiledLessCache cache;
 
     @Before
     public void createHandler() throws Exception {
-        cache = new InMemoryLessCssCache();
+        cache = new InMemoryCompiledLessCache();
     }
 
     @Test
@@ -42,7 +42,7 @@ public class LessCssHandlerTest {
 
 
     private void ensureCacheContains(final String path) throws Exception {
-        cache.put(path, new CachedLessCss("", Dates.date(2000, 1, 1)));
+        cache.put(path, new CompiledLess("", Dates.date(2000, 1, 1)));
     }
 
     private LessCssConfig alwaysCache() {

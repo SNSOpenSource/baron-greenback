@@ -11,19 +11,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class CompositeLessCssCacheTest {
     @Test
     public void shouldTryAllCachesOnGet() throws Exception {
-        InMemoryLessCssCache inMemory = new InMemoryLessCssCache();
-        CachedLessCss cached = new CachedLessCss("more", date(1974, 10, 29));
+        InMemoryCompiledLessCache inMemory = new InMemoryCompiledLessCache();
+        CompiledLess cached = new CompiledLess("more", date(1974, 10, 29));
         inMemory.put("cheese", cached);
-        CompositeLessCssCache composite = CompositeLessCssCache.compositeLessCssCache(NoLessCssCache.instance, inMemory);
-        Option<CachedLessCss> cheese = composite.get("cheese");
+        CompositeCompiledLessCache composite = CompositeCompiledLessCache.compositeLessCssCache(NoCompiledLessCache.instance, inMemory);
+        Option<CompiledLess> cheese = composite.get("cheese");
         assertThat(cheese, is(some(cached)));
     }
 
     @Test
     public void shouldTryAllCachesOnPut() throws Exception {
-        InMemoryLessCssCache inMemory = new InMemoryLessCssCache();
-        CachedLessCss cached = new CachedLessCss("more", date(1974, 10, 29));
-        CompositeLessCssCache composite = CompositeLessCssCache.compositeLessCssCache(NoLessCssCache.instance, inMemory);
+        InMemoryCompiledLessCache inMemory = new InMemoryCompiledLessCache();
+        CompiledLess cached = new CompiledLess("more", date(1974, 10, 29));
+        CompositeCompiledLessCache composite = CompositeCompiledLessCache.compositeLessCssCache(NoCompiledLessCache.instance, inMemory);
         boolean result = composite.put("cheese", cached);
         assertThat(result, is(true));
         assertThat(inMemory.get("cheese"), is(some(cached)));
