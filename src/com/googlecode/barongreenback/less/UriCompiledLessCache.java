@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 
 import static com.googlecode.totallylazy.None.none;
@@ -19,6 +20,10 @@ public class UriCompiledLessCache implements CompiledLessCache {
     public UriCompiledLessCache(Uri root, HttpClient httpClient) {
         this.root = root;
         this.httpClient = httpClient;
+    }
+
+    public UriCompiledLessCache(Uri root) {
+        this(root, new ClientHttpHandler());
     }
 
     @Override
