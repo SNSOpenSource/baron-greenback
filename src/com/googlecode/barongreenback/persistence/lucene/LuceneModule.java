@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.persistence.lucene;
 
+import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
 import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Records;
@@ -9,12 +10,22 @@ import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 
+import java.net.URI;
 import java.util.concurrent.Callable;
 
+import static com.googlecode.totallylazy.URLs.uri;
 import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
 import static com.googlecode.yadic.Containers.addIfAbsent;
 
 public class LuceneModule implements ApplicationScopedModule, RequestScopedModule {
+    public static URI fileUrl(String persistenceUri) {
+        return uri(persistenceUri.substring(PersistenceModule.LUCENE.length() + 1));
+    }
+
+    public static String lucene(DirectoryType type) {
+        return String.format("%s:%s", PersistenceModule.LUCENE, type.value());
+    }
+
     public Container addPerApplicationObjects(Container applicationScope) {
         final Container container = applicationScope.get(BaronGreenbackApplicationScope.class).value();
         addActivatorIfAbsent(container, PartitionedIndex.class, PartitionedIndexActivator.class);
