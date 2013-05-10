@@ -13,7 +13,7 @@ public class PersistenceUri extends Uri {
     }
 
     public PersistenceUri(BaronGreenbackProperties properties) {
-        super(properties.getProperty(PROPERTY_NAME, "lucene:mem"));
+        this(properties.getProperty(PROPERTY_NAME, "lucene:mem"));
     }
 
     public static String name() {
