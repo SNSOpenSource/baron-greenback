@@ -12,7 +12,7 @@ public class LucenePersistence {
     }
 
     public static String luceneRam() {
-        return String.format("%s:%s", PersistenceModule.LUCENE, PartitionedIndexActivator.MEMORY);
+        return String.format("%s:%s", PersistenceModule.LUCENE, DirectoryType.Memory);
     }
 
     public static String luceneTemporaryDirectory(String name) {

@@ -16,9 +16,7 @@ import static com.googlecode.lazyrecords.lucene.PartitionedIndex.functions.nioDi
 import static com.googlecode.totallylazy.URLs.uri;
 
 public class PartitionedIndexActivator implements Callable<PartitionedIndex>, Closeable {
-    public static final String FILE = "file";
-    public static final String MEMORY = "mem";
-    public static final String NIO = "nio";
+
     private final String persistenceUri;
     private LucenePartitionedIndex partitionedIndex;
 
@@ -27,14 +25,14 @@ public class PartitionedIndexActivator implements Callable<PartitionedIndex>, Cl
     }
 
     public PartitionedIndex call() throws Exception {
-        if (persistenceUri.startsWith(prefix(MEMORY))) {
+        if (persistenceUri.startsWith(prefix(DirectoryType.Memory.value()))) {
             return partitionedIndex = partitionedIndex();
         }
-        if (persistenceUri.startsWith(prefix(NIO))) {
+        if (persistenceUri.startsWith(prefix(DirectoryType.Nio.value()))) {
             URI fileUri = extractFileUri();
             return partitionedIndex = partitionedIndex(nioDirectory(new File(fileUri)));
         }
-        if (persistenceUri.startsWith(prefix(FILE))) {
+        if (persistenceUri.startsWith(prefix(DirectoryType.File.value()))) {
             URI fileUri = extractFileUri();
             return partitionedIndex = partitionedIndex(new File(fileUri));
         }
