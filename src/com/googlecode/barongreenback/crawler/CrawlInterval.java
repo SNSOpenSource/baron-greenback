@@ -4,7 +4,7 @@ import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Value;
 
 public class CrawlInterval implements Value<Long> {
-    public static final String DEFAULT_VALUE = "300";
+    public static final String DEFAULT_VALUE = "60";
     public static final String PROPERTY_NAME = "crawler.interval";
     private final long value;
 
