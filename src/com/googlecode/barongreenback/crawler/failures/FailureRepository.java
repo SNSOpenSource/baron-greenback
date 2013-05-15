@@ -12,6 +12,7 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
+import java.util.Date;
 import java.util.UUID;
 
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
@@ -25,12 +26,14 @@ public class FailureRepository implements Repository<UUID, Record>, Finder<Recor
     public static final Keyword<String> JOB_TYPE = keyword("jobType", String.class);
     public static final Keyword<String> REASON = keyword("reason", String.class);
     public static final Keyword<Uri> URI = keyword("uri", Uri.class);
+    public static final Keyword<Date> REQUEST_TIME = keyword("request time", Date.class);
+    public static final Keyword<Long> DURATION = keyword("duration (ms)", Long.class);
     public static final Keyword<String> SOURCE = keyword("source", String.class);
     public static final Keyword<UUID> CRAWLER_ID = keyword("crawlerId", UUID.class);
     public static final Keyword<String> RECORD = keyword("record", String.class);
     public static final Keyword<String> VISITED = keyword("visited", String.class);
 
-    private static final Definition FAILURES = Definition.constructors.definition("failures", ID, JOB_TYPE, REASON, URI, CRAWLER_ID, SOURCE, RECORD, VISITED);
+    private static final Definition FAILURES = Definition.constructors.definition("failures", ID, JOB_TYPE, REASON, URI, REQUEST_TIME, DURATION, CRAWLER_ID, SOURCE, RECORD, VISITED);
 
     private final Records records;
 

@@ -1,7 +1,10 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.crawler.*;
+import com.googlecode.barongreenback.crawler.CountDownScheduler;
+import com.googlecode.barongreenback.crawler.CrawlerHttpClient;
+import com.googlecode.barongreenback.crawler.CrawlerImportPage;
+import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.barongreenback.queues.Completer;
@@ -10,31 +13,28 @@ import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.Unary;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
+import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.utterlyidle.handlers.RoutingClient;
 import com.googlecode.utterlyidle.html.Browser;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.waitrest.Waitrest;
-import com.googlecode.waitrest.internal.totallylazy.$Uri;
 import com.googlecode.yadic.Container;
 import org.junit.After;
 import org.junit.Before;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
-import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
-import static com.googlecode.utterlyidle.MediaType.TEXT_XML;
-import static com.googlecode.utterlyidle.RequestBuilder.put;
 import static com.googlecode.utterlyidle.html.Browser.browser;
 
 public abstract class ApplicationTests {
@@ -56,7 +56,7 @@ public abstract class ApplicationTests {
             @Override
             public Container addPerRequestObjects(Container container) throws Exception {
                 container.removeOption(CrawlerHttpClient.class);
-                return container.addInstance(CrawlerHttpClient.class, new CrawlerHttpClient(feedClient()));
+                return container.addInstance(CrawlerHttpClient.class, new CrawlerHttpClient(feedClientCallable()));
             }
         });
         application.usingRequestScope(new Callable1<Container, Object>() {
@@ -67,6 +67,15 @@ public abstract class ApplicationTests {
             }
         });
         browser = browser(application);
+    }
+
+    protected Unary<HttpHandler> feedClientCallable() {
+        return new Unary<HttpHandler>() {
+            @Override
+            public HttpHandler call(HttpHandler httpHandler) throws Exception {
+                return RoutingClient.allTrafficTo(httpHandler, feed().authority());
+            }
+        };
     }
 
     protected Properties getProperties() {
@@ -97,6 +106,4 @@ public abstract class ApplicationTests {
     protected HttpClient feedClient() {
         return RoutingClient.allTrafficTo(new ClientHttpHandler(), feed().authority());
     }
-
-
 }

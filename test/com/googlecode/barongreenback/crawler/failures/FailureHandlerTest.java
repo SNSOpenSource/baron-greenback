@@ -59,7 +59,7 @@ public class FailureHandlerTest {
 
         assertThat(response.entity().toString(), is(""));
         assertThat(response.status(), is(Status.NO_CONTENT));
-        assertThat(scope.get(Failures.class).values().map(Callables.<Failure>second()).contains(failure(job, originalResponse.toString())), is(true));
+        assertThat(scope.get(Failures.class).values().map(Callables.<Failure>second()).contains(failure(job, originalResponse.toString(), 0L)), is(true));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class FailureHandlerTest {
             fail("An exception should have been thrown");
         } catch (Exception e) {
             assertThat(e, is(expectedException));
-            assertThat(scope.get(Failures.class).values().map(Callables.<Failure>second()).contains(failure(job, asString(e))), is(true));
+            assertThat(scope.get(Failures.class).values().map(Callables.<Failure>second()).contains(failure(job, asString(e), 0L)), is(true));
         }
     }
 }

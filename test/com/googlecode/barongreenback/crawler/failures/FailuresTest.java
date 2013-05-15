@@ -59,17 +59,20 @@ public class FailuresTest {
 
     @Test
     public void canSaveAndLoadAnHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(httpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, visitedFactory().value(), scope.get(Clock.class).now()), "Bigtime failures"));
+        Clock clock = scope.get(Clock.class);
+        assertCanPersistAndLoad(Failure.failure(httpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, visitedFactory().value(), clock.now()), "Bigtime failures", 0L));
     }
 
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(BaronGreenbackStringMappings.class).value(), visitedFactory().value(), scope.get(Clock.class).now()), "Bigtime failures"));
+        Clock clock = scope.get(Clock.class);
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(BaronGreenbackStringMappings.class).value(), visitedFactory().value(), clock.now()), "Bigtime failures", 0L));
     }
 
     @Test
     public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
-        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(BaronGreenbackStringMappings.class).value(), visitedFactory(), scope.get(Clock.class)), "Bigtime failures"));
+        Clock clock = scope.get(Clock.class);
+        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(BaronGreenbackStringMappings.class).value(), visitedFactory(), clock), "Bigtime failures", 0L));
     }
 
     private void assertCanPersistAndLoad(Failure failure) {

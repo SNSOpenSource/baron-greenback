@@ -11,7 +11,13 @@ import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Block;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -24,8 +30,10 @@ import com.googlecode.yadic.Container;
 
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.DURATION;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.ID;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REASON;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REQUEST_TIME;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.URI;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Option.some;
@@ -57,7 +65,7 @@ public class FailureResource {
     @GET
     @Path("list")
     public Model list(@QueryParam("message") Option<String> message) {
-        Sequence<Keyword<?>> headers = Sequences.<Keyword<?>>sequence(URI, REASON);
+        Sequence<Keyword<?>> headers = Sequences.<Keyword<?>>sequence(URI, REASON, REQUEST_TIME, DURATION);
         Sequence<Record> unpaged = failureRepository.find(all());
         Sequence<Record> sorted = sorter.sort(unpaged, headers);
         Sequence<Record> paged = pager.paginate(sorted);
@@ -158,6 +166,8 @@ public class FailureResource {
                 return model().
                         add("uri", record.get(URI)).
                         add("reason", record.get(REASON)).
+                        add("requestTime", record.get(REQUEST_TIME)).
+                        add("duration", record.get(DURATION)).
                         add("id", record.get(ID));
             }
         };

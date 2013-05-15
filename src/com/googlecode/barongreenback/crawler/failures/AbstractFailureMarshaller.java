@@ -21,9 +21,11 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.HttpDatasource.httpDatasource;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.CRAWLER_ID;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.DURATION;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.JOB_TYPE;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REASON;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.RECORD;
+import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REQUEST_TIME;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.SOURCE;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.URI;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
@@ -59,6 +61,8 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
                 set(JOB_TYPE, FailureMarshallers.forJob(failure.job()).name()).
                 set(REASON, failure.reason()).
                 set(URI, failure.job().datasource().uri()).
+                set(REQUEST_TIME, failure.job().createdDate()).
+                set(DURATION, failure.duration()).
                 set(SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
                 set(RECORD, toJson(failure.job().record())).
                 set(CRAWLER_ID, failure.job().crawlerId());

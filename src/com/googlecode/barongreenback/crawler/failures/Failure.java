@@ -1,18 +1,24 @@
 package com.googlecode.barongreenback.crawler.failures;
 
 import com.googlecode.barongreenback.crawler.StagedJob;
+import com.googlecode.totallylazy.Eq;
+import com.googlecode.totallylazy.annotations.multimethod;
 
-public class Failure {
+import java.util.Date;
+
+public class Failure extends Eq {
     private final StagedJob job;
     private final String reason;
+    private final Long duration;
 
-    private Failure(StagedJob job, String reason) {
+    private Failure(StagedJob job, String reason, Long duration) {
         this.job = job;
         this.reason = reason;
+        this.duration = duration;
     }
 
-    public static Failure failure(StagedJob job, String reason) {
-        return new Failure(job, reason);
+    public static Failure failure(StagedJob job, String reason, Long duration) {
+        return new Failure(job, reason, duration);
     }
 
     public StagedJob job() {
@@ -23,18 +29,26 @@ public class Failure {
         return reason;
     }
 
-    @Override
-    public int hashCode() {
-        return job.hashCode() * reason.hashCode();
+    public Date date() {
+        return job.createdDate();
+    }
+
+    public Long duration() {
+        return duration;
     }
 
     @Override
-    public boolean equals(Object other) {
-        return other instanceof Failure && job.equals(((Failure) other).job()) && reason.equals(((Failure) other).reason());
+    public int hashCode() {
+        return job.hashCode() * reason.hashCode() * duration.hashCode();
+    }
+
+    @multimethod
+    public boolean equals(Failure other) {
+        return (other.duration == duration) && other.job.equals(job) && other.reason.equals(reason);
     }
 
     @Override
     public String toString() {
-        return String.format("job: %s, reason: %s", job.toString(), reason);
+        return String.format("job: %s, reason: %s, date: %s, duration: %d", job.toString(), reason, duration);
     }
 }
