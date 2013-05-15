@@ -19,7 +19,7 @@ import com.googlecode.totallylazy.Sequences;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.barongreenback.views.ViewsRepository.viewName;
-import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Callables.ignoreAndReturn;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Option.none;
@@ -73,8 +73,8 @@ public class RecordsService {
         return recordsFound.map(ignoreAndReturn(Option.none(Record.class)), firstResult());
     }
 
-    public Either<String,Sequence<Record>> findAll(String viewName, String query) {
-        Option<Model> optionalView = findView( viewName);
+    public Either<String, Sequence<Record>> findAll(String viewName, String query) {
+        Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
         Model view = optionalView.get();
@@ -82,7 +82,7 @@ public class RecordsService {
     }
 
     public Either<String, Sequence<Record>> findFromView(final String viewName, final String query) {
-        Option<Model> optionalView = findView( viewName);
+        Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
         Model view = optionalView.get();
@@ -103,7 +103,7 @@ public class RecordsService {
 
     private Either<String, Sequence<Record>> getRecordsWithQuery(Model view, String query, Sequence<Keyword<?>> visibleHeaders) {
         Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(query, visibleHeaders);
-        if(invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
+        if (invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
 
         return right(getRecords(view, invalidQueryOrPredicate.right()));
     }

@@ -9,7 +9,6 @@ import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Function2;
 import com.googlecode.totallylazy.LazyException;
@@ -31,6 +30,7 @@ import static com.googlecode.barongreenback.crawler.failures.FailureRepository.U
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.funclate.Model.mutable.parse;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
@@ -92,7 +92,7 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
             public Record call(Record record, Model model) throws Exception {
                 String name = model.get("name", String.class);
                 Class<?> type = Class.forName(model.get("type", String.class));
-                Keyword<Object> keyword = Keywords.keyword(name, type);
+                Keyword<Object> keyword = keyword(name, type);
                 return record.set(keyword, model.get("value"));
             }
         };

@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
@@ -20,7 +19,7 @@ import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 
 public class CompositeCrawler {
     public static final Keyword<String> MORE = keyword("more", String.class);
-    public static final Keyword<Boolean> CHECKPOINT = Keywords.keyword("checkpoint", Boolean.class);
+    public static final Keyword<Boolean> CHECKPOINT = keyword("checkpoint", Boolean.class);
     public static final Keyword<Date> CHECKPOINT_VALUE = keyword("checkpointValue", Date.class);
 
     private final HttpHandler client;
@@ -33,7 +32,7 @@ public class CompositeCrawler {
         this.client = new AuditHandler(client, new PrintAuditor(log));
     }
 
-    public Sequence<Record>  crawl(Uri uri, String more, Object checkpoint, RecordDefinition recordDefinition) throws Exception {
+    public Sequence<Record> crawl(Uri uri, String more, Object checkpoint, RecordDefinition recordDefinition) throws Exception {
         Feeder<Uri> feeder = new SubFeeder(new DuplicateRemover(new CheckPointStopper(checkpoint, new UriFeeder(client, more))));
         return feeder.get(uri, recordDefinition);
     }

@@ -19,10 +19,10 @@ import com.googlecode.totallylazy.Sequences;
 import java.util.List;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.ExpensiveModelToKeyword.expensiveModelToKeyword;
-import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.funclate.Model.functions.value;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
-import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -202,15 +202,17 @@ public class RecordDefinition {
     }
 
 
-
     public static Sequence<Keyword<?>> toKeywords(List<Model> keywords) {
         return sequence(keywords).filter(where(value("name", String.class), is(not(empty())))).map(expensiveModelToKeyword()).realise();
     }
 
     public static class ExpensiveModelToKeyword implements Callable1<Model, Keyword<?>> {
-        private ExpensiveModelToKeyword() { }
+        private ExpensiveModelToKeyword() {
+        }
 
-        public static ExpensiveModelToKeyword expensiveModelToKeyword() { return new ExpensiveModelToKeyword(); }
+        public static ExpensiveModelToKeyword expensiveModelToKeyword() {
+            return new ExpensiveModelToKeyword();
+        }
 
         public Keyword<?> call(Model model) throws Exception {
             Keyword<?> keyword = keyword(model.get("name", String.class), Class.forName(model.get("type", String.class)));

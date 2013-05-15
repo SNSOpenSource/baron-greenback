@@ -12,7 +12,7 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordsModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;
@@ -34,6 +34,7 @@ import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.maste
 import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
 import static com.googlecode.barongreenback.crawler.VisitedFactory.visitedFactory;
 import static com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
@@ -41,7 +42,7 @@ import static com.googlecode.totallylazy.time.Dates.date;
 import static org.junit.Assert.assertThat;
 
 public class FailuresTest {
-    private static final Record record = Record.constructors.record().set(Keywords.keyword("title", String.class), "Man eats dog");
+    private static final Record record = Record.constructors.record().set(keyword("title", String.class), "Man eats dog");
     private static final Container scope = testScope();
 
     private static final UUID crawlerId = UUID.randomUUID();

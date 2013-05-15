@@ -10,6 +10,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Unchecked;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.priority;
+import static com.googlecode.lazyrecords.Keyword.methods.matchKeyword;
 import static com.googlecode.totallylazy.Sequences.reduce;
 import static com.googlecode.totallylazy.comparators.NullComparator.Direction.Up;
 import static com.googlecode.totallylazy.comparators.NullComparator.compare;
@@ -20,7 +21,7 @@ public class PriorityMerge {
     }
 
     private static Keyword<Object> unalias(Keyword<?> keyword) {
-        return Keywords.keyword(keyword.name(), keyword.forClass());
+        return Keyword.constructors.keyword(keyword.name(), keyword.forClass());
     }
 
     public static final Function2<Record, Record, Record> priorityMerge = new Function2<Record, Record, Record>() {
@@ -52,6 +53,6 @@ public class PriorityMerge {
     }
 
     private static Keyword<Object> childKeyword(Record child, Keyword<?> parentKeyword) {
-        return Keywords.matchKeyword(parentKeyword.name(), child.keywords());
+        return matchKeyword(parentKeyword.name(), child.keywords());
     }
 }

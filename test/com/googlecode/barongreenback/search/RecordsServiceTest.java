@@ -6,7 +6,6 @@ import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Predicates;
@@ -16,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.googlecode.barongreenback.search.RecordsService.headers;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -27,7 +27,7 @@ public class RecordsServiceTest {
     @Before
     public void initialiseRecords() {
         this.records = BaronGreenbackRecords.records(new MemoryRecords());
-        Keyword<String> foo = Keywords.keyword("foo", String.class);
+        Keyword<String> foo = keyword("foo", String.class);
         this.view = ViewsRepository.viewModel(Sequences.<Keyword<?>>sequence(foo), "name", "records", "", true, "");
         Definition viewDefinition = Definition.constructors.definition(ViewsRepository.viewName(view), headers(view));
         expected = Record.constructors.record().set(foo, "bar");

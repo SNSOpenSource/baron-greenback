@@ -17,7 +17,7 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMerge;
 import static com.googlecode.barongreenback.crawler.StagedJob.functions.datasource;
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
-import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;

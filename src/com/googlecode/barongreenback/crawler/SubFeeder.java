@@ -10,7 +10,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
-import static com.googlecode.lazyrecords.Keywords.metadata;
+import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -48,21 +48,21 @@ public class SubFeeder implements Feeder<Uri> {
         return new Callable1<Keyword, Sequence<Record>>() {
             public Sequence<Record> call(Keyword keyword) throws Exception {
                 Object value = record.get(keyword);
-                if(value == null) {
+                if (value == null) {
                     return one(record);
                 }
                 Uri subFeed = uri(value.toString());
                 try {
                     RecordDefinition subFeedDefinition = keyword.metadata().get(RECORD_DEFINITION);
                     Sequence<Record> records = get(subFeed, subFeedDefinition).memorise();
-                    if(records.isEmpty()){
+                    if (records.isEmpty()) {
                         return one(record);
                     }
                     return records.
                             map(mergeWith(record));
-                } catch (LazyException e){
+                } catch (LazyException e) {
                     return handleError(subFeed, e.getCause(), record);
-                } catch (Exception e){
+                } catch (Exception e) {
                     return handleError(subFeed, e, record);
                 }
             }
@@ -80,7 +80,7 @@ public class SubFeeder implements Feeder<Uri> {
 
     static Record copyMissingFieldsFromParent(Record parentRecord, Record subFeedRecord) {
         for (Keyword<Object> keyword : parentRecord.keywords().<Keyword<Object>>unsafeCast()) {
-            if(!subFeedRecord.keywords().contains(keyword)){
+            if (!subFeedRecord.keywords().contains(keyword)) {
                 subFeedRecord = subFeedRecord.set(keyword, parentRecord.get(keyword));
             }
         }
