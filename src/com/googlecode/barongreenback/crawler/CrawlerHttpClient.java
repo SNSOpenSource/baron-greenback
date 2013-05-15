@@ -15,12 +15,8 @@ import static com.googlecode.totallylazy.Functions.identity;
 public class CrawlerHttpClient implements HttpClient {
     private final HttpHandler httpHandler;
 
-    public CrawlerHttpClient() {
-        this(identity(HttpHandler.class));
-    }
-
-    public CrawlerHttpClient(Unary<HttpHandler> handlerGenerator) {
-        httpHandler = Callers.call(handlerGenerator, new ClientHttpHandler(50, Long.valueOf(TimeUnit.SECONDS.toMillis(60)).intValue()));
+    public CrawlerHttpClient(Unary<HttpHandler> handlerGenerator, CrawlerConnectTimeout connectTimeout, CrawlerReadTimeout readTimeout) {
+        httpHandler = Callers.call(handlerGenerator, new ClientHttpHandler(connectTimeout.value(), readTimeout.value()));
     }
 
     @Override

@@ -2,9 +2,11 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.WebApplication;
 import com.googlecode.barongreenback.crawler.CountDownScheduler;
+import com.googlecode.barongreenback.crawler.CrawlerConnectTimeout;
 import com.googlecode.barongreenback.crawler.CrawlerHttpClient;
 import com.googlecode.barongreenback.crawler.CrawlerImportPage;
 import com.googlecode.barongreenback.crawler.CrawlerListPage;
+import com.googlecode.barongreenback.crawler.CrawlerReadTimeout;
 import com.googlecode.barongreenback.jobs.JobsListPage;
 import com.googlecode.barongreenback.jobs.Scheduler;
 import com.googlecode.barongreenback.queues.Completer;
@@ -56,7 +58,7 @@ public abstract class ApplicationTests {
             @Override
             public Container addPerRequestObjects(Container container) throws Exception {
                 container.removeOption(CrawlerHttpClient.class);
-                return container.addInstance(CrawlerHttpClient.class, new CrawlerHttpClient(feedClientCallable()));
+                return container.addInstance(CrawlerHttpClient.class, new CrawlerHttpClient(feedClientCallable(), new CrawlerConnectTimeout(new BaronGreenbackProperties()), new CrawlerReadTimeout(new BaronGreenbackProperties())));
             }
         });
         application.usingRequestScope(new Callable1<Container, Object>() {

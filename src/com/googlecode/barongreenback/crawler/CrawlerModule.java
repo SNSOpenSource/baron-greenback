@@ -36,6 +36,8 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
                 add(CrawlerActivator.class).
                 addActivator(Crawler.class, container.get(CrawlerActivator.class)).
                 add(CrawlInterval.class).
-                addInstance(PrintStream.class, new StringPrintStream());
+                addInstance(PrintStream.class, new StringPrintStream()).
+                add(CrawlerConnectTimeout.class).
+                add(CrawlerReadTimeout.class);
     }
 }
