@@ -13,17 +13,19 @@ import com.googlecode.yadic.Container;
 import java.net.URI;
 import java.util.concurrent.Callable;
 
+import static com.googlecode.barongreenback.persistence.lucene.DirectoryType.File;
 import static com.googlecode.totallylazy.URLs.uri;
 import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
 import static com.googlecode.yadic.Containers.addIfAbsent;
+import static java.lang.String.format;
 
 public class LuceneModule implements ApplicationScopedModule, RequestScopedModule {
     public static URI fileUrl(String persistenceUri) {
-        return uri(persistenceUri.substring(PersistenceModule.LUCENE.length() + 1));
+        return uri(format("%s:%s", File.value(), persistenceUri.substring(persistenceUri.indexOf("///"))));
     }
 
     public static String lucene(DirectoryType type) {
-        return String.format("%s:%s", PersistenceModule.LUCENE, type.value());
+        return format("%s:%s", PersistenceModule.LUCENE, type.value());
     }
 
     public Container addPerApplicationObjects(Container applicationScope) {

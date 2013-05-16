@@ -42,5 +42,4 @@ public class PartitionedIndexActivator implements Callable<PartitionedIndex>, Cl
     public void close() throws IOException {
         partitionedIndex.close();
     }
-
 }
