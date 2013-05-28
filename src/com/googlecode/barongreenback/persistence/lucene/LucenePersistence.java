@@ -8,7 +8,7 @@ import static com.googlecode.totallylazy.Files.temporaryDirectory;
 
 public class LucenePersistence {
     public static String luceneDirectory(File file) {
-        return String.format("%s:%s", PersistenceModule.LUCENE, file.toURI());
+        return String.format("%s:%s//%s", PersistenceModule.LUCENE, DirectoryType.File.value(), file);
     }
 
     public static String luceneRam() {
