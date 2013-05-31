@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler.executor;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -10,32 +11,29 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     private final int capacity;
-    private final PriorityQueue<E> decorated;
+    private final Queue<E> queue;
     private final ReentrantLock lock = new ReentrantLock(true);
     private final Condition space = lock.newCondition();
     private final Condition item = lock.newCondition();
 
-    public BoundedPriorityBlockingQueue(int capacity) {
-        super();
+    public BoundedPriorityBlockingQueue(int capacity, Queue<E> queue) {
         this.capacity = capacity;
-        this.decorated = new PriorityQueue<E>(capacity);
+        this.queue = queue;
     }
-    
+
+    public BoundedPriorityBlockingQueue(int capacity) {
+        this(capacity, new PriorityQueue<E>());
+    }
+
     public BoundedPriorityBlockingQueue() {
-        super();
-        this.decorated = new PriorityQueue<E>();
-        this.capacity = Integer.MAX_VALUE;
+        this(Integer.MAX_VALUE);
     }
 
     @Override
     public boolean offer(E e) {
         try {
             lock.lock();
-            if (!isFull()) {
-                return decorated.offer(e);
-            } else {
-                return false;
-            }
+            return !isFull() && queue.offer(e);
         } finally {
             item.signal();
             lock.unlock();
@@ -50,7 +48,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public E remove() {
         try {
             lock.lock();
-            return decorated.remove();
+            return queue.remove();
         } finally {
             space.signal();
             lock.unlock();
@@ -61,7 +59,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public E poll() {
         try {
             lock.lock();
-            return decorated.poll();
+            return queue.poll();
         } finally {
             space.signal();
             lock.unlock();
@@ -72,7 +70,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public boolean addAll(Collection<? extends E> c) {
         try {
             lock.lock();
-            return decorated.addAll(c);
+            return queue.addAll(c);
         } finally {
             item.signal();
             lock.unlock();
@@ -83,7 +81,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public boolean removeAll(Collection<?> c) {
         try {
             lock.lock();
-            return decorated.removeAll(c);
+            return queue.removeAll(c);
         } finally {
             space.signal();
             lock.unlock();
@@ -94,7 +92,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public boolean retainAll(Collection<?> c) {
         try {
             lock.lock();
-            return decorated.retainAll(c);
+            return queue.retainAll(c);
         } finally {
             space.signal();
             lock.unlock();
@@ -105,7 +103,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public void clear() {
         try {
             lock.lock();
-            decorated.clear();
+            queue.clear();
         } finally {
             space.signal();
             lock.unlock();
@@ -116,7 +114,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public boolean add(E e) {
         try {
             lock.lock();
-            return decorated.add(e);
+            return queue.add(e);
         } finally {
             item.signal();
             lock.unlock();
@@ -140,7 +138,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public boolean remove(Object o) {
         try {
             lock.lock();
-            return decorated.remove(o);
+            return queue.remove(o);
         } finally {
             space.signal();
             lock.unlock();
@@ -153,12 +151,11 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
         try {
             lock.lock();
             if (!isFull()) {
-                boolean timedout = space.await(timeout, unit);
-                if (timedout) {
+                if (space.await(timeout, unit)) {
                     return false;
                 }
             }
-            return decorated.offer(e);
+            return queue.offer(e);
         } finally {
             item.signal();
             lock.unlock();
@@ -172,7 +169,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             while (isEmpty()) {
                 item.await();
             }
-            return decorated.poll();
+            return queue.poll();
         } finally {
             space.signal();
             lock.unlock();
@@ -184,12 +181,11 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
         try {
             lock.lock();
             while (isEmpty()) {
-                boolean timedout = item.await(timeout, unit);
-                if (timedout) {
+                if (item.await(timeout, unit)) {
                     return null;
                 }
             }
-            return decorated.poll();
+            return queue.poll();
         } finally {
             space.signal();
             lock.unlock();
@@ -241,7 +237,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public boolean contains(Object o) {
         try {
             lock.lock();
-            return decorated.contains(o);
+            return queue.contains(o);
         } finally {
             lock.unlock();
         }
@@ -261,7 +257,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public E element() {
         try {
             lock.lock();
-            return decorated.element();
+            return queue.element();
         } finally {
             lock.unlock();
         }
@@ -271,7 +267,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public E peek() {
         try {
             lock.lock();
-            return decorated.peek();
+            return queue.peek();
         } finally {
             lock.unlock();
         }
@@ -281,7 +277,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public int size() {
         try {
             lock.lock();
-            return decorated.size();
+            return queue.size();
         } finally {
             lock.unlock();
         }
@@ -291,7 +287,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public boolean isEmpty() {
         try {
             lock.lock();
-            return decorated.isEmpty();
+            return queue.isEmpty();
         } finally {
             lock.unlock();
         }
@@ -301,7 +297,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public Iterator<E> iterator() {
         try {
             lock.lock();
-            return decorated.iterator();
+            return queue.iterator();
         } finally {
             lock.unlock();
         }
@@ -311,7 +307,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public Object[] toArray() {
         try {
             lock.lock();
-            return decorated.toArray();
+            return queue.toArray();
         } finally {
             lock.unlock();
         }
@@ -321,7 +317,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public <T> T[] toArray(T[] a) {
         try {
             lock.lock();
-            return decorated.toArray(a);
+            return queue.toArray(a);
         } finally {
             lock.unlock();
         }
@@ -331,7 +327,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     public boolean containsAll(Collection<?> c) {
         try {
             lock.lock();
-            return decorated.containsAll(c);
+            return queue.containsAll(c);
         } finally {
             lock.unlock();
         }
