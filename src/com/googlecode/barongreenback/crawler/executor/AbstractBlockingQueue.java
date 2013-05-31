@@ -31,7 +31,7 @@ public abstract class AbstractBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     protected <T> T addItem(Callable1<? super Queue<E>, ? extends T> callable) {
-        return removeItem(RuntimeException.class, callable);
+        return addItem(RuntimeException.class, callable);
     }
 
     protected <T, Ex extends Exception> T addItem(Class<Ex> exception, Callable1<? super Queue<E>, ? extends T> callable) throws Ex {
