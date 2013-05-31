@@ -1,5 +1,10 @@
 package com.googlecode.barongreenback.crawler.executor;
 
+import com.googlecode.totallylazy.Block;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Mapper;
+import com.googlecode.totallylazy.callables.Count;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -8,6 +13,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.googlecode.barongreenback.crawler.executor.Queues.functions;
+import static com.googlecode.totallylazy.Callers.call;
+import static com.googlecode.totallylazy.LazyException.lazyException;
+import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     private final int capacity;
@@ -30,306 +40,314 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     @Override
-    public boolean offer(E e) {
-        try {
-            lock.lock();
-            return !isFull() && queue.offer(e);
-        } finally {
-            item.signal();
-            lock.unlock();
-        }
-    }
-    
-    private boolean isFull() {
-        return size() >= capacity;
+    public boolean offer(final E e) {
+        return addItem(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return !isFull() && queue.offer(e);
+            }
+        });
     }
 
     @Override
     public E remove() {
-        try {
-            lock.lock();
-            return queue.remove();
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
+        return removeItem(functions.<E>head());
     }
 
     @Override
     public E poll() {
-        try {
-            lock.lock();
-            return queue.poll();
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
+        return removeItem(functions.<E>poll());
+    }
+
+    // TODO Fix me to take into account capacity
+    @Override
+    public boolean addAll(final Collection<? extends E> c) {
+        return addItem(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return queue.addAll(c);
+            }
+        });
     }
 
     @Override
-    public boolean addAll(Collection<? extends E> c) {
-        try {
-            lock.lock();
-            return queue.addAll(c);
-        } finally {
-            item.signal();
-            lock.unlock();
-        }
+    public boolean removeAll(final Collection<?> c) {
+        return removeItem(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return queue.removeAll(c);
+            }
+        });
     }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
-        try {
-            lock.lock();
-            return queue.removeAll(c);
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        try {
-            lock.lock();
-            return queue.retainAll(c);
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
+    public boolean retainAll(final Collection<?> c) {
+        return removeItem(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return queue.retainAll(c);
+            }
+        });
     }
 
     @Override
     public void clear() {
-        try {
-            lock.lock();
-            queue.clear();
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public boolean add(E e) {
-        try {
-            lock.lock();
-            return queue.add(e);
-        } finally {
-            item.signal();
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public void put(E e) throws InterruptedException {
-        try {
-            lock.lock();
-            while (!offer(e)) {
-                space.await();
+        removeItem(new Block<Queue<E>>() {
+            @Override
+            protected void execute(Queue<E> queue) throws Exception {
+                queue.clear();
             }
-        } finally {
-            item.signal();
-            lock.unlock();
-        }
+        });
+    }
+
+    // TODO Fix me to take into account capacity
+    @Override
+    public boolean add(final E e) {
+        return addItem(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return queue.add(e);
+            }
+        });
     }
 
     @Override
-    public boolean remove(Object o) {
-        try {
-            lock.lock();
-            return queue.remove(o);
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
-    }
-    
-    @Override
-    public boolean offer(E e, long timeout, TimeUnit unit)
-            throws InterruptedException {
-        try {
-            lock.lock();
-            if (!isFull()) {
-                if (space.await(timeout, unit)) {
-                    return false;
+    public void put(final E e) throws InterruptedException {
+        addItem(InterruptedException.class, new Block<Queue<E>>() {
+            @Override
+            protected void execute(Queue<E> queue) throws Exception {
+                while (!offer(e)) {
+                    space.await();
                 }
             }
-            return queue.offer(e);
-        } finally {
-            item.signal();
-            lock.unlock();
-        }
+        });
+    }
+
+    @Override
+    public boolean remove(final Object o) {
+        return removeItem(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return queue.remove(o);
+            }
+        });
+    }
+
+    @Override
+    public boolean offer(final E e, final long timeout, final TimeUnit unit) throws InterruptedException {
+        return addItem(InterruptedException.class, new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                if (!isFull()) {
+                    if (space.await(timeout, unit)) {
+                        return false;
+                    }
+                }
+                return queue.offer(e);
+            }
+        });
     }
 
     @Override
     public E take() throws InterruptedException {
-        try {
-            lock.lock();
-            while (isEmpty()) {
-                item.await();
-            }
-            return queue.poll();
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-        try {
-            lock.lock();
-            while (isEmpty()) {
-                if (item.await(timeout, unit)) {
-                    return null;
+        return removeItem(InterruptedException.class, new Mapper<Queue<E>, E>() {
+            @Override
+            public E call(Queue<E> queue) throws Exception {
+                while (isEmpty()) {
+                    item.await();
                 }
+                return queue.poll();
             }
-            return queue.poll();
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
+        });
     }
 
     @Override
-    public int drainTo(Collection<? super E> c) {
-        int changes = 0;
-        try {
-            lock.lock();
-            for (E e : this) {
-                remove(e);
-                changes++;
-                c.add(e);
+    public E poll(final long timeout, final TimeUnit unit) throws InterruptedException {
+        return removeItem(InterruptedException.class, new Mapper<Queue<E>, E>() {
+            @Override
+            public E call(Queue<E> queue) throws Exception {
+                while (isEmpty()) {
+                    if (item.await(timeout, unit)) {
+                        return null;
+                    }
+                }
+                return queue.poll();
             }
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
-        return changes;
+        });
     }
 
     @Override
-    public int drainTo(Collection<? super E> c, int maxElements) {
-        int changes = 0;
-        try {
-            lock.lock();
-            Iterator<E> iterator = this.iterator();
-            while (iterator.hasNext() && changes <= maxElements ) {
-                E e = iterator.next();
-                remove(e);
-                changes++;
-                c.add(e);
-            }
-        } finally {
-            space.signal();
-            lock.unlock();
-        }
-        return changes;
+    public int drainTo(final Collection<? super E> c) {
+        return drainTo(c, c.size());
     }
 
-    
+    @Override
+    public int drainTo(final Collection<? super E> c, final int maxElements) {
+        return removeItem(new Mapper<Queue<E>, Integer>() {
+            @Override
+            public Integer call(Queue<E> queue) throws Exception {
+                return sequence(BoundedPriorityBlockingQueue.this).
+                        take(maxElements).
+                        map(functions.<E>remove().apply(queue)).
+                        reduce(Count.count()).intValue();
+            }
+        });
+    }
+
+
     //
     // Non-mutating methods
     //
-    
+
     @Override
-    public boolean contains(Object o) {
-        try {
-            lock.lock();
-            return queue.contains(o);
-        } finally {
-            lock.unlock();
-        }
+    public boolean contains(final Object o) {
+        return lock(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return queue.contains(o);
+            }
+        });
     }
 
     @Override
     public int remainingCapacity() {
-        try {
-            lock.lock();
-            return capacity - size();
-        } finally {
-            lock.unlock();
-        }
+        return lock(new Mapper<Queue<E>, Integer>() {
+            @Override
+            public Integer call(Queue<E> queue) throws Exception {
+                return capacity - size();
+            }
+        });
     }
 
     @Override
     public E element() {
-        try {
-            lock.lock();
-            return queue.element();
-        } finally {
-            lock.unlock();
-        }
+        return lock(new Mapper<Queue<E>, E>() {
+            @Override
+            public E call(Queue<E> queue) throws Exception {
+                return queue.element();
+            }
+        });
     }
 
     @Override
     public E peek() {
-        try {
-            lock.lock();
-            return queue.peek();
-        } finally {
-            lock.unlock();
-        }
+        return lock(new Mapper<Queue<E>, E>() {
+            @Override
+            public E call(Queue<E> queue) throws Exception {
+                return queue.peek();
+            }
+        });
     }
 
     @Override
     public int size() {
-        try {
-            lock.lock();
-            return queue.size();
-        } finally {
-            lock.unlock();
-        }
+        return lock(new Mapper<Queue<E>, Integer>() {
+            @Override
+            public Integer call(Queue<E> queue) throws Exception {
+                return queue.size();
+            }
+        });
     }
 
     @Override
     public boolean isEmpty() {
-        try {
-            lock.lock();
-            return queue.isEmpty();
-        } finally {
-            lock.unlock();
-        }
+        return lock(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return queue.isEmpty();
+            }
+        });
     }
 
+    //TODO fix me to be a snapshot
     @Override
     public Iterator<E> iterator() {
-        try {
-            lock.lock();
-            return queue.iterator();
-        } finally {
-            lock.unlock();
-        }
+        return lock(new Mapper<Queue<E>, Iterator<E>>() {
+            @Override
+            public Iterator<E> call(Queue<E> queue) throws Exception {
+                return queue.iterator();
+            }
+        });
     }
 
     @Override
     public Object[] toArray() {
+        return lock(new Mapper<Queue<E>, Object[]>() {
+            @Override
+            public Object[] call(Queue<E> queue) throws Exception {
+                return queue.toArray();
+            }
+        });
+    }
+
+    @Override
+    public <T> T[] toArray(final T[] a) {
+        return lock(new Mapper<Queue<E>, T[]>() {
+            @Override
+            public T[] call(Queue<E> queue) throws Exception {
+                return queue.toArray(a);
+            }
+        });
+    }
+
+    @Override
+    public boolean containsAll(final Collection<?> c) {
+        return lock(new Mapper<Queue<E>, Boolean>() {
+            @Override
+            public Boolean call(Queue<E> queue) throws Exception {
+                return queue.containsAll(c);
+            }
+        });
+    }
+
+    private <T> T addItem(Callable1<? super Queue<E>, ? extends T> callable) {
+        return removeItem(RuntimeException.class, callable);
+    }
+
+    private <T, Ex extends Exception> T addItem(Class<Ex> exception, Callable1<? super Queue<E>, ? extends T> callable) throws Ex {
         try {
             lock.lock();
-            return queue.toArray();
+            try {
+                return callable.call(queue);
+            } catch (Exception e) {
+                throw lazyException(e).unwrap(exception);
+            }
+        } finally {
+            item.signal();
+            lock.unlock();
+        }
+    }
+
+    private <T> T removeItem(Callable1<? super Queue<E>, ? extends T> callable) {
+        return removeItem(RuntimeException.class, callable);
+    }
+
+    private <T, Ex extends Exception> T removeItem(Class<Ex> exception, Callable1<? super Queue<E>, ? extends T> callable) throws Ex {
+        try {
+            lock.lock();
+            try {
+                return callable.call(queue);
+            } catch (Exception e) {
+                throw lazyException(e).unwrap(exception);
+            }
+        } finally {
+            space.signal();
+            lock.unlock();
+        }
+    }
+
+    private <T> T lock(Callable1<? super Queue<E>, ? extends T> callable) {
+        try {
+            lock.lock();
+            return call(callable, queue);
         } finally {
             lock.unlock();
         }
     }
 
-    @Override
-    public <T> T[] toArray(T[] a) {
-        try {
-            lock.lock();
-            return queue.toArray(a);
-        } finally {
-            lock.unlock();
-        }
+    private boolean isFull() {
+        return size() >= capacity;
     }
 
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        try {
-            lock.lock();
-            return queue.containsAll(c);
-        } finally {
-            lock.unlock();
-        }
-    }
+
 }
