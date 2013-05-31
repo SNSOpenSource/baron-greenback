@@ -9,14 +9,11 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
-    
     private final int capacity;
-    
     private final PriorityQueue<E> decorated;
-    
     private final ReentrantLock lock = new ReentrantLock(true);
-    private final Condition full = lock.newCondition();
-    private final Condition empty = lock.newCondition();
+    private final Condition space = lock.newCondition();
+    private final Condition item = lock.newCondition();
 
     public BoundedPriorityBlockingQueue(int capacity) {
         super();
@@ -40,7 +37,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
                 return false;
             }
         } finally {
-            empty.signal();
+            item.signal();
             lock.unlock();
         }
     }
@@ -55,7 +52,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.remove();
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
     }
@@ -66,7 +63,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.poll();
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
     }
@@ -77,7 +74,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.addAll(c);
         } finally {
-            empty.signal();
+            item.signal();
             lock.unlock();
         }
     }
@@ -88,7 +85,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.removeAll(c);
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
     }
@@ -99,7 +96,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.retainAll(c);
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
     }
@@ -110,7 +107,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             decorated.clear();
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
     }
@@ -121,7 +118,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.add(e);
         } finally {
-            empty.signal();
+            item.signal();
             lock.unlock();
         }
     }
@@ -131,10 +128,10 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
         try {
             lock.lock();
             while (!offer(e)) {
-                full.await();
+                space.await();
             }
         } finally {
-            empty.signal();
+            item.signal();
             lock.unlock();
         }
     }
@@ -145,7 +142,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
             lock.lock();
             return decorated.remove(o);
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
     }
@@ -156,14 +153,14 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
         try {
             lock.lock();
             if (!isFull()) {
-                boolean timedout = full.await(timeout, unit);
+                boolean timedout = space.await(timeout, unit);
                 if (timedout) {
                     return false;
                 }
             }
             return decorated.offer(e);
         } finally {
-            empty.signal();
+            item.signal();
             lock.unlock();
         }
     }
@@ -173,11 +170,11 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
         try {
             lock.lock();
             while (isEmpty()) {
-                empty.await();
+                item.await();
             }
             return decorated.poll();
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
     }
@@ -187,14 +184,14 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
         try {
             lock.lock();
             while (isEmpty()) {
-                boolean timedout = empty.await(timeout, unit);
+                boolean timedout = item.await(timeout, unit);
                 if (timedout) {
                     return null;
                 }
             }
             return decorated.poll();
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
     }
@@ -210,7 +207,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
                 c.add(e);
             }
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
         return changes;
@@ -229,7 +226,7 @@ public class BoundedPriorityBlockingQueue<E> implements BlockingQueue<E> {
                 c.add(e);
             }
         } finally {
-            full.signal();
+            space.signal();
             lock.unlock();
         }
         return changes;
