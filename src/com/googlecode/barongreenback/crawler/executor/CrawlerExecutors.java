@@ -42,11 +42,11 @@ public class CrawlerExecutors implements Closeable {
     }
 
     private ThreadPoolJobExecutor<PriorityJobRunnable> processExecutor(String suffix) {
-        return executorFactory.executor(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY), "Processing " + suffix, BoundedPriorityBlockingQueue.class);
+        return executorFactory.executor(configValues.get(PROCESS_HANDLER_THREADS), configValues.get(PROCESS_HANDLER_CAPACITY), "Processing " + suffix, BoundedBlockingQueue.class);
     }
 
     ThreadPoolJobExecutor<PriorityJobRunnable>  inputExecutor(String suffix) {
-        return executorFactory.executor(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY), "Reading " + suffix, BoundedPriorityBlockingQueue.class);
+        return executorFactory.executor(configValues.get(INPUT_HANDLER_THREADS), configValues.get(INPUT_HANDLER_CAPACITY), "Reading " + suffix, BoundedBlockingQueue.class);
     }
 
     public void resetExecutors() {
