@@ -29,7 +29,7 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     public Container addPerRequestObjects(Container container) throws Exception {
         return container.
                 add(VisitedFactory.class).
-                add(CrawlerHttpClient.class).
+                addActivator(CrawlerHttpClient.class, CrawlerHttpClientActivator.class).
                 add(CompositeCrawler.class).
                 add(CheckpointHandler.class).
                 add(CrawlerRepository.class).

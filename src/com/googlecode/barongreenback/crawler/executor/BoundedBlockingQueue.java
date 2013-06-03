@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.crawler.executor;
 
 import com.googlecode.totallylazy.Mapper;
 
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
@@ -12,14 +11,6 @@ public class BoundedBlockingQueue<E> extends AbstractBlockingQueue<E> {
     public BoundedBlockingQueue(int capacity, Queue<E> queue) {
         super(queue);
         this.capacity = capacity;
-    }
-
-    public BoundedBlockingQueue(int capacity) {
-        this(capacity, new PriorityQueue<E>());
-    }
-
-    public BoundedBlockingQueue() {
-        this(Integer.MAX_VALUE);
     }
 
     @Override

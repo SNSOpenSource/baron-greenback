@@ -37,6 +37,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
+import static com.googlecode.utterlyidle.handlers.RoutingClient.allTrafficTo;
 import static com.googlecode.utterlyidle.html.Browser.browser;
 
 public abstract class ApplicationTests {
@@ -58,7 +59,8 @@ public abstract class ApplicationTests {
             @Override
             public Container addPerRequestObjects(Container container) throws Exception {
                 container.removeOption(CrawlerHttpClient.class);
-                return container.addInstance(CrawlerHttpClient.class, new CrawlerHttpClient(feedClientCallable(), new CrawlerConnectTimeout(new BaronGreenbackProperties()), new CrawlerReadTimeout(new BaronGreenbackProperties())));
+                BaronGreenbackProperties properties = container.get(BaronGreenbackProperties.class);
+                return container.addInstance(CrawlerHttpClient.class, new CrawlerHttpClient(allTrafficTo(new CrawlerHttpClient(new CrawlerConnectTimeout(properties), new CrawlerReadTimeout(properties)), feed().authority())));
             }
         });
         application.usingRequestScope(new Callable1<Container, Object>() {
@@ -69,15 +71,6 @@ public abstract class ApplicationTests {
             }
         });
         browser = browser(application);
-    }
-
-    protected Unary<HttpHandler> feedClientCallable() {
-        return new Unary<HttpHandler>() {
-            @Override
-            public HttpHandler call(HttpHandler httpHandler) throws Exception {
-                return RoutingClient.allTrafficTo(httpHandler, feed().authority());
-            }
-        };
     }
 
     protected Properties getProperties() {
@@ -106,6 +99,6 @@ public abstract class ApplicationTests {
     }
 
     protected HttpClient feedClient() {
-        return RoutingClient.allTrafficTo(new ClientHttpHandler(), feed().authority());
+        return allTrafficTo(new ClientHttpHandler(), feed().authority());
     }
 }

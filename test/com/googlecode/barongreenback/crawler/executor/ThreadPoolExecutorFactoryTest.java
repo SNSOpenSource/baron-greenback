@@ -155,7 +155,7 @@ public class ThreadPoolExecutorFactoryTest {
     }
 
     private JobExecutor<PriorityJobRunnable> getJobExecutor() {
-        return new ThreadPoolExecutorFactory().executor(inputHandlerThreads, inputHandlerCapacity, "test name", BoundedBlockingQueue.class);
+        return new ThreadPoolExecutorFactory().executor(inputHandlerThreads, inputHandlerCapacity, "test name", BoundedPriorityBlockingQueue.class);
     }
 
     private class ListeningPriorityJobRunnable extends PriorityJobRunnable {
