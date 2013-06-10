@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.Sequence;
 import org.junit.Test;
 
 import java.util.Date;
-import java.util.List;
 
 import static com.googlecode.barongreenback.crawler.HttpJob.httpJob;
 import static com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob.masterPaginatedHttpJob;
@@ -15,6 +14,7 @@ import static com.googlecode.barongreenback.crawler.StagedJobComparator.masterJo
 import static com.googlecode.barongreenback.crawler.StagedJobComparator.newestJobsFirst;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static com.googlecode.totallylazy.time.Dates.date;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
@@ -22,8 +22,8 @@ import static org.hamcrest.Matchers.sameInstance;
 public class StagedJobComparatorTest {
     @Test
     public void shouldPutMasterJobsFirst() throws Exception {
-        Sequence<HttpJob> sorted = sequence(httpJob, masterJob, paginatedJob).sortBy(masterJobsFirst());
-        assertThat(sorted.head(), sameInstance((HttpJob) masterJob));
+        Sequence<HttpJob> sorted = sequence(paginatedJob, httpJob, masterJob).sortBy(masterJobsFirst());
+        assertThat(sorted, is(sequence(masterJob, httpJob, paginatedJob)));
     }
 
     @Test
@@ -37,17 +37,15 @@ public class StagedJobComparatorTest {
 
     @Test
     public void canSortByMasterJobsThenCreatedDate() throws Exception {
-        HttpJob oldestJob = httpJobFor(date(1999, 1, 1));
+        HttpJob olderJob = httpJobFor(date(2000, 1, 1));
+        HttpJob olderPaginatedJob = pagedJob(date(2000, 1, 1));
         HttpJob olderMasterJob = masterJobFor(date(2000, 1, 1));
+        HttpJob newerPaginatedJob = pagedJob(date(2001, 1, 1));
         HttpJob newerMasterJob = masterJobFor(date(2001, 1, 1));
-        HttpJob newestJob = httpJobFor(date(2002, 1, 1));
+        HttpJob newerJob = httpJobFor(date(2001, 1, 1));
 
-        List<HttpJob> sorted = sequence(oldestJob, olderMasterJob, newerMasterJob, newestJob).sortBy(masterJobsThenNewest()).toList();
-        assertThat(sorted.get(0), sameInstance(newerMasterJob));
-        assertThat(sorted.get(1), sameInstance(olderMasterJob));
-        assertThat(sorted.get(2), sameInstance(newestJob));
-        assertThat(sorted.get(3), sameInstance(oldestJob));
-
+        Sequence<HttpJob> sorted = sequence(olderPaginatedJob, olderJob, olderMasterJob, newerMasterJob, newerPaginatedJob, newerJob).sortBy(masterJobsThenNewest());
+        assertThat(sorted, is(sequence(newerMasterJob, newerJob, newerPaginatedJob, olderMasterJob, olderJob, olderPaginatedJob)));
     }
 
     private HttpJob httpJobFor(Date createdDate) {
@@ -56,6 +54,10 @@ public class StagedJobComparatorTest {
 
     private HttpJob masterJobFor(Date createdDate) {
         return masterPaginatedHttpJob(created(createdDate));
+    }
+
+    private HttpJob pagedJob(Date createdDate) {
+        return paginatedHttpJob(created(createdDate));
     }
 
     private Model created(Date createdDate) {
