@@ -6,9 +6,11 @@ import static com.googlecode.barongreenback.crawler.StagedJob.functions.createdD
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.comparators.Comparators.comparators;
 
-public class StagedJobComparator{
+public class StagedJobComparator {
     private static int priorityFor(StagedJob aJob) {
-        return aJob instanceof MasterPaginatedHttpJob ? 0 : 1;
+        if (aJob instanceof MasterPaginatedHttpJob) return -1;
+        if (aJob instanceof PaginatedHttpJob) return 1;
+        return 0;
     }
 
     public static Comparator<StagedJob> masterJobsFirst() {
@@ -25,6 +27,6 @@ public class StagedJobComparator{
     }
 
     public static Comparator<StagedJob> masterJobsThenNewest() {
-        return comparators(masterJobsFirst(), newestJobsFirst());
+        return comparators(newestJobsFirst(), masterJobsFirst());
     }
 }

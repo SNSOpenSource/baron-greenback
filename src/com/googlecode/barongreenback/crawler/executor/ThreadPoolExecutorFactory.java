@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.crawler.executor;
 
 import com.googlecode.totallylazy.CloseableList;
-import com.googlecode.totallylazy.concurrent.BlockingRetryRejectedExecutionHandler;
 import com.googlecode.totallylazy.concurrent.NamedExecutors;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
@@ -22,11 +21,11 @@ public class ThreadPoolExecutorFactory implements ExecutorFactory {
     }
 
     private ThreadPoolExecutor executor(int threads, int capacity, Class<? extends BlockingQueue> queueClass, String name) {
-        return new ThreadPoolExecutor(threads, threads == 0 ? Integer.MAX_VALUE : threads,
+        return new ThreadPoolExecutor(0, threads == 0 ? Integer.MAX_VALUE : threads,
                 60L, TimeUnit.SECONDS,
                 queue(queueClass, capacity),
                 NamedExecutors.namedThreadFactory(name),
-                new BlockingRetryRejectedExecutionHandler());
+                new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     private BlockingQueue<Runnable> queue(Class<? extends BlockingQueue> queueClass, int capacity) {

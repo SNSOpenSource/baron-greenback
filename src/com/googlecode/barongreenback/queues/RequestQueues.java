@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.googlecode.totallylazy.Runnables.VOID;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.utterlyidle.MediaType.TEXT_PLAIN;
+import static com.googlecode.utterlyidle.ResponseBuilder.response;
+import static com.googlecode.utterlyidle.Status.INTERNAL_SERVER_ERROR;
 
 public class RequestQueues implements Queues {
     private final List<RunningJob> running = new CopyOnWriteArrayList<RunningJob>();
@@ -50,14 +54,25 @@ public class RequestQueues implements Queues {
         completed.clear();
     }
 
-    private void complete(Request request) throws Exception {
+    private void complete(Request request) {
         Date started = clock.now();
         RunningJob runningJob = new RunningJob(request, started, clock);
         running.add(runningJob);
-        Response response = application.handle(request);
+        Response response = responseFor(request);
         running.remove(runningJob);
         Date completedDate = clock.now();
         completed.add(new CompletedJob(request, response, started, completedDate));
+    }
+
+    private Response responseFor(Request request) {
+        try {
+            return application.handle(request);
+        } catch (Exception e) {
+            return response(INTERNAL_SERVER_ERROR).
+                    contentType(TEXT_PLAIN).
+                    entity(ExceptionRenderer.toString(e)).
+                    build();
+        }
     }
 
     private Callable<Void> handle(final Request request) {

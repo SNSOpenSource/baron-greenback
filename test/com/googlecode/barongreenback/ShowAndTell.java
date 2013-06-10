@@ -14,14 +14,13 @@ import java.util.Properties;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneDirectory;
-import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneTemporaryDirectory;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 
 public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        PersistenceUri.set(properties, luceneDirectory(new File("/dev/shm/bgb")));
+        PersistenceUri.set(properties, luceneDirectory(new File("/tmp/bgb")));
         SearcherPoolActivator.setSearchPool(properties, LucenePool.class);
         Application application = new WebApplication(BasePath.basePath("/"), properties);
         new RestServer(
