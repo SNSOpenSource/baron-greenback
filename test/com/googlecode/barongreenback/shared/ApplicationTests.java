@@ -1,29 +1,26 @@
 package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.crawler.CountDownScheduler;
 import com.googlecode.barongreenback.crawler.CrawlerConnectTimeout;
 import com.googlecode.barongreenback.crawler.CrawlerHttpClient;
 import com.googlecode.barongreenback.crawler.CrawlerImportPage;
 import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.CrawlerReadTimeout;
-import com.googlecode.barongreenback.jobs.JobsListPage;
-import com.googlecode.barongreenback.jobs.Scheduler;
-import com.googlecode.barongreenback.queues.Completer;
-import com.googlecode.barongreenback.queues.CountDownCompleter;
+import com.googlecode.barongreenback.jobs.schedule.ScheduleListPage;
 import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.Unary;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
-import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
-import com.googlecode.utterlyidle.handlers.RoutingClient;
 import com.googlecode.utterlyidle.html.Browser;
+import com.googlecode.utterlyidle.jobs.Completer;
+import com.googlecode.utterlyidle.jobs.CountDownCompleter;
+import com.googlecode.utterlyidle.jobs.schedule.CountDownScheduler;
+import com.googlecode.utterlyidle.jobs.schedule.Scheduler;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.waitrest.Waitrest;
 import com.googlecode.yadic.Container;
@@ -82,14 +79,14 @@ public abstract class ApplicationTests {
         return crawlerImportPage.importCrawler(Strings.toString(stream), Option.<UUID>none());
     }
 
-    public JobsListPage crawlSampleData(CrawlerListPage listPage, String name) throws Exception {
+    public ScheduleListPage crawlSampleData(CrawlerListPage listPage, String name) throws Exception {
 
         final CountDownLatch latch = new CountDownLatch(2);
         application.applicationScope().addInstance(CountDownLatch.class, latch).
                 decorate(Scheduler.class, CountDownScheduler.class).
                 decorate(Completer.class, CountDownCompleter.class);
 
-        JobsListPage jobs = listPage.crawlAndCreateView(name);
+        ScheduleListPage jobs = listPage.crawlAndCreateView(name);
         latch.await();
         return jobs;
     }

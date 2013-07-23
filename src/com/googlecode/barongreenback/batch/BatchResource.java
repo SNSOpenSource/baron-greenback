@@ -1,8 +1,6 @@
 package com.googlecode.barongreenback.batch;
 
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
-import com.googlecode.barongreenback.jobs.HttpScheduler;
-import com.googlecode.barongreenback.queues.Queues;
 import com.googlecode.barongreenback.shared.ModelCache;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.messages.Category;
@@ -13,7 +11,6 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Callers;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
@@ -28,6 +25,8 @@ import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.utterlyidle.jobs.Jobs;
+import com.googlecode.utterlyidle.jobs.schedule.HttpScheduler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,7 +40,6 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.shared.messages.Messages.error;
 import static com.googlecode.barongreenback.shared.messages.Messages.success;
 import static com.googlecode.funclate.Model.mutable.model;
-import static com.googlecode.totallylazy.Files.files;
 import static com.googlecode.totallylazy.Files.hasSuffix;
 import static com.googlecode.totallylazy.Files.recursiveFiles;
 import static com.googlecode.totallylazy.Streams.copy;
@@ -60,7 +58,7 @@ public class BatchResource {
     private final Redirector redirector;
     private final Persistence persistence;
     private final HttpScheduler scheduler;
-    private final Queues queues;
+    private final Jobs jobs;
     private final ModelCache cache;
     private final Clock clock;
     private final CrawlerExecutors crawlerExecutors;
@@ -71,13 +69,13 @@ public class BatchResource {
     private AutoBackupsLocation autoBackupsLocation;
 
     public BatchResource(final ModelRepository modelRepository, final Redirector redirector, final Persistence persistence, final HttpScheduler scheduler,
-                         final Queues queues, final ModelCache cache, final Clock clock, final CrawlerExecutors crawlerExecutors, final FileRoller fileRoller,
+                         final Jobs jobs, final ModelCache cache, final Clock clock, final CrawlerExecutors crawlerExecutors, final FileRoller fileRoller,
                          final BackupStart backupStart, final BackupInterval backupInterval, final BackupsLocation backupsLocation, final AutoBackupsLocation autoBackupsLocation) {
         this.modelRepository = modelRepository;
         this.redirector = redirector;
         this.persistence = persistence;
         this.scheduler = scheduler;
-        this.queues = queues;
+        this.jobs = jobs;
         this.cache = cache;
         this.clock = clock;
         this.crawlerExecutors = crawlerExecutors;
@@ -239,7 +237,7 @@ public class BatchResource {
     private void deleteAllData() throws Exception {
         persistence.deleteAll(); // Delete data twice so that no new jobs will be created
         scheduler.stop();
-        queues.deleteAll();
+        jobs.deleteAll();
         persistence.deleteAll();
         crawlerExecutors.resetExecutors();
         cache.clear();

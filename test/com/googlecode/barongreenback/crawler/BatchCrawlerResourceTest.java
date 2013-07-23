@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.jobs.JobsListPage;
+import com.googlecode.barongreenback.jobs.schedule.ScheduleListPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.junit.Test;
@@ -17,16 +17,16 @@ import static org.hamcrest.Matchers.not;
 public class BatchCrawlerResourceTest extends ApplicationTests {
     @Test
     public void canCrawlAll() throws Exception {
-        JobsListPage jobsListPage = new JobsListPage(browser);
-        assertThat(jobsListPage.numberOfJobs(), is(0));
+        ScheduleListPage scheduleListPage = new ScheduleListPage(browser);
+        assertThat(scheduleListPage.numberOfJobs(), is(0));
 
         importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
         CrawlerListPage crawlerListPage = importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
 
         crawlerListPage.crawlAll();
 
-        jobsListPage = new JobsListPage(browser);
-        assertThat(jobsListPage.numberOfJobs(), is(greaterThan(0)));
+        scheduleListPage = new ScheduleListPage(browser);
+        assertThat(scheduleListPage.numberOfJobs(), is(greaterThan(0)));
     }
 
     @Test

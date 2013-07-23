@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.jobs.JobsListPage;
+import com.googlecode.barongreenback.jobs.schedule.ScheduleListPage;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
@@ -71,21 +71,21 @@ public class CrawlerListPage {
         return response.entity().toString();
     }
 
-    public JobsListPage crawl(String name) throws Exception {
+    public ScheduleListPage crawl(String name) throws Exception {
         return goToJobsList(html.form(formFor(name, "crawl")).submit(button("crawl")));
     }
 
-    public JobsListPage crawlAndCreateView(String name) throws Exception {
+    public ScheduleListPage crawlAndCreateView(String name) throws Exception {
         return goToJobsList(html.form(formFor(name, "crawl-and-create-view")).submit(button("crawl-and-create-view")));
     }
 
-    public JobsListPage crawlAll() throws Exception {
+    public ScheduleListPage crawlAll() throws Exception {
         return goToJobsList(html.form(singleForm("crawlAll")).submit(button("crawlAll")));
     }
 
-    private JobsListPage goToJobsList(Request request) throws Exception {
+    private ScheduleListPage goToJobsList(Request request) throws Exception {
         Response response = httpHandler.handle(request);
-        return new JobsListPage(httpHandler, response);
+        return new ScheduleListPage(httpHandler, response);
     }
 
     public CrawlerListPage deleteAll() throws Exception {

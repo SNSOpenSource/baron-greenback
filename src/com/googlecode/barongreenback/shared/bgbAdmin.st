@@ -12,10 +12,10 @@
 </li>
 <li class="divider"></li>
 <li class="menu">
-    <a href="$base$jobs/list">Jobs</a>
+    <a href="$base$schedules/list">Schedules</a>
 </li>
 <li class="menu">
-    <a href="$base$queues/list">Queues</a>
+    <a href="$base$jobs/list">Jobs</a>
 </li>
 <li class="menu">
     <a href="$base$views/list">Views</a>

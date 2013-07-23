@@ -1,7 +1,5 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.jobs.JobsResource;
-import com.googlecode.barongreenback.queues.QueuesResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.ViewsRepository;
@@ -26,6 +24,8 @@ import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.utterlyidle.jobs.JobsResource;
+import com.googlecode.utterlyidle.jobs.schedule.ScheduleResource;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -234,8 +234,8 @@ public class CrawlerDefinitionResource {
 
     public static Uri scheduleAQueuedCrawl(UUID crawlerId, UUID schedulerId, Long interval) throws Exception {
         String crawlerJob = absolutePathOf(method(on(CrawlerDefinitionResource.class).crawl(crawlerId)));
-        String queued = absolutePathOf(method(on(QueuesResource.class).queue(null, crawlerJob)));
-        return relativeUriOf(method(on(JobsResource.class).schedule(schedulerId, interval, queued)));
+        String queued = absolutePathOf(method(on(JobsResource.class).run(null, crawlerJob)));
+        return relativeUriOf(method(on(ScheduleResource.class).schedule(schedulerId, interval, queued)));
     }
 
     private static String absolutePathOf(Invocation<?, ?> method) {

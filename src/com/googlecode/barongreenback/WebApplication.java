@@ -5,10 +5,8 @@ import com.googlecode.barongreenback.batch.BatchModule;
 import com.googlecode.barongreenback.crawler.CrawlerModule;
 import com.googlecode.barongreenback.crawler.executor.ExecutorModule;
 import com.googlecode.barongreenback.crawler.failures.FailureModule;
-import com.googlecode.barongreenback.jobs.JobsModule;
 import com.googlecode.barongreenback.less.LessCssModule;
 import com.googlecode.barongreenback.persistence.PersistenceModule;
-import com.googlecode.barongreenback.queues.QueuesModule;
 import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
 import com.googlecode.barongreenback.views.ViewsModule;
@@ -21,6 +19,8 @@ import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.handlers.GZipPolicy;
+import com.googlecode.utterlyidle.jobs.JobsModule;
+import com.googlecode.utterlyidle.jobs.schedule.ScheduleModule;
 import com.googlecode.utterlyidle.modules.Modules;
 import com.googlecode.utterlyidle.modules.PerformanceModule;
 import com.googlecode.utterlyidle.profiling.ProfilingModule;
@@ -48,7 +48,6 @@ import static com.googlecode.utterlyidle.sitemesh.ContentTypePredicate.contentTy
 import static com.googlecode.utterlyidle.sitemesh.MetaTagRule.metaTagRule;
 import static com.googlecode.utterlyidle.sitemesh.QueryParamRule.queryParamRule;
 import static com.googlecode.utterlyidle.sitemesh.StaticDecoratorRule.staticRule;
-import static com.googlecode.utterlyidle.sitemesh.StringTemplateDecorators.stringTemplateDecorators;
 import static com.googlecode.utterlyidle.sitemesh.TemplateName.templateName;
 import static java.lang.System.getProperties;
 
@@ -101,6 +100,7 @@ public class WebApplication extends RestApplication {
                     }
                 };
             }
+
             @Override
             public Decorators addDecorators(Decorators decorators) {
                 return sequence(rules).fold(decorators, Decorators.add());
@@ -117,8 +117,8 @@ public class WebApplication extends RestApplication {
         application.add(new SearchModule());
         application.add(new ActionsModule());
         application.add(new ViewsModule());
+        application.add(new ScheduleModule());
         application.add(new JobsModule());
-        application.add(new QueuesModule());
         application.add(new BatchModule());
         application.add(new ExecutorModule());
         application.add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("baron-greenback"))));

@@ -6,6 +6,7 @@ import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.html.Html;
+import com.googlecode.utterlyidle.jobs.JobsResource;
 
 import java.util.UUID;
 
@@ -19,19 +20,19 @@ import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-public class QueuesPage {
+public class JobsPage {
     private final HttpHandler httpHandler;
     private final Html html;
 
-    public QueuesPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(QueuesResource.class).list()))).build()));
+    public JobsPage(HttpHandler httpHandler) throws Exception {
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(JobsResource.class).list()))).build()));
     }
 
-    public QueuesPage(HttpHandler httpHandler, Response response) throws Exception {
+    public JobsPage(HttpHandler httpHandler, Response response) throws Exception {
         this.httpHandler = httpHandler;
         assertThat(response.status(), is(Status.OK));
         this.html = Html.html(response);
-        assertThat(html.title(), containsString("Queues"));
+        assertThat(html.title(), containsString("Jobs"));
     }
 
     public int numberOfCompletedJobs() {
@@ -40,13 +41,13 @@ public class QueuesPage {
 
     public Response queue(Request request) throws Exception {
         Uri resource = request.uri();
-        String queuedPath = "/" + relativeUriOf(method(on(QueuesResource.class).queue(request, "/" + resource.path()))).toString();
+        String queuedPath = "/" + relativeUriOf(method(on(JobsResource.class).run(request, "/" + resource.path()))).toString();
         return httpHandler.handle(modify(request).uri(resource.path(queuedPath)).build());
     }
 
-    public QueuesPage deleteAll() throws Exception {
+    public JobsPage deleteAll() throws Exception {
         Request request = html.form("//form[@class='deleteAll']").submit("descendant::input[@class='deleteAll']");
-        return new QueuesPage(httpHandler, httpHandler.handle(request));
+        return new JobsPage(httpHandler, httpHandler.handle(request));
     }
 
     public int responseStatusFor(UUID crawlerId) {

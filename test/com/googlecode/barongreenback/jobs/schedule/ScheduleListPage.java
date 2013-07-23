@@ -1,8 +1,9 @@
-package com.googlecode.barongreenback.jobs;
+package com.googlecode.barongreenback.jobs.schedule;
 
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
+import com.googlecode.utterlyidle.jobs.schedule.ScheduleResource;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -11,18 +12,18 @@ import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeU
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-public class JobsListPage {
+public class ScheduleListPage {
     private final HttpHandler httpHandler;
     private final Html html;
 
-    public JobsListPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(JobsResource.class).list()))).build()));
+    public ScheduleListPage(HttpHandler httpHandler) throws Exception {
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(ScheduleResource.class).list()))).build()));
     }
 
-    public JobsListPage(HttpHandler httpHandler, Response response) throws Exception {
+    public ScheduleListPage(HttpHandler httpHandler, Response response) throws Exception {
         this.httpHandler = httpHandler;
         this.html = Html.html(response);
-        assertThat(html.title(), containsString("Jobs"));
+        assertThat(html.title(), containsString("Schedules"));
     }
 
     public int numberOfJobs() {

@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.queues.QueuesPage;
+import com.googlecode.barongreenback.queues.JobsPage;
+import com.googlecode.barongreenback.queues.JobsPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.funclate.Model;
 import com.googlecode.utterlyidle.Status;
@@ -111,9 +112,9 @@ public class CrawlerDefinitionResourceTest extends ApplicationTests {
         CrawlerListPage list = BatchCrawlerResourceTest.importCrawlerWithId(disabledCrawlerId, namedCrawler(disabled, true).toString(), browser);
         list.crawl(disabled);
 
-        QueuesPage queuesPage = new QueuesPage(browser);
-        System.out.println("queuesPage = " + queuesPage);
-        assertThat(queuesPage.responseStatusFor(disabledCrawlerId), is(Status.FORBIDDEN.code()));
+        JobsPage jobsPage = new JobsPage(browser);
+        System.out.println("queuesPage = " + jobsPage);
+        assertThat(jobsPage.responseStatusFor(disabledCrawlerId), is(Status.FORBIDDEN.code()));
     }
 
     @Test

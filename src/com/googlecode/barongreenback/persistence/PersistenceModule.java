@@ -10,12 +10,14 @@ import com.googlecode.lazyrecords.Logger;
 import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.utterlyidle.Application;
+import com.googlecode.utterlyidle.jobs.UtterlyIdleRecords;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
@@ -28,6 +30,7 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         addIfAbsent(container, Logger.class, IgnoreLogger.class);
         addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
         addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
+        addActivatorIfAbsent(container, UtterlyIdleRecords.class, UtterlyIdleRecordsActivator.class);
         addActivatorIfAbsent(container, BaronGreenbackStringMappings.class, BaronGreenbackStringMappingsActivator.class);
         return container;
     }
@@ -61,5 +64,18 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         Container container = bgbRequestScope.value();
         addInstanceIfAbsent(container, StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
         return bgbRequestScope;
+    }
+
+    public static class UtterlyIdleRecordsActivator implements Callable<UtterlyIdleRecords> {
+        private final BaronGreenbackRecords baronGreenbackRecords;
+
+        public UtterlyIdleRecordsActivator(BaronGreenbackRecords baronGreenbackRecords) {
+            this.baronGreenbackRecords = baronGreenbackRecords;
+        }
+
+        @Override
+        public UtterlyIdleRecords call() throws Exception {
+            return new UtterlyIdleRecords(baronGreenbackRecords.value());
+        }
     }
 }
