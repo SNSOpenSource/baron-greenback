@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.views;
 
-import com.googlecode.barongreenback.shared.InvocationHandler;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
@@ -11,6 +10,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
+import com.googlecode.utterlyidle.handlers.InvocationHandler;
 
 import java.util.UUID;
 

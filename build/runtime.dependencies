@@ -9,7 +9,7 @@ mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
 mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1098
 mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:jar|sources:256
-mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:660
+mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:663
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:157
 mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:102
 mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:jar|sources:10
