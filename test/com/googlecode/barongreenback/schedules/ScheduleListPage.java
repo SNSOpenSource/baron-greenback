@@ -1,9 +1,9 @@
-package com.googlecode.barongreenback.jobs.schedule;
+package com.googlecode.barongreenback.schedules;
 
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
-import com.googlecode.utterlyidle.jobs.schedule.ScheduleResource;
+import com.googlecode.utterlyidle.schedules.ScheduleResource;
 
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;

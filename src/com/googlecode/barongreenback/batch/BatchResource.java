@@ -26,7 +26,7 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 import com.googlecode.utterlyidle.jobs.Jobs;
-import com.googlecode.utterlyidle.jobs.schedule.HttpScheduler;
+import com.googlecode.utterlyidle.schedules.HttpScheduler;
 
 import java.io.File;
 import java.io.FileInputStream;

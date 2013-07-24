@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.jobs.schedule.ScheduleListPage;
+import com.googlecode.barongreenback.schedules.ScheduleListPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.junit.Test;

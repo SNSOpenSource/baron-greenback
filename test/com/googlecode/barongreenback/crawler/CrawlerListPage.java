@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.jobs.schedule.ScheduleListPage;
+import com.googlecode.barongreenback.schedules.ScheduleListPage;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;

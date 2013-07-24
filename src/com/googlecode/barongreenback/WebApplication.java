@@ -20,7 +20,7 @@ import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.handlers.GZipPolicy;
 import com.googlecode.utterlyidle.jobs.JobsModule;
-import com.googlecode.utterlyidle.jobs.schedule.ScheduleModule;
+import com.googlecode.utterlyidle.schedules.ScheduleModule;
 import com.googlecode.utterlyidle.modules.Modules;
 import com.googlecode.utterlyidle.modules.PerformanceModule;
 import com.googlecode.utterlyidle.profiling.ProfilingModule;
