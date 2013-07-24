@@ -14,12 +14,12 @@
 </table>
 
 <div class="actions">
-    $post(name="start")$
-    $post(name="stop")$
+    $post(name="start", value="start scheduler")$
+    $post(name="stop", value="stop scheduler")$
     $if(anyExists)$
-        $post(name="deleteAll", value="Delete All")$
+        $post(name="deleteAll", value="delete all")$
     $else$
-        $post(name="deleteAll", value="Delete All", disabled="true")$
+        $post(class="deleteAllDanger", name="deleteAll", value="Delete All", disabled=true)$
     $endif$
 </div>
 
