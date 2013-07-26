@@ -13,7 +13,7 @@ $if(results)$
         </tbody>
     </table>
 </div>
-<div>
+<div class="actions">
     <div class="selectors">
         <a href="#" class="clearSelection">Clear Selection</a>
         <a href="#" class="selectPage">Select Page</a>

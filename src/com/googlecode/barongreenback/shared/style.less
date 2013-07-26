@@ -237,7 +237,7 @@ body {
 }
 
 .actions {
-    padding-left: 20px;
+    margin-top: 10px;
 }
 
 .navbar {
@@ -405,11 +405,11 @@ div.actions form {
 }
 
 .selectors {
-    float: right;
     .clearSelection {
         .btn;
         .btn-danger;
     }
+    .inlineBlock;
     margin-top: 5px;
 }
 
@@ -452,23 +452,23 @@ div.actions form {
     list-style: none;
 }
 
+.pagination-controls {
+  float: right;
+}
+
 .pager-and-rowpager .pagination, .pager-and-rowpager .rowpager {
-    .inlineBlock;
-    margin: 0;
-    padding: 0;
-    form {
-        margin: 0;
-        padding: 0;
-    }
+  .inlineBlock;
+  margin: 0;
+  padding: 0;
+  form {
+      margin: 0;
+      padding: 0;
+      select, input {
+        height: 24px;
+      }
+  }
 }
 
-.pager-and-rowpager .pagination {
-    padding-top: 5px;
-}
-
-.pager-and-rowpager .rowpager {
-    margin: 20px 0;
-}
 
 .pager-and-rowpager div {
     vertical-align: middle;
