@@ -9,7 +9,6 @@
     $actions: {url |
         $include.({$url$}).body;format="raw"$
     }$
-    <div class="message"></div>
 </div>
 </body>
 </html>
