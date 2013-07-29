@@ -17,7 +17,7 @@
                 jQuery('div.actions form').append(jQuery('table.results tbody tr.selected >td:first-child').map(function(index, el){return jQuery(el).text()}).map(function(index, text) {
                     return '<input type="hidden" name="id" value="' + text + '"/>';
                 }).toArray().join(''));
-                jQuery('.actions .message').text(jQuery('table.results tr.selected').size() + " rows are selected");
+                jQuery('.table-actions .message').text(jQuery('table.results tr.selected').size() + " rows are selected");
             }
         });
         jQuery('.selectors a.selectPage').click(function() {
@@ -29,7 +29,7 @@
             jQuery('.selectors a.selectPage').click();
             BGB.search.bulk.actions.removeAllIdentifiers();
             jQuery('div.actions form').append('<input type="hidden" name="query" value="' + jQuery('meta[name="query"]').attr('content') + '">');
-            jQuery('.actions .message').text('All ' + BGB.search.rowCount() +' rows are selected');
+            jQuery('.table-actions .message').text('All ' + BGB.search.rowCount() +' rows are selected');
 
             return false;
         });
