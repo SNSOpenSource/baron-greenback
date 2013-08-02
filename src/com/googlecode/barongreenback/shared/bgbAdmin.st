@@ -8,7 +8,7 @@
     <a href="$base$crawler/failures/list">Crawler Failures</a>
 </li>
 <li class="menu">
-    <a href="$base$crawler/executor/list">Executor Config</a>
+    <a href="$base$views/list">Views</a>
 </li>
 <li class="divider"></li>
 <li class="menu">
@@ -18,7 +18,7 @@
     <a href="$base$jobs/list">Jobs</a>
 </li>
 <li class="menu">
-    <a href="$base$views/list">Views</a>
+    <a href="$base$crawler/executor/list">Executor Config</a>
 </li>
 <li class="divider"></li>
 <li class="menu">
