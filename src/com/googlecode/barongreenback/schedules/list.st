@@ -14,8 +14,12 @@
 </table>
 
 <div class="actions">
-    $post(name="start", value="start scheduler")$
-    $post(name="stop", value="stop scheduler")$
+    $if(schedulerIsRunning)$
+        $post(name="stop", value="stop scheduler")$
+    $else$
+        $post(name="start", value="start scheduler")$
+    $endif$
+
     $if(anyExists)$
         $post(name="deleteAll", value="delete all")$
     $else$
