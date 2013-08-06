@@ -20,6 +20,8 @@ import com.googlecode.utterlyidle.html.Browser;
 import com.googlecode.utterlyidle.jobs.Completer;
 import com.googlecode.utterlyidle.jobs.CountDownCompleter;
 import com.googlecode.utterlyidle.schedules.CountDownScheduler;
+import com.googlecode.utterlyidle.schedules.FixedScheduler;
+import com.googlecode.utterlyidle.schedules.HttpScheduler;
 import com.googlecode.utterlyidle.schedules.Scheduler;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.waitrest.Waitrest;
@@ -67,6 +69,7 @@ public abstract class ApplicationTests {
                 return null;
             }
         });
+        application.start();
         browser = browser(application);
     }
 
