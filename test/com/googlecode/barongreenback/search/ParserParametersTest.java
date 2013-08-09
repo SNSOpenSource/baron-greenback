@@ -6,7 +6,7 @@ import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.totallylazy.time.Dates;
-import com.googlecode.totallylazy.time.FixedClock;
+import com.googlecode.totallylazy.time.StoppedClock;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.yadic.Container;
@@ -21,17 +21,17 @@ public class ParserParametersTest extends ApplicationTests {
 
     @Test
     public void shouldProvideNowAsDate() {
-        Clock firstNowClock = new FixedClock(Dates.date(1983, 10, 7));
+        Clock firstNowClock = new StoppedClock(Dates.date(1983, 10, 7));
         setClockTo(firstNowClock);
 
         Date firstNow = getDateFromParserParameters();
         assertThat(firstNow, is(firstNowClock.now()));
 
-        Clock secondNowClock = new FixedClock(Dates.date(1970, 2, 14));
+        Clock secondNowClock = new StoppedClock(Dates.date(1970, 2, 14));
         setClockTo(secondNowClock);
 
         Date secondNow = getDateFromParserParameters();
-        assertThat(secondNow,  is(secondNowClock.now()));
+        assertThat(secondNow, is(secondNowClock.now()));
     }
 
     private Application setClockTo(final Clock myClock) {

@@ -14,8 +14,8 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.matchers.Matchers;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.totallylazy.time.Dates;
-import com.googlecode.totallylazy.time.FixedClock;
 import com.googlecode.totallylazy.time.Hours;
+import com.googlecode.totallylazy.time.StoppedClock;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.yadic.Container;
@@ -66,7 +66,7 @@ public class ParserFunctionsTest extends ApplicationTests {
 
     private Date aFixedTime() {
         final Date fixedTime = Dates.date(1983, 7, 10, 0);
-        setClockTo(new FixedClock(fixedTime));
+        setClockTo(new StoppedClock(fixedTime));
         return fixedTime;
     }
 

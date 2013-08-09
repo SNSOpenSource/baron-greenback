@@ -18,7 +18,7 @@ import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.time.Clock;
-import com.googlecode.totallylazy.time.FixedClock;
+import com.googlecode.totallylazy.time.StoppedClock;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Containers;
 import com.googlecode.yadic.SimpleContainer;
@@ -99,7 +99,7 @@ public class FailuresTest {
         scope.add(PaginatedJobFailureMarshaller.class);
         scope.add(MasterPaginatedJobFailureMarshaller.class);
         scope.add(Failures.class);
-        scope.addInstance(Clock.class, new FixedClock(date(2001, 1, 1)));
+        scope.addInstance(Clock.class, new StoppedClock(date(2001, 1, 1)));
         scope.add(VisitedFactory.class);
         Containers.selfRegister(scope);
         return scope;
