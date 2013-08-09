@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.barongreenback.shared.RecordDefinition;
-import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -19,7 +18,7 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CheckPointStopper.extractCheckpoint;
+import static com.googlecode.barongreenback.crawler.CheckpointStopper.extractCheckpoint;
 import static com.googlecode.barongreenback.shared.RecordDefinition.UNIQUE_FILTER;
 import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Sequences.forwardOnly;
@@ -53,7 +52,7 @@ public class SequentialCrawler extends AbstractCrawler {
         }
 
         Record head = recordIterator.next();
-        checkpointHandler.updateCheckPoint(id, crawler, getFirstCheckPoint(head));
+        checkpointHandler.updateCheckpoint(id, crawler, getFirstCheckpoint(head));
 
         return put(update(crawler), sequence(head).join(forwardOnly(recordIterator)), keywords);
     }
@@ -61,11 +60,11 @@ public class SequentialCrawler extends AbstractCrawler {
     private Iterator<Record> startCrawl(PrintStream log, Model crawler, RecordDefinition recordDefinition) throws Exception {
         final Uri from = from(crawler);
         final String more = more(crawler);
-        final Object lastCheckPoint = lastCheckPoint(crawler);
-        return new CompositeCrawler(httpClient, log).crawl(from, more, lastCheckPoint, recordDefinition).iterator();
+        final Object lastCheckpoint = lastCheckpoint(crawler);
+        return new CompositeCrawler(httpClient, log).crawl(from, more, lastCheckpoint, recordDefinition).iterator();
     }
 
-    private Object lastCheckPoint(Model crawler) throws Exception {
+    private Object lastCheckpoint(Model crawler) throws Exception {
         final String checkpoint = crawler.get("checkpoint", String.class);
         final String checkpointType = crawler.get("checkpointType", String.class);
         return convertFromString(checkpoint, checkpointType);
@@ -87,7 +86,7 @@ public class SequentialCrawler extends AbstractCrawler {
         return mappings.get(aClass).toValue(checkpoint);
     }
 
-    private Option<Object> getFirstCheckPoint(Record record) {
+    private Option<Object> getFirstCheckpoint(Record record) {
         return extractCheckpoint(record);
     }
 }

@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CheckPointStopper.matchesCurrentCheckPoint;
+import static com.googlecode.barongreenback.crawler.CheckpointStopper.matchesCurrentCheckpoint;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.lazyrecords.Keyword.functions.metadata;
@@ -43,11 +43,11 @@ public class PaginatedHttpJob extends HttpJob {
         return new PaginatedHttpJob(context);
     }
 
-    public static PaginatedHttpJob paginatedHttpJob(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited, Date createdDate) {
-        return paginatedHttpJob(createContext(crawlerId, record, datasource, destination, checkpoint, moreXPath, mappings, visited, createdDate));
+    public static PaginatedHttpJob paginatedHttpJob(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, Set<HttpDatasource> visited, Date createdDate) {
+        return paginatedHttpJob(createContext(crawlerId, record, datasource, destination, checkpoint, moreXPath, visited, createdDate));
     }
 
-    protected static Model createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, Set<HttpDatasource> visited, Date createdDate) {
+    protected static Model createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, Set<HttpDatasource> visited, Date createdDate) {
         return createContext(crawlerId, record, datasource, destination, visited, createdDate).
                 set("moreXPath", moreXPath).
                 set("checkpoint", checkpoint).
@@ -59,18 +59,13 @@ public class PaginatedHttpJob extends HttpJob {
         return String.format("%s/%s", source.name(), keyword.name());
     }
 
-    private static String checkpointAsString(StringMappings mappings, Object checkpoint) {
-        if (checkpoint == null) return null;
-        return mappings.toString(checkpoint.getClass(), checkpoint);
-    }
-
     public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
         return processDocument(loadDocument(response));
     }
 
     protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document) {
         Sequence<Record> events = transformData(document, datasource().source());
-        Sequence<Record> filtered = CheckPointStopper.stopAt(checkpoint(), events);
+        Sequence<Record> filtered = CheckpointStopper.stopAt(checkpoint(), events);
         Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(destination(), visited(), crawlerId(), record(), createdDate()).process(filtered);
         Sequence<StagedJob> sequence = Sequences.<StagedJob>sequence(nextPageJob(document));
         return Pair.pair(pair.first(), sequence.join(pair.second()));
@@ -100,7 +95,7 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     private boolean containsCheckpoint(Document document) {
-        return selectCheckpoints(document).exists(matchesCurrentCheckPoint(checkpoint()));
+        return selectCheckpoints(document).exists(matchesCurrentCheckpoint(checkpoint()));
     }
 
     private PaginatedHttpJob job(HttpDatasource datasource) {

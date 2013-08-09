@@ -12,7 +12,6 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordsModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;
@@ -67,7 +66,7 @@ public class FailuresTest {
     @Test
     public void canSaveAndLoadAPaginatedHttpJobFailure() throws Exception {
         Clock clock = scope.get(Clock.class);
-        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(BaronGreenbackStringMappings.class).value(), visitedFactory().value(), clock.now()), "Bigtime failures", 0L));
+        assertCanPersistAndLoad(Failure.failure(paginatedHttpJob(crawlerId, record, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", visitedFactory().value(), clock.now()), "Bigtime failures", 0L));
     }
 
     @Test

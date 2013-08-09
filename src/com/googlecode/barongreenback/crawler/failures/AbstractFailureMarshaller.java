@@ -70,7 +70,7 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
 
     protected Object lastCheckpointFor(Record record) {
         try {
-            return checkpointHandler.lastCheckPointFor(crawlerIdFor(record));
+            return checkpointHandler.lastCheckpointFor(crawlerIdFor(record));
         } catch (Exception e) {
             throw LazyException.lazyException(e);
         }

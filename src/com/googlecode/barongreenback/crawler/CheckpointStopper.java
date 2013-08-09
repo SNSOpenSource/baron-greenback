@@ -18,22 +18,22 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
 
-public class CheckPointStopper implements Feeder<Uri> {
-    private final Object currentCheckPoint;
+public class CheckpointStopper implements Feeder<Uri> {
+    private final Object currentCheckpoint;
     private final Feeder<Uri> feeder;
 
-    public CheckPointStopper(Object currentCheckPoint, Feeder<Uri> feeder) {
-        this.currentCheckPoint = currentCheckPoint;
+    public CheckpointStopper(Object currentCheckpoint, Feeder<Uri> feeder) {
+        this.currentCheckpoint = currentCheckpoint;
         this.feeder = feeder;
     }
 
     public static Sequence<Record> stopAt(Object checkpoint, Sequence<Record> records) {
-        return records.takeWhile(not(CheckPointStopper.checkpointReached(checkpoint))).realise();
+        return records.takeWhile(not(CheckpointStopper.checkpointReached(checkpoint))).realise();
     }
 
     public Sequence<Record> get(Uri source, RecordDefinition definition) throws Exception {
         return feeder.get(source, definition).
-                takeWhile(not(checkpointReached(currentCheckPoint)));
+                takeWhile(not(checkpointReached(currentCheckpoint)));
     }
 
     public static Option<Object> extractCheckpoint(Record record) {
@@ -42,29 +42,29 @@ public class CheckPointStopper implements Feeder<Uri> {
                 map(checkpoint(record));
     }
 
-    public static Predicate<Record> checkpointReached(final Object currentCheckPoint) {
+    public static Predicate<Record> checkpointReached(final Object currentCheckpoint) {
         return new Predicate<Record>() {
             public boolean matches(Record record) {
                 return extractCheckpoint(record).
-                        map(matchesCurrentCheckPoint(currentCheckPoint)).
+                        map(matchesCurrentCheckpoint(currentCheckpoint)).
                         getOrElse(false);
             }
         };
     }
 
-    public static LogicalPredicate<Object> matchesCurrentCheckPoint(final Object currentCheckPoint) {
+    public static LogicalPredicate<Object> matchesCurrentCheckpoint(final Object currentCheckpoint) {
         return new LogicalPredicate<Object>() {
             @Override
             public boolean matches(Object instance) {
-                if (currentCheckPoint == null) {
+                if (currentCheckpoint == null) {
                     return false;
                 }
-                if (currentCheckPoint instanceof Date) {
+                if (currentCheckpoint instanceof Date) {
                     Date updatedDate = Dates.parse(instance.toString());
-                    Date checkPointDate = (Date) currentCheckPoint;
-                    return updatedDate.before(checkPointDate) || (updatedDate.equals(checkPointDate));
+                    Date checkpointDate = (Date) currentCheckpoint;
+                    return updatedDate.before(checkpointDate) || (updatedDate.equals(checkpointDate));
                 }
-                return currentCheckPoint.equals(instance);
+                return currentCheckpoint.equals(instance);
             }
         };
     }

@@ -33,7 +33,7 @@ public class CompositeCrawler {
     }
 
     public Sequence<Record> crawl(Uri uri, String more, Object checkpoint, RecordDefinition recordDefinition) throws Exception {
-        Feeder<Uri> feeder = new SubFeeder(new DuplicateRemover(new CheckPointStopper(checkpoint, new UriFeeder(client, more))));
+        Feeder<Uri> feeder = new SubFeeder(new DuplicateRemover(new CheckpointStopper(checkpoint, new UriFeeder(client, more))));
         return feeder.get(uri, recordDefinition);
     }
 }

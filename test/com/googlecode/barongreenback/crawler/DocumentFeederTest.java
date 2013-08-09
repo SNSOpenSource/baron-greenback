@@ -7,7 +7,6 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.matchers.IterableMatcher;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.handlers.AuditHandler;
-import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -52,7 +51,7 @@ public class DocumentFeederTest extends CrawlerTests {
 
     @Test
     public void supportsStoppingWhenCheckpointIsReached() throws Exception {
-        Feeder<Uri> feeder = new CheckPointStopper("2011-07-19T12:43:25.000Z", new UriFeeder(client(), ""));
+        Feeder<Uri> feeder = new CheckpointStopper("2011-07-19T12:43:25.000Z", new UriFeeder(client(), ""));
         Sequence<Record> records = feeder.get(feed(), ATOM_DEFINITION);
         assertThat(records.size(), is(1));
     }

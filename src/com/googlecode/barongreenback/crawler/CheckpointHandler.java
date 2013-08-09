@@ -20,20 +20,20 @@ public class CheckpointHandler {
         this.modelRepository = modelRepository;
     }
 
-    public Object lastCheckPointFor(Model crawler) throws Exception {
+    public Object lastCheckpointFor(Model crawler) throws Exception {
         final String checkpoint = crawler.get("checkpoint", String.class);
         final String checkpointType = crawler.get("checkpointType", String.class);
         return convertFromString(checkpoint, checkpointType);
     }
 
-    public void updateCheckPoint(UUID id, Model crawler, Option<?> checkpoint) {
+    public void updateCheckpoint(UUID id, Model crawler, Option<?> checkpoint) {
         if (!checkpoint.isEmpty()) {
             modelRepository.set(id, addCheckpoint(crawler, checkpoint.value()));
         }
     }
 
     private Model addCheckpoint(Model crawler, Object checkpoint) {
-        return model().set("form", crawler.set("checkpoint", convertToString(checkpoint)).set("checkpointType", getCheckPointType(checkpoint)));
+        return model().set("form", crawler.set("checkpoint", convertToString(checkpoint)).set("checkpointType", getCheckpointType(checkpoint)));
     }
 
     private Object convertFromString(String checkpoint, String checkpointType) throws Exception {
@@ -45,7 +45,7 @@ public class CheckpointHandler {
         return mapAsString(checkpoint);
     }
 
-    private String getCheckPointType(Object checkpoint) {
+    private String getCheckpointType(Object checkpoint) {
         if(checkpoint == null) return String.class.getName();
         return checkpoint.getClass().getName();
     }

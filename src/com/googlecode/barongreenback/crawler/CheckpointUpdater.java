@@ -17,6 +17,6 @@ public class CheckpointUpdater {
     }
 
     public void update(Option<?> checkpoint) throws Exception {
-        checkpointHandler.updateCheckPoint(id, crawler, checkpoint);
+        checkpointHandler.updateCheckpoint(id, crawler, checkpoint);
     }
 }

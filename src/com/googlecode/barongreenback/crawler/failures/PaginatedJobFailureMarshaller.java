@@ -13,17 +13,15 @@ import static com.googlecode.barongreenback.crawler.failures.FailureRepository.D
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REASON;
 
 public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
-    private final StringMappings mappings;
 
-    public PaginatedJobFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, BaronGreenbackStringMappings mappings, VisitedFactory visitedFactory, Clock clock) {
+    public PaginatedJobFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, VisitedFactory visitedFactory, Clock clock) {
         super(crawlerRepository, checkpointHandler, visitedFactory, clock);
-        this.mappings = mappings.value();
     }
 
     @Override
     public Failure unmarshal(Record record) {
         PaginatedHttpJob job = PaginatedHttpJob.paginatedHttpJob(crawlerId(record), crawledRecord(record), datasource(record), destination(record),
-                lastCheckpointFor(record), moreUri(record), mappings, visited.value(), clock.now());
+                lastCheckpointFor(record), moreUri(record), visited.value(), clock.now());
         return Failure.failure(job, record.get(REASON), record.get(DURATION));
     }
 }
