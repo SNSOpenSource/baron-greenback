@@ -8,6 +8,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.totallylazy.time.Dates;
 
 import java.util.Date;
@@ -51,9 +52,10 @@ public class CheckPointStopper implements Feeder<Uri> {
         };
     }
 
-    public static  Callable1<Object, Boolean> matchesCurrentCheckPoint(final Object currentCheckPoint) {
-        return new Callable1<Object, Boolean>() {
-            public Boolean call(Object instance) throws Exception {
+    public static LogicalPredicate<Object> matchesCurrentCheckPoint(final Object currentCheckPoint) {
+        return new LogicalPredicate<Object>() {
+            @Override
+            public boolean matches(Object instance) {
                 if (currentCheckPoint == null) {
                     return false;
                 }

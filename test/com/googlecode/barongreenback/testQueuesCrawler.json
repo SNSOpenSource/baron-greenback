@@ -1,7 +1,7 @@
 {"form":{
     "update":"test",
     "from":"http://localhost:9001/data",
-    "more":"",
+    "more":"//link[@rel='prev-archive']/@href",
     "disabled": false,
     "record":{
         "name":"/feed/entry",

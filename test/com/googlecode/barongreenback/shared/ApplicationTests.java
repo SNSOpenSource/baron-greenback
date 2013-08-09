@@ -83,7 +83,6 @@ public abstract class ApplicationTests {
     }
 
     public ScheduleListPage crawlSampleData(CrawlerListPage listPage, String name) throws Exception {
-
         final CountDownLatch latch = new CountDownLatch(2);
         application.applicationScope().addInstance(CountDownLatch.class, latch).
                 decorate(Scheduler.class, CountDownScheduler.class).

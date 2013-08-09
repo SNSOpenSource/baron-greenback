@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.crawler.CheckPointStopper.matchesCurrentCheckPoint;
 import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.lazyrecords.Keyword.functions.metadata;
@@ -50,8 +51,7 @@ public class PaginatedHttpJob extends HttpJob {
         return createContext(crawlerId, record, datasource, destination, visited, createdDate).
                 set("moreXPath", moreXPath).
                 set("checkpoint", checkpoint).
-                set("checkpointXPath", checkpointXPath(datasource.source())).
-                set("checkpointAsString", checkpointAsString(mappings, checkpoint));
+                set("checkpointXPath", checkpointXPath(datasource.source()));
     }
 
     protected static String checkpointXPath(Definition source) {
@@ -59,7 +59,7 @@ public class PaginatedHttpJob extends HttpJob {
         return String.format("%s/%s", source.name(), keyword.name());
     }
 
-    protected static String checkpointAsString(StringMappings mappings, Object checkpoint) {
+    private static String checkpointAsString(StringMappings mappings, Object checkpoint) {
         if (checkpoint == null) return null;
         return mappings.toString(checkpoint.getClass(), checkpoint);
     }
@@ -100,7 +100,7 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     private boolean containsCheckpoint(Document document) {
-        return selectCheckpoints(document).contains(checkpointAsString());
+        return selectCheckpoints(document).exists(matchesCurrentCheckPoint(checkpoint()));
     }
 
     private PaginatedHttpJob job(HttpDatasource datasource) {
@@ -123,12 +123,8 @@ public class PaginatedHttpJob extends HttpJob {
         return context.get("checkpointXPath");
     }
 
-    private String checkpointAsString() {
-        return context.get("checkpointAsString");
-    }
-
     @Override
     public String toString() {
-        return String.format("%s, checkpoint: %s, moreXPath: %s, checkpointXPath: %s, checkpointAsString: %s", super.toString(), checkpoint(), moreXPath(), checkpointXPath(), checkpointAsString());
+        return String.format("%s, checkpoint: %s, moreXPath: %s, checkpointXPath: %s", super.toString(), checkpoint(), moreXPath(), checkpointXPath());
     }
 }
