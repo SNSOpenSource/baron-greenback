@@ -4,7 +4,6 @@ import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Xml;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.utterlyidle.Response;
 import org.junit.Test;

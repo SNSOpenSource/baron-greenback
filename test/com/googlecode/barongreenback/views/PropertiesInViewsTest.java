@@ -4,14 +4,10 @@ import com.googlecode.barongreenback.EndToEndTest;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
-import com.googlecode.waitrest.Waitrest;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Properties;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 

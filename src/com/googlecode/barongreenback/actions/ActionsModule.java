@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.actions;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.annotations.HttpMethod;
-import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.utterlyidle.sitemesh.TemplateName;

@@ -72,7 +72,7 @@ public class FailuresTest {
     @Test
     public void canSaveAndLoadAMasterPaginatedHttpJobFailure() throws Exception {
         Clock clock = scope.get(Clock.class);
-        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", scope.get(BaronGreenbackStringMappings.class).value(), visitedFactory(), clock), "Bigtime failures", 0L));
+        assertCanPersistAndLoad(Failure.failure(masterPaginatedHttpJob(crawlerId, httpDatasource(uri("/any/uri"), source), destination, "checkpoint", "/some/xpath", visitedFactory(), clock), "Bigtime failures", 0L));
     }
 
     private void assertCanPersistAndLoad(Failure failure) {

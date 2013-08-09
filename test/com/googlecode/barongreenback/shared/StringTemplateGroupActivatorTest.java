@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.shared;
 
-import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.utterlyidle.MatchedResource;
 import org.antlr.stringtemplate.StringTemplate;
 import org.junit.Test;

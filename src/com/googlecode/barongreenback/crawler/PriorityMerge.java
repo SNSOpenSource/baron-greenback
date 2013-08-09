@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Function2;

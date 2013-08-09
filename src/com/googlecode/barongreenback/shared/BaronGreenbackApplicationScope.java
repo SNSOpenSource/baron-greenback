@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.totallylazy.Value;
 import com.googlecode.yadic.Container;
-import com.googlecode.yadic.Containers;
 import com.googlecode.yadic.Resolver;
 import com.googlecode.yadic.closeable.CloseableContainer;
 

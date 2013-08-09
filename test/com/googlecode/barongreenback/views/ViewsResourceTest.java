@@ -4,8 +4,6 @@ import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.totallylazy.Block;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Runnables;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.yadic.Container;
 import org.junit.Before;

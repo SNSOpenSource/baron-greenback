@@ -1,8 +1,6 @@
 package com.googlecode.barongreenback.batch;
 
 import com.googlecode.totallylazy.Files;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.time.Dates;
 import org.junit.Test;
 
 import java.io.File;

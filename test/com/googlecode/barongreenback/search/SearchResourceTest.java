@@ -16,8 +16,6 @@ import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.annotations.AnnotatedBindings;
-import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
-import com.googlecode.utterlyidle.handlers.RoutingClient;
 import com.googlecode.waitrest.Waitrest;
 import com.googlecode.yadic.Container;
 import org.hamcrest.Matchers;

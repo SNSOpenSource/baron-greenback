@@ -3,16 +3,14 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
-import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
-import com.googlecode.utterlyidle.handlers.RoutingClient;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.*;
-import static com.googlecode.lazyrecords.Definition.constructors.definition;
-import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
-import static com.googlecode.lazyrecords.Record.constructors.record;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ATOM_DEFINITION;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.FIRST;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ID;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.USER_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 

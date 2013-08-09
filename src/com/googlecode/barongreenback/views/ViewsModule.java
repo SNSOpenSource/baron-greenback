@@ -3,14 +3,13 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.search.RecordsService;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
-import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 
-public class ViewsModule implements ResourcesModule, RequestScopedModule, ApplicationScopedModule{
+public class ViewsModule implements ResourcesModule, RequestScopedModule, ApplicationScopedModule {
     public Resources addResources(Resources resources) throws Exception {
         return resources.add(annotatedClass(ViewsResource.class)).
                 add(annotatedClass(BatchViewsResource.class));

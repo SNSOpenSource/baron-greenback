@@ -4,7 +4,6 @@ import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.ImportCrawlerPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;

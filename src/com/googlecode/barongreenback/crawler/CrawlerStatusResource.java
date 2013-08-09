@@ -14,7 +14,6 @@ import java.util.List;
 
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Callables.toString;
-import static com.googlecode.totallylazy.Sequences.sequence;
 
 @Path("crawler")
 @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})

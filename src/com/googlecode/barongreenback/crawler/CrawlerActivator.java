@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.barongreenback.shared.ModelRepository;
-import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.yadic.Container;
 

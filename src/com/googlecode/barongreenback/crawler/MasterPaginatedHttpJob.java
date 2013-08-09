@@ -24,7 +24,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         super(context);
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, StringMappings mappings, VisitedFactory visitedFactory, Clock clock) {
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, VisitedFactory visitedFactory, Clock clock) {
         return masterPaginatedHttpJob(createContext(crawlerId, Record.constructors.record(), datasource, destination, checkpoint, moreXPath, visitedFactory.value(), clock.now()));
     }
 

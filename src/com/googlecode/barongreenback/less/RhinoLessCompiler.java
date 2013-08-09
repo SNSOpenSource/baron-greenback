@@ -1,6 +1,5 @@
 package com.googlecode.barongreenback.less;
 
-import com.googlecode.totallylazy.Callable1;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;

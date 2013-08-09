@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -18,7 +17,7 @@ public interface StagedJob {
 
     Definition destination();
 
-    Pair<Sequence<Record>,Sequence<StagedJob>> process(Container scope, Response response) throws Exception;
+    Pair<Sequence<Record>, Sequence<StagedJob>> process(Container scope, Response response) throws Exception;
 
     Set<HttpDatasource> visited();
 

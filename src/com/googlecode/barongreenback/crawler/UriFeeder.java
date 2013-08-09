@@ -8,7 +8,6 @@ import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
-import com.googlecode.utterlyidle.profiling.ProfilingClient;
 import org.w3c.dom.Document;
 
 import static com.googlecode.totallylazy.Sequences.empty;

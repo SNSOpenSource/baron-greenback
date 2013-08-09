@@ -5,10 +5,7 @@ import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.waitrest.Waitrest;
-import org.junit.After;
-import org.junit.Before;
 
-import java.io.IOException;
 import java.net.URL;
 
 import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
@@ -30,7 +27,7 @@ public abstract class CrawlerTests extends ApplicationTests {
     }
 
     private static Uri uri(URL baseUrl, String path) {
-       return Uri.uri(String.format("%s%s", baseUrl.toString(), path));
+        return Uri.uri(String.format("%s%s", baseUrl.toString(), path));
     }
 
     public static String contentOf(String name) {

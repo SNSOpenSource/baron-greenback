@@ -4,9 +4,7 @@ import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.PaginatedHttpJob;
 import com.googlecode.barongreenback.crawler.VisitedFactory;
-import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.time.Clock;
 
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.DURATION;

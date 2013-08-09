@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.UriTemplate;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 
@@ -40,7 +39,9 @@ public class UriCompiledLessCache implements CompiledLessCache {
         return none();
     }
 
-    private Uri cached(String key) {return root.mergePath(trimSlashes(key) + ".css");}
+    private Uri cached(String key) {
+        return root.mergePath(trimSlashes(key) + ".css");
+    }
 
     @Override
     public boolean put(String key, CompiledLess result) {

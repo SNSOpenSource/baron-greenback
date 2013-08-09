@@ -2,7 +2,6 @@ package com.googlecode.barongreenback.less;
 
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.time.Dates;
-import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import org.junit.Test;
 
 import java.io.File;

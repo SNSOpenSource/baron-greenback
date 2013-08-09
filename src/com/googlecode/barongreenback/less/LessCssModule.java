@@ -2,12 +2,8 @@ package com.googlecode.barongreenback.less;
 
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
-import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.yadic.Container;
-
-import java.io.File;
-import java.util.concurrent.Callable;
 
 import static com.googlecode.yadic.Containers.addIfAbsent;
 

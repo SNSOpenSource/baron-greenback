@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.batch;
 
 import com.googlecode.utterlyidle.Resources;
-import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;

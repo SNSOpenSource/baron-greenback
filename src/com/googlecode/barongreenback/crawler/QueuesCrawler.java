@@ -42,7 +42,7 @@ public class QueuesCrawler extends AbstractCrawler {
         Container crawlerScope = crawlerScope(id, crawler);
 
         return crawlerScope.get(StagedJobExecutor.class).crawlAndWait(
-                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckpointFor(crawler), more(crawler), mappings, visitedFactory, crawlerScope.get(Clock.class)));
+                masterPaginatedHttpJob(id, datasource, destination, checkpointHandler.lastCheckpointFor(crawler), more(crawler), visitedFactory, crawlerScope.get(Clock.class)));
     }
 
     private Container crawlerScope(UUID id, Model crawler) {

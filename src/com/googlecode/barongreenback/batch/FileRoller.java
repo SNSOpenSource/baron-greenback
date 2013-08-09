@@ -2,10 +2,8 @@ package com.googlecode.barongreenback.batch;
 
 import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Runnables;
-import com.googlecode.totallylazy.Sequence;
 
 import java.io.File;
-import java.util.concurrent.Callable;
 
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Files.delete;

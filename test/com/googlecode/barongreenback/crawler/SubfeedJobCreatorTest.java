@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -35,7 +34,7 @@ public class SubfeedJobCreatorTest {
     public static final Definition SOME_DESTINATION = Definition.constructors.definition("foo", Sequences.<Keyword<?>>empty());
     public static final Uri URI = Uri.uri("http://hello.com/");
     public static final Keyword<String> PREV_UNIQUE = keyword("foo", String.class).metadata(unique, true);
-    private final Date createdDate = date(2001,1,1);
+    private final Date createdDate = date(2001, 1, 1);
 
     @Test
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {

@@ -1,7 +1,5 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
-
 import java.util.concurrent.Callable;
 
 public class CrawlerHttpClientActivator implements Callable<CrawlerHttpClient> {
