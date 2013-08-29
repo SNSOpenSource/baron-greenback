@@ -6,15 +6,21 @@ import com.googlecode.barongreenback.crawler.executor.PriorityJobRunnable;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Named;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Block;
+import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Function2;
 import com.googlecode.totallylazy.Group;
+import com.googlecode.totallylazy.Iterators;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Triple;
 import com.googlecode.totallylazy.concurrent.NamedExecutors;
 import com.googlecode.utterlyidle.Application;
@@ -22,6 +28,7 @@ import com.googlecode.yadic.Container;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +39,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMergeBy;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
+import static com.googlecode.lazyrecords.Definition.functions.fields;
+import static com.googlecode.lazyrecords.Definition.functions.name;
 import static com.googlecode.lazyrecords.Record.methods.update;
 import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Callables.first;
@@ -98,13 +107,15 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
     private void batchWrite(final Records records) {
         List<Triple<Definition, Sequence<Record>, CountLatch>> newData = new ArrayList<Triple<Definition, Sequence<Record>, CountLatch>>();
         data.drainTo(newData);
-        sequence(newData).groupBy(first(Definition.class)).mapConcurrently(new Function1<Group<Definition, Triple<Definition, Sequence<Record>, CountLatch>>, Number>() {
+        sequence(newData).groupBy(first(Definition.class).then(Definition.functions.name)).mapConcurrently(new Function1<Group<String, Triple<Definition, Sequence<Record>, CountLatch>>, Number>() {
             @Override
-            public Number call(Group<Definition, Triple<Definition, Sequence<Record>, CountLatch>> group) throws Exception {
-                Definition definition = group.key();
+            public Number call(Group<String, Triple<Definition, Sequence<Record>, CountLatch>> group) throws Exception {
+                Sequence<Keyword<?>> fields = group.map(first(Definition.class).then(fields())).reduce(Sequence.functions.<Keyword<?>>join()).unique();
+
+                Definition definition = group.head().first();
                 Keyword<?> unique = uniqueFields(definition).head();
                 Sequence<Record> mergedRecords = priorityMergeBy(group.flatMap(Callables.<Sequence<Record>>second()), unique);
-                return records.put(definition, update(using(unique), mergedRecords));
+                return records.put(Definition.constructors.definition(definition.name(), fields), update(using(unique), mergedRecords));
             }
         }).realise();
         for (Triple<Definition, Sequence<Record>, CountLatch> aNewData : newData) {

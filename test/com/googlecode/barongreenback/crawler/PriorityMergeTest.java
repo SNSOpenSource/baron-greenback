@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.RecordDefinition;
+import com.googlecode.lazyrecords.ImmutableKeyword;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import org.junit.Test;
