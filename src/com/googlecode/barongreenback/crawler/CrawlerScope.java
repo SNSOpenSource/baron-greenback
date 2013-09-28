@@ -6,6 +6,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.handlers.Auditor;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
 import com.googlecode.yadic.Container;
+import com.googlecode.yadic.ContainerException;
 import com.googlecode.yadic.Containers;
 import com.googlecode.yadic.Resolver;
 import com.googlecode.yadic.SimpleContainer;
@@ -124,7 +125,7 @@ public class CrawlerScope implements Container {
     }
 
     @Override
-    public <T> T create(Type type) throws Exception {
+    public <T> T create(Type type) throws ContainerException {
         return container.create(type);
     }
 }

@@ -31,7 +31,7 @@ public class CrawlerStatusResource {
     @GET
     @Path("status")
     public Model status() {
-        List<Model> executors = crawlerExecutors.statusMonitors().safeCast(StatusMonitor.class).add(failures).add(viewsExecutor.value()).map(toModel()).toList();
+        List<Model> executors = crawlerExecutors.statusMonitors().safeCast(StatusMonitor.class).append(failures).append(viewsExecutor.value()).map(toModel()).toList();
         return model().add("executors", executors);
     }
 

@@ -53,7 +53,7 @@ public class IndexCheckerResource {
     @POST
     @Path("fix")
     public Response fix(@FormParam("id") String id) throws IOException {
-        partitionedindex.partitions().get(id).get().fix();
+        partitionedindex.partitions().lookup(id).get().fix();
         return redirector.seeOther(method(on(IndexCheckerResource.class).check()));
     }
 
