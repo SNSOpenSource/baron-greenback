@@ -45,9 +45,10 @@ public class SubfeedJobCreator {
 
 
     private Sequence<StagedJob> createSubfeedJobs(Sequence<Record> records) {
+        Object[] visitedSnapshot = visited.toArray();
         return records.flatMap(subfeedsKeywords()).
                 unique(datasource()).
-                filter(where(datasource(), not(in(visited)))).
+                filter(where(datasource(), not(in(visitedSnapshot)))).
                 realise();
     }
 
