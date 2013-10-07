@@ -1,0 +1,15 @@
+syntax: glob
+out
+*.iws
+build/artifacts
+.idea/workspace.xml
+*.orig
+lib/build
+lib/runtime
+lib/optional
+.idea/uiDesigner.xml
+.idea/copyright/profiles_settings.xml
+build/runtime.dependencies~
+bin
+.classpath
+.project
