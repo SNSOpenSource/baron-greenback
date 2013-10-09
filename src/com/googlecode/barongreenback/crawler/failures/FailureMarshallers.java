@@ -1,9 +1,9 @@
 package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.HttpJob;
-import com.googlecode.barongreenback.crawler.MasterPaginatedHttpJob;
-import com.googlecode.barongreenback.crawler.PaginatedHttpJob;
-import com.googlecode.barongreenback.crawler.StagedJob;
+import com.googlecode.barongreenback.crawler.jobs.HttpJob;
+import com.googlecode.barongreenback.crawler.jobs.Job;
+import com.googlecode.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
+import com.googlecode.barongreenback.crawler.jobs.PaginatedHttpJob;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequences;
@@ -17,10 +17,10 @@ public enum FailureMarshallers {
     paginated(PaginatedHttpJob.class, PaginatedJobFailureMarshaller.class),
     master(MasterPaginatedHttpJob.class, MasterPaginatedJobFailureMarshaller.class);
 
-    private final Class<? extends StagedJob> jobClass;
+    private final Class<? extends Job> jobClass;
     private final Class<? extends FailureMarshaller> marshallerClass;
 
-    FailureMarshallers(Class<? extends StagedJob> jobClass, Class<? extends FailureMarshaller> marshallerClass) {
+    FailureMarshallers(Class<? extends Job> jobClass, Class<? extends FailureMarshaller> marshallerClass) {
         this.jobClass = jobClass;
         this.marshallerClass = marshallerClass;
     }
@@ -29,14 +29,14 @@ public enum FailureMarshallers {
         return scope.get(marshallerClass);
     }
 
-    public static FailureMarshallers forJob(StagedJob job) {
-        return Sequences.sequence(values()).find(where(jobClass(), Predicates.<Class<? extends StagedJob>>is(job.getClass()))).get();
+    public static FailureMarshallers forJob(Job job) {
+        return Sequences.sequence(values()).find(where(jobClass(), Predicates.<Class<? extends Job>>is(job.getClass()))).get();
     }
 
-    private static Callable1<FailureMarshallers, Class<? extends StagedJob>> jobClass() {
-        return new Callable1<FailureMarshallers, Class<? extends StagedJob>>() {
+    private static Callable1<FailureMarshallers, Class<? extends Job>> jobClass() {
+        return new Callable1<FailureMarshallers, Class<? extends Job>>() {
             @Override
-            public Class<? extends StagedJob> call(FailureMarshallers failureMarshallers) throws Exception {
+            public Class<? extends Job> call(FailureMarshallers failureMarshallers) throws Exception {
                 return failureMarshallers.jobClass;
             }
         };

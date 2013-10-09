@@ -17,7 +17,6 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
     public Resources addResources(Resources resources) throws Exception {
         return resources.
                 add(annotatedClass(CrawlerDefinitionResource.class)).
-                add(annotatedClass(CrawlerImplementationResource.class)).
                 add(annotatedClass(BatchCrawlerResource.class)).
                 add(annotatedClass(CrawlerStatusResource.class));
     }
@@ -28,13 +27,12 @@ public class CrawlerModule implements ResourcesModule, ArgumentScopedModule, Req
 
     public Container addPerRequestObjects(Container container) throws Exception {
         return container.
-                add(VisitedFactory.class).
+                add(HttpVisitedFactory.class).
                 addActivator(CrawlerHttpClient.class, CrawlerHttpClientActivator.class).
                 add(CompositeCrawler.class).
                 add(CheckpointHandler.class).
                 add(CrawlerRepository.class).
-                add(CrawlerActivator.class).
-                addActivator(Crawler.class, container.get(CrawlerActivator.class)).
+                add(Crawler.class, HttpCrawler.class).
                 add(CrawlInterval.class).
                 addInstance(PrintStream.class, new StringPrintStream()).
                 add(CrawlerConnectTimeout.class).

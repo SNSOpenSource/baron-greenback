@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.crawler;
 import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
 import com.googlecode.barongreenback.crawler.executor.JobExecutor;
 import com.googlecode.barongreenback.crawler.executor.PriorityJobRunnable;
+import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -66,7 +67,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
         return service;
     }
 
-    public static Function1<Sequence<Record>, Number> write(final StagedJob job, final Container container) {
+    public static Function1<Sequence<Record>, Number> write(final Job job, final Container container) {
         return new Function1<Sequence<Record>, Number>() {
             @Override
             public Number call(final Sequence<Record> newData) throws Exception {
@@ -83,7 +84,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
         command.run();
     }
 
-    public int queue(StagedJob job, Sequence<Record> newData, CountLatch latch) throws InterruptedException {
+    public int queue(Job job, Sequence<Record> newData, CountLatch latch) throws InterruptedException {
         Definition destination = job.destination();
         if (newData.isEmpty()) return 0;
 

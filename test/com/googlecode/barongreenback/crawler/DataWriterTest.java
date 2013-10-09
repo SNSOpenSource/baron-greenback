@@ -1,5 +1,8 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.crawler.datasources.DataSource;
+import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
+import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -63,10 +66,10 @@ public class DataWriterTest {
         }).build();
     }
 
-    private StagedJob jobWithDefinition(final Definition definition) {
-        return new StagedJob() {
+    private Job jobWithDefinition(final Definition definition) {
+        return new Job() {
             @Override
-            public HttpDatasource datasource() {
+            public DataSource dataSource() {
                 throw new RuntimeException("not done yet");
             }
 
@@ -76,12 +79,12 @@ public class DataWriterTest {
             }
 
             @Override
-            public Pair<Sequence<Record>, Sequence<StagedJob>> process(Container scope, Response response) throws Exception {
+            public Pair<Sequence<Record>, Sequence<Job>> process(Container scope, Response response) throws Exception {
                 throw new RuntimeException("not done yet");
             }
 
             @Override
-            public Set<HttpDatasource> visited() {
+            public Set<DataSource> visited() {
                 throw new RuntimeException("not done yet");
             }
 

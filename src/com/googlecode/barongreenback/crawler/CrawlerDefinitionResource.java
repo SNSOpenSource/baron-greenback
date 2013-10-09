@@ -31,7 +31,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.AbstractCrawler.extractRecordDefinition;
+import static com.googlecode.barongreenback.crawler.Crawler.methods.extractRecordDefinition;
 import static com.googlecode.barongreenback.shared.Forms.functions.addTemplates;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -161,7 +161,7 @@ public class CrawlerDefinitionResource {
     private void createView(UUID id) {
         final Model crawler = repository.crawlerFor(id);
         final RecordDefinition recordDefinition = extractRecordDefinition(crawler);
-        Sequence<Keyword<?>> keywords = AbstractCrawler.keywords(recordDefinition);
+        Sequence<Keyword<?>> keywords = Crawler.methods.keywords(recordDefinition);
         viewsRepository.ensureViewForCrawlerExists(crawler, keywords);
     }
 

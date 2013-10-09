@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.views;
 
-import com.googlecode.barongreenback.crawler.AbstractCrawler;
+import com.googlecode.barongreenback.crawler.Crawler;
 import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
@@ -49,9 +49,9 @@ public class ViewsRepository {
     }
 
     public void ensureViewForCrawlerExists(Model crawler, Sequence<Keyword<?>> keywords) {
-        final String name = AbstractCrawler.name(crawler);
-        if (viewForName(name).isEmpty() && viewForRecords(AbstractCrawler.update(crawler)).isEmpty()) {
-            set(randomUUID(), viewModel(keywords, name, AbstractCrawler.update(crawler), "", true, ""));
+        final String name = Crawler.methods.name(crawler);
+        if (viewForName(name).isEmpty() && viewForRecords(Crawler.methods.update(crawler)).isEmpty()) {
+            set(randomUUID(), viewModel(keywords, name, Crawler.methods.update(crawler), "", true, ""));
         }
     }
 

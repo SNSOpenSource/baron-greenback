@@ -1,5 +1,9 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.crawler.datasources.DataSource;
+import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
+import com.googlecode.barongreenback.crawler.jobs.HttpSubfeedJobCreator;
+import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -26,7 +30,7 @@ import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static com.googlecode.totallylazy.time.Dates.date;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class SubfeedJobCreatorTest {
+public class HttpSubfeedJobCreatorTest {
     public static final Keyword<String> PERSON_NAME = keyword("person/name", String.class);
     public static final Keyword<Uri> LINK = keyword("link", Uri.class).
             metadata(RECORD_DEFINITION, new RecordDefinition(definition("/subfeed", PERSON_NAME))).
@@ -39,17 +43,17 @@ public class SubfeedJobCreatorTest {
     @Test
     public void ifRecordContainsSubfeedReturnsJob() throws Exception {
         UUID crawlerId = UUID.randomUUID();
-        Sequence<StagedJob> jobs = new SubfeedJobCreator(SOME_DESTINATION, new HashSet<HttpDatasource>(), crawlerId, record(), createdDate).process(one(record().set(LINK, URI))).second();
+        Sequence<Job> jobs = new HttpSubfeedJobCreator(SOME_DESTINATION, new HashSet<DataSource>(), crawlerId, record(), createdDate).process(one(record().set(LINK, URI))).second();
         assertThat(jobs.size(), NumberMatcher.is(1));
         assertThat(jobs.head().destination(), is(SOME_DESTINATION));
-        assertThat(jobs.head().datasource().uri(), is(URI));
+        assertThat(jobs.head().dataSource().uri(), is(URI));
     }
 
     @Test
     public void shouldPassDownKeyAndValuesToSubfeedJobs() throws Exception {
         Record previousUnique = record(one(Pair.<Keyword<?>, Object>pair(PREV_UNIQUE, "bar")));
         UUID crawlerId = UUID.randomUUID();
-        Sequence<StagedJob> jobs = new SubfeedJobCreator(SOME_DESTINATION, new HashSet<HttpDatasource>(), crawlerId, previousUnique, createdDate).process(one(record().set(LINK, URI))).second();
+        Sequence<Job> jobs = new HttpSubfeedJobCreator(SOME_DESTINATION, new HashSet<DataSource>(), crawlerId, previousUnique, createdDate).process(one(record().set(LINK, URI))).second();
         Record record = record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)));
         assertThat(jobs.head().record(), is(one(record).map(merge(previousUnique)).head()));
     }
@@ -58,8 +62,8 @@ public class SubfeedJobCreatorTest {
     public void shouldMergeUniqueKeysIntoEachRecord() throws Exception {
         Record previousRecord = record(one(Pair.<Keyword<?>, Object>pair(LINK, URI)));
         UUID crawlerId = UUID.randomUUID();
-        Pair<Sequence<Record>, Sequence<StagedJob>> records = new SubfeedJobCreator(
-                SOME_DESTINATION, new HashSet<HttpDatasource>(), crawlerId, previousRecord, createdDate).process(one(record().set(PERSON_NAME, "Dan")));
+        Pair<Sequence<Record>, Sequence<Job>> records = new HttpSubfeedJobCreator(
+                SOME_DESTINATION, new HashSet<DataSource>(), crawlerId, previousRecord, createdDate).process(one(record().set(PERSON_NAME, "Dan")));
         assertThat(records.first(), is(one(record().set(PERSON_NAME, "Dan").set(LINK, URI))));
     }
 }

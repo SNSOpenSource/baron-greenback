@@ -128,9 +128,4 @@ public class CrawlerListPage {
     public CrawlerListPage copy(String crawlerName) throws Exception {
         return new CrawlerListPage(httpHandler, httpHandler.handle(html.form(formFor(crawlerName, "copy")).submit(button("copy"))));
     }
-
-    public CrawlerListPage changeCrawler(Class<? extends Crawler> crawlerClass) throws Exception {
-        html.select("//select[@class='crawler']").value(crawlerClass.getName());
-        return new CrawlerListPage(httpHandler, httpHandler.handle(html.form("//form[contains(@class, 'activeCrawler')]").submit("descendant::input[@value='change']")));
-    }
 }

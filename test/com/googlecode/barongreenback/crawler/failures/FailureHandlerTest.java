@@ -1,10 +1,11 @@
 package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.AbstractCrawler;
+import com.googlecode.barongreenback.crawler.Crawler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.CrawlerTests;
-import com.googlecode.barongreenback.crawler.HttpDatasource;
-import com.googlecode.barongreenback.crawler.HttpJob;
+import com.googlecode.barongreenback.crawler.datasources.DataSource;
+import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
+import com.googlecode.barongreenback.crawler.jobs.HttpJob;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
@@ -46,10 +47,10 @@ public class FailureHandlerTest {
         CrawlerRepository crawlerRepository = scope.get(CrawlerRepository.class);
         crawlerRepository.importCrawler(some(crawlerId), CrawlerTests.contentOf("crawlerForFailures.json"));
         Model crawler = crawlerRepository.crawlerFor(crawlerId);
-        Definition source = AbstractCrawler.sourceDefinition(crawler);
-        Definition destination = AbstractCrawler.destinationDefinition(crawler);
-        HttpDatasource datasource = HttpDatasource.httpDatasource(uri("/any/uri"), source);
-        job = HttpJob.httpJob(crawlerId, Record.constructors.record(), datasource, destination, new HashSet<HttpDatasource>(), scope.get(Clock.class).now());
+        Definition source = Crawler.methods.sourceDefinition(crawler);
+        Definition destination = Crawler.methods.destinationDefinition(crawler);
+        DataSource datasource = HttpDataSource.httpDataSource(uri("/any/uri"), source);
+        job = HttpJob.httpJob(crawlerId, Record.constructors.record(), datasource, destination, new HashSet<DataSource>(), scope.get(Clock.class).now());
     }
 
     @Test

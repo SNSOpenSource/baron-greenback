@@ -1,10 +1,10 @@
 package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.AbstractCrawler;
 import com.googlecode.barongreenback.crawler.CheckpointHandler;
+import com.googlecode.barongreenback.crawler.Crawler;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
-import com.googlecode.barongreenback.crawler.HttpDatasource;
-import com.googlecode.barongreenback.crawler.VisitedFactory;
+import com.googlecode.barongreenback.crawler.HttpVisitedFactory;
+import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
@@ -18,7 +18,7 @@ import com.googlecode.totallylazy.time.Clock;
 import java.util.List;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.HttpDatasource.httpDatasource;
+import static com.googlecode.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.CRAWLER_ID;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.DURATION;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.JOB_TYPE;
@@ -37,10 +37,10 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     private final CrawlerRepository crawlerRepository;
     private final CheckpointHandler checkpointHandler;
-    protected final VisitedFactory visited;
+    protected final HttpVisitedFactory visited;
     protected final Clock clock;
 
-    public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, VisitedFactory visited, Clock clock) {
+    public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, HttpVisitedFactory visited, Clock clock) {
         this.crawlerRepository = crawlerRepository;
         this.checkpointHandler = checkpointHandler;
         this.visited = visited;
@@ -48,11 +48,11 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     }
 
     public Definition destination(Record record) {
-        return AbstractCrawler.destinationDefinition(crawlerIdFor(record));
+        return Crawler.methods.destinationDefinition(crawlerIdFor(record));
     }
 
-    public HttpDatasource datasource(Record record) {
-        return httpDatasource(record.get(URI), convert(parse(record.get(SOURCE))).definition());
+    public HttpDataSource dataSource(Record record) {
+        return httpDataSource(record.get(URI), convert(parse(record.get(SOURCE))).definition());
     }
 
     @Override
@@ -60,10 +60,10 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
         return record().
                 set(JOB_TYPE, FailureMarshallers.forJob(failure.job()).name()).
                 set(REASON, failure.reason()).
-                set(URI, failure.job().datasource().uri()).
+                set(URI, failure.job().dataSource().uri()).
                 set(REQUEST_TIME, failure.job().createdDate()).
                 set(DURATION, failure.duration()).
-                set(SOURCE, RecordDefinition.toModel(failure.job().datasource().source()).toString()).
+                set(SOURCE, RecordDefinition.toModel(failure.job().dataSource().source()).toString()).
                 set(RECORD, toJson(failure.job().record())).
                 set(CRAWLER_ID, failure.job().crawlerId());
     }
@@ -77,7 +77,7 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     }
 
     protected String moreUri(Record record) {
-        return AbstractCrawler.more(crawlerIdFor(record));
+        return Crawler.methods.more(crawlerIdFor(record));
     }
 
     private Record toRecord(String json) {

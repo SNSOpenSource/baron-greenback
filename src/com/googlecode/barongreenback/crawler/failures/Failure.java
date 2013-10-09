@@ -1,27 +1,27 @@
 package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.StagedJob;
+import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.totallylazy.Eq;
 import com.googlecode.totallylazy.annotations.multimethod;
 
 import java.util.Date;
 
 public class Failure extends Eq {
-    private final StagedJob job;
+    private final Job job;
     private final String reason;
     private final Long duration;
 
-    private Failure(StagedJob job, String reason, Long duration) {
+    private Failure(Job job, String reason, Long duration) {
         this.job = job;
         this.reason = reason;
         this.duration = duration;
     }
 
-    public static Failure failure(StagedJob job, String reason, Long duration) {
+    public static Failure failure(Job job, String reason, Long duration) {
         return new Failure(job, reason, duration);
     }
 
-    public StagedJob job() {
+    public Job job() {
         return job;
     }
 

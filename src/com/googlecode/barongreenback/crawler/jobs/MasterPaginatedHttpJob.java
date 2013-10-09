@@ -1,5 +1,8 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.jobs;
 
+import com.googlecode.barongreenback.crawler.CheckpointUpdater;
+import com.googlecode.barongreenback.crawler.HttpVisitedFactory;
+import com.googlecode.barongreenback.crawler.datasources.DataSource;
 import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
@@ -24,7 +27,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         super(context);
     }
 
-    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, VisitedFactory visitedFactory, Clock clock) {
+    public static MasterPaginatedHttpJob masterPaginatedHttpJob(UUID crawlerId, DataSource datasource, Definition destination, Object checkpoint, String moreXPath, HttpVisitedFactory visitedFactory, Clock clock) {
         return masterPaginatedHttpJob(createContext(crawlerId, Record.constructors.record(), datasource, destination, checkpoint, moreXPath, visitedFactory.value(), clock.now()));
     }
 
@@ -32,7 +35,7 @@ public class MasterPaginatedHttpJob extends PaginatedHttpJob {
         return new MasterPaginatedHttpJob(model);
     }
 
-    public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
+    public Pair<Sequence<Record>, Sequence<Job>> process(final Container crawlerScope, Response response) throws Exception {
         Option<Document> document = loadDocument(response);
         for (Document doc : document)
             crawlerScope.get(CheckpointUpdater.class).update(selectCheckpoints(doc).headOption().map(toDateValue(crawlerScope.get(BaronGreenbackStringMappings.class).value())));

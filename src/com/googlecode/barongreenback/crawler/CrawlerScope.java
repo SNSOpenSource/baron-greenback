@@ -22,7 +22,7 @@ public class CrawlerScope implements Container {
     private CrawlerScope(Container requestScope, CheckpointUpdater checkpointUpdater) {
         container = new SimpleContainer(requestScope);
         container.add(CountLatch.class);
-        container.add(StagedJobExecutor.class);
+        container.add(HttpJobExecutor.class);
         container.add(Auditor.class, PrintAuditor.class);
         container.add(FailureHandler.class);
         container.addInstance(AtomicInteger.class, new AtomicInteger(0));

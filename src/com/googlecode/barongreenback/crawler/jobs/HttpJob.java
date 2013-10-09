@@ -1,5 +1,7 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.jobs;
 
+import com.googlecode.barongreenback.crawler.datasources.DataSource;
+import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
@@ -16,22 +18,22 @@ import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument
 import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.funclate.Model.persistent.model;
 
-public class HttpJob implements StagedJob {
+public class HttpJob implements Job {
     protected final Model context;
 
     protected HttpJob(Model context) {
         this.context = context;
     }
 
-    public static HttpJob httpJob(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited, Date createdDate) {
-        return httpJob(createContext(crawlerId, record, datasource, destination, visited, createdDate));
+    public static HttpJob httpJob(UUID crawlerId, Record record, DataSource dataSource, Definition destination, Set<DataSource> visited, Date createdDate) {
+        return httpJob(createContext(crawlerId, record, dataSource, destination, visited, createdDate));
     }
 
     public static HttpJob httpJob(Model model) {
         return new HttpJob(model);
     }
 
-    protected static Model createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Set<HttpDatasource> visited, Date createdDate) {
+    protected static Model createContext(UUID crawlerId, Record record, DataSource datasource, Definition destination, Set<DataSource> visited, Date createdDate) {
         return model().
                 set("record", record).
                 set("crawlerId", crawlerId).
@@ -47,7 +49,7 @@ public class HttpJob implements StagedJob {
     }
 
     @Override
-    public HttpDatasource datasource() {
+    public DataSource dataSource() {
         return context.get("datasource");
     }
 
@@ -57,7 +59,7 @@ public class HttpJob implements StagedJob {
     }
 
     @Override
-    public Set<HttpDatasource> visited() {
+    public Set<DataSource> visited() {
         return context.get("visited");
     }
 
@@ -72,8 +74,8 @@ public class HttpJob implements StagedJob {
     }
 
     @Override
-    public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
-        return new SubfeedJobCreator(destination(), visited(), crawlerId(), record(), createdDate()).process(transformData(loadDocument(response), datasource().source()).realise());
+    public Pair<Sequence<Record>, Sequence<Job>> process(final Container crawlerScope, Response response) throws Exception {
+        return new HttpSubfeedJobCreator(destination(), visited(), crawlerId(), record(), createdDate()).process(transformData(loadDocument(response), dataSource().source()).realise());
     }
 
     @Override
@@ -88,6 +90,6 @@ public class HttpJob implements StagedJob {
 
     @Override
     public String toString() {
-        return String.format("datasource: %s, destination: %s", datasource(), destination());
+        return String.format("datasource: %s, destination: %s", dataSource(), destination());
     }
 }

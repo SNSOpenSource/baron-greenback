@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.crawler.jobs.PaginatedHttpJob;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.time.Dates;
@@ -8,8 +9,8 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static com.googlecode.barongreenback.crawler.HttpDatasource.httpDatasource;
-import static com.googlecode.barongreenback.crawler.PaginatedHttpJob.paginatedHttpJob;
+import static com.googlecode.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
+import static com.googlecode.barongreenback.crawler.jobs.PaginatedHttpJob.paginatedHttpJob;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
@@ -37,10 +38,10 @@ public class PaginatedHttpJobTest {
                 set("moreXPath", "/root/more").
                 set("checkpoint", "Today").
                 set("checkpointXPath", "/root/date").
-                set("datasource", httpDatasource(uri("http://go.away.com"), null));
+                set("datasource", httpDataSource(uri("http://go.away.com"), null));
         PaginatedHttpJob job = paginatedHttpJob(context);
         Option<PaginatedHttpJob> more = job.nextPageJob(some(document("<root><date>Yesterday</date><more>next</more></root>")));
-        assertThat(more.get().datasource().uri(), is(uri("next")));
+        assertThat(more.get().dataSource().uri(), is(uri("next")));
     }
 
     @Test

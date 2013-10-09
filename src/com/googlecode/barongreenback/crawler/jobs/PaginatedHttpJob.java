@@ -1,5 +1,9 @@
-package com.googlecode.barongreenback.crawler;
+package com.googlecode.barongreenback.crawler.jobs;
 
+import com.googlecode.barongreenback.crawler.CheckpointStopper;
+import com.googlecode.barongreenback.crawler.CompositeCrawler;
+import com.googlecode.barongreenback.crawler.datasources.DataSource;
+import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -38,15 +42,15 @@ public class PaginatedHttpJob extends HttpJob {
         super(context);
     }
 
-    static PaginatedHttpJob paginatedHttpJob(Model context) {
+    public static PaginatedHttpJob paginatedHttpJob(Model context) {
         return new PaginatedHttpJob(context);
     }
 
-    public static PaginatedHttpJob paginatedHttpJob(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, Set<HttpDatasource> visited, Date createdDate) {
+    public static PaginatedHttpJob paginatedHttpJob(UUID crawlerId, Record record, DataSource datasource, Definition destination, Object checkpoint, String moreXPath, Set<DataSource> visited, Date createdDate) {
         return paginatedHttpJob(createContext(crawlerId, record, datasource, destination, checkpoint, moreXPath, visited, createdDate));
     }
 
-    protected static Model createContext(UUID crawlerId, Record record, HttpDatasource datasource, Definition destination, Object checkpoint, String moreXPath, Set<HttpDatasource> visited, Date createdDate) {
+    protected static Model createContext(UUID crawlerId, Record record, DataSource datasource, Definition destination, Object checkpoint, String moreXPath, Set<DataSource> visited, Date createdDate) {
         return createContext(crawlerId, record, datasource, destination, visited, createdDate).
                 set("moreXPath", moreXPath).
                 set("checkpoint", checkpoint).
@@ -54,19 +58,19 @@ public class PaginatedHttpJob extends HttpJob {
     }
 
     protected static String checkpointXPath(Definition source) {
-        Keyword<?> keyword = source.fields().find(where(metadata(CompositeCrawler.CHECKPOINT), is(true))).get();
+        Keyword<?> keyword = source.fields().find(where(Keyword.functions.metadata(CompositeCrawler.CHECKPOINT), is(true))).get();
         return String.format("%s/%s", source.name(), keyword.name());
     }
 
-    public Pair<Sequence<Record>, Sequence<StagedJob>> process(final Container crawlerScope, Response response) throws Exception {
+    public Pair<Sequence<Record>, Sequence<Job>> process(final Container crawlerScope, Response response) throws Exception {
         return processDocument(loadDocument(response));
     }
 
-    protected Pair<Sequence<Record>, Sequence<StagedJob>> processDocument(Option<Document> document) {
-        Sequence<Record> events = transformData(document, datasource().source());
+    protected Pair<Sequence<Record>, Sequence<Job>> processDocument(Option<Document> document) {
+        Sequence<Record> events = transformData(document, dataSource().source());
         Sequence<Record> filtered = CheckpointStopper.stopAt(checkpoint(), events);
-        Pair<Sequence<Record>, Sequence<StagedJob>> pair = new SubfeedJobCreator(destination(), visited(), crawlerId(), record(), createdDate()).process(filtered);
-        Sequence<StagedJob> sequence = Sequences.<StagedJob>sequence(nextPageJob(document));
+        Pair<Sequence<Record>, Sequence<Job>> pair = new HttpSubfeedJobCreator(destination(), visited(), crawlerId(), record(), createdDate()).process(filtered);
+        Sequence<Job> sequence = Sequences.<Job>sequence(nextPageJob(document));
         return Pair.pair(pair.first(), sequence.join(pair.second()));
     }
 
@@ -84,7 +88,7 @@ public class PaginatedHttpJob extends HttpJob {
         return new Callable1<Uri, PaginatedHttpJob>() {
             @Override
             public PaginatedHttpJob call(Uri uri) throws Exception {
-                return job(datasource().uri(uri));
+                return job(HttpDataSource.httpDataSource(uri, dataSource().source()));
             }
         };
     }
@@ -97,7 +101,7 @@ public class PaginatedHttpJob extends HttpJob {
         return selectCheckpoints(document).exists(matchesCurrentCheckpoint(checkpoint()));
     }
 
-    private PaginatedHttpJob job(HttpDatasource datasource) {
+    private PaginatedHttpJob job(DataSource datasource) {
         return paginatedHttpJob(context.set("datasource", datasource));
     }
 

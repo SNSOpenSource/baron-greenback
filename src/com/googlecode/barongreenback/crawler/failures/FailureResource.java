@@ -4,8 +4,8 @@ import com.googlecode.barongreenback.crawler.CheckpointHandler;
 import com.googlecode.barongreenback.crawler.CheckpointUpdater;
 import com.googlecode.barongreenback.crawler.CrawlerRepository;
 import com.googlecode.barongreenback.crawler.CrawlerScope;
-import com.googlecode.barongreenback.crawler.StagedJob;
-import com.googlecode.barongreenback.crawler.StagedJobExecutor;
+import com.googlecode.barongreenback.crawler.HttpJobExecutor;
+import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.Model;
@@ -148,7 +148,7 @@ public class FailureResource {
         return new Callable1<Failure, Response>() {
             @Override
             public Response call(Failure failure) throws Exception {
-                executor(failure.job()).crawl(failure.job());
+                executor(failure.job()).execute(failure.job());
                 failures.delete(id);
                 return backToMe("Job retried");
             }
@@ -173,10 +173,10 @@ public class FailureResource {
         };
     }
 
-    private StagedJobExecutor executor(StagedJob stagedJob) {
+    private HttpJobExecutor executor(Job job) {
         CrawlerScope crawlerScope = CrawlerScope.crawlerScope(requestScope,
-                new CheckpointUpdater(requestScope.get(CheckpointHandler.class), stagedJob.crawlerId(),
-                        crawlerRepository.modelFor(stagedJob.crawlerId()).get()));
-        return crawlerScope.get(StagedJobExecutor.class);
+                new CheckpointUpdater(requestScope.get(CheckpointHandler.class), job.crawlerId(),
+                        crawlerRepository.modelFor(job.crawlerId()).get()));
+        return crawlerScope.get(HttpJobExecutor.class);
     }
 }

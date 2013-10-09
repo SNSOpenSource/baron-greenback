@@ -27,8 +27,6 @@ $message()$
         $post(name="deleteAll", value="Delete All", disabled="true")$
     $endif$
 
-    $include.({$base$crawler/active}).body;format="raw"$
-
     $get(url={$base$crawler/status}, class="crawler-status", name="Status")$
     $get(url={$base$crawler/failures/list}, class="crawler-failures", name="Failures")$
 </div>

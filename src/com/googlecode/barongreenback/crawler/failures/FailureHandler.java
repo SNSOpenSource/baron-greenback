@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.StagedJob;
+import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Request;
@@ -24,7 +24,7 @@ public class FailureHandler {
         this.clock = clock;
     }
 
-    public Function1<Request, Response> captureFailures(final Function1<Request, Response> function, final StagedJob job) {
+    public Function1<Request, Response> captureFailures(final Function1<Request, Response> function, final Job job) {
         return new Function1<Request, Response>() {
             @Override
             public Response call(Request request) throws Exception {
@@ -33,7 +33,7 @@ public class FailureHandler {
         };
     }
 
-    private Response captureFailures(Function1<Request, Response> function, Request request, StagedJob job) throws Exception {
+    private Response captureFailures(Function1<Request, Response> function, Request request, Job job) throws Exception {
         Date start = job.createdDate();
         try {
             return checkResponseCode(job, function.call(request), elapsedTime(start));
@@ -51,7 +51,7 @@ public class FailureHandler {
         return MILLISECONDS.toNanos(start.getTime());
     }
 
-    private Response checkResponseCode(StagedJob job, Response response, Long duration) {
+    private Response checkResponseCode(Job job, Response response, Long duration) {
         if (!response.status().equals(Status.OK)) {
             addFailure(failures, job, response.toString(), duration);
             return response(Status.NO_CONTENT).build();
@@ -59,7 +59,7 @@ public class FailureHandler {
         return response;
     }
 
-    private static void addFailure(Failures failures, StagedJob job, String reason, Long duration) {
+    private static void addFailure(Failures failures, Job job, String reason, Long duration) {
         failures.add(failure(job, reason, duration));
     }
 }

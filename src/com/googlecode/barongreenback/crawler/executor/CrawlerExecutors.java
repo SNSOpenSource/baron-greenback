@@ -1,7 +1,7 @@
 package com.googlecode.barongreenback.crawler.executor;
 
 import com.googlecode.barongreenback.crawler.DataWriter;
-import com.googlecode.barongreenback.crawler.StagedJob;
+import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Application;
@@ -80,8 +80,8 @@ public class CrawlerExecutors implements Closeable {
         return configValues.get(OUTPUT_HANDLER_CAPACITY);
     }
 
-    public JobExecutor<PriorityJobRunnable> inputHandler(StagedJob job) {
-        final String authority = job.datasource().uri().authority();
+    public JobExecutor<PriorityJobRunnable> inputHandler(Job job) {
+        final String authority = job.dataSource().uri().authority();
         inputHandler.putIfAbsent(authority, new Lazy<JobExecutor<PriorityJobRunnable>>() {
             @Override
             protected JobExecutor get() throws Exception {
@@ -91,7 +91,7 @@ public class CrawlerExecutors implements Closeable {
         return inputHandler.get(authority).value();
     }
 
-    public JobExecutor<PriorityJobRunnable> processHandler(StagedJob job) {
+    public JobExecutor<PriorityJobRunnable> processHandler(Job job) {
         final Definition definition = job.destination();
         processHandler.putIfAbsent(definition.name(), new Lazy<JobExecutor<PriorityJobRunnable>>() {
             @Override
@@ -102,7 +102,7 @@ public class CrawlerExecutors implements Closeable {
         return processHandler.get(definition.name()).value();
     }
 
-    public DataWriter outputHandler(StagedJob job) {
+    public DataWriter outputHandler(Job job) {
         final Definition definition = job.destination();
         outputHandler.putIfAbsent(definition.name(), new Lazy<DataWriter>() {
             @Override

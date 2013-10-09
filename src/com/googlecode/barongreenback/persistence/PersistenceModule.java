@@ -26,8 +26,8 @@ import static com.googlecode.yadic.Containers.addInstanceIfAbsent;
 
 public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule, BaronGreenbackRequestScopedModule {
 
+    @Override
     public Container addPerRequestObjects(final Container container) throws Exception {
-        addIfAbsent(container, Logger.class, IgnoreLogger.class);
         addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
         addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
         addActivatorIfAbsent(container, UtterlyIdleRecords.class, UtterlyIdleRecordsActivator.class);
@@ -37,6 +37,7 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
 
     @Override
     public Container addPerApplicationObjects(Container container) throws Exception {
+        addIfAbsent(container, Logger.class, IgnoreLogger.class);
         addIfAbsent(container, PersistenceUri.class);
         addIfAbsent(container, PersistenceUser.class);
         addIfAbsent(container, PersistencePassword.class);
