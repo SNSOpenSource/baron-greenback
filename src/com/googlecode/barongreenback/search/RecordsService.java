@@ -73,6 +73,14 @@ public class RecordsService {
         return recordsFound.map(ignoreAndReturn(Option.none(Record.class)), firstResult());
     }
 
+    public Either<String, Sequence<Record>> findAll(String viewName, String query) {
+        Option<Model> optionalView = findView(viewName);
+        if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
+
+        Model view = optionalView.get();
+        return getRecordsWithQuery(view, query, headers(view));
+    }
+
     public Either<String, Sequence<Record>> findFromView(final String viewName, final String query) {
         Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
