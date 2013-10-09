@@ -1,0 +1,19 @@
+{"form":{
+    "update":"news",
+    "record":{
+        "keywords":[
+            {
+                "record":null,
+                "unique":false,
+                "visible":true,
+                "alias":"",
+                "name":"title",
+                "subfeed":false,
+                "group":"",
+                "type":"java.lang.String"
+            }
+        ],
+        "name":"/rss/channel/item"
+    },
+    "from":"http://feeds.bbci.co.uk/news/rss.xml"
+}}
