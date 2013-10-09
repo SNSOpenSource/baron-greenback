@@ -42,7 +42,7 @@ public class RecordsService {
 
     public void delete(String viewName, String query) {
         Model view = view(viewName);
-        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithImplicitViewQuery(view, query), visibleHeaders(view)).right();
+        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithImplicitViewQuery(view, query), headers(view)).right();
         records.remove(Definition.constructors.definition(viewName(view), Sequences.<Keyword<?>>empty()), predicate);
     }
 
@@ -73,20 +73,12 @@ public class RecordsService {
         return recordsFound.map(ignoreAndReturn(Option.none(Record.class)), firstResult());
     }
 
-    public Either<String, Sequence<Record>> findAll(String viewName, String query) {
-        Option<Model> optionalView = findView(viewName);
-        if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
-
-        Model view = optionalView.get();
-        return getRecordsWithQuery(view, query, visibleHeaders(view));
-    }
-
     public Either<String, Sequence<Record>> findFromView(final String viewName, final String query) {
         Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
         Model view = optionalView.get();
-        return getRecords(view, query, visibleHeaders(headers(view)));
+        return getRecords(view, query, headers(view));
     }
 
     public static String prefixQueryWithImplicitViewQuery(Model view, final String query) {

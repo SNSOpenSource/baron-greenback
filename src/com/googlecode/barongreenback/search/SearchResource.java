@@ -77,13 +77,6 @@ public class SearchResource {
     }
 
     @GET
-    @Path("all")
-    public Model all(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
-        final Either<String, Sequence<Record>> errorOrResults = recordsService.findAll(viewName, query);
-        return results(viewName, query, errorOrResults);
-    }
-
-    @GET
     @Produces(MediaType.TEXT_CSV)
     @Path("csv")
     public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("id") Iterable<String> id) {

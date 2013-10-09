@@ -7,6 +7,7 @@ import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Block;
@@ -33,8 +34,12 @@ import static com.googlecode.utterlyidle.HttpHeaders.LOCATION;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 public class SearchResourceTest extends ApplicationTests {
+
+    private Definition usersView;
 
     @Before
     public void addSomeData() throws Exception {
@@ -44,10 +49,10 @@ public class SearchResourceTest extends ApplicationTests {
         application.usingRequestScope(new Block<Container>() {
             public void execute(Container container) throws Exception {
                 Records records = container.get(BaronGreenbackRecords.class).value();
-                Definition users = Definition.constructors.definition("users", keywords(recordSequence));
-                records.add(users, recordSequence);
+                usersView = Definition.constructors.definition("users", keywords(recordSequence));
+                records.add(usersView, recordSequence);
                 ModelRepository views = container.get(ModelRepository.class);
-                views.set(UUID.randomUUID(), ViewsRepository.convertToViewModel(users));
+                views.set(UUID.randomUUID(), ViewsRepository.convertToViewModel(usersView));
             }
         });
         waitrest.close();
@@ -116,6 +121,16 @@ public class SearchResourceTest extends ApplicationTests {
         InputStream resourceAsStream = SearchResourceTest.class.getResourceAsStream("csvTest.csv");
         String expected = Strings.toString(resourceAsStream);
         assertThat(response.entity().toString(), Matchers.is(expected));
+    }
+
+    @Test
+    public void shouldExportOnlyVisibleFields() throws Exception {
+        Keyword<?> invisibleField = usersView.fields().first();
+        invisibleField.metadata().set(ViewsRepository.VISIBLE, Boolean.FALSE);
+
+        RequestBuilder requestBuilder = get("/" + AnnotatedBindings.relativeUriOf(method(on(SearchResource.class).exportCsv("users", "first:Dan OR first:Matt"))));
+        Response response = application.handle(requestBuilder.build());
+        assertThat(response.entity().toString(), not(containsString(invisibleField.name())));
     }
 
 }
