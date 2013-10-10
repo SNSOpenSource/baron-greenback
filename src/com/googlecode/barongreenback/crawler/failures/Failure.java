@@ -49,6 +49,6 @@ public class Failure extends Eq {
 
     @Override
     public String toString() {
-        return String.format("job: %s, reason: %s, date: %s, duration: %d", job.toString(), reason, duration);
+        return String.format("job: %s, reason: %s, date: %s, duration: %d", job.toString(), reason, date(), duration);
     }
 }
