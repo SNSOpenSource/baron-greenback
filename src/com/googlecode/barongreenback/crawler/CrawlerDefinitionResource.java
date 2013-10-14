@@ -65,9 +65,7 @@ public class CrawlerDefinitionResource {
     @Path("list")
     public Model list(@QueryParam("message") Option<String> message) {
         List<Model> models = repository.allCrawlerModels().map(asModelWithId()).toList();
-        Model model = model().add("items", models).add("anyExists", !models.isEmpty());
-        message.fold(model, toMessageModel());
-        return model;
+        return message.fold(model().add("items", models), toMessageModel());
     }
 
     private Callable2<Model, String, Model> toMessageModel() {
@@ -234,7 +232,7 @@ public class CrawlerDefinitionResource {
 
     public static Uri scheduleAQueuedCrawl(UUID crawlerId, UUID schedulerId, Long interval) throws Exception {
         String crawlerJob = absolutePathOf(method(on(CrawlerDefinitionResource.class).crawl(crawlerId)));
-        String queued = absolutePathOf(method(on(JobsResource.class).run(null, crawlerJob)));
+        String queued = absolutePathOf(method(on(JobsResource.class).create(null, crawlerJob)));
         return relativeUriOf(method(on(ScheduleResource.class).schedule(schedulerId, interval, queued)));
     }
 

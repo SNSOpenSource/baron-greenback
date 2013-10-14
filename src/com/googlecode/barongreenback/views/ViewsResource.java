@@ -153,7 +153,7 @@ public class ViewsResource {
                 mapConcurrently(asModel(current, query), viewsExecutor).
                 sortBy(Comparators.comparators(ascending(priority()), ascending(name()))).
                 toList();
-        return model().add("views", models).add("anyExists", !models.isEmpty());
+        return model().add("views", models);
     }
 
     private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current, final String query) {

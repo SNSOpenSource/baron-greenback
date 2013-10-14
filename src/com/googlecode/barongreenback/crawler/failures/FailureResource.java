@@ -70,7 +70,6 @@ public class FailureResource {
         Sequence<Record> sorted = sorter.sort(unpaged, headers);
         Sequence<Record> paged = pager.paginate(sorted);
         Model model = pager.model(sorter.model(model().
-                add("anyExists", !failureRepository.isEmpty()).
                 add("items", paged.map(toModel()).toList()), headers, paged));
         return message.fold(model, toMessageModel()).
                 add("retryUrl", redirector.absoluteUriOf(method(on(FailureResource.class).retry(null)))).

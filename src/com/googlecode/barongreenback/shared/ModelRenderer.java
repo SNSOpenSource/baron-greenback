@@ -9,6 +9,7 @@ import com.googlecode.utterlyidle.sitemesh.TemplateName;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
+import static com.googlecode.totallylazy.Debug.debugging;
 import static com.googlecode.totallylazy.Debug.inDebug;
 
 public class ModelRenderer implements Renderer<Model> {
@@ -27,11 +28,16 @@ public class ModelRenderer implements Renderer<Model> {
     }
 
     public String render(Model value) throws Exception {
-        StringTemplate template = group.getInstanceOf(templateName.value(), value.toMap());
-        template.setAttribute("base", basePath);
-        template.setAttribute("include", new PageMap(httpHandlerForIncludes));
-        template.setAttribute("advanced", mode.equals(AdvancedMode.Enable));
-        template.setAttribute("debug", inDebug());
-        return template.toString();
+        try {
+            StringTemplate template = group.getInstanceOf(templateName.value(), value.toMap());
+            template.setAttribute("base", basePath);
+            template.setAttribute("include", new PageMap(httpHandlerForIncludes));
+            template.setAttribute("advanced", mode.equals(AdvancedMode.Enable));
+            template.setAttribute("debug", inDebug());
+            return template.toString();
+        } catch (Exception e) {
+            if(debugging()) System.err.println("Could not load template '" +  templateName.value() + "' in " + ModelRenderer.class + " falling back to Model.toString()");
+            return value.toString();
+        }
     }
 }
