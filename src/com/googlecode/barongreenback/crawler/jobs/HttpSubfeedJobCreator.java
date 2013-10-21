@@ -47,10 +47,9 @@ public class HttpSubfeedJobCreator {
 
 
     private Sequence<Job> createSubfeedJobs(Sequence<Record> records) {
-        Object[] visitedSnapshot = visited.toArray();
         return records.flatMap(subfeedsKeywords()).
                 unique(dataSource()).
-                filter(where(dataSource(), not(in(visitedSnapshot)))).
+                filter(where(dataSource(), not(in(visited)))).
                 realise();
     }
 

@@ -11,11 +11,13 @@ $item.request.raw$
     </td>
     <td>
         <div class="response">
+        $if(item.response)$
             <span class="code">$item.response.code$</span> <span class="status">$item.response.status$</span>
             <div class="entity">$item.response.entity$</div>
 <!--
 $item.response.raw$
 -->
+        $endif$
         </div>
     </td>
     <td><span class="started">$item.started$</span></td>

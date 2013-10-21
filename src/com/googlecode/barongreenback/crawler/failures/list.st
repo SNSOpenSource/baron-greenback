@@ -24,7 +24,7 @@ $message()$
 
 <div class="actions">
     $get(url={$base$crawler/status}, class="crawler-status", name="Status")$
-    $if(anyExists)$
+    $if(items)$
         $post(name="retryAll", value="Retry All")$
         $post(name="deleteAll", value="Delete All")$
     $else$

@@ -20,7 +20,7 @@
         $post(name="start", value="start scheduler")$
     $endif$
 
-    $if(anyExists)$
+    $if(schedules)$
         $post(name="deleteAll", value="delete all")$
     $else$
         $post(class="deleteAllDanger", name="deleteAll", value="Delete All", disabled=true)$

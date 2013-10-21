@@ -14,7 +14,7 @@ $items:item(item=it)$
 </table>
 
 <div class="actions">
-$if(anyExists)$
+$if(items)$
     $post(name="deleteAll", value="Delete All")$
 $else$
     $post(name="deleteAll", value="Delete All", disabled="true")$

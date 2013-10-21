@@ -17,7 +17,7 @@ $message()$
     <a href="new" class="new">New</a>
     <a href="import" class="import">Import</a>
 
-    $if(anyExists)$
+    $if(items)$
         $post(name="crawlAll", value="Crawl All")$
         $post(name="resetAll", value="Reset All")$
         $post(name="deleteAll", value="Delete All")$

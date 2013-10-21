@@ -1,15 +1,18 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.datasources.DataSource;
-import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
 import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Value;
 
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static com.googlecode.totallylazy.Sets.fifoSet;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.valueOf;
+import static java.util.Collections.newSetFromMap;
 
 public class HttpVisitedFactory implements Value<Set<DataSource>> {
     public static final String PROPERTY_NAME = "crawler.visited.size";
@@ -29,6 +32,32 @@ public class HttpVisitedFactory implements Value<Set<DataSource>> {
     }
 
     public Set<DataSource> value() {
-        return fifoSet(size);
+        return concurrentFifoSet(size);
+    }
+
+    private Set<DataSource> concurrentFifoSet(int size) {
+        return newSetFromMap(HttpVisitedFactory.<DataSource, Boolean>concurrentFifoMap(size));
+    }
+
+    private static <K, V> Map<K, V> concurrentFifoMap(final int maximumElements) {
+        return new ConcurrentHashMap<K, V>(maximumElements) {
+            Queue<K> entryOrder = new ConcurrentLinkedQueue<K>();
+
+            @Override
+            public V put(K key, V value) {
+                V result = super.put(key, value);
+                entryOrder.offer(key);
+
+                if (size() > maximumElements) {
+                    remove(eldestEntry());
+                }
+
+                return result;
+            }
+
+            private K eldestEntry() {
+                return entryOrder.poll();
+            }
+        };
     }
 }

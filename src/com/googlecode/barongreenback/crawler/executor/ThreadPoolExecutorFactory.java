@@ -21,7 +21,7 @@ public class ThreadPoolExecutorFactory implements ExecutorFactory {
     }
 
     private ThreadPoolExecutor executor(int threads, int capacity, Class<? extends BlockingQueue> queueClass, String name) {
-        return new ThreadPoolExecutor(0, threads == 0 ? Integer.MAX_VALUE : threads,
+        return new ThreadPoolExecutor(threads, threads == 0 ? Integer.MAX_VALUE : threads,
                 60L, TimeUnit.SECONDS,
                 queue(queueClass, capacity),
                 NamedExecutors.namedThreadFactory(name),

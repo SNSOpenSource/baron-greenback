@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMergeBy;
 import static com.googlecode.barongreenback.shared.RecordDefinition.uniqueFields;
+import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Record.methods.update;
 import static com.googlecode.lazyrecords.Using.using;
 import static com.googlecode.totallylazy.Callables.first;
@@ -104,10 +105,12 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
         sequence(newDataToWrite).groupBy(first(Definition.class).then(Definition.functions.name)).mapConcurrently(new Function1<Group<String, Triple<Definition, Sequence<Record>, CountLatch>>, Number>() {
             @Override
             public Number call(Group<String, Triple<Definition, Sequence<Record>, CountLatch>> newData) throws Exception {
-                Definition mergedDefinition = newData.head().first();
-                Keyword<?> unique = uniqueFields(mergedDefinition).head();
-                Sequence<Record> mergedRecords = priorityMergeBy(newData.flatMap(Callables.<Sequence<Record>>second()), unique);
-                return records.put(Definition.constructors.definition(mergedDefinition.name(), mergeFields(newData)), update(using(unique), mergedRecords));
+                Definition firstDefinition = newData.head().first();
+                Definition definition = definition(firstDefinition.name(), mergeFields(newData));
+
+                Keyword<?> uniqueKeyword = uniqueFields(firstDefinition).head();
+                Sequence<Record> mergedRecords = priorityMergeBy(newData.flatMap(Callables.<Sequence<Record>>second()), uniqueKeyword);
+                return records.put(definition, update(using(uniqueKeyword), mergedRecords));
             }
         }).realise();
         for (Triple<Definition, Sequence<Record>, CountLatch> aNewData : newDataToWrite) {
@@ -118,7 +121,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
     private Set<Keyword<?>> mergeFields(Group<String, Triple<Definition, Sequence<Record>, CountLatch>> data) {
         final Set<Keyword<?>> mergedFields = new LinkedHashSet<Keyword<?>>();
         for (Triple<Definition, Sequence<Record>, CountLatch> trio : data) {
-            mergedFields.addAll(trio.first().fields().toList());
+            mergedFields.addAll(trio.first().fields());
         }
         return mergedFields;
     }

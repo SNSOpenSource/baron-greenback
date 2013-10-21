@@ -41,7 +41,7 @@ public class JobsPage {
 
     public Response queue(Request request) throws Exception {
         Uri resource = request.uri();
-        String queuedPath = "/" + relativeUriOf(method(on(JobsResource.class).run(request, "/" + resource.path()))).toString();
+        String queuedPath = "/" + relativeUriOf(method(on(JobsResource.class).create(request, "/" + resource.path()))).toString();
         return httpHandler.handle(modify(request).uri(resource.path(queuedPath)).build());
     }
 
