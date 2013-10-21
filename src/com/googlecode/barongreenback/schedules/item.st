@@ -13,8 +13,11 @@ $item.request.raw$
     </td>
     <td>
         <div class="response">
+            $if(item.isOk)$
             <span class="code">$item.response.code$</span> <span class="status">$item.response.status$</span>
-            <div class="entity">$item.response.entity$</div>
+            $else$
+            <span class="status">OK</span>
+            $endif$
 <!--
 $item.response.raw$
 -->
