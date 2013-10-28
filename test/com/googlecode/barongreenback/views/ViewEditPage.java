@@ -45,6 +45,10 @@ public class ViewEditPage {
         return html.input("//input[@name='view.query']");
     }
 
+    public Input parent() {
+        return html.input("//input[@name='view.parent']");
+    }
+
     public static final String fieldName = "//input[@id='view.keywords[%s].name']";
 
     public Input fieldName(int index) {

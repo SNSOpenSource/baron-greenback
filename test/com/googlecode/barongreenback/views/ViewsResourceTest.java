@@ -36,6 +36,7 @@ public class ViewsResourceTest extends ApplicationTests {
                                 add("records", "users").
                                 add("query", "").
                                 add("visible", true).
+                                add("parent", "someParent").
                                 add("keywords", list(model().
                                         add("name", "firstname").
                                         add("alias", "").
@@ -89,10 +90,12 @@ public class ViewsResourceTest extends ApplicationTests {
         assertThat(edit.name().value(), is("users"));
         assertThat(edit.records().value(), is("users"));
         assertThat(edit.query().value(), is(""));
+        assertThat(edit.parent().value(), is("someParent"));
         assertThat(edit.fieldName(1).value(), is("firstname"));
         edit.name().value("people");
         edit.records().value("people");
         edit.query().value("firstname:dan");
+        edit.parent().value("parent");
 
         ViewListPage modifiedViews = edit.save();
 
@@ -100,6 +103,7 @@ public class ViewsResourceTest extends ApplicationTests {
         ViewEditPage modifiedView = views.edit(VIEW_ID);
         assertThat(modifiedView.records().value(), is("people"));
         assertThat(modifiedView.query().value(), is("firstname:dan"));
+        assertThat(modifiedView.parent().value(), is("parent"));
         assertThat(modifiedView.fieldName(1).value(), is("firstname"));
     }
 
