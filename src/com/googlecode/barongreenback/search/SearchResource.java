@@ -59,13 +59,15 @@ public class SearchResource {
     private final Sorter sorter;
     private final RecordsService recordsService;
     private final Clock clock;
+    private final ShortcutPolicy shortcutPolicy;
 
-    public SearchResource(final Redirector redirector, final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock) {
+    public SearchResource(final Redirector redirector, final Pager pager, final Sorter sorter, final RecordsService recordsService, final Clock clock, final ShortcutPolicy shortcutPolicy) {
         this.redirector = redirector;
         this.pager = pager;
         this.sorter = sorter;
         this.recordsService = recordsService;
         this.clock = clock;
+        this.shortcutPolicy = shortcutPolicy;
     }
 
     @GET
@@ -131,7 +133,7 @@ public class SearchResource {
     @GET
     @Path("shortcut")
     public Object shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
-        if (recordsService.count(viewName, query).intValue() == 1) {
+        if (shortcutPolicy.shouldShortcut(query)) {
             final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
             final Option<Record> optionalRecord = recordsService.findUnique(viewName, query);
             Option<Keyword<?>> unique = uniqueHeader(visibleHeaders);

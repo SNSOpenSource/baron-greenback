@@ -36,6 +36,7 @@ public class SearchModule implements BaronGreenbackRequestScopedModule, Resource
         container.add(Pager.class, RequestPager.class).
                 add(Sorter.class, Sorter.class).
                 addActivator(PredicateBuilder.class, PredicateBuilderActivator.class);
+        Containers.addIfAbsent(container, ShortcutPolicy.class, PrimaryViewShortcutPolicy.class);
         return Containers.addInstanceIfAbsent(container, ConvertExtensionToAcceptHeader.Replacements.class, replacements(Pair.pair("json", MediaType.APPLICATION_JSON))).
                 decorate(HttpHandler.class, ConvertExtensionToAcceptHeader.class);
     }

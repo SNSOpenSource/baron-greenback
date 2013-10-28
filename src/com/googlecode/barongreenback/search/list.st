@@ -8,7 +8,7 @@
 </head>
 <body class="$view$">
 <div>
-    <form class="search" method="get">
+    <form class="search" method="get" action="shortcut">
         $if(queryException)$
             $input(name="query", value=query, message="Invalid Query", messageType="error")$
             <!-- $queryException$ -->
