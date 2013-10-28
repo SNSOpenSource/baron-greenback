@@ -133,7 +133,7 @@ public class SearchResource {
     @GET
     @Path("shortcut")
     public Object shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
-        if (shortcutPolicy.shouldShortcut(query)) {
+        if (shortcutPolicy.shouldShortcut(viewName, query)) {
             final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
             final Option<Record> optionalRecord = recordsService.findUnique(viewName, query);
             Option<Keyword<?>> unique = uniqueHeader(visibleHeaders);

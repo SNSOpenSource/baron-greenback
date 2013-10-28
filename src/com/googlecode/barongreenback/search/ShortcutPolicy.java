@@ -1,5 +1,5 @@
 package com.googlecode.barongreenback.search;
 
 public interface ShortcutPolicy {
-    boolean shouldShortcut(String query);
+    boolean shouldShortcut(String view, String query);
 }

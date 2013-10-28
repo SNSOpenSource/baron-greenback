@@ -45,7 +45,7 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("foo:value"), is(true));
+        assertThat(policy.shouldShortcut("someView", "foo:value"), is(true));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class PrimaryViewShortcutPolicyTest {
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("foo:value"), is(false));
+        assertThat(policy.shouldShortcut("viewName", "foo:value"), is(false));
     }
 
     @Test
@@ -64,14 +64,14 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("foo:value"), is(false));
+        assertThat(policy.shouldShortcut("someView", "foo:value"), is(false));
     }
 
     @Test
     public void shouldNotShortcutWithNoData() throws Exception {
         createView(someDefinition(), "someView", true);
 
-        assertThat(policy.shouldShortcut("foo:value"), is(false));
+        assertThat(policy.shouldShortcut("someView", "foo:value"), is(false));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("foo:value"), is(false));
+        assertThat(policy.shouldShortcut("view1", "foo:value"), is(false));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("foo:value"), is(true));
+        assertThat(policy.shouldShortcut("view1", "foo:value"), is(true));
     }
 
     @Test
@@ -101,7 +101,17 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("foo:value"), is(true));
+        assertThat(policy.shouldShortcut("view2", "foo:value"), is(true));
+    }
+
+    @Test
+    public void shouldNotShortcutWhenThereAreNoResultsInCurrentView() throws Exception {
+        createView(someDefinition(), "view1", true, none(String.class), some("foo:bar"));
+        createView(someDefinition(), "view2", true);
+
+        records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
+
+        assertThat(policy.shouldShortcut("view1", "foo:value"), is(false));
     }
 
     private Definition someDefinition() {
@@ -114,7 +124,11 @@ public class PrimaryViewShortcutPolicyTest {
     }
 
     private void createView(Definition definition, String viewName, boolean visible, Option<String> parent) {
-        Model view = ViewsRepository.viewModel(Sequences.<Keyword<?>>sequence(keyword), viewName, parent, definition.name(), "", visible, "");
+        createView(definition, viewName, visible, parent, none(String.class));
+    }
+
+    private void createView(Definition definition, String viewName, boolean visible, Option<String> parent, Option<String> query) {
+        Model view = ViewsRepository.viewModel(Sequences.<Keyword<?>>sequence(keyword), viewName, parent, definition.name(), query.getOrElse(""), visible, "");
         modelRepository.set(UUID.randomUUID(), view);
     }
 }

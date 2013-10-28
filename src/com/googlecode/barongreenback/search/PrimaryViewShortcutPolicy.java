@@ -4,7 +4,10 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
@@ -26,12 +29,16 @@ public class PrimaryViewShortcutPolicy implements ShortcutPolicy {
     }
 
     @Override
-    public boolean shouldShortcut(String query) {
-        Number count = views().filter(is(visible()).and(hasNoParent().or(hasParentIn(invisibleParents())))).
+    public boolean shouldShortcut(String view, String query) {
+        Sequence<Pair<String, Number>> counts = views().filter(is(visible()).and(hasNoParent().or(hasParentIn(invisibleParents())))).
                 map(value("name", String.class)).
-                map(toCount(query)).
+                map(toCount(query).capturing()).memoize();
+
+        Number count = counts.
+                map(Callables.<Number>second()).
                 reduce(sum());
-        return count.intValue() == 1;
+
+        return counts.exists(Predicates.is(Pair.pair(view, Numbers.number(1)))) && count.intValue() == 1;
     }
 
     private Sequence<Model> views() {
