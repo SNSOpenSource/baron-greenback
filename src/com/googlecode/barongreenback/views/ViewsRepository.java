@@ -39,13 +39,18 @@ public class ViewsRepository {
     }
 
     public static Model viewModel(Sequence<Keyword<?>> keywords, String name, String records, String query, boolean visible, String priority) {
-        return model().add(ROOT, model().
+        return viewModel(keywords, name, Option.<String>none(), records, query, visible, priority);
+    }
+
+    public static Model viewModel(Sequence<Keyword<?>> keywords, String name, Option<String> parent, String records, String query, boolean visible, String priority) {
+        Model view = model().
                 add("name", name).
                 add("records", records).
                 add("query", query).
                 add("visible", visible).
                 add("priority", priority).
-                add("keywords", keywords.map(asModel()).toList()));
+                add("keywords", keywords.map(asModel()).toList());
+        return model().add(ROOT, parent.fold(view, Model.functions.add("parent")));
     }
 
     public void ensureViewForCrawlerExists(Model crawler, Sequence<Keyword<?>> keywords) {
@@ -56,7 +61,7 @@ public class ViewsRepository {
     }
 
     public static Model clean(Model root) {
-        return new ModelCleaner(in("view", "name", "records", "query", "priority", "keywords", "group", "type", "unique", "visible")).clean(root);
+        return new ModelCleaner(in("view", "name", "parent", "records", "query", "priority", "keywords", "group", "type", "unique", "visible")).clean(root);
     }
 
     public static Model convertToViewModel(Definition definition) {
