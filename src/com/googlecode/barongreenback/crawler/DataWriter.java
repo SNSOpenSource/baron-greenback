@@ -10,6 +10,7 @@ import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Block;
+import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Function1;
@@ -102,23 +103,44 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
     private void batchWrite(final Records records) {
         List<Triple<Definition, Sequence<Record>, CountLatch>> newDataToWrite = new LinkedList<Triple<Definition, Sequence<Record>, CountLatch>>();
         data.drainTo(newDataToWrite);
-        sequence(newDataToWrite).groupBy(first(Definition.class).then(Definition.functions.name)).mapConcurrently(new Function1<Group<String, Triple<Definition, Sequence<Record>, CountLatch>>, Number>() {
-            @Override
-            public Number call(Group<String, Triple<Definition, Sequence<Record>, CountLatch>> newData) throws Exception {
-                Definition firstDefinition = newData.head().first();
-                Definition definition = definition(firstDefinition.name(), mergeFields(newData));
 
-                Keyword<?> uniqueKeyword = uniqueFields(firstDefinition).head();
-                Sequence<Record> mergedRecords = priorityMergeBy(newData.flatMap(Callables.<Sequence<Record>>second()), uniqueKeyword);
-                return records.put(definition, update(using(uniqueKeyword), mergedRecords));
-            }
-        }).realise();
+        sequence(newDataToWrite).
+                groupBy(first(Definition.class).then(Definition.functions.name)).
+                eachConcurrently(new Block<Group<String, Triple<Definition, Sequence<Record>, CountLatch>>>() {
+                    @Override
+                    public void execute(final Group<String, Triple<Definition, Sequence<Record>, CountLatch>> newDataGroupedByDefinitionName) throws Exception {
+                        newDataGroupedByDefinitionName.
+                                groupBy(firstUniqueField()).
+                                forEach(new Block<Group<Keyword<?>, Triple<Definition, Sequence<Record>, CountLatch>>>() {
+                                    @Override
+                                    public void execute(Group<Keyword<?>, Triple<Definition, Sequence<Record>, CountLatch>> newDataGroupedByUnique) throws Exception {
+                                        Keyword<?> uniqueField = newDataGroupedByUnique.key();
+                                        String definitionName = newDataGroupedByDefinitionName.key();
+                                        Definition mergedDefinition = definition(definitionName, mergeFields(newDataGroupedByUnique));
+
+                                        Sequence<Record> mergedRecords = priorityMergeBy(newDataGroupedByUnique.flatMap(Callables.<Sequence<Record>>second()), uniqueField);
+
+                                        records.put(mergedDefinition, update(using(uniqueField), mergedRecords));
+                                    }
+                                });
+                    }
+                });
+
         for (Triple<Definition, Sequence<Record>, CountLatch> aNewData : newDataToWrite) {
             aNewData.third().countDown();
         }
     }
 
-    private Set<Keyword<?>> mergeFields(Group<String, Triple<Definition, Sequence<Record>, CountLatch>> data) {
+    private Callable1<Triple<Definition, Sequence<Record>, CountLatch>, Keyword<?>> firstUniqueField() {
+        return new Callable1<Triple<Definition, Sequence<Record>, CountLatch>, Keyword<?>>() {
+            @Override
+            public Keyword<?> call(Triple<Definition, Sequence<Record>, CountLatch> triple) throws Exception {
+                return uniqueFields(triple.first()).head();
+            }
+        };
+    }
+
+    private Set<Keyword<?>> mergeFields(Group<?, Triple<Definition, Sequence<Record>, CountLatch>> data) {
         final Set<Keyword<?>> mergedFields = new LinkedHashSet<Keyword<?>>();
         for (Triple<Definition, Sequence<Record>, CountLatch> trio : data) {
             mergedFields.addAll(trio.first().fields());
