@@ -1,4 +1,6 @@
-mvn:org.apache.lucene:lucene-core:jar|sources:3.6.2
+mvn:org.apache.lucene:lucene-core:jar|sources:4.5.1
+mvn:org.apache.lucene:lucene-analyzers-common:jar|sources:4.5.1
+mvn:org.apache.lucene:lucene-queryparser:jar|sources:4.5.1
 mvn:com.h2database:h2:jar:1.3.160
 
 mvn:cglib:cglib-nodep:jar:2.2
@@ -8,8 +10,8 @@ mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
 mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1155
-mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:pack|sources:270
-mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:pack|sources:728
+mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:pack|sources:272
+mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:pack|sources:732
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:pack|sources:167
 mvn://repo.bodar.com/com.googlecode.funclate:funclate:pack|sources:128
 mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:pack|sources:12
