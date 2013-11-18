@@ -18,6 +18,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import static com.googlecode.totallylazy.Functions.returns1;
@@ -32,18 +33,20 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
     public static final Regex UI_ROOT = regex("^.*\\/utterlyidle\\/");
     public static final Regex BG_ROOT = regex("^.*\\/barongreenback\\/");
     private final URL baseUrl;
+    private String dateFormat;
 
-    public StringTemplateGroupActivator(final MatchedResource matchedResource) {
-        this(makeRelativeToBaronGreenback(packageUrl(matchedResource.forClass())));
+    public StringTemplateGroupActivator(final MatchedResource matchedResource, Properties properties) {
+        this(makeRelativeToBaronGreenback(packageUrl(matchedResource.forClass())), properties);
+    }
+
+    public StringTemplateGroupActivator(URL baseUrl, Properties properties) {
+        this.baseUrl = baseUrl;
+        this.dateFormat = properties.getProperty("barongreenback.date.format");
     }
 
     private static URL makeRelativeToBaronGreenback(URL url) {
         String bgRoot = BG_ROOT.match(packageUrl(StringTemplateGroupActivator.class).toString()).group(0);
         return url(UI_ROOT.findMatches(url.toString()).replace(returns1(bgRoot)));
-    }
-
-    public StringTemplateGroupActivator(URL baseUrl) {
-        this.baseUrl = baseUrl;
     }
 
     public StringTemplateGroup call() throws Exception {
@@ -53,7 +56,7 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer("dashes", instanceOf(String.class), dashes());
         shared.registerRenderer(always(), Xml.escape());
         shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
-        shared.registerRenderer(instanceOf(Date.class), DateRenderer.toLexicalDateTime());
+        shared.registerRenderer(instanceOf(Date.class), dateFormat != null ? DateRenderer.toLexicalDateTime(dateFormat) : DateRenderer.toLexicalDateTime());
         shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer(shared));
         shared.registerRenderer("htmlDecode", Predicates.<Object>always(), HtmlEncodedMessage.functions.decode());
         shared.registerRenderer("urlEncode", Predicates.<Object>always(), encodeUrl());
