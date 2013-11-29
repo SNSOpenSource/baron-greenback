@@ -5,6 +5,9 @@
     <meta name="decorator" content="none"/>
 </head>
 <body>
-<form action="$url$" method="$method$" class="$name$"><input type="submit" class="$name$" value="$name$"/></form>
+<form action="$url$" method="$method$" class="$name$">
+    <input type="hidden" name="query" value="$query$"/>
+    <input type="submit" class="$name$" value="$name$"/>
+</form>
 </body>
 </html>

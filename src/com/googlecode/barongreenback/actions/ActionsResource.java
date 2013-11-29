@@ -50,9 +50,10 @@ public class ActionsResource {
         return model().add("actions", actions.toList());
     }
 
-    private Model action(final Uri uri, final String name, final String method) {
+    private Model action(final Uri uri, final String query, final String name, final String method) {
         return model().
                 add("name", name).
+                add("query", query).
                 add("url", uri).
                 add("method", method);
     }
@@ -60,13 +61,13 @@ public class ActionsResource {
     @GET
     @Path("export")
     public Model exportModel(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        return action(redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query))), "export", "GET");
+        return action(redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query))), query, "export", "GET");
     }
 
     @GET
     @Path("delete")
     public Model deleteModel(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query, Sequences.<String>empty()))), "delete", "POST");
+        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query, Sequences.<String>empty()))), query, "delete", "POST");
     }
 
 
