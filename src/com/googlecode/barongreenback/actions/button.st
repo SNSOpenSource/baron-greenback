@@ -6,7 +6,7 @@
 </head>
 <body>
 <form action="$url$" method="$method$" class="$name$">
-    <input type="hidden" name="query" value="$query$"/>
+    $if(query)$<input type="hidden" name="query" value="$query$"/>$endif$
     <input type="submit" class="$name$" value="$name$"/>
 </form>
 </body>

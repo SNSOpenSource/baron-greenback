@@ -1,10 +1,7 @@
 (function() {
     var actions = BGB.namespace('search.bulk.actions');
-    actions.allIdentifiers = function() {
-        return jQuery('div.actions form input').filter('[name="id"], [name="query"]');
-    };
     actions.removeAllIdentifiers = function() {
-        jQuery(actions.allIdentifiers()).remove();
+        jQuery('div.actions form input').filter('[name="id"]').remove();
     };
 
     actions.attach = function() {

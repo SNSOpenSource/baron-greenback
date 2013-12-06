@@ -132,7 +132,7 @@
 
         module('API');
         test('API provided', function () {
-            QUnit.ok(BGB.search.bulk.actions.allIdentifiers, 'Finds all ids used for bulk actions');
+            QUnit.ok(BGB.search.countSelectedRows, 'Finds all ids used for bulk actions');
             QUnit.ok(BGB.search.bulk.actions.removeAllIdentifiers, 'Removes all ids used for bulk actions');
             QUnit.ok(BGB.search.bulk.actions.attach, 'Attaches behaviour to results table');
         });

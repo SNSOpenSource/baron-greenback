@@ -51,11 +51,11 @@ public class ActionsResource {
     }
 
     private Model action(final Uri uri, final String query, final String name, final String method) {
-        return model().
+        final Model model = model().
                 add("name", name).
-                add("query", query).
                 add("url", uri).
                 add("method", method);
+        return method.equalsIgnoreCase("get") ? model.add("query", query) : model;
     }
 
     @GET
@@ -67,13 +67,13 @@ public class ActionsResource {
     @GET
     @Path("delete")
     public Model deleteModel(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query, Sequences.<String>empty()))), query, "delete", "POST");
+        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query, Sequences.<String>empty()))), null, "delete", "POST");
     }
 
 
     @POST
     @Path("delete")
-    public Response delete(@PathParam("view") String viewName, @FormParam("query") @DefaultValue("") String query) {
+    public Response delete(@PathParam("view") String viewName, @QueryParam("query") @DefaultValue("") String query) {
         recordsService.delete(viewName, query);
         return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
     }

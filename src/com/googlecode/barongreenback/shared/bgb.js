@@ -21,3 +21,8 @@ BGB.namespace = function() {
 BGB.namespace('search').rowCount = function() {
     return jQuery('ul.nav-tabs li.active a.tab span.count').text().replace(/[^0-9]/g, '');
 };
+
+BGB.namespace('search').countSelectedRows = function() {
+    var selectedRows = jQuery('.orders .actions form:first-child input[name="id"]').length;
+    return selectedRows || BGB.search.rowCount();
+};
