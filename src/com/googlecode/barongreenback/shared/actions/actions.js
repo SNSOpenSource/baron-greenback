@@ -27,15 +27,18 @@
             BGB.search.bulk.actions.removeAllIdentifiers();
             jQuery('div.actions form').append('<input type="hidden" name="query" value="' + jQuery('meta[name="query"]').attr('content') + '">');
             jQuery('.table-actions .message').text('All ' + BGB.search.rowCount() +' rows are selected');
-
+            BGB.search.allPagesSelected = true;
             return false;
         });
         jQuery('.selectors a.clearSelection').click(function() {
             jQuery('table.results tr.selected >td:first-child').click();
             BGB.search.bulk.actions.removeAllIdentifiers();
+            BGB.search.allPagesSelected = false;
             return false;
         });
     };
 })();
 
-jQuery(document).ready(BGB.search.bulk.actions.attach);
+jQuery(document).ready(function() {
+    BGB.search.bulk.actions.attach();
+});
