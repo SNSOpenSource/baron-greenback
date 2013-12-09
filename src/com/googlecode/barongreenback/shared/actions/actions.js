@@ -20,6 +20,7 @@
         jQuery('.selectors a.selectPage').click(function() {
             jQuery('table.results tbody tr').removeClass('selected');
             jQuery('table.results tbody td:first-child').click();
+            BGB.search.allPagesSelected = false;
             return false;
         });
         jQuery('.selectors a.selectAll').click(function() {
