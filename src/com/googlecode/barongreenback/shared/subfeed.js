@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     speed = "normal";
 
-    $("input.subfeed").live('click', function() {
+    $("input.subfeed").click(function() {
         var keywordDefinition = new KeywordDefinition($(this).closest("div.keywordDefinition"), "div.recordDefinitionTemplate", "input.subfeedPrefix");
 
         if (this.checked) {
@@ -11,7 +11,7 @@ $(document).ready(function() {
             keywordDefinition.hideSubfeed();
         }
     });
-    $("input.more").live("click", function() {
+    $("input.more").click(function() {
         var ol = $(this).parent().children("ol")[0];
         var template = $(ol).children("li.keywordTemplate")[0];
         var nextIndex = $(ol).children().length;
@@ -31,7 +31,7 @@ $(document).ready(function() {
         }
     });
 
-    $(".closeIcon").live("click", function() {
+    $(".closeIcon").click(function() {
         var li = $(this).parent().parent();
         var ol = li.parent();
         li.remove();

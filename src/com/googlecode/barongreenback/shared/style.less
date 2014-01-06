@@ -5,14 +5,29 @@
 @baseLineHeight:          14px;
 @blur-radius: 3px;
 
+html, body {
+  overflow: hidden !important;
+}
+
 .content {
     z-index: 0;
-    position: relative;
+    position: absolute !important;
+    overflow-y: auto !important;
+    top: 41px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
 }
 
 .navbar {
     z-index: 10;
-    position: relative;
+    position: absolute !important;
+    top: 0px !important;
+    left: 0px !important;
+}
+
+#results {
+  position:relative;
 }
 
 .border-radius {
@@ -156,7 +171,7 @@ div.container, .container {
 }
 
 .content {
-    margin: 10px;
+    padding: 10px;
 }
 
 .shadow(#D3D3D3); // Dan: Fixes wierd bug in less.js where it can't find .border-radius in next section
@@ -494,6 +509,7 @@ div.table-actions form {
 /* Tablesorter css, removed from Bootstrap 2.0 */
 table .header {
     cursor: pointer;
+    background-color: #ffffff !important;
 }
 table .header:after {
   content: "";

@@ -30,9 +30,11 @@
     $include.({$base$views/menu?current=$meta.view$&query=$urlEncode(htmlDecode(meta.query))$}).body$
     $body$
 </div>
-<script type="text/javascript" src="$base$baron-greenback/shared/jquery-1.6.4.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/jquery-1.10.2.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="$base$baron-greenback/shared/jquery-ui-1.8.16.custom.min.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/jquery-ui-1.10.3.custom.min.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/FixedHeader.nightly.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/bgb.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/subfeed.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/expander/expander.js"></script>

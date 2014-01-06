@@ -29,3 +29,66 @@ BGB.namespace('search').selectedRowCount = function() {
 };
 
 BGB.namespace('search').allPagesSelected = false;
+
+$(document).ready(function() {
+    var navbarHeight = $('.navbar').height();
+    $('.content').css('top', navbarHeight + 'px');
+
+    var resultsTable = $('#results > table').dataTable({
+        'bPaginate': false,
+        'bSearchable' : false,
+        'bFilter': false,
+        'bSort': false,
+        'bInfo': false,
+        'bAutoWidth': false,
+        'sScrollY': '',
+        'sScrollX': '',
+        'bSortClasses': false
+    });
+
+    new FixedHeader(resultsTable, { offsetTop: navbarHeight });
+    $('.dataTables_wrapper').css('position', '');
+
+    $('div.fixedHeader').css({
+        'position': 'absolute',
+        'top': '0px',
+        'left': '0px'
+    });
+
+    $('#results').append($('div.fixedHeader').detach());
+
+    var updateFixedHeaderPosition = function() {
+        navbarHeight = $('.navbar').height();
+        var resultsTop = $('#results').offset().top;
+        var newTop;
+        if (resultsTop < navbarHeight) {
+            newTop = resultsTop < 0 ? (-resultsTop) + navbarHeight : navbarHeight - resultsTop;
+        } else {
+            newTop = 0;
+        }
+        $('div.fixedHeader').css({
+            'top': newTop + 'px',
+            'left': '0px'
+        });
+    }
+
+    $('.content').scroll(updateFixedHeaderPosition);
+
+    $(window).resize(function () {
+        var tableWidth = $("table.results").outerWidth();
+
+        $(".FixedHeader_Header").width(tableWidth);
+        $(".FixedHeader_Header > table").width(tableWidth);
+
+        var columnsWidths = [];
+        $('.dataTables_wrapper th').each(function() {
+            columnsWidths.push($(this).width());
+        });
+
+        var fixedHeaderCells = $('.FixedHeader_Header th')
+        for (var count = 0; count < columnsWidths.length; count++) {
+            $(fixedHeaderCells[count]).css('width', columnsWidths[count] + 'px');
+        }
+        updateFixedHeaderPosition();
+    });
+});
