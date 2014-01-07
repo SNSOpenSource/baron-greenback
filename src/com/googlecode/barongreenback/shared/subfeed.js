@@ -19,9 +19,6 @@ $(document).ready(function() {
         var newKeyword = $(html).hide().insertBefore(template);
         newKeyword.show().css({display:'list-item'});
     });
-    $("table.results:not(.paged)").tablesorter({ sortList: [
-        [0,1]
-    ] });
 
     $("form > fieldset > ol.fields").sortable({
         placeholder: "placeholder",

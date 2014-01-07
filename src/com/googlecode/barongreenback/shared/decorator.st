@@ -31,7 +31,6 @@
     $body$
 </div>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-1.10.2.min.js"></script>
-<script type="text/javascript" src="$base$baron-greenback/shared/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-ui-1.10.3.custom.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/FixedHeader.nightly.min.js"></script>

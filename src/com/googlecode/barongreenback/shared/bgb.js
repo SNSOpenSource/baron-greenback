@@ -31,19 +31,38 @@ BGB.namespace('search').selectedRowCount = function() {
 BGB.namespace('search').allPagesSelected = false;
 
 $(document).ready(function() {
+    $.fn.dataTableExt.oSort['string-pre'] = function (h) {
+        if(typeof h != "string")  h = h !== null && h.toString ? h.toString() : "";
+        return h;
+    }
+
+    $.fn.dataTableExt.oStdClasses['sSortAsc'] = 'headerSortDown';
+    $.fn.dataTableExt.oStdClasses['sSortDesc'] = 'headerSortUp';
+
+
     var navbarHeight = $('.navbar').height();
     $('.content').css('top', navbarHeight + 'px');
 
+    var currentSort = $('th.headerSortUp, th.headerSortDown').map(function(collectionIndex, elem){
+        return [$(elem).index(), $(elem).hasClass('headerSortUp') ? 'desc' : 'asc'];
+    });
+
+    var clientSideSort = $('#results > table.paged').length == 0;
     var resultsTable = $('#results > table').dataTable({
         'bPaginate': false,
         'bSearchable' : false,
         'bFilter': false,
-        'bSort': false,
+        'bSort': clientSideSort,
+        'aaSorting': [currentSort || [0, 'asc']],
         'bInfo': false,
         'bAutoWidth': false,
         'sScrollY': '',
         'sScrollX': '',
         'bSortClasses': false
+    });
+
+    $('#results table th a').click(function (event) {
+        event.stopPropagation();
     });
 
     new FixedHeader(resultsTable, { offsetTop: navbarHeight });
