@@ -35,6 +35,7 @@
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/FixedHeader.nightly.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/bgb.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/tables.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/subfeed.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/expander/expander.js"></script>
 </body>
