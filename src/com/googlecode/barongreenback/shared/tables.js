@@ -1,4 +1,8 @@
 $(document).ready(function() {
+    if($('#results > table').length == 0) {
+        return;
+    }
+
     $.fn.dataTableExt.oSort['string-pre'] = function (h) {
         if(typeof h != "string")  h = h !== null && h.toString ? h.toString() : "";
         return h;
