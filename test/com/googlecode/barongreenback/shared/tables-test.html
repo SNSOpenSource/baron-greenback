@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Tables test</title>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.10.0.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture">
+    <div id="results">
+        <table class="results table table-striped">
+            <thead>
+            <tr>
+                <th class="Foo blue Foo header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Foo&amp;page.sort.direction=asc">Foo</a></th>
+                <th class="Id blue Id header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Id&amp;page.sort.direction=asc">Id</a></th>
+                <th class="Last Modified Date green Last_Modified_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Last+Modified+Date">Last Modified Date</a>
+                </th>
+                <th class="Created Date orange Created_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Created+Date">Created Date</a></th>
+                <th class="Received Date purple Received_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Received+Date">Received Date</a></th>
+                <th class="Completed Date blue Completed_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Completed+Date">Completed Date</a></th>
+                <th class="Committed Date green Committed_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Committed+Date">Committed Date</a></th>
+                <th class="Requested Delivery Date orange Requested_Delivery_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Requested+Delivery+Date">Requested Delivery
+                    Date</a></th>
+                <th class="Expiry Date purple Expiry_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Expiry+Date">Expiry Date</a></th>
+                <th class="Status Date blue Status_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Status+Date">Status Date</a></th>
+                <th class="Last Created Date green Last_Created_Date  header"><a
+                        href="?query=&amp;page.rows=4&amp;page.sort.column=Last+Created+Date">Last Created Date</a></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="Foo">First column is always automatically sorted</td>
+                <td class="Id"><a href='/somserver?query=Id%3A%2249467548%22'>49467548</a></td>
+                <td class="Last_Modified_Date"></td>
+                <td class="Created_Date">29/04/13 10:08:46</td>
+                <td class="Received_Date"></td>
+                <td class="Completed_Date"></td>
+                <td class="Committed_Date"></td>
+                <td class="Requested_Delivery_Date">09/05/13 01:00:00</td>
+                <td class="Expiry_Date"></td>
+                <td class="Status_Date"></td>
+                <td class="Last_Created_Date">29/04/13 10:08:53</td>
+            </tr>
+            <tr>
+                <td class="Foo">First column is always automatically sorted</td>
+                <td class="Id"><a href='/somserver?query=Id%3A%2249374669%22'>49374669</a></td>
+                <td class="Last_Modified_Date"></td>
+                <td class="Created_Date">24/04/13 10:58:33</td>
+                <td class="Received_Date"></td>
+                <td class="Completed_Date"></td>
+                <td class="Committed_Date"></td>
+                <td class="Requested_Delivery_Date">09/05/13 01:00:00</td>
+                <td class="Expiry_Date"></td>
+                <td class="Status_Date"></td>
+                <td class="Last_Created_Date">24/04/13 10:58:35</td>
+            </tr>
+            <tr>
+                <td class="Foo">First column is always automatically sorted</td>
+                <td class="Id"><a href='/somserver?query=Id%3A%2249454772%22'>49454772</a></td>
+                <td class="Last_Modified_Date"></td>
+                <td class="Created_Date">28/04/13 10:04:47</td>
+                <td class="Received_Date"></td>
+                <td class="Completed_Date"></td>
+                <td class="Committed_Date"></td>
+                <td class="Requested_Delivery_Date">14/05/13 01:00:00</td>
+                <td class="Expiry_Date"></td>
+                <td class="Status_Date"></td>
+                <td class="Last_Created_Date">28/04/13 10:04:49</td>
+            </tr>
+            <tr>
+                <td class="Foo">First column is always automatically sorted</td>
+                <td class="Id"><a href='/somserver?query=Id%3A%229487149%22'>9487149</a></td>
+                <td class="Last_Modified_Date">06/10/08 17:28:38</td>
+                <td class="Created_Date">26/09/08 08:51:14</td>
+                <td class="Received_Date">26/09/08 08:51:12</td>
+                <td class="Completed_Date"></td>
+                <td class="Committed_Date"></td>
+                <td class="Requested_Delivery_Date"></td>
+                <td class="Expiry_Date"></td>
+                <td class="Status_Date"></td>
+                <td class="Last_Created_Date"></td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="http://code.jquery.com/qunit/qunit-1.10.0.js"></script>
+<script>
+    var addProdFiles = function (files, callback) {
+        if (files.length == 1) {
+            var testUri = document.location.href.replace('test', 'src');
+            var resourceUri = testUri.slice(0, testUri.lastIndexOf('/') + 1) + files[0];
+            var scriptNode = document.createElement("script");
+            scriptNode.setAttribute("src", resourceUri);
+            scriptNode.onload = callback;
+            document.head.appendChild(scriptNode);
+        } else {
+            // [fileA, fileB] CB -> addProdFiles ([fileA], addProdFile([fileB], CB))
+            var nextFile = files.pop();
+            addProdFiles(files, function () {
+                addProdFiles([nextFile], callback)
+            });
+        }
+    };
+
+
+    addProdFiles(['jquery-1.10.2.min.js', 'sugar.min.js', 'jquery.dataTables.min.js', 'FixedHeader.nightly.min.js', 'bgb.js', 'tables.js'], function () {
+
+        var header = function (headerName) {
+            return $('th.' + headerName).first();
+        }
+
+        var column = function (columnName) {
+            return $('td.' + columnName).first();
+        }
+
+        QUnit.config.reorder = false;
+
+        module('Numeric ordering');
+        test('Clicking the header of a numeric column orders it correctly', function () {
+            header('Id').first().click();
+            QUnit.equal(column('Id').text(), '9487149');
+            header('Id').first().click();
+            QUnit.equal(column('Id').text(), '49467548');
+        });
+
+        module('Date ordering');
+        test('Clicking the header of a date column orders it correctly', function () {
+            BGB.tables.init();
+            header('Created_Date').click();
+            QUnit.equal(column('Created_Date').text(), '26/09/08 08:51:14');
+            header('Created_Date').click();
+            QUnit.equal(column('Created_Date').text(), '29/04/13 10:08:46');
+        });
+    });
+</script>
+</body>
+</html>
