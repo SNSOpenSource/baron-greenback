@@ -83,9 +83,6 @@ BGB.namespace('tables').init = function () {
         return;
     }
 
-    var navbarHeight = $('.navbar').height();
-    $('.content').css('top', navbarHeight + 'px');
-
     var currentSort = $('th.headerSortUp, th.headerSortDown').map(function (collectionIndex, elem) {
         return [$(elem).index(), $(elem).hasClass('headerSortUp') ? 'desc' : 'asc'];
     });
@@ -105,9 +102,9 @@ BGB.namespace('tables').init = function () {
         event.stopPropagation();
     });
 
-    new FixedHeader(resultsTable, { offsetTop: navbarHeight });
+    new FixedHeader(resultsTable, { offsetTop: $('.navbar').height()});
     $('div.dataTables_wrapper').css('position', '');
-    var startingTop = $('table.results').position().top
+    var startingTop = $('table.results').position().top;
 
     $('div.fixedHeader').css({
         'position': 'absolute',
@@ -120,14 +117,15 @@ BGB.namespace('tables').init = function () {
     $('div.dataTables_wrapper').after($('div.fixedHeader').detach());
 
     var updateFixedHeaderPosition = function () {
-        navbarHeight = $('.navbar').height();
+        var navbarHeight = $('.navbar').height();
 
+        var scrolled = $(window).scrollTop();
         var resultsTop = $('div.dataTables_wrapper').offset().top;
-        var newTop;
-        if (resultsTop < navbarHeight) {
-            newTop = navbarHeight - resultsTop + startingTop;
-        } else {
-            newTop = $('div.dataTables_wrapper').position().top;
+        var offsetAfterScroll = (resultsTop - scrolled);
+
+        var newTop = $('div.dataTables_wrapper').position().top;
+        if (offsetAfterScroll < navbarHeight) {
+            newTop += navbarHeight - offsetAfterScroll;
         }
 
         $('div.fixedHeader').css({
@@ -135,9 +133,9 @@ BGB.namespace('tables').init = function () {
             'top': newTop + 'px',
             'left': 'auto'
         });
-    }
+    };
 
-    $('.content').scroll(updateFixedHeaderPosition);
+    $(window).scroll(updateFixedHeaderPosition);
 
     $(window).resize(function () {
         if ($(".FixedHeader_Header").length == 0) {
