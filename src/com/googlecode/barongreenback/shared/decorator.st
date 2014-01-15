@@ -31,7 +31,7 @@
     $body$
 </div>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-1.10.2.min.js"></script>
-<script type="text/javascript" src="$base$baron-greenback/shared/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/jquery-migrate-1.2.1.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-ui-1.10.3.custom.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/sugar.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery.dataTables.min.js"></script>
