@@ -97,6 +97,8 @@ BGB.namespace('tables').init = (function () {
             'top': newTop + 'px',
             'left': 'auto'
         });
+
+        $('div.fixedHeader').slideDown('fast');
     };
 
     var registerAfterDrawCallback = function (table, funct) {
@@ -150,7 +152,22 @@ BGB.namespace('tables').init = (function () {
     };
 
     var registerWindowEvents = function () {
-        $(window).scroll(updateFixedHeaderPosition);
+
+        var lastVerticalScroll = $(window).scrollTop();
+        $(window).scroll(function() {
+            var verticalScrollAmount = $(window).scrollTop();
+            if (verticalScrollAmount === lastVerticalScroll) {
+                $('div.fixedHeader').css({
+                    'position': 'absolute',
+                    'left': 'auto'
+                });
+                return;
+            }
+            lastVerticalScroll = verticalScrollAmount;
+            $('div.fixedHeader').hide();
+            clearTimeout($.data(this, 'scrollTimer'));
+            $.data(this, 'scrollTimer', setTimeout(updateFixedHeaderPosition, 500));
+        });
 
         $(window).resize(function () {
             if ($(".FixedHeader_Header").length == 0) {
@@ -179,6 +196,7 @@ BGB.namespace('tables').init = (function () {
         initDataTables();
         initFixedHeader();
         registerWindowEvents();
+        updateFixedHeaderPosition();
     };
 })();
 
