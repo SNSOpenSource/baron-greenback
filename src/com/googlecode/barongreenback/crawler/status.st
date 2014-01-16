@@ -1,5 +1,6 @@
 <html>
 <head>
+    <title>Crawler Status</title>
     <meta http-equiv="refresh" content="3"/>
 </head>
 <body>
