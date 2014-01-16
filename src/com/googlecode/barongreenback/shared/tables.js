@@ -109,8 +109,12 @@ BGB.namespace('tables').init = (function () {
         });
     };
 
+    var interestedTables = function() {
+        return $('table.results:not(.static)');
+    }
+
     var initFixedHeader = function () {
-        if ($('table.results').length == 0) {
+        if (interestedTables().length == 0) {
             return;
         }
 
@@ -118,8 +122,8 @@ BGB.namespace('tables').init = (function () {
             return [$(elem).index(), $(elem).hasClass('headerSortUp') ? 'desc' : 'asc'];
         });
 
-        var clientSideSort = $('table.results.paged').length == 0;
-        var resultsTable = $('table.results').dataTable({
+        var clientSideSort = interestedTables().filter('.paged').length == 0;
+        var resultsTable = interestedTables().dataTable({
             'bPaginate': false,
             'bFilter': false,
             'bSort': clientSideSort,
@@ -129,7 +133,7 @@ BGB.namespace('tables').init = (function () {
             'bSortClasses': false
         });
 
-        $('table.results:not(.paged) th a').click(function (event) {
+        interestedTables().filter(':not(.paged)').find('th a').click(function (event) {
             event.stopPropagation();
         });
 
@@ -140,7 +144,7 @@ BGB.namespace('tables').init = (function () {
 
 
         $('div.dataTables_wrapper').css('position', '');
-        var startingTop = $('table.results').position().top;
+        var startingTop = interestedTables().position().top;
 
         $('div.fixedHeader').css({
             'position': 'absolute',
@@ -149,6 +153,8 @@ BGB.namespace('tables').init = (function () {
         });
 
         $('div.dataTables_wrapper').after($('div.fixedHeader').detach());
+
+        updateFixedHeaderPosition();
     };
 
     var registerWindowEvents = function () {
@@ -174,7 +180,7 @@ BGB.namespace('tables').init = (function () {
                 return;
             }
 
-            var tableWidth = $("table.results").outerWidth();
+            var tableWidth = interestedTables().outerWidth();
 
             $(".FixedHeader_Header").width(tableWidth);
             $(".FixedHeader_Header > table").width(tableWidth);
@@ -196,7 +202,6 @@ BGB.namespace('tables').init = (function () {
         initDataTables();
         initFixedHeader();
         registerWindowEvents();
-        updateFixedHeaderPosition();
     };
 })();
 

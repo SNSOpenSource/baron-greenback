@@ -144,6 +144,14 @@
             header('Created_Date').click();
             QUnit.equal(column('Created_Date').text(), '29/04/13 10:08:46');
         });
+
+        module('Ignores static tables');
+        test('A table with static is not decorated', function () {
+            $('#qunit-fixture table').addClass('static');
+            BGB.tables.init();
+            QUnit.equal($('#qunit-fixture div.dataTables_wrapper').length, 0);
+            QUnit.equal($('#qunit-fixture div.FixedHeader_Header').length, 0);
+        });
     });
 </script>
 </body>
