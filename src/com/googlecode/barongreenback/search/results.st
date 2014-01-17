@@ -14,14 +14,14 @@ $if(results)$
     </table>
 </div>
 <div class="table-actions">
+    <div class="pagination-controls">
+        $pager$
+    </div>
     <div class="selectors">
         <a href="#" class="clearSelection">Clear Selection</a>
         <a href="#" class="selectPage">Select Page</a>
         <a href="#" class="selectAll">Select All Pages</a>
         <span class="message"></span>
-    </div>
-    <div class="pagination-controls">
-        $pager$
     </div>
 </div>
 
