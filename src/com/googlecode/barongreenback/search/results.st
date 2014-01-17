@@ -18,7 +18,7 @@ $if(results)$
         <a href="#" class="clearSelection">Clear Selection</a>
         <a href="#" class="selectPage">Select Page</a>
         <a href="#" class="selectAll">Select All Pages</a>
-        <div class="message"></div>
+        <span class="message"></span>
     </div>
     <div class="pagination-controls">
         $pager$
