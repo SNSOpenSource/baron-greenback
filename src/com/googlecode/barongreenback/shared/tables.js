@@ -176,7 +176,6 @@ BGB.namespace('tables').init = (function () {
         });
 
         var resizeHandler = function() {
-            $('div.fixedHeader').hide();
             if ($("div.fixedHeader").length == 0) {
                 return;
             }
@@ -199,7 +198,9 @@ BGB.namespace('tables').init = (function () {
         }
 
         $(window).resize(function () {
-            setTimeout(resizeHandler, 500);
+            $('div.fixedHeader').hide();
+            clearTimeout($.data(this, 'resizeTimer'));
+            $.data(this, 'resizeTimer', setTimeout(resizeHandler, 500));
         });
     };
 
