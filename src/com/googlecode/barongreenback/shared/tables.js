@@ -175,26 +175,31 @@ BGB.namespace('tables').init = (function () {
             $.data(this, 'scrollTimer', setTimeout(updateFixedHeaderPosition, 500));
         });
 
-        $(window).resize(function () {
-            if ($(".FixedHeader_Header").length == 0) {
+        var resizeHandler = function() {
+            $('div.fixedHeader').hide();
+            if ($("div.fixedHeader").length == 0) {
                 return;
             }
 
             var tableWidth = interestedTables().outerWidth();
 
-            $(".FixedHeader_Header").width(tableWidth);
-            $(".FixedHeader_Header > table").width(tableWidth);
+            $("div.fixedHeader").width(tableWidth);
+            $("div.fixedHeader > table").width(tableWidth);
 
             var columnsWidths = [];
             $('.dataTables_wrapper th').each(function () {
                 columnsWidths.push($(this).width());
             });
 
-            var fixedHeaderCells = $('.FixedHeader_Header th')
+            var fixedHeaderCells = $('div.fixedHeader th')
             for (var count = 0; count < columnsWidths.length; count++) {
                 $(fixedHeaderCells[count]).css('width', columnsWidths[count] + 'px');
             }
             updateFixedHeaderPosition();
+        }
+
+        $(window).resize(function () {
+            setTimeout(resizeHandler, 500);
         });
     };
 
