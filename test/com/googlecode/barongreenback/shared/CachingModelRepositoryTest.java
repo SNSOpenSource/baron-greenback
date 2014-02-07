@@ -9,12 +9,14 @@ import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Sequence;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.UUID;
 
 import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,12 +29,14 @@ public class CachingModelRepositoryTest {
     private ModelRepository cachingModelRepository;
     private Model model;
     private UUID key;
+    private RecordsModelRepository modelRepository;
 
     @Before
     public void setUp() throws Exception {
         records = new MemoryRecords(new StringMappings().add(Model.class, new ModelMapping()));
         cache = new ModelCache();
-        cachingModelRepository = new CachingModelRepository(new RecordsModelRepository(BaronGreenbackRecords.records(records)), cache);
+        modelRepository = new RecordsModelRepository(BaronGreenbackRecords.records(records));
+        cachingModelRepository = new CachingModelRepository(modelRepository, cache);
         model = model().add("key", "someValue");
         key = UUID.randomUUID();
     }
@@ -72,6 +76,18 @@ public class CachingModelRepositoryTest {
         Pair<UUID, Model> result = cachingModelRepository.find(where(ModelRepository.MODEL, Predicates.is(model))).head();
         assertThat(result.first(), is(key));
         assertThat(result.second(), is(model));
+    }
+
+    @Test
+    public void findShouldInitializeValuesFromRepositoryToCache() throws Exception {
+        Model anotherModel = model.copy().set("key", "someOtherValue");
+        final UUID anotherKey = UUID.randomUUID();
+        modelRepository.set(anotherKey, anotherModel);
+
+        cachingModelRepository.set(key, model);
+
+        final Sequence<Pair<UUID, Model>> models = cachingModelRepository.find(always());
+        assertThat(models.size(), is(2));
     }
 
     @Test
