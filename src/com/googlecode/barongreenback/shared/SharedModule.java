@@ -36,8 +36,7 @@ public class SharedModule implements ApplicationScopedModule, ResponseHandlersMo
         return container.
                 addActivator(TemplateName.class, TemplateNameActivator.class).
                 addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class).
-                add(ModelRepository.class, RecordsModelRepository.class).
-                decorate(ModelRepository.class, CachingModelRepository.class).
+                addActivator(ModelRepository.class, ModelRepositoryActivator.class).
                 addActivator(AdvancedMode.class, AdvancedModeActivator.class);
     }
 
