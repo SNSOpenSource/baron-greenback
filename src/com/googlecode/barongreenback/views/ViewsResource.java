@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.views;
 
+import com.googlecode.barongreenback.persistence.Types;
 import com.googlecode.barongreenback.search.RecordsService;
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.Forms;
@@ -53,12 +54,14 @@ public class ViewsResource {
     private final ModelRepository modelRepository;
     private final RecordsService recordsService;
     private final ViewsExecutor viewsExecutor;
+    private final Types types;
 
-    public ViewsResource(Redirector redirector, ModelRepository modelRepository, RecordsService recordsService, ViewsExecutor viewsExecutor) {
+    public ViewsResource(Redirector redirector, ModelRepository modelRepository, RecordsService recordsService, ViewsExecutor viewsExecutor, Types types) {
         this.redirector = redirector;
         this.modelRepository = modelRepository;
         this.recordsService = recordsService;
         this.viewsExecutor = viewsExecutor;
+        this.types = types;
     }
 
     @GET
@@ -77,7 +80,7 @@ public class ViewsResource {
     @GET
     @Path("new")
     public Model create() {
-        return Forms.emptyForm(NUMBER_OF_FIELDS);
+        return Forms.emptyForm(NUMBER_OF_FIELDS, types);
     }
 
     @POST
@@ -89,7 +92,7 @@ public class ViewsResource {
     @GET
     @Path("edit")
     public Model edit(@QueryParam("id") UUID id) {
-        return addTemplates(modelRepository.get(id).get());
+        return addTemplates(modelRepository.get(id).get(), types);
     }
 
     @POST

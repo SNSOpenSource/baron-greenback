@@ -2,13 +2,9 @@ package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
 import com.googlecode.barongreenback.persistence.sql.SqlModule;
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScopedModule;
-import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.IgnoreLogger;
 import com.googlecode.lazyrecords.Logger;
 import com.googlecode.lazyrecords.lucene.Persistence;
-import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.jobs.UtterlyIdleRecords;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
@@ -22,16 +18,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
 import static com.googlecode.yadic.Containers.addIfAbsent;
-import static com.googlecode.yadic.Containers.addInstanceIfAbsent;
 
-public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule, BaronGreenbackRequestScopedModule {
+public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule {
 
     @Override
     public Container addPerRequestObjects(final Container container) throws Exception {
         addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
+        addActivatorIfAbsent(container, BaronGreenbackStringMappings.class, BaronGreenbackStringMappingsActivator.class);
         addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
         addActivatorIfAbsent(container, UtterlyIdleRecords.class, UtterlyIdleRecordsActivator.class);
-        addActivatorIfAbsent(container, BaronGreenbackStringMappings.class, BaronGreenbackStringMappingsActivator.class);
+        addActivatorIfAbsent(container, Types.class, InMemoryTypesActivator.class);
         return container;
     }
 
@@ -58,13 +54,6 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         PersistenceUri persistenceUri = application.applicationScope().get(PersistenceUri.class);
         application.add(modules.get(persistenceUri.scheme()));
         return application;
-    }
-
-    @Override
-    public BaronGreenbackRequestScope addBaronGreenbackPerRequestObjects(BaronGreenbackRequestScope bgbRequestScope) {
-        Container container = bgbRequestScope.value();
-        addInstanceIfAbsent(container, StringMappings.class, new StringMappings().add(Model.class, new ModelMapping()));
-        return bgbRequestScope;
     }
 
     public static class UtterlyIdleRecordsActivator implements Callable<UtterlyIdleRecords> {

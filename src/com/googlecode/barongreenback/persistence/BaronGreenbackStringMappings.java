@@ -1,17 +1,35 @@
 package com.googlecode.barongreenback.persistence;
 
+import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.mappings.StringMapping;
 import com.googlecode.lazyrecords.mappings.StringMappings;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Value;
 
-public class BaronGreenbackStringMappings implements Value<StringMappings> {
-    private final StringMappings mappings;
+import static com.googlecode.totallylazy.Sequences.sequence;
 
-    private BaronGreenbackStringMappings(StringMappings mappings) {
-        this.mappings = mappings;
+public class BaronGreenbackStringMappings implements Value<StringMappings> {
+    private StringMappings mappings;
+
+    private BaronGreenbackStringMappings(StringMappings mappings, Types types) {
+        this.mappings = mappings.add(Model.class, new ModelMapping());
+        final Sequence<Pair<Class<?>, StringMapping>> additionalMappings = sequence(types.mappings()).map(asStringMapping());
+        
+        for (Pair<Class<?>, StringMapping> mapping : additionalMappings) {
+            this.mappings = this.mappings.add(mapping.first(), mapping.second());
+        }
     }
 
-    public static BaronGreenbackStringMappings baronGreenbackStringMappings(StringMappings mappings) {
-        return new BaronGreenbackStringMappings(mappings);
+    private Function1<Pair<Class<?>, Callable1<StringMappings, StringMapping>>, Pair<Class<?>, StringMapping>> asStringMapping() {
+        return Callables.second(Callables.<StringMappings, StringMapping>callWith(this.mappings));
+    }
+
+    public static BaronGreenbackStringMappings baronGreenbackStringMappings(StringMappings mappings, Types types) {
+        return new BaronGreenbackStringMappings(mappings, types);
     }
 
     @Override

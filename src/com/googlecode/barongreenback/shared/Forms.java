@@ -1,11 +1,10 @@
 package com.googlecode.barongreenback.shared;
 
+import com.googlecode.barongreenback.persistence.Types;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequences;
 
-import java.net.URI;
-import java.util.Date;
 import java.util.List;
 
 import static com.googlecode.funclate.Model.mutable.model;
@@ -26,8 +25,8 @@ public class Forms {
                         add("record", definition));
     }
 
-    public static Model emptyForm(Integer numberOfFields) {
-        return addTemplates(crawler("", "", "", "", "", "", false, emptyDefinition(numberOfFields(numberOfFields))));
+    public static Model emptyForm(Integer numberOfFields, Types types) {
+        return addTemplates(crawler("", "", "", "", "", "", false, emptyDefinition(numberOfFields(numberOfFields))), types);
     }
 
     public static Model emptyKeyword() {
@@ -42,7 +41,7 @@ public class Forms {
         return RecordDefinition.recordDefinition("", Sequences.repeat(emptyKeyword()).take(number).toArray(Model.class));
     }
 
-    public static List<Model> types(Class... classes) {
+    public static List<Model> types(List<Class<?>> classes) {
         return Sequences.sequence(classes).map(new Callable1<Class, Model>() {
             public Model call(Class aClass) throws Exception {
                 return model().
@@ -53,17 +52,17 @@ public class Forms {
         }).toList();
     }
 
-    public static Model addTemplates(Model model) {
+    public static Model addTemplates(Model model, Types types) {
         return model.add("emptyKeyword", emptyKeyword()).
-                add("types", types(String.class, Date.class, URI.class));
+                add("types", types(types.types()));
     }
 
     public static class functions {
-        public static Callable1<Model, Model> addTemplates() {
+        public static Callable1<Model, Model> addTemplates(final Types types) {
             return new Callable1<Model, Model>() {
                 @Override
                 public Model call(Model model) throws Exception {
-                    return Forms.addTemplates(model);
+                    return Forms.addTemplates(model, types);
                 }
             };
         }

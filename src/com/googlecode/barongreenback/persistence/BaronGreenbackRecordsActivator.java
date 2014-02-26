@@ -2,6 +2,7 @@ package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Records;
+import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.yadic.Container;
 
 import java.util.concurrent.Callable;
@@ -15,6 +16,6 @@ public class BaronGreenbackRecordsActivator implements Callable<BaronGreenbackRe
 
     @Override
     public BaronGreenbackRecords call() throws Exception {
-        return BaronGreenbackRecords.records(requestScope.get(Records.class));
+        return BaronGreenbackRecords.records(requestScope.addInstance(StringMappings.class, requestScope.get(BaronGreenbackStringMappings.class).value()).get(Records.class));
     }
 }
