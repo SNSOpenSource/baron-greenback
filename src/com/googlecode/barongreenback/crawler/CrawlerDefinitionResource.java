@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
-import com.googlecode.barongreenback.persistence.Types;
+import com.googlecode.barongreenback.persistence.PersistentTypes;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.barongreenback.views.ViewsRepository;
@@ -52,16 +52,16 @@ public class CrawlerDefinitionResource {
     private final PrintStream log;
     private final CrawlerRepository repository;
     private final ViewsRepository viewsRepository;
-    private final Types types;
+    private final PersistentTypes persistentTypes;
 
-    public CrawlerDefinitionResource(CrawlerRepository repository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log, ViewsRepository viewsRepository, Types types) {
+    public CrawlerDefinitionResource(CrawlerRepository repository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log, ViewsRepository viewsRepository, PersistentTypes persistentTypes) {
         this.interval = interval;
         this.redirector = redirector;
         this.crawler = crawler;
         this.log = log;
         this.repository = repository;
         this.viewsRepository = viewsRepository;
-        this.types = types;
+        this.persistentTypes = persistentTypes;
     }
 
     @GET
@@ -116,7 +116,7 @@ public class CrawlerDefinitionResource {
     @GET
     @Path("new")
     public Model newForm() {
-        return Forms.emptyForm(Forms.NUMBER_OF_FIELDS, types);
+        return Forms.emptyForm(Forms.NUMBER_OF_FIELDS, persistentTypes);
     }
 
     @POST
@@ -141,7 +141,7 @@ public class CrawlerDefinitionResource {
     @GET
     @Path("edit")
     public Response edit(@QueryParam("id") final UUID id) {
-        return repository.modelFor(id).map(addTemplates(types)).map(asResponse()).getOrElse(crawlerNotFound(id));
+        return repository.modelFor(id).map(addTemplates(persistentTypes)).map(asResponse()).getOrElse(crawlerNotFound(id));
     }
 
     @POST

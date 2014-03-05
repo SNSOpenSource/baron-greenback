@@ -8,12 +8,12 @@ import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class InMemoryTypesActivatorTest {
+public class InMemoryPersistentTypesActivatorTest {
 
     @Test
     public void shouldIncludeMappingForStringDateAndURI() throws Exception {
         final InMemoryTypesActivator inMemoryTypesActivator = new InMemoryTypesActivator();
-        final Types types = inMemoryTypesActivator.call();
-        assertThat(types.types(), CoreMatchers.<Class<?>>hasItems(String.class, Date.class, URI.class));
+        final PersistentTypes persistentTypes = inMemoryTypesActivator.call();
+        assertThat(persistentTypes.types(), CoreMatchers.<Class<?>>hasItems(String.class, Date.class, URI.class));
     }
 }

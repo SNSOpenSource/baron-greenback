@@ -9,7 +9,7 @@ import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.barongreenback.persistence.InMemoryTypesActivator;
 import com.googlecode.barongreenback.persistence.ModelMapping;
-import com.googlecode.barongreenback.persistence.Types;
+import com.googlecode.barongreenback.persistence.PersistentTypes;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordsModelRepository;
 import com.googlecode.funclate.Model;
@@ -93,7 +93,7 @@ public class FailuresTest {
         StringMappings mappings = new StringMappings().add(Model.class, new ModelMapping());
         scope.addInstance(StringMappings.class, mappings);
         scope.addInstance(Records.class, new MemoryRecords(mappings));
-        scope.addActivator(Types.class, InMemoryTypesActivator.class);
+        scope.addActivator(PersistentTypes.class, InMemoryTypesActivator.class);
         scope.add(BaronGreenbackStringMappings.class);
         scope.add(CrawlerRepository.class);
         scope.add(ModelRepository.class, RecordsModelRepository.class);

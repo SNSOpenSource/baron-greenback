@@ -27,7 +27,7 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         addActivatorIfAbsent(container, BaronGreenbackStringMappings.class, BaronGreenbackStringMappingsActivator.class);
         addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
         addActivatorIfAbsent(container, UtterlyIdleRecords.class, UtterlyIdleRecordsActivator.class);
-        addActivatorIfAbsent(container, Types.class, InMemoryTypesActivator.class);
+        addActivatorIfAbsent(container, PersistentTypes.class, InMemoryTypesActivator.class);
         return container;
     }
 

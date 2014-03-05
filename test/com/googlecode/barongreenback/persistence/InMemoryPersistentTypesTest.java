@@ -15,13 +15,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertThat;
 
-public class InMemoryTypesTest {
+public class InMemoryPersistentTypesTest {
 
     @Test
     public void shouldReturnAllTheRegisteredTypes() throws Exception {
-        final Types types = new InMemoryTypes().add(String.class).add(Integer.class, new ObjectMapping<Integer>(Integer.class));
+        final PersistentTypes persistentTypes = new InMemoryPersistentTypes().add(String.class).add(Integer.class, new ObjectMapping<Integer>(Integer.class));
 
-        final List<Class<?>> availableTypes = types.types();
+        final List<Class<?>> availableTypes = persistentTypes.types();
 
         assertThat(availableTypes.size(), CoreMatchers.is(2));
         assertThat(availableTypes, CoreMatchers.<Class<?>>hasItems(String.class, Integer.class));
@@ -30,9 +30,9 @@ public class InMemoryTypesTest {
     @Test
     public void shouldReturnMappingsOnlyForTypesWithAMapping() throws Exception {
         final ObjectMapping<Integer> mapping = new ObjectMapping<Integer>(Integer.class);
-        final Types types = new InMemoryTypes().add(String.class).add(Integer.class, mapping);
+        final PersistentTypes persistentTypes = new InMemoryPersistentTypes().add(String.class).add(Integer.class, mapping);
 
-        final List<Pair<Class<?>, Callable1<StringMappings,StringMapping>>> mappings = types.mappings();
+        final List<Pair<Class<?>, Callable1<StringMappings,StringMapping>>> mappings = persistentTypes.mappings();
 
         assertThat(mappings.size(), CoreMatchers.is(1));
         assertThat(mappings.get(0).first(), CoreMatchers.<Class<?>>is(Integer.class));
@@ -42,9 +42,9 @@ public class InMemoryTypesTest {
     @Test
     public void shouldAllowAddingAMappingThatDependsOnAnotherMapping() throws Exception {
         final Callable1<StringMappings,StringMapping<Integer>> mappingFunction = Callables.<StringMappings,StringMapping<Integer>>returns1(new ObjectMapping<Integer>(Integer.class));
-        final Types types = new InMemoryTypes().add(String.class).add(Integer.class, mappingFunction);
+        final PersistentTypes persistentTypes = new InMemoryPersistentTypes().add(String.class).add(Integer.class, mappingFunction);
 
-        final List<Pair<Class<?>, Callable1<StringMappings,StringMapping>>> mappings = types.mappings();
+        final List<Pair<Class<?>, Callable1<StringMappings,StringMapping>>> mappings = persistentTypes.mappings();
 
         assertThat(mappings.size(), CoreMatchers.is(1));
         assertThat(mappings.get(0).first(), CoreMatchers.<Class<?>>is(Integer.class));

@@ -15,9 +15,9 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 public class BaronGreenbackStringMappings implements Value<StringMappings> {
     private StringMappings mappings;
 
-    private BaronGreenbackStringMappings(StringMappings mappings, Types types) {
+    private BaronGreenbackStringMappings(StringMappings mappings, PersistentTypes persistentTypes) {
         this.mappings = mappings.add(Model.class, new ModelMapping());
-        final Sequence<Pair<Class<?>, StringMapping>> additionalMappings = sequence(types.mappings()).map(asStringMapping());
+        final Sequence<Pair<Class<?>, StringMapping>> additionalMappings = sequence(persistentTypes.mappings()).map(asStringMapping());
         
         for (Pair<Class<?>, StringMapping> mapping : additionalMappings) {
             this.mappings = this.mappings.add(mapping.first(), mapping.second());
@@ -28,8 +28,8 @@ public class BaronGreenbackStringMappings implements Value<StringMappings> {
         return Callables.second(Callables.<StringMappings, StringMapping>callWith(this.mappings));
     }
 
-    public static BaronGreenbackStringMappings baronGreenbackStringMappings(StringMappings mappings, Types types) {
-        return new BaronGreenbackStringMappings(mappings, types);
+    public static BaronGreenbackStringMappings baronGreenbackStringMappings(StringMappings mappings, PersistentTypes persistentTypes) {
+        return new BaronGreenbackStringMappings(mappings, persistentTypes);
     }
 
     @Override

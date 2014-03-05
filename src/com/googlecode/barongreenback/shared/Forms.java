@@ -1,6 +1,6 @@
 package com.googlecode.barongreenback.shared;
 
-import com.googlecode.barongreenback.persistence.Types;
+import com.googlecode.barongreenback.persistence.PersistentTypes;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequences;
@@ -25,8 +25,8 @@ public class Forms {
                         add("record", definition));
     }
 
-    public static Model emptyForm(Integer numberOfFields, Types types) {
-        return addTemplates(crawler("", "", "", "", "", "", false, emptyDefinition(numberOfFields(numberOfFields))), types);
+    public static Model emptyForm(Integer numberOfFields, PersistentTypes persistentTypes) {
+        return addTemplates(crawler("", "", "", "", "", "", false, emptyDefinition(numberOfFields(numberOfFields))), persistentTypes);
     }
 
     public static Model emptyKeyword() {
@@ -52,17 +52,17 @@ public class Forms {
         }).toList();
     }
 
-    public static Model addTemplates(Model model, Types types) {
+    public static Model addTemplates(Model model, PersistentTypes persistentTypes) {
         return model.add("emptyKeyword", emptyKeyword()).
-                add("types", types(types.types()));
+                add("types", types(persistentTypes.types()));
     }
 
     public static class functions {
-        public static Callable1<Model, Model> addTemplates(final Types types) {
+        public static Callable1<Model, Model> addTemplates(final PersistentTypes persistentTypes) {
             return new Callable1<Model, Model>() {
                 @Override
                 public Model call(Model model) throws Exception {
-                    return Forms.addTemplates(model, types);
+                    return Forms.addTemplates(model, persistentTypes);
                 }
             };
         }

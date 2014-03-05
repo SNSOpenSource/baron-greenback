@@ -16,35 +16,35 @@ import java.util.List;
 
 import static com.googlecode.totallylazy.Callables.second;
 
-public class InMemoryTypes implements Types {
+public class InMemoryPersistentTypes implements PersistentTypes {
 
     private final Sequence<Pair<Class<?>, Option<Callable1<StringMappings, StringMapping>>>> typesAndMappings;
 
-    public InMemoryTypes() {
+    public InMemoryPersistentTypes() {
         this(Sequences.<Pair<Class<?>, Option<Callable1<StringMappings, StringMapping>>>>sequence());
     }
 
-    private InMemoryTypes(Sequence<Pair<Class<?>, Option<Callable1<StringMappings, StringMapping>>>> typesAndMappings) {
+    private InMemoryPersistentTypes(Sequence<Pair<Class<?>, Option<Callable1<StringMappings, StringMapping>>>> typesAndMappings) {
         this.typesAndMappings = typesAndMappings;
     }
 
     @Override
-    public Types add(Class<?> klass) {
+    public PersistentTypes add(Class<?> klass) {
         return add(klass, Option.<Callable1<StringMappings, StringMapping>>none());
     }
 
     @Override
-    public <T> Types add(Class<T> klass, StringMapping<T> mapping) {
+    public <T> PersistentTypes add(Class<T> klass, StringMapping<T> mapping) {
         return add(klass, Callables.<StringMappings, StringMapping<T>>ignoreAndReturn(mapping));
     }
 
     @Override
-    public <T> Types add(Class<T> klass, Callable1<StringMappings, StringMapping<T>> mappingCallable) {
+    public <T> PersistentTypes add(Class<T> klass, Callable1<StringMappings, StringMapping<T>> mappingCallable) {
         return add(klass, Option.some(Unchecked.<Callable1<StringMappings, StringMapping>>cast(mappingCallable)));
     }
 
-    private Types add(Class<?> klass, Option<Callable1<StringMappings, StringMapping>> mappingCallable) {
-        return new InMemoryTypes(typesAndMappings.append(Pair.<Class<?>, Option<Callable1<StringMappings, StringMapping>>>pair(klass, mappingCallable)));
+    private PersistentTypes add(Class<?> klass, Option<Callable1<StringMappings, StringMapping>> mappingCallable) {
+        return new InMemoryPersistentTypes(typesAndMappings.append(Pair.<Class<?>, Option<Callable1<StringMappings, StringMapping>>>pair(klass, mappingCallable)));
     }
 
     @Override
