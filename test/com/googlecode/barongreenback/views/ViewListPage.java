@@ -5,6 +5,7 @@ import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Link;
+import com.googlecode.utterlyidle.html.Select;
 
 import java.util.UUID;
 
@@ -47,5 +48,10 @@ public class ViewListPage {
         Request request = html.form(String.format("//form[@class='delete' and input[@name='id' and @value='%s']]", id)).submit("input[@value='delete']");
         Response response = httpHandler.handle(request);
         return new ViewListPage(httpHandler, response);
+    }
+
+    public UUID uuidFor(String name) {
+        final String href = html.link("//a[text() = '" + name + "']").value();
+        return UUID.fromString(href.substring("edit?id=".length()));
     }
 }

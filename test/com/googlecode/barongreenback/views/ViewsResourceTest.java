@@ -56,7 +56,14 @@ public class ViewsResourceTest extends ApplicationTests {
                                         add("group", "").
                                         add("type", "java.lang.String").
                                         add("visible", true).
-                                        add("unique", false)))));
+                                        add("unique", false),
+                                        model().
+                                                add("name", "field").
+                                                add("alias", "fieldalias").
+                                                add("group", "").
+                                                add("type", "java.lang.String").
+                                                add("visible", true).
+                                                add("unique", false)))));
                 repository.set(UUID.randomUUID(), model().
                         add("view", model().
                                 add("name", "hidden view").

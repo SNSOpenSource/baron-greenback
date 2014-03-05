@@ -4,25 +4,38 @@ import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.AliasedKeyword;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.First;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.UnaryFunction;
+import com.googlecode.totallylazy.Unchecked;
+import com.googlecode.totallylazy.predicates.LogicalPredicate;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.barongreenback.views.ViewsRepository.viewName;
 import static com.googlecode.lazyrecords.Keyword.functions.metadata;
+import static com.googlecode.lazyrecords.Record.constructors.record;
+import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Callables.ignoreAndReturn;
+import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Predicates.in;
+import static com.googlecode.totallylazy.Predicates.instanceOf;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
@@ -109,8 +122,37 @@ public class RecordsService {
     }
 
     public Sequence<Record> getRecords(Model view, Predicate<Record> predicate) {
-        Definition viewDefinition = definition(view);
-        return records.get(viewDefinition).filter(predicate);
+        final Definition viewDefinition = definition(view);
+        final Definition unaliasedDefinition = Definition.constructors.definition(viewDefinition.name(), viewDefinition.fields().map(unalias()));
+        final Sequence<AliasedKeyword<?>> aliasedKeywords = viewDefinition.fields().safeCast(AliasedKeyword.class).unsafeCast();
+        final Sequence<Keyword<?>> sourceKeywords = aliasedKeywords.map(unalias());
+
+        return records.get(unaliasedDefinition).filter(predicate).map(alias(aliasedKeywords, sourceKeywords));
+    }
+
+    private UnaryFunction<Record> alias(final Sequence<AliasedKeyword<?>> aliasedKeywords, final Sequence<Keyword<?>> sourceKeywords) {
+        return new UnaryFunction<Record>() {
+            @Override
+            public Record call(Record record) throws Exception {
+                final Pair<Sequence<Pair<Keyword<?>, Object>>, Sequence<Pair<Keyword<?>, Object>>> partition = record.fields().partition(where(Callables.<Keyword<?>>first(), in(sourceKeywords)));
+                return record(partition.first().map(Callables.<Keyword<?>, Object, Keyword<?>>first(new UnaryFunction<Keyword<?>>() {
+                    @Override
+                    public Keyword<?> call(Keyword<?> keyword) throws Exception {
+                        return aliasedKeywords.filter(where(unalias(), Predicates.<Keyword<?>>is(keyword))).head();
+                    }
+                })).join(partition.second()));
+            }
+        };
+    }
+
+    private UnaryFunction<Keyword<?>> unalias() {
+        return new UnaryFunction<Keyword<?>>() {
+            @Override
+            public Keyword<?> call(Keyword<?> keyword) throws Exception {
+                return (keyword instanceof AliasedKeyword) ? Unchecked.<AliasedKeyword<?>>cast(keyword).source() : keyword;
+            }
+        };
+
     }
 
     public Definition definition(Model view) {

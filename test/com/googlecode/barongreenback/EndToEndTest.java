@@ -4,6 +4,8 @@ import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.CrawlerPage;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
+import com.googlecode.barongreenback.views.ViewEditPage;
+import com.googlecode.barongreenback.views.ViewListPage;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;
@@ -11,6 +13,7 @@ import com.googlecode.utterlyidle.Request;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.UUID;
 
 import static com.googlecode.totallylazy.Strings.empty;
 import static com.googlecode.totallylazy.matchers.Matchers.matcher;
@@ -73,6 +76,23 @@ public class EndToEndTest extends ApplicationTests {
     }
 
     @Test
+    public void viewAllRecordsWithViewAlias() throws Exception {
+        crawlSampleData(createCrawler(null), "newsfeed");
+        ViewEditPage page = editView("newsfeed");
+        page.fieldAlias(1).value("event title");
+        page.save();
+
+        ViewSearchPage viewSearchPage = view("newsfeed");
+
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(4));
+
+        assertThat(viewSearchPage.containsCell("event_title", "Added user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", "Deleted user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", "Updated user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", "Created user"), is(true));
+    }
+
+    @Test
     public void createCrawlerViaImportWithSubfeedAndThenViewAllRecords() throws Exception {
 //        crawlSampleData(importCrawler("testCrawler.json"), "test");
         crawlSampleData(importCrawler(EndToEndTest.class.getResourceAsStream("testQueuesCrawler.json")), "test");
@@ -109,6 +129,12 @@ public class EndToEndTest extends ApplicationTests {
 
     private ViewSearchPage view(String name) throws Exception {
         return new ViewSearchPage(browser, name, "");
+    }
+
+    private ViewEditPage editView(String viewName) throws Exception {
+        ViewListPage listPage = new ViewListPage(browser);
+        final UUID uuid = listPage.uuidFor(viewName);
+        return new ViewEditPage(browser, uuid);
     }
 
     private CrawlerListPage createCrawler(Date checkpointValue) throws Exception {

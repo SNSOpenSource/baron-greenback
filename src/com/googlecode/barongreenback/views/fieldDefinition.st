@@ -1,5 +1,6 @@
 <div class="fieldDefinition">
     $input(id=prefix + "name", name=prefix + "name", class="keywordName", label="Name", value=keyword.name)$
+    $input(id=prefix + "alias", name=prefix + "alias", class="keywordAlias", label="Alias", value=keyword.alias)$
     $input(id=prefix + "group", name=prefix + "group", class="group", label="Group", value=keyword.group)$
     $select(id=prefix + "type", name=prefix + "type", class="type", label="Type", value=keyword.type, values=types)$
     $checkbox(id=prefix + "unique", name=prefix + "unique", class="unique", label="Unique", checked=keyword.unique)$

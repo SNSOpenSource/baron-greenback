@@ -61,7 +61,7 @@ public class ViewsRepository {
     }
 
     public static Model clean(Model root) {
-        return new ModelCleaner(in("view", "name", "parent", "records", "query", "priority", "keywords", "group", "type", "unique", "visible")).clean(root);
+        return new ModelCleaner(in("view", "name", "alias", "parent", "records", "query", "priority", "keywords", "group", "type", "unique", "visible")).clean(root);
     }
 
     public static Model convertToViewModel(Definition definition) {

@@ -50,9 +50,14 @@ public class ViewEditPage {
     }
 
     public static final String fieldName = "//input[@id='view.keywords[%s].name']";
+    public static final String fieldAlias = "//input[@id='view.keywords[%s].alias']";
 
     public Input fieldName(int index) {
         return html.input(String.format(fieldName, index));
+    }
+
+    public Input fieldAlias(int index) {
+        return html.input(String.format(fieldAlias, index));
     }
 
     public ViewListPage save() throws Exception {
