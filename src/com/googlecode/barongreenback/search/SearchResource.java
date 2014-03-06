@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.AliasedKeyword;
 import com.googlecode.lazyrecords.csv.CsvWriterLegacy;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -34,14 +35,18 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.googlecode.barongreenback.search.RecordsService.unalias;
 import static com.googlecode.barongreenback.search.RecordsService.visibleHeaders;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
 import static com.googlecode.totallylazy.Predicates.classAssignableTo;
+import static com.googlecode.totallylazy.Predicates.in;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -186,12 +191,32 @@ public class SearchResource {
                 if (results.isEmpty()) return baseModel(viewName, query);
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
+
+                final Sequence<AliasedKeyword<?>> aliasedKeywords = visibleHeaders.safeCast(AliasedKeyword.class).unsafeCast();
+                final Sequence<Keyword<?>> sourceKeywords = aliasedKeywords.map(unalias());
+
                 return pager.model(sorter.model(baseModel(viewName, query).
-                        add("results", results.map(asModel(viewName, visibleHeaders)).toList()),
+                        add("results", results.map(alias(aliasedKeywords, sourceKeywords).map(asModel(viewName, visibleHeaders))).toList()),
                         visibleHeaders, results));
             }
         };
     }
+
+    private UnaryFunction<Record> alias(final Sequence<AliasedKeyword<?>> aliasedKeywords, final Sequence<Keyword<?>> sourceKeywords) {
+        return new UnaryFunction<Record>() {
+            @Override
+            public Record call(Record record) throws Exception {
+                final Pair<Sequence<Pair<Keyword<?>, Object>>, Sequence<Pair<Keyword<?>, Object>>> partition = record.fields().partition(where(Callables.<Keyword<?>>first(), in(sourceKeywords)));
+                return record(partition.first().map(Callables.<Keyword<?>, Object, Keyword<?>>first(new UnaryFunction<Keyword<?>>() {
+                    @Override
+                    public Keyword<?> call(Keyword<?> keyword) throws Exception {
+                        return aliasedKeywords.filter(where(unalias(), Predicates.<Keyword<?>>is(keyword))).head();
+                    }
+                })).join(partition.second()));
+            }
+        };
+    }
+
 
     private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword<?>> visibleHeaders) {
         return new Callable1<Record, Model>() {

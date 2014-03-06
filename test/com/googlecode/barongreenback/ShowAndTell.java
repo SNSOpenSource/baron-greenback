@@ -20,7 +20,7 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        PersistenceUri.set(properties, luceneDirectory(new File("/tmp/bgb")));
+        PersistenceUri.set(properties, luceneDirectory(new File("/dev/shm/penfold/test-server")));
         SearcherPoolActivator.setSearchPool(properties, LucenePool.class);
         Application application = new WebApplication(BasePath.basePath("/"), properties);
         new RestServer(
