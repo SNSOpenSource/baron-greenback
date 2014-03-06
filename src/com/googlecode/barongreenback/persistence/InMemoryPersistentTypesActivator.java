@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
-public class InMemoryTypesActivator implements Callable<PersistentTypes> {
+public class InMemoryPersistentTypesActivator implements Callable<PersistentTypes> {
 
     @Override
     public PersistentTypes call() throws Exception {

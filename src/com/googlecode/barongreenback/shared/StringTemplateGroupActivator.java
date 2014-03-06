@@ -3,27 +3,29 @@ package com.googlecode.barongreenback.shared;
 
 import com.googlecode.barongreenback.shared.pager.PagerRenderer;
 import com.googlecode.barongreenback.shared.pager.RequestPager;
+import com.googlecode.funclate.Renderer;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
+import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.HtmlEncodedMessage;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.URLs;
+import com.googlecode.totallylazy.Unchecked;
 import com.googlecode.totallylazy.Xml;
 import com.googlecode.totallylazy.regex.Regex;
 import com.googlecode.utterlyidle.MatchedResource;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
-import java.net.URI;
 import java.net.URL;
-import java.util.Date;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import static com.googlecode.totallylazy.Functions.returns1;
 import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Predicates.instanceOf;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static com.googlecode.totallylazy.URLs.url;
 import static com.googlecode.totallylazy.UrlEncodedMessage.encode;
@@ -32,16 +34,17 @@ import static com.googlecode.totallylazy.regex.Regex.regex;
 public class StringTemplateGroupActivator implements Callable<StringTemplateGroup> {
     public static final Regex UI_ROOT = regex("^.*\\/utterlyidle\\/");
     public static final Regex BG_ROOT = regex("^.*\\/barongreenback\\/");
-    private final URL baseUrl;
-    private String dateFormat;
 
-    public StringTemplateGroupActivator(final MatchedResource matchedResource, Properties properties) {
-        this(makeRelativeToBaronGreenback(packageUrl(matchedResource.forClass())), properties);
+    private final URL baseUrl;
+    private final RenderableTypes renderableTypes;
+
+    public StringTemplateGroupActivator(final MatchedResource matchedResource, RenderableTypes renderableTypes) {
+        this(makeRelativeToBaronGreenback(packageUrl(matchedResource.forClass())), renderableTypes);
     }
 
-    public StringTemplateGroupActivator(URL baseUrl, Properties properties) {
+    public StringTemplateGroupActivator(URL baseUrl, RenderableTypes renderableTypes) {
         this.baseUrl = baseUrl;
-        this.dateFormat = properties.getProperty("barongreenback.date.format");
+        this.renderableTypes = renderableTypes;
     }
 
     private static URL makeRelativeToBaronGreenback(URL url) {
@@ -55,12 +58,20 @@ public class StringTemplateGroupActivator implements Callable<StringTemplateGrou
         shared.registerRenderer("underscores", instanceOf(String.class), underscores());
         shared.registerRenderer("dashes", instanceOf(String.class), dashes());
         shared.registerRenderer(always(), Xml.escape());
-        shared.registerRenderer(instanceOf(URI.class), URIRenderer.toLink());
-        shared.registerRenderer(instanceOf(Date.class), dateFormat != null ? DateRenderer.toLexicalDateTime(dateFormat) : DateRenderer.toLexicalDateTime());
         shared.registerRenderer(instanceOf(RequestPager.class), PagerRenderer.pagerRenderer(shared));
         shared.registerRenderer("htmlDecode", Predicates.<Object>always(), HtmlEncodedMessage.functions.decode());
         shared.registerRenderer("urlEncode", Predicates.<Object>always(), encodeUrl());
+        sequence(renderableTypes.renderableTypes()).forEach(registerRenderer(shared));
         return new EnhancedStringTemplateGroup(baseUrl, shared);
+    }
+
+    private Block<Pair<Class<?>, Renderer<?>>> registerRenderer(final EnhancedStringTemplateGroup stringTemplateGroup) {
+        return new Block<Pair<Class<?>, Renderer<?>>>() {
+            @Override
+            protected void execute(Pair<Class<?>, Renderer<?>> rendererPair) throws Exception {
+                stringTemplateGroup.registerRenderer(instanceOf(rendererPair.first()), Unchecked.<Renderer>cast(rendererPair.second()));
+            }
+        };
     }
 
     private Callable1<Object, String> encodeUrl() {

@@ -12,8 +12,8 @@ public class InMemoryPersistentTypesActivatorTest {
 
     @Test
     public void shouldIncludeMappingForStringDateAndURI() throws Exception {
-        final InMemoryTypesActivator inMemoryTypesActivator = new InMemoryTypesActivator();
-        final PersistentTypes persistentTypes = inMemoryTypesActivator.call();
+        final InMemoryPersistentTypesActivator inMemoryPersistentTypesActivator = new InMemoryPersistentTypesActivator();
+        final PersistentTypes persistentTypes = inMemoryPersistentTypesActivator.call();
         assertThat(persistentTypes.types(), CoreMatchers.<Class<?>>hasItems(String.class, Date.class, URI.class));
     }
 }

@@ -35,6 +35,7 @@ public class SharedModule implements ApplicationScopedModule, ResponseHandlersMo
         addIfAbsent(container, BaronGreenbackRequestScope.class);
         return container.
                 addActivator(TemplateName.class, TemplateNameActivator.class).
+                addActivator(RenderableTypes.class, InMemoryRenderableTypesActivator.class).
                 addActivator(StringTemplateGroup.class, StringTemplateGroupActivator.class).
                 addActivator(ModelRepository.class, ModelRepositoryActivator.class).
                 addActivator(AdvancedMode.class, AdvancedModeActivator.class);
