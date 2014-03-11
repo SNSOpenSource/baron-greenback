@@ -5,12 +5,24 @@ import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.AliasedKeyword;
-import com.googlecode.lazyrecords.csv.CsvWriterLegacy;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.*;
+import com.googlecode.lazyrecords.csv.CsvWriterLegacy;
+import com.googlecode.totallylazy.Block;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callable2;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.UnaryFunction;
+import com.googlecode.totallylazy.Uri;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
@@ -106,7 +118,7 @@ public class SearchResource {
         final Model view = recordsService.view(viewName);
         final Definition definition = recordsService.definition(view);
         Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
-        final Iterator<Record> result = errorOrResults.right().sortBy(descending(firstComparable)).iterator();
+        final Iterator<Record> result = errorOrResults.right().map(aliasFor(viewName)).sortBy(descending(firstComparable)).iterator();
 
         final Sequence<Keyword<?>> visibleHeaders = visibleHeaders(view);
 
@@ -163,7 +175,7 @@ public class SearchResource {
         final Option<Record> record = recordsService.findUnique(viewName, query);
         if (record.isEmpty()) return Responses.response(Status.NOT_FOUND);
 
-        Map<String, Map<String, Object>> group = record.get().fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(ViewsRepository.GROUP));
+        Map<String, Map<String, Object>> group = record.map(aliasFor(viewName)).get().fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(ViewsRepository.GROUP));
         return baseModel(viewName, query).add("record", group);
     }
 
@@ -192,14 +204,17 @@ public class SearchResource {
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
 
-                final Sequence<AliasedKeyword<?>> aliasedKeywords = visibleHeaders.safeCast(AliasedKeyword.class).unsafeCast();
-                final Sequence<Keyword<?>> sourceKeywords = aliasedKeywords.map(unalias());
-
                 return pager.model(sorter.model(baseModel(viewName, query).
-                        add("results", results.map(alias(aliasedKeywords, sourceKeywords).map(asModel(viewName, visibleHeaders))).toList()),
+                        add("results", results.map(aliasFor(viewName).map(asModel(viewName, visibleHeaders))).toList()),
                         visibleHeaders, results));
             }
         };
+    }
+
+    private UnaryFunction<Record> aliasFor(String viewName) {
+        final Sequence<AliasedKeyword<?>> aliasedKeywords = recordsService.visibleHeaders(viewName).safeCast(AliasedKeyword.class).unsafeCast();
+        final Sequence<Keyword<?>> sourceKeywords = aliasedKeywords.map(unalias());
+        return alias(aliasedKeywords, sourceKeywords);
     }
 
     private UnaryFunction<Record> alias(final Sequence<AliasedKeyword<?>> aliasedKeywords, final Sequence<Keyword<?>> sourceKeywords) {
