@@ -155,12 +155,14 @@ public class RecordsService {
         };
     }
 
-
     public static UnaryFunction<Keyword<?>> unalias() {
         return new UnaryFunction<Keyword<?>>() {
             @Override
             public Keyword<?> call(Keyword<?> keyword) throws Exception {
-                return (keyword instanceof AliasedKeyword) ? Unchecked.<AliasedKeyword<?>>cast(keyword).source() : keyword;
+                if (keyword instanceof AliasedKeyword) {
+                    return Unchecked.<AliasedKeyword<?>>cast(keyword).source().metadata(keyword.metadata());
+                }
+                return keyword;
             }
         };
     }
