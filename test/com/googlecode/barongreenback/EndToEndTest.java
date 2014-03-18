@@ -4,12 +4,16 @@ import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.CrawlerPage;
 import com.googlecode.barongreenback.search.ViewSearchPage;
 import com.googlecode.barongreenback.shared.ApplicationTests;
+import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewEditPage;
 import com.googlecode.barongreenback.views.ViewListPage;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;
 import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.RequestBuilder;
+import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.junit.Test;
 
 import java.util.Date;
@@ -90,6 +94,29 @@ public class EndToEndTest extends ApplicationTests {
         assertThat(viewSearchPage.containsCell("event_title", "Deleted user"), is(true));
         assertThat(viewSearchPage.containsCell("event_title", "Updated user"), is(true));
         assertThat(viewSearchPage.containsCell("event_title", "Created user"), is(true));
+    }
+
+    @Test
+    public void sortShouldWorkForAliasedColumns() throws Exception {
+        crawlSampleData(createCrawler(null), "newsfeed");
+        ViewEditPage page = editView("newsfeed");
+        page.fieldAlias(1).value("event title");
+        page.save();
+
+        HttpClient browserThatRequestsSortOrderForEventTitle = new HttpClient() {
+            @Override
+            public Response handle(Request request) throws Exception {
+                return browser.handle(RequestBuilder.modify(request).query(Sorter.SORT_COLUMN_QUERY_PARAM, "event title").query(Sorter.SORT_DIRECTION_QUERY_PARAM, Sorter.ASCENDING_SORT_DIRECTION).build());
+            }
+        };
+        ViewSearchPage viewSearchPage = new ViewSearchPage(browserThatRequestsSortOrderForEventTitle, "newsfeed", 4);
+
+        assertThat(viewSearchPage.resultsSize(), NumberMatcher.is(4));
+
+        assertThat(viewSearchPage.containsCell("event_title", 0, "Added user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", 1, "Created user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", 2, "Deleted user"), is(true));
+        assertThat(viewSearchPage.containsCell("event_title", 3, "Updated user"), is(true));
     }
 
     @Test

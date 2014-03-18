@@ -52,12 +52,14 @@ import static com.googlecode.barongreenback.search.RecordsService.visibleHeaders
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.lazyrecords.Keyword.functions.name;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
 import static com.googlecode.totallylazy.Predicates.classAssignableTo;
 import static com.googlecode.totallylazy.Predicates.in;
+import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Unchecked.cast;
@@ -199,7 +201,7 @@ public class SearchResource {
                 Option<Model> view = recordsService.findView(viewName);
                 if (view.isEmpty()) return baseModel(viewName, query);
 
-                Sequence<Record> results = pager.paginate(sorter.sort(unpaged, headers(view.get())));
+                Sequence<Record> results = pager.paginate(sorter.sort(unpaged, aliasedSort(headers(view.get()))));
                 if (results.isEmpty()) return baseModel(viewName, query);
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
@@ -207,6 +209,16 @@ public class SearchResource {
                 return pager.model(sorter.model(baseModel(viewName, query).
                         add("results", results.map(aliasFor(viewName).map(asModel(viewName, visibleHeaders))).toList()),
                         visibleHeaders, results));
+            }
+        };
+    }
+
+    private Callable1<Option<String>, Keyword> aliasedSort(final Sequence<Keyword<?>> headers) {
+        return new Callable1<Option<String>, Keyword>() {
+            @Override
+            public Keyword call(Option<String> column) throws Exception {
+                final String sortColumn = column.getOrElse(headers.first().name());
+                return headers.find(where(name(), is(sortColumn))).map(unalias()).get();
             }
         };
     }
