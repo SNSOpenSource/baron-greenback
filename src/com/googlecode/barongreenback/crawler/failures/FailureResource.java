@@ -35,6 +35,7 @@ import static com.googlecode.barongreenback.crawler.failures.FailureRepository.I
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REASON;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REQUEST_TIME;
 import static com.googlecode.barongreenback.crawler.failures.FailureRepository.URI;
+import static com.googlecode.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.all;
@@ -67,7 +68,7 @@ public class FailureResource {
     public Model list(@QueryParam("message") Option<String> message) {
         Sequence<Keyword<?>> headers = Sequences.<Keyword<?>>sequence(URI, REASON, REQUEST_TIME, DURATION);
         Sequence<Record> unpaged = failureRepository.find(all());
-        Sequence<Record> sorted = sorter.sort(unpaged, headers);
+        Sequence<Record> sorted = sorter.sort(unpaged, sortKeywordFromRequest(headers));
         Sequence<Record> paged = pager.paginate(sorted);
         Model model = pager.model(sorter.model(model().
                 add("items", paged.map(toModel()).toList()), headers, paged));

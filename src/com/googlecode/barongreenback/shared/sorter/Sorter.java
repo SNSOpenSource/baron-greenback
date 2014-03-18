@@ -6,6 +6,7 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callers;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Maps;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
@@ -63,7 +64,7 @@ public class Sorter {
         };
     }
 
-    public Sequence<Record> sort(Sequence<Record> results, Callable1<Option<String>, Keyword> keywordMapper) {
+    public Sequence<Record> sort(Sequence<Record> results, Callable1<Option<String>, Keyword<?>> keywordMapper) {
         final Keyword keyword = Callers.call(keywordMapper, sortColumn);
         if (DESCENDING_SORT_DIRECTION.equalsIgnoreCase(sortDirection.getOrElse(DESCENDING_SORT_DIRECTION))) {
             return results.sortBy(descending(keyword));
@@ -71,12 +72,13 @@ public class Sorter {
         return results.sortBy(keyword);
     }
 
-    public Sequence<Record> sort(Sequence<Record> results, Sequence<Keyword<?>> allHeaders) {
-        Keyword keyword = allHeaders.find(where(name(), is(sortColumn.getOrElse(allHeaders.first().name())))).get();
-        if (DESCENDING_SORT_DIRECTION.equalsIgnoreCase(sortDirection.getOrElse(DESCENDING_SORT_DIRECTION))) {
-            return results.sortBy(descending(keyword));
-        }
-        return results.sortBy(keyword);
+    public static Function1<Option<String>, Keyword<?>> sortKeywordFromRequest(final Sequence<Keyword<?>> allHeaders) {
+        return new Function1<Option<String>, Keyword<?>>() {
+            @Override
+            public Keyword call(Option<String> sortColumn) throws Exception {
+                return allHeaders.find(where(name(), is(sortColumn.getOrElse(allHeaders.first().name())))).get();
+            }
+        };
     }
 
     public String linkFor(Keyword keyword, Sequence<Keyword<?>> visibleHeaders) {

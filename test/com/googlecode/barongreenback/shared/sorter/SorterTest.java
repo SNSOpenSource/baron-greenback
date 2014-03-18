@@ -14,6 +14,7 @@ import java.util.Date;
 
 import static com.googlecode.barongreenback.shared.sorter.Sorter.SORT_COLUMN_QUERY_PARAM;
 import static com.googlecode.barongreenback.shared.sorter.Sorter.SORT_DIRECTION_QUERY_PARAM;
+import static com.googlecode.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Triple.triple;
@@ -25,22 +26,22 @@ public class SorterTest {
     @Test
     public void readsKeywordToSortFromRequest() throws Exception {
         Sorter secondSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "mooCow").query(SORT_DIRECTION_QUERY_PARAM, "asc").build());
-        assertThat(secondSorter.sort(records(), keywords()).map(asSecondKeyword()).safeCast(String.class), is(sequence("1", "2", "3")));
+        assertThat(secondSorter.sort(records(), sortKeywordFromRequest(keywords())).map(asSecondKeyword()).safeCast(String.class), is(sequence("1", "2", "3")));
 
         Sorter thirdSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "blueCow").build());
-        assertThat(thirdSorter.sort(records(), keywords()).map(asThirdKeyword()).safeCast(Date.class), is(sequence(new Date(100000), new Date(10000), new Date(1))));
+        assertThat(thirdSorter.sort(records(), sortKeywordFromRequest(keywords())).map(asThirdKeyword()).safeCast(Date.class), is(sequence(new Date(100000), new Date(10000), new Date(1))));
     }
 
     @Test
     public void defaultsToFirstColumnWhenKeywordMissing() throws Exception {
         Sorter sorterWithNoParam = new Sorter(RequestBuilder.get("/somePath").build());
-        assertThat(sorterWithNoParam.sort(records(), keywords()).map(asFirstKeyword()).safeCast(String.class), is(sequence("C", "B", "A")));
+        assertThat(sorterWithNoParam.sort(records(), sortKeywordFromRequest(keywords())).map(asFirstKeyword()).safeCast(String.class), is(sequence("C", "B", "A")));
     }
 
     @Test
     public void usesDescendingOrderWhenSpecified() throws Exception {
         Sorter secondSorter = new Sorter(RequestBuilder.get("/somePath").query(SORT_COLUMN_QUERY_PARAM, "mooCow").query(SORT_DIRECTION_QUERY_PARAM, "desc").build());
-        assertThat(secondSorter.sort(records(), keywords()).map(asSecondKeyword()).safeCast(String.class), is(sequence("3", "2", "1")));
+        assertThat(secondSorter.sort(records(), sortKeywordFromRequest(keywords())).map(asSecondKeyword()).safeCast(String.class), is(sequence("3", "2", "1")));
     }
 
     private Callable1<? super Record, Object> asFirstKeyword() {

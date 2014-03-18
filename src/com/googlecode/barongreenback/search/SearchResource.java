@@ -50,6 +50,7 @@ import java.util.Map;
 import static com.googlecode.barongreenback.search.RecordsService.unalias;
 import static com.googlecode.barongreenback.search.RecordsService.visibleHeaders;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
+import static com.googlecode.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.lazyrecords.Keyword.functions.name;
@@ -201,7 +202,7 @@ public class SearchResource {
                 Option<Model> view = recordsService.findView(viewName);
                 if (view.isEmpty()) return baseModel(viewName, query);
 
-                Sequence<Record> results = pager.paginate(sorter.sort(unpaged, aliasedSort(headers(view.get()))));
+                Sequence<Record> results = pager.paginate(sorter.sort(unpaged, sortKeywordFromRequest(headers(view.get())).then(unalias())));
                 if (results.isEmpty()) return baseModel(viewName, query);
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
@@ -209,16 +210,6 @@ public class SearchResource {
                 return pager.model(sorter.model(baseModel(viewName, query).
                         add("results", results.map(aliasFor(viewName).map(asModel(viewName, visibleHeaders))).toList()),
                         visibleHeaders, results));
-            }
-        };
-    }
-
-    private Callable1<Option<String>, Keyword> aliasedSort(final Sequence<Keyword<?>> headers) {
-        return new Callable1<Option<String>, Keyword>() {
-            @Override
-            public Keyword call(Option<String> column) throws Exception {
-                final String sortColumn = column.getOrElse(headers.first().name());
-                return headers.find(where(name(), is(sortColumn))).map(unalias()).get();
             }
         };
     }
