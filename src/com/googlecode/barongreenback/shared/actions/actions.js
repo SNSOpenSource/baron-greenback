@@ -2,6 +2,7 @@
     var actions = BGB.namespace('search.bulk.actions');
     actions.removeAllIdentifiers = function() {
         jQuery('div.actions form input').filter('[name="id"]').remove();
+        jQuery('div.actions form input').filter('[name="query"]').remove();
     };
 
     actions.attach = function() {
