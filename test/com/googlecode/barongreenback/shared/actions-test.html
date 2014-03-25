@@ -194,6 +194,12 @@
             clearSelection().click();
             allRows().each(hasSelectedSetTo(false));
         });
+
+        test('Deselecting a row after selecting all resets the "all rows selected" flag', function(){
+            selectAll().click();
+            firstRow().click();
+            QUnit.equal(BGB.search.allPagesSelected, false);
+        });
     });
 
 </script>

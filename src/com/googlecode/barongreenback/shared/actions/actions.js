@@ -15,6 +15,7 @@
                     return '<input type="hidden" name="id" value="' + text + '"/>';
                 }).toArray().join(''));
                 jQuery('.table-actions .message').text(jQuery('table.results tr.selected').size() + " rows are selected");
+                BGB.search.allPagesSelected = false;
             }
         });
         jQuery('.selectors a.selectPage').click(function() {
