@@ -15,6 +15,7 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
@@ -43,26 +44,28 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static com.googlecode.barongreenback.search.RecordsService.unalias;
 import static com.googlecode.barongreenback.search.RecordsService.visibleHeaders;
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
+import static com.googlecode.funclate.Model.functions.value;
 import static com.googlecode.funclate.Model.mutable.model;
-import static com.googlecode.lazyrecords.Keyword.functions.name;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
 import static com.googlecode.totallylazy.Predicates.classAssignableTo;
 import static com.googlecode.totallylazy.Predicates.in;
-import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Strings.isEmpty;
 import static com.googlecode.totallylazy.Unchecked.cast;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -178,8 +181,21 @@ public class SearchResource {
         final Option<Record> record = recordsService.findUnique(viewName, query);
         if (record.isEmpty()) return Responses.response(Status.NOT_FOUND);
 
-        Map<String, Map<String, Object>> group = record.map(aliasFor(viewName)).get().fields().fold(new LinkedHashMap<String, Map<String, Object>>(), groupBy(ViewsRepository.GROUP));
-        return baseModel(viewName, query).add("record", group);
+        final List<Model> viewFields = recordsService.findView(viewName).get().get("view", Model.class).getValues("keywords", Model.class);
+        final List<String> aliasedViewFieldNames = sequence(viewFields).map(toAliasOrElseName()).unique().toList();
+        final List<String> viewGroupNames = sequence(viewFields).map(value("group", String.class)).unique().toList();
+        final Map<String, Map<String, Object>> groupedAliasedFields = record.map(aliasFor(viewName)).get().fields().fold(newSortedMapUsing(viewGroupNames), groupBy(ViewsRepository.GROUP, aliasedViewFieldNames));
+
+        return baseModel(viewName, query).add("record", groupedAliasedFields);
+    }
+
+    private Mapper<Model, String> toAliasOrElseName() {
+        return new Mapper<Model, String>() {
+            @Override
+            public String call(Model viewField) throws Exception {
+                return viewField.getOption("alias", String.class).getOrElse(viewField.get("name", String.class));
+            }
+        };
     }
 
     private Model baseModel(String viewName, String query) {
@@ -208,8 +224,9 @@ public class SearchResource {
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
 
                 return pager.model(sorter.model(baseModel(viewName, query).
-                        add("results", results.map(aliasFor(viewName).map(asModel(viewName, visibleHeaders))).toList()),
-                        visibleHeaders, results));
+                                add("results", results.map(aliasFor(viewName).map(asModel(viewName, visibleHeaders))).toList()),
+                        visibleHeaders, results
+                ));
             }
         };
     }
@@ -234,7 +251,6 @@ public class SearchResource {
             }
         };
     }
-
 
     private Callable1<? super Record, Model> asModel(final String viewName, final Sequence<Keyword<?>> visibleHeaders) {
         return new Callable1<Record, Model>() {
@@ -262,17 +278,17 @@ public class SearchResource {
                 dropScheme().dropAuthority();
     }
 
-    public static Callable2<Map<String, Map<String, Object>>, Pair<Keyword<?>, Object>, Map<String, Map<String, Object>>> groupBy(final Keyword<String> lookupKeyword) {
+    public Callable2<Map<String, Map<String, Object>>, Pair<Keyword<?>, Object>, Map<String, Map<String, Object>>> groupBy(final Keyword<String> lookupKeyword, final List<String> fieldNames) {
         return new Callable2<Map<String, Map<String, Object>>, Pair<Keyword<?>, Object>, Map<String, Map<String, Object>>>() {
             public Map<String, Map<String, Object>> call(Map<String, Map<String, Object>> map, Pair<Keyword<?>, Object> pair) throws Exception {
                 Keyword<?> keyword = pair.first();
-                Object value = pair.second();
-                String key = keyword.metadata().get(lookupKeyword);
-                if (Strings.isEmpty(key)) key = "Other";
-                if (!map.containsKey(key)) {
-                    map.put(key, new LinkedHashMap<String, Object>());
+                Object fieldValue = pair.second();
+                String groupName = keyword.metadata().get(lookupKeyword);
+                if (isEmpty(groupName)) groupName = "Other";
+                if (!map.containsKey(groupName)) {
+                    map.put(groupName, new TreeMap(fixedOrderStringComparator(fieldNames)));
                 }
-                map.get(key).put(keyword.name(), value);
+                map.get(groupName).put(keyword.name(), fieldValue);
                 return map;
             }
         };
@@ -280,5 +296,23 @@ public class SearchResource {
 
     private Sequence<Keyword<?>> headers(Model view) {
         return toKeywords(unwrap(view));
+    }
+
+    private Map<String, Map<String, Object>> newSortedMapUsing(final List<String> expectedOrder) {
+        return new TreeMap<String, Map<String, Object>>(fixedOrderStringComparator(expectedOrder));
+    }
+
+    private Comparator<String> fixedOrderStringComparator(final List<String> expectedOrder) {
+        return new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                final int indexOfO1 = expectedOrder.indexOf(o1);
+                final int indexOfO2 = expectedOrder.indexOf(o2);
+                if (indexOfO1 < 0 && indexOfO2 < 0) return o1.compareTo(o2);
+                if (indexOfO1 < 0) return 1;
+                if (indexOfO2 < 0) return -1;
+                return indexOfO1 - indexOfO2;
+            }
+        };
     }
 }
