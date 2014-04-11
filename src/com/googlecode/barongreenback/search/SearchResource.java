@@ -121,7 +121,7 @@ public class SearchResource {
         final Model view = recordsService.view(viewName);
         final Definition definition = recordsService.definition(view);
         Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
-        final Iterator<Record> result = errorOrResults.right().map(aliasFor(viewName)).sortBy(descending(firstComparable)).iterator();
+        final Iterator<Record> result = errorOrResults.right().sortBy(descending(firstComparable)).map(aliasFor(viewName)).iterator();
 
         final Sequence<Keyword<?>> visibleHeaders = visibleHeaders(view);
 
