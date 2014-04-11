@@ -21,6 +21,7 @@ import static com.googlecode.totallylazy.URLs.uri;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
 import static com.googlecode.yadic.Containers.addIfAbsent;
+import static com.googlecode.yadic.Containers.addInstanceIfAbsent;
 import static java.lang.String.format;
 
 public class LuceneModule implements ApplicationScopedModule, RequestScopedModule, ResourcesModule {
@@ -42,6 +43,7 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
         final Container container = requestScope.get(BaronGreenbackRequestScope.class).value();
         addIfAbsent(container, LuceneMappings.class);
         addActivatorIfAbsent(container, Persistence.class, PersistenceActivator.class);
+        addInstanceIfAbsent(requestScope, LuceneQueryPreprocessor.class, CaseInsensitive.luceneQueryPreprocessor());
         addIfAbsent(container, Records.class, LucenePartitionedRecords.class);
         return requestScope;
     }

@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.persistence.lucene;
 
 import com.googlecode.barongreenback.persistence.PersistenceUri;
+import com.googlecode.lazyrecords.lucene.CaseInsensitive;
 import com.googlecode.lazyrecords.lucene.LucenePartitionedIndex;
 import com.googlecode.lazyrecords.lucene.PartitionedIndex;
 
@@ -15,7 +16,9 @@ import static com.googlecode.barongreenback.persistence.lucene.DirectoryType.Nio
 import static com.googlecode.barongreenback.persistence.lucene.LuceneModule.fileUrl;
 import static com.googlecode.barongreenback.persistence.lucene.LuceneModule.lucene;
 import static com.googlecode.lazyrecords.lucene.LucenePartitionedIndex.partitionedIndex;
+import static com.googlecode.lazyrecords.lucene.PartitionedIndex.functions.mmapDirectory;
 import static com.googlecode.lazyrecords.lucene.PartitionedIndex.functions.nioDirectory;
+import static com.googlecode.lazyrecords.lucene.PartitionedIndex.functions.ramDirectory;
 
 public class PartitionedIndexActivator implements Callable<PartitionedIndex>, Closeable {
 
@@ -28,13 +31,13 @@ public class PartitionedIndexActivator implements Callable<PartitionedIndex>, Cl
 
     public PartitionedIndex call() throws Exception {
         if (persistenceUri.startsWith(lucene(Memory))) {
-            return partitionedIndex = partitionedIndex();
+            return partitionedIndex = partitionedIndex(ramDirectory(), CaseInsensitive.storage());
         }
         if (persistenceUri.startsWith(lucene(Nio))) {
-            return partitionedIndex = partitionedIndex(nioDirectory(new File(fileUrl(persistenceUri))));
+            return partitionedIndex = partitionedIndex(nioDirectory(new File(fileUrl(persistenceUri))), CaseInsensitive.storage());
         }
         if (persistenceUri.startsWith(lucene(File))) {
-            return partitionedIndex = partitionedIndex(new File(fileUrl(persistenceUri)));
+            return partitionedIndex = partitionedIndex(mmapDirectory(new File(fileUrl(persistenceUri))), CaseInsensitive.storage());
         }
         throw new UnsupportedOperationException();
     }
