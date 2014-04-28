@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
+import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.funclate.Model.mutable.parse;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -31,7 +32,11 @@ public class CrawlerRepository {
     }
 
     public Model crawlerFor(UUID id) {
-        return modelFor(id).get().get("form", Model.class);
+        final Option<Model> modelOption = modelFor(id);
+        if(modelOption.isEmpty()){
+            return model();
+        }
+        return modelOption.get().get("form", Model.class);
     }
 
     public Sequence<Pair<UUID, Model>> allCrawlerModels() {
