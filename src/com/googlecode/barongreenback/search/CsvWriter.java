@@ -80,8 +80,8 @@ public class CsvWriter {
             @Override
             public String call(String recordValue) throws Exception {
                 recordValue = recordValue.replace('\n', ' ');
-                if (recordValue.contains(",")) {
-                    return '"' + recordValue + '"';
+                if (recordValue.contains(",") || recordValue.contains("\"")) {
+                    return '"' + recordValue.replaceAll("\"", "\"\"") + '"';
                 }
                 return recordValue;
             }

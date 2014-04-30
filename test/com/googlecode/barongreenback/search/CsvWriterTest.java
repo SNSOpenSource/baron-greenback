@@ -44,6 +44,18 @@ public class CsvWriterTest {
         assertThat(writer.toString(), is(outputCsv(FIELD_KEYWORD, stringRenderer.render(FIELD_VALUE))));
     }
 
+    @Test
+    public void shouldEscapeCsvFieldsCorrectly() throws Exception {
+        final CsvWriter csvWriter = new CsvWriter(new InMemoryRenderableTypes());
+        final StringWriter writer = new StringWriter();
+
+        final Record record = record(keyword("not_escaped", String.class), "not_escaped", keyword("comma_escaped", String.class), "comma,escaped", keyword("dquote_escaped", String.class), "dquote\"escaped");
+        csvWriter.writeTo(sequence(record), writer, record.keywords());
+
+        final String secondLine = writer.toString().split("\n")[1];
+        assertThat(secondLine, is("not_escaped,\"comma,escaped\",\"dquote\"\"escaped\""));
+    }
+
     private Renderer<String> bracketedStringRenderer() {
         return new Renderer<String>() {
             @Override
