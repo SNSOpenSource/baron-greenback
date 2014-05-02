@@ -158,6 +158,13 @@
             QUnit.deepEqual(selectedQueryFor('json'), ['queryForTest']);
         });
 
+        test('Clicking select all adds a query with double quote correctly', function () {
+            $("meta[name=query]").attr("content", "query\"doublequote");
+            selectAll().click();
+            QUnit.deepEqual(selectedQueryFor('export'), ["query\"doublequote"]);
+            QUnit.deepEqual(selectedQueryFor('json'), ["query\"doublequote"]);
+        });
+
         test('Clicking select page adds all ids on page into all bulk forms', function () {
             selectPage().click();
             QUnit.deepEqual(selectedRowsFor('export'), ['id1', 'id2', 'id3', 'id4']);

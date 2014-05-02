@@ -28,7 +28,7 @@
         jQuery('.selectors a.selectAll').click(function() {
             jQuery('.selectors a.selectPage').click();
             BGB.search.bulk.actions.removeAllIdentifiers();
-            jQuery('div.actions form').append('<input type="hidden" name="query" value="' + jQuery('meta[name="query"]').attr('content') + '">');
+            jQuery('div.actions form').append('<input type="hidden" name="query" value="' + BGB.encodeTextToHtmlEntities(jQuery('meta[name="query"]').attr('content')) + '">');
             jQuery('.table-actions .message').text('All ' + BGB.search.rowCount() +' rows are selected');
             BGB.search.allPagesSelected = true;
             return false;
