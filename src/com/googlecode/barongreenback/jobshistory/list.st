@@ -3,7 +3,7 @@
 <head>
     <title>Jobs History</title>
 </head>
-<body class="list jobsHistory bgb">
+<body class="list jobsHistory">
 <form class="search" method="get" action="">
     $input(name="query", value=query)$
     <input type="submit" value="Search" class="search"/>
