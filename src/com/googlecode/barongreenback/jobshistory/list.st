@@ -19,9 +19,9 @@
 $items:item(item=it)$
     </tbody>
 </table>
-</div>
 <div class="pagination-controls">
     $pager$
+</div>
 </div>
 
 </body>
