@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.barongreenback.shared.DateRenderer;
 import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
@@ -17,6 +18,7 @@ import com.googlecode.totallylazy.time.Minutes;
 import com.googlecode.totallylazy.time.Seconds;
 import com.googlecode.totallylazy.time.StoppedClock;
 import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.jobs.CompletedJob;
@@ -37,6 +39,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static com.googlecode.barongreenback.jobshistory.JobsHistoryPage.JobHistoryItem.functions.timestamp;
@@ -52,6 +55,7 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
+import static com.googlecode.utterlyidle.jobs.CreatedJob.createJob;
 import static java.lang.String.format;
 import static java.util.Calendar.DAY_OF_MONTH;
 import static org.hamcrest.Matchers.contains;
@@ -152,25 +156,18 @@ public class JobsHistoryResourceTest extends ApplicationTests {
 
     @Test
     public void resultsCanBeSorted() throws Exception {
-        jobStorageContains(Numbers.range(1, 9).map(new Function1<Number, Job>() {
-            @Override
-            public Job call(Number number) throws Exception {
-                return CreatedJob.createJob(get("/" + number.toString()).build(), new StoppedClock(new Date(946598400000L + (number.intValue() * 86400000))));
-            }
-        }).shuffle().toArray(Job.class));
+        final DateFormat dateFormatter = new SimpleDateFormat(DateRenderer.DEFAULT_DATE_FORMAT, Locale.ENGLISH);
+
+        final Date date1 = Dates.date(1980, 1, 1);
+        final Date date2 = Dates.date(2001, 1, 1);
+        final Date date3 = Dates.date(3000, 1, 1);
+        jobStorageContains(jobCreatedAt(date2), jobCreatedAt(date1), jobCreatedAt(date3));
 
         final JobsHistoryPage ascendingRequest = new JobsHistoryPage(browser).sortByTimestamp(true);
-
-        final Sequence<Pair<Number, JobsHistoryPage.JobHistoryItem>> ascendingPairs = Numbers.range(1, 9).zip(ascendingRequest.items());
-        for (Pair<Number, JobsHistoryPage.JobHistoryItem> pair : ascendingPairs) {
-            assertThat(pair.second().getTimestamp(), containsString(pair.first().toString()));
-        }
+        assertThat(sequence(ascendingRequest.items()).map(timestamp).map(trim()), Matchers.is(sequence(dateFormatter.format(date1), dateFormatter.format(date2), dateFormatter.format(date3))));
 
         final JobsHistoryPage descendingRequest = ascendingRequest.sortByTimestamp(false);
-        final Sequence<Pair<Number, JobsHistoryPage.JobHistoryItem>> descendingPairs = Numbers.range(9, 1).zip(descendingRequest.items());
-        for (Pair<Number, JobsHistoryPage.JobHistoryItem> pair : descendingPairs) {
-            assertThat(pair.second().getTimestamp(), containsString(pair.first().toString()));
-        }
+        assertThat(sequence(descendingRequest.items()).map(timestamp).map(trim()), Matchers.is(sequence(dateFormatter.format(date3), dateFormatter.format(date2), dateFormatter.format(date1))));
     }
 
     @Test
@@ -254,7 +251,7 @@ public class JobsHistoryResourceTest extends ApplicationTests {
     }
 
     private CreatedJob jobCreatedAt(Date date, Request request) {
-        return CreatedJob.createJob(request, new StoppedClock(date));
+        return createJob(request, new StoppedClock(date));
     }
 
     private Job[] jobs(int count) {
