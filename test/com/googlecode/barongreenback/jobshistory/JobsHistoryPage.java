@@ -67,7 +67,7 @@ public class JobsHistoryPage {
 
     private static String decodeCell(TableCell tableCell) {
         final String value = tableCell.toString();
-        final Matcher matcher = Pattern.compile("<td>(.*)</td>", Pattern.DOTALL).matcher(value);
+        final Matcher matcher = Pattern.compile("<td.*?>(.*)</td>", Pattern.DOTALL).matcher(value);
         matcher.find();
         return matcher.group(1);
     }

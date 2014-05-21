@@ -5,7 +5,7 @@
     <td>
         $item.elapsedTime$
     </td>
-    <td>
+    <td class="action">
         $item.action$
     </td>
     <td>

@@ -3,7 +3,7 @@
 <head>
     <title>Jobs History</title>
 </head>
-<body class="list bgb">
+<body class="list jobsHistory bgb">
 
 <div id="results">
 <table class="results $if(pager.paged)$paged$endif$ table table-striped">
