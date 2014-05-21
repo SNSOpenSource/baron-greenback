@@ -1,6 +1,8 @@
 package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.barongreenback.jobshistory.JobId;
+import com.googlecode.lazyrecords.mappings.LexicalLongMapping;
+import com.googlecode.lazyrecords.mappings.LongMapping;
 import com.googlecode.lazyrecords.mappings.StringMapping;
 import com.googlecode.lazyrecords.mappings.UUIDMapping;
 
@@ -16,6 +18,7 @@ public class InMemoryPersistentTypesActivator implements Callable<PersistentType
                 .add(String.class)
                 .add(Date.class)
                 .add(URI.class)
+                .add(Long.class, new LongMapping())
                 .add(JobId.class, jobIdMapping());
     }
 

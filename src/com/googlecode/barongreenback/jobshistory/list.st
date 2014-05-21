@@ -4,7 +4,10 @@
     <title>Jobs History</title>
 </head>
 <body class="list jobsHistory bgb">
-
+<form class="search" method="get" action="">
+    $input(name="query", value=query)$
+    <input type="submit" value="Search" class="search"/>
+</form>
 <div id="results">
 <table class="results $if(pager.paged)$paged$endif$ table table-striped">
     <thead>

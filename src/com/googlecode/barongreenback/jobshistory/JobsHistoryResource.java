@@ -49,7 +49,7 @@ public class JobsHistoryResource {
         Sequence<Record> sorted = sorter.sort(unpaged, sortKeywordFromRequest(headers));
         Sequence<Record> paged = pager.paginate(sorted);
 
-        Model model = model().add("items", paged.map(toModel()).toList());
+        Model model = model().add("query", query).add("items", paged.map(toModel()).toList());
 
         return pager.model(sorter.model(model, headers, paged));
     }
