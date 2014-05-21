@@ -6,6 +6,8 @@
     <JAVADOC />
     <SOURCES>
       <root url="file://$PROJECT_DIR$/lib/runtime" />
+      <root url="file://$PROJECT_DIR$/../utterlyidle/src" />
+      <root url="file://$PROJECT_DIR$/../utterlyidle/test" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib/runtime" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/runtime" recursive="false" type="SOURCES" />

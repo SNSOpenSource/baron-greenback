@@ -15,7 +15,10 @@
     <a href="$base$schedules/list">Schedules</a>
 </li>
 <li class="menu">
-    <a href="$base$jobs/list">Jobs</a>
+    <a href="$base$jobs/list">Recent Jobs</a>
+</li>
+<li class="menu">
+    <a href="$base$jobsHistory/list">Jobs History</a>
 </li>
 <li class="menu">
     <a href="$base$crawler/executor/list">Executor Config</a>

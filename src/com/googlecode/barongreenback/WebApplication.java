@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.batch.BatchModule;
 import com.googlecode.barongreenback.crawler.CrawlerModule;
 import com.googlecode.barongreenback.crawler.executor.ExecutorModule;
 import com.googlecode.barongreenback.crawler.failures.FailureModule;
+import com.googlecode.barongreenback.jobshistory.JobsHistoryModule;
 import com.googlecode.barongreenback.less.LessCssModule;
 import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.search.SearchModule;
@@ -119,6 +120,7 @@ public class WebApplication extends RestApplication {
         application.add(new ViewsModule());
         application.add(new ScheduleModule());
         application.add(new JobsModule());
+        application.add(new JobsHistoryModule());
         application.add(new BatchModule());
         application.add(new ExecutorModule());
         application.add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("baron-greenback"))));

@@ -2,6 +2,8 @@ package com.googlecode.barongreenback.persistence;
 
 import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
 import com.googlecode.barongreenback.persistence.sql.SqlModule;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
+import com.googlecode.barongreenback.shared.BaronGreenbackRequestScopedModule;
 import com.googlecode.lazyrecords.IgnoreLogger;
 import com.googlecode.lazyrecords.Logger;
 import com.googlecode.lazyrecords.lucene.Persistence;
@@ -19,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
 import static com.googlecode.yadic.Containers.addIfAbsent;
 
-public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule {
+public class PersistenceModule implements ApplicationScopedModule, RequestScopedModule, BaronGreenbackRequestScopedModule {
 
     @Override
     public Container addPerRequestObjects(final Container container) throws Exception {
@@ -28,6 +30,12 @@ public class PersistenceModule implements ApplicationScopedModule, RequestScoped
         addActivatorIfAbsent(container, BaronGreenbackRecords.class, BaronGreenbackRecordsActivator.class);
         addActivatorIfAbsent(container, UtterlyIdleRecords.class, UtterlyIdleRecordsActivator.class);
         addActivatorIfAbsent(container, PersistentTypes.class, InMemoryPersistentTypesActivator.class);
+        return container;
+    }
+
+    @Override
+    public BaronGreenbackRequestScope addBaronGreenbackPerRequestObjects(BaronGreenbackRequestScope container) {
+        addActivatorIfAbsent(container.value(), BaronGreenbackStringMappings.class, BaronGreenbackStringMappingsActivator.class);
         return container;
     }
 

@@ -17,7 +17,7 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
     @Test
     public void canCrawlAll() throws Exception {
         ScheduleListPage scheduleListPage = new ScheduleListPage(browser);
-        assertThat(scheduleListPage.numberOfJobs(), is(0));
+        final int existingJobs = scheduleListPage.numberOfJobs();
 
         importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
         CrawlerListPage crawlerListPage = importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
@@ -25,7 +25,7 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
         crawlerListPage.crawlAll();
 
         scheduleListPage = new ScheduleListPage(browser);
-        assertThat(scheduleListPage.numberOfJobs(), is(greaterThan(0)));
+        assertThat(scheduleListPage.numberOfJobs(), is(greaterThan(existingJobs)));
     }
 
     @Test

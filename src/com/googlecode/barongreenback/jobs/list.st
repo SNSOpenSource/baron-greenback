@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Jobs</title>
+    <title>Recent Jobs</title>
     <meta http-equiv="refresh" content="30"/>
 </head>
 <body class="jobs">

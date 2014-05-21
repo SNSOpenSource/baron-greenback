@@ -1,20 +1,24 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
+import com.googlecode.lazyrecords.mappings.DateMapping;
+import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.parser.ParserDateConverter;
 import com.googlecode.lazyrecords.parser.PredicateParser;
 import com.googlecode.lazyrecords.parser.StandardParser;
 
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 public class StandardParserActivator implements Callable<PredicateParser> {
-    private final ParserDateConverter parserDateConverter;
+    private final StringMappings stringMappings;
 
-    public StandardParserActivator(ParserDateConverter parserDateConverter) {
-        this.parserDateConverter = parserDateConverter;
+    public StandardParserActivator(ParserDateConverter dateConverter, BaronGreenbackStringMappings mappings) {
+        stringMappings = mappings.value().add(Date.class, new DateMapping(dateConverter));
     }
 
     @Override
     public PredicateParser call() throws Exception {
-        return new StandardParser(parserDateConverter);
+        return new StandardParser(stringMappings);
     }
 }

@@ -85,7 +85,7 @@ public class CrawlerListPage {
 
     private ScheduleListPage goToJobsList(Request request) throws Exception {
         Response response = httpHandler.handle(request);
-        return new ScheduleListPage(httpHandler, response);
+        return new ScheduleListPage(response);
     }
 
     public CrawlerListPage deleteAll() throws Exception {
