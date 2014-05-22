@@ -223,6 +223,15 @@ public class JobsHistoryResourceTest extends ApplicationTests {
         assertThat(historyPage.items().size(), is(1));
     }
 
+    @Test
+    public void canSearchByElapsedTime() throws Exception {
+        final CreatedJob createdJob = jobCreatedAt(date(1983, 10, 6));
+        jobStorageContains(createdJob);
+
+        final JobsHistoryPage historyPage = JobsHistoryPage.find(browser, "elapsedTime:0");
+        assertThat(historyPage.items().isEmpty(), is(false));
+    }
+
     private Response deleteJobHistoryItemsThatMatch(String nonMatchingQuery) throws Exception {
         return application.handle(post(relativeUriOf(method(on(JobsHistoryResource.class).remove(nonMatchingQuery)))).build());
     }
