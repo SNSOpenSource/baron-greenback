@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Jobs History</title>
+    <meta name="query" content="$query$" />
 </head>
 <body class="list jobsHistory">
 <form class="search" method="get" action="">
