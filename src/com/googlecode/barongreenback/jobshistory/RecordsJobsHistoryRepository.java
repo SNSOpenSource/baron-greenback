@@ -4,6 +4,7 @@ import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.search.PredicateBuilder;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
+import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
@@ -14,6 +15,7 @@ import static com.googlecode.barongreenback.jobshistory.JobHistoryItemDefinition
 import static com.googlecode.barongreenback.jobshistory.JobHistoryItemDefinition.jobsHistory;
 import static com.googlecode.barongreenback.jobshistory.JobHistoryItemDefinition.message;
 import static com.googlecode.barongreenback.jobshistory.JobHistoryItemDefinition.timestamp;
+import static com.googlecode.totallylazy.Either.right;
 
 public class RecordsJobsHistoryRepository implements JobsHistoryRepository {
 
@@ -31,9 +33,11 @@ public class RecordsJobsHistoryRepository implements JobsHistoryRepository {
     }
 
     @Override
-    public Sequence<Record> find(String query) {
-        final Predicate<Record> filter = predicateBuilder.build(query, jobsHistory.fields()).right();
-        return records.get(jobsHistory).filter(filter);
+    public Either<String, Sequence<Record>> find(String query) {
+        final Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(query, jobsHistory.fields());
+        if (invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
+
+        return right(records.get(jobsHistory).filter(invalidQueryOrPredicate.right()));
     }
 
     @Override

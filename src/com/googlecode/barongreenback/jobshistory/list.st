@@ -3,10 +3,16 @@
 <head>
     <title>Jobs History</title>
     <meta name="query" content="$query$" />
+    <meta name="queryException" content="$queryException$" />
 </head>
 <body class="list jobsHistory">
 <form class="search" method="get" action="">
-    $input(name="query", value=query)$
+    $if(queryException)$
+        $input(name="query", value=query, message="Invalid Query", messageType="error")$
+        <!-- $queryException$ -->
+    $else$
+        $input(name="query", value=query)$
+    $endif$
     <input type="submit" value="Search" class="search"/>
 </form>
 <div id="results">

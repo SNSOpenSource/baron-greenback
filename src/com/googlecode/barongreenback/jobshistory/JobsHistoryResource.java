@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
+import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.HttpMessageParser;
@@ -45,8 +46,12 @@ public class JobsHistoryResource {
     public Model list(@QueryParam("query") @DefaultValue("") final String query) {
         Sequence<Keyword<?>> headers = JobHistoryItemDefinition.jobsHistory.fields();
 
-        Sequence<Record> unpaged = jobsHistoryRepository.find(query);
-        Sequence<Record> sorted = sorter.sort(unpaged, sortKeywordFromRequest(headers));
+        Either<String, Sequence<Record>> invalidQueryOrPredicateOrUnpagedRecords = jobsHistoryRepository.find(query);
+        if(invalidQueryOrPredicateOrUnpagedRecords.isLeft()){
+            return model().add("query", query).add("queryException", invalidQueryOrPredicateOrUnpagedRecords.left());
+        }
+
+        Sequence<Record> sorted = sorter.sort(invalidQueryOrPredicateOrUnpagedRecords.right(), sortKeywordFromRequest(headers));
         Sequence<Record> paged = pager.paginate(sorted);
 
         Model model = model().add("query", query).add("items", paged.map(toModel()).toList());

@@ -35,14 +35,14 @@ public class RecordsJobsHistoryRepositoryTest {
     public void deletesNothing() throws Exception {
         repository.put(aJobHistoryItemFrom(new Date()));
         repository.remove("nonMatchingQuery");
-        assertThat(repository.find("").size(), is(1));
+        assertThat(repository.find("").right().size(), is(1));
     }
 
     @Test
     public void deletesEverything() throws Exception {
         repository.put(aJobHistoryItemFrom(new Date()));
         repository.remove("");
-        assertThat(repository.find("").size(), is(0));
+        assertThat(repository.find("").right().size(), is(0));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class RecordsJobsHistoryRepositoryTest {
         repository.put(aJobHistoryItemWith(jobId));
         repository.put(aJobHistoryItem());
         repository.remove(format("jobId:\"%s\"", jobId.value().toString()));
-        assertThat(repository.find("").size(), is(1));
+        assertThat(repository.find("").right().size(), is(1));
     }
 
     private JobHistoryItem aJobHistoryItem() {
