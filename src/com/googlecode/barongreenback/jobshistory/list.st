@@ -22,6 +22,7 @@ $items:item(item=it)$
 <div class="pagination-controls">
     $pager$
 </div>
+<div class="clear"></div>
 </div>
 
 </body>
