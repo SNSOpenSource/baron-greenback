@@ -30,6 +30,7 @@ import org.junit.runner.RunWith;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
@@ -125,6 +126,7 @@ public class SearchResourceTest extends ApplicationTests {
             @Row({"19/07/2011 13:43:25"})
     })
     public void supportsDateTimeQueriesFormattedInSummerTime(String query) throws Exception {
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
         SearchPage searchPage = new SearchPage(browser, "users", query);
         assertThat(searchPage.numberOfResults(), is(1));
     }
