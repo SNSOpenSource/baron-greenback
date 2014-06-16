@@ -1,0 +1,34 @@
+{"form":{
+    "update":"MultiUniques",
+    "from":"http://www.example.com",
+    "more":"",
+    "checkpoint":"",
+    "checkpointType":"java.lang.String",
+    "record":{
+        "name":"/path",
+        "keywords":[
+            {
+                "name":"/first/unique",
+                "alias":"",
+                "group":"",
+                "type":"java.lang.String",
+                "unique":true,
+                "visible":true,
+                "subfeed":false,
+                "record":null,
+                "checkpoint":false
+            },
+            {
+                "name":"/second/unique",
+                "alias":"",
+                "group":"",
+                "type":"java.lang.String",
+                "unique":true,
+                "visible":true,
+                "subfeed":false,
+                "record":null,
+                "checkpoint":false
+            }
+        ]
+    }
+}}
