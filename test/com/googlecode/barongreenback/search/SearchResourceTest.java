@@ -20,11 +20,16 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.waitrest.Waitrest;
 import com.googlecode.yadic.Container;
+import com.googlecode.yatspec.junit.Row;
+import com.googlecode.yatspec.junit.SpecRunner;
+import com.googlecode.yatspec.junit.Table;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.UUID;
 
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
@@ -43,6 +48,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+@RunWith(SpecRunner.class)
 public class SearchResourceTest extends ApplicationTests {
 
     private Definition usersView;
@@ -55,7 +61,7 @@ public class SearchResourceTest extends ApplicationTests {
         application.usingRequestScope(new Block<Container>() {
             public void execute(Container container) throws Exception {
                 Records records = container.get(BaronGreenbackRecords.class).value();
-                usersView = definition("users", keywords(recordSequence));
+                usersView = definition("users", keywords(recordSequence).append(keyword("updated", Date.class)));
                 records.add(usersView, recordSequence);
                 ModelRepository views = container.get(ModelRepository.class);
                 views.set(UUID.randomUUID(), ViewsRepository.convertToViewModel(usersView));
@@ -87,6 +93,28 @@ public class SearchResourceTest extends ApplicationTests {
     @Test
     public void supportsQueryForAParticularEntry() throws Exception {
         SearchPage searchPage = new SearchPage(browser, "users", "id:\"urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1\"");
+        assertThat(searchPage.numberOfResults(), is(1));
+    }
+
+    @Test
+    @Table({
+            @Row({"2011/07/19"}),
+            @Row({"19/07/11"}),
+            @Row({"19/07/2011"})
+    })
+    public void supportsDateQuery(String query) throws Exception {
+        SearchPage searchPage = new SearchPage(browser, "users", query);
+        assertThat(searchPage.numberOfResults(), is(2));
+    }
+
+    @Test
+    @Table({
+            @Row({"2011/07/19 12:43:25"}),
+            @Row({"19/07/11 12:43:25"}),
+            @Row({"19/07/2011 12:43:25"})
+    })
+    public void supportsDateTimeQuery(String query) throws Exception {
+        SearchPage searchPage = new SearchPage(browser, "users", query);
         assertThat(searchPage.numberOfResults(), is(1));
     }
 
