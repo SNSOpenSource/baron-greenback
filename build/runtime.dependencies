@@ -9,10 +9,10 @@ mvn:org.sitemesh:sitemesh:jar:3.0-alpha-2
 mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
-mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1155
-mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:pack|sources:279
-mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:pack|sources:746
-mvn://repo.bodar.com/com.googlecode.yadic:yadic:pack|sources:167
+mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1.11
+mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:pack|sources:284
+mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:pack|sources:753
+mvn://repo.bodar.com/com.googlecode.yadic:yadic:pack|sources:1.5
 mvn://repo.bodar.com/com.googlecode.funclate:funclate:pack|sources:132
 mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:pack|sources:12
 mvn://repo.bodar.com/com.googlecode.yatspec:yatspec:jar|sources:214
