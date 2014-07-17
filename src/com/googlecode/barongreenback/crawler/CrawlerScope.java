@@ -13,6 +13,7 @@ import com.googlecode.yadic.SimpleContainer;
 import com.googlecode.yadic.TypeMap;
 
 import java.lang.reflect.Type;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -127,5 +128,10 @@ public class CrawlerScope implements Container {
     @Override
     public <T> T create(Type type) throws ContainerException {
         return container.create(type);
+    }
+
+    @Override
+    public Iterator<Type> iterator() {
+        return container.iterator();
     }
 }
