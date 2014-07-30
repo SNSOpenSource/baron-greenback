@@ -19,7 +19,7 @@ BGB.namespace = function() {
 };
 
 BGB.namespace('search').rowCount = function() {
-    return parseInt(jQuery('ul.nav-tabs li.active a.tab span.count').text().replace(/[^0-9]/g, ''));
+    return parseInt(jQuery('meta[name="resultCount"]').attr('content'));
 };
 
 BGB.namespace('search').selectedRowCount = function() {
