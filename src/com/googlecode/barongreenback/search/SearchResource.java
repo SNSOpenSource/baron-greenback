@@ -224,7 +224,8 @@ public class SearchResource {
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
 
                 return pager.model(sorter.model(baseModel(viewName, query).
-                                add("results", results.map(aliasFor(viewName).map(asModel(viewName, visibleHeaders))).toList()),
+                                add("results", results.map(aliasFor(viewName).map(asModel(viewName, visibleHeaders))).toList()).
+                                add("resultCount", recordsService.count(viewName, query)),
                         visibleHeaders, results
                 ));
             }

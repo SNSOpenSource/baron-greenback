@@ -4,6 +4,7 @@
     <title>$view$ Search</title>
     <meta name="view" content="$view$" />
     <meta name="query" content="$query$" />
+    <meta name="resultCount" content="$resultCount$" />
     <meta name="queryException" content="$queryException$" />
 </head>
 <body class="$view$">

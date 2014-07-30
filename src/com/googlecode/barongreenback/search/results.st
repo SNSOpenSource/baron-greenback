@@ -24,5 +24,8 @@ $if(results)$
         <span class="message"></span>
     </div>
 </div>
-
+$else$
+<div id="no-results">
+    No records found.
+</div>
 $endif$
