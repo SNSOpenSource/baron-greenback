@@ -26,6 +26,6 @@ $if(results)$
 </div>
 $else$
 <div id="no-results">
-    No records found.
+    No results found.
 </div>
 $endif$
