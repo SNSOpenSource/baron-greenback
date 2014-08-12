@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.crawler;
 
+import com.googlecode.barongreenback.crawler.failures.FailureRepository;
 import com.googlecode.barongreenback.persistence.PersistentTypes;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.RecordDefinition;
@@ -51,15 +52,17 @@ public class CrawlerDefinitionResource {
     private final Crawler crawler;
     private final PrintStream log;
     private final CrawlerRepository repository;
+    private final FailureRepository failureRepository;
     private final ViewsRepository viewsRepository;
     private final PersistentTypes persistentTypes;
 
-    public CrawlerDefinitionResource(CrawlerRepository repository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log, ViewsRepository viewsRepository, PersistentTypes persistentTypes) {
+    public CrawlerDefinitionResource(CrawlerRepository repository, Redirector redirector, CrawlInterval interval, Crawler crawler, PrintStream log, FailureRepository failureRepository, ViewsRepository viewsRepository, PersistentTypes persistentTypes) {
         this.interval = interval;
         this.redirector = redirector;
         this.crawler = crawler;
         this.log = log;
         this.repository = repository;
+        this.failureRepository = failureRepository;
         this.viewsRepository = viewsRepository;
         this.persistentTypes = persistentTypes;
     }
@@ -103,6 +106,7 @@ public class CrawlerDefinitionResource {
     @Path("delete")
     public Response delete(@FormParam("id") UUID id) {
         repository.remove(id);
+        failureRepository.removeAllForCrawler(id);
         return redirectToCrawlerList();
     }
 

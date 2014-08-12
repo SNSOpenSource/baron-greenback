@@ -72,4 +72,8 @@ public class FailureRepository implements Repository<UUID, Record>, Finder<Recor
     public int removeAll() {
         return records.remove(FAILURES).intValue();
     }
+
+    public void removeAllForCrawler(final UUID crawlerId) {
+        records.remove(FAILURES, where(CRAWLER_ID, is(crawlerId)));
+    }
 }
