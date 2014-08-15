@@ -240,7 +240,7 @@ public class CrawlerDefinitionResource {
     public static Uri scheduleAQueuedCrawl(UUID crawlerId, UUID schedulerId, Long interval) throws Exception {
         String crawlerJob = absolutePathOf(method(on(CrawlerDefinitionResource.class).crawl(crawlerId)));
         String queued = absolutePathOf(method(on(JobsResource.class).create(null, crawlerJob)));
-        return relativeUriOf(method(on(ScheduleResource.class).schedule(schedulerId, interval, queued)));
+        return relativeUriOf(method(on(ScheduleResource.class).scheduleWithQueryParams(schedulerId, interval, queued)));
     }
 
     private static String absolutePathOf(Invocation<?, ?> method) {
