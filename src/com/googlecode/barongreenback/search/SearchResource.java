@@ -4,40 +4,12 @@ import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.AliasedKeyword;
-import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.*;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Block;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callable2;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.Mapper;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.UnaryFunction;
-import com.googlecode.totallylazy.Uri;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.time.Clock;
-import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.ResponseBuilder;
-import com.googlecode.utterlyidle.Responses;
-import com.googlecode.utterlyidle.Status;
-import com.googlecode.utterlyidle.StreamingOutput;
-import com.googlecode.utterlyidle.annotations.DefaultValue;
-import com.googlecode.utterlyidle.annotations.GET;
-import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.PathParam;
-import com.googlecode.utterlyidle.annotations.Priority;
-import com.googlecode.utterlyidle.annotations.Produces;
-import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.utterlyidle.*;
+import com.googlecode.utterlyidle.annotations.*;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -59,9 +31,7 @@ import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
-import static com.googlecode.totallylazy.Predicates.classAssignableTo;
-import static com.googlecode.totallylazy.Predicates.in;
-import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.isEmpty;
 import static com.googlecode.totallylazy.Unchecked.cast;
@@ -124,7 +94,7 @@ public class SearchResource {
         final Model view = recordsService.view(viewName);
         final Definition definition = recordsService.definition(view);
         Keyword<? extends Comparable> firstComparable = findFirstComparable(definition);
-        final Sequence<Record> result = errorOrResults.right().sortBy(descending(firstComparable)).map(aliasFor(viewName));
+        final Sequence<Record> result = errorOrResults.right().sortBy(descending(firstComparable)).map(withAliasesFor(recordsService.visibleHeaders(viewName)));
 
         final Sequence<Keyword<?>> visibleHeaders = visibleHeaders(view);
 
@@ -184,7 +154,7 @@ public class SearchResource {
         final List<Model> viewFields = recordsService.findView(viewName).get().get("view", Model.class).getValues("keywords", Model.class);
         final List<String> aliasedViewFieldNames = sequence(viewFields).map(toAliasOrElseName()).unique().toList();
         final List<String> viewGroupNames = sequence(viewFields).map(value("group", String.class)).unique().toList();
-        final Map<String, Map<String, Object>> groupedAliasedFields = record.map(aliasFor(viewName)).get().fields().fold(newSortedMapUsing(viewGroupNames), groupBy(ViewsRepository.GROUP, aliasedViewFieldNames));
+        final Map<String, Map<String, Object>> groupedAliasedFields = record.map(withAliasesFor(headers(recordsService.view(viewName)))).get().fields().fold(newSortedMapUsing(viewGroupNames), groupBy(ViewsRepository.GROUP, aliasedViewFieldNames));
 
         return baseModel(viewName, query).add("record", groupedAliasedFields);
     }
@@ -224,7 +194,7 @@ public class SearchResource {
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
 
                 return pager.model(sorter.model(baseModel(viewName, query).
-                                add("results", results.map(aliasFor(viewName).map(asModel(viewName, visibleHeaders))).toList()).
+                                add("results", results.map(withAliasesFor(recordsService.visibleHeaders(viewName)).map(asModel(viewName, visibleHeaders))).toList()).
                                 add("resultCount", recordsService.count(viewName, query)),
                         visibleHeaders, results
                 ));
@@ -232,8 +202,8 @@ public class SearchResource {
         };
     }
 
-    private UnaryFunction<Record> aliasFor(String viewName) {
-        final Sequence<AliasedKeyword<?>> aliasedKeywords = recordsService.visibleHeaders(viewName).safeCast(AliasedKeyword.class).unsafeCast();
+    private UnaryFunction<Record> withAliasesFor(Sequence<Keyword<?>> keywords) {
+        final Sequence<AliasedKeyword<?>> aliasedKeywords = keywords.safeCast(AliasedKeyword.class).unsafeCast();
         final Sequence<Keyword<?>> sourceKeywords = aliasedKeywords.map(unalias());
         return alias(aliasedKeywords, sourceKeywords);
     }
