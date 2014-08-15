@@ -39,7 +39,7 @@ public class JobsHistoryCleanupService extends StartOnlyService {
         return application.usingRequestScope(new Function1<Container, Response>() {
             @Override
             public Response call(Container container) throws Exception {
-                Uri uri = relativeUriOf(method(on(ScheduleResource.class).schedule(CLEANUP_JOBS_HISTORY_ID, START_TIME, DAYS.toSeconds(1), deleteOldJobHistoryItems())));
+                Uri uri = relativeUriOf(method(on(ScheduleResource.class).scheduleWithQueryParams(CLEANUP_JOBS_HISTORY_ID, START_TIME, DAYS.toSeconds(1), deleteOldJobHistoryItems())));
                 return application.handle(post(uri).build());
             }
         });
