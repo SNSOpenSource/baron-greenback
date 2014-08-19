@@ -45,7 +45,7 @@ public class RecordsService {
 
     public void delete(String viewName, String query) {
         Model view = view(viewName);
-        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithImplicitViewQuery(view, query), headers(view)).right();
+        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithImplicitViewQuery(view, query), headersForQuery(view)).right();
         records.remove(Definition.constructors.definition(viewName(view), Sequences.<Keyword<?>>empty()), predicate);
     }
 
@@ -54,7 +54,7 @@ public class RecordsService {
         if (optionalView.isEmpty()) return 0;
 
         Model view = optionalView.get();
-        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headers(view));
+        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headersForQuery(view));
         return recordsFound.map(Callables.<String, Number>ignoreAndReturn(0), size());
     }
 
@@ -72,7 +72,7 @@ public class RecordsService {
         if (optionalView.isEmpty()) return none();
 
         Model view = optionalView.get();
-        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headers(view));
+        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headersForQuery(view));
         return recordsFound.map(ignoreAndReturn(Option.none(Record.class)), firstResult());
     }
 
@@ -81,7 +81,7 @@ public class RecordsService {
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
         Model view = optionalView.get();
-        return getRecordsWithQuery(view, query, headers(view));
+        return getRecordsWithQuery(view, query, headersForQuery(view));
     }
 
     public Either<String, Sequence<Record>> findFromView(final String viewName, final String query) {
@@ -89,7 +89,7 @@ public class RecordsService {
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
         Model view = optionalView.get();
-        return getRecords(view, query, headers(view));
+        return getRecords(view, query, headersForQuery(view));
     }
 
     public static String prefixQueryWithImplicitViewQuery(Model view, final String query) {
@@ -137,13 +137,17 @@ public class RecordsService {
         return visibleHeaders(headers(view));
     }
 
-
     private static Sequence<Keyword<?>> visibleHeaders(Sequence<Keyword<?>> headers) {
         return headers.filter(where(metadata(ViewsRepository.VISIBLE), is(notNullValue(Boolean.class).and(is(true))))).realise();
     }
 
+
     public static Sequence<Keyword<?>> headers(Model view) {
         return toKeywords(unwrap(view));
+    }
+
+    private Sequence<Keyword<?>> headersForQuery(Model view) {
+        return headers(view).map(unalias());
     }
 
     private static Callable1<Sequence<Record>, Option<Record>> firstResult() {
