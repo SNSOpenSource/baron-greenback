@@ -11,6 +11,7 @@ import com.googlecode.yadic.Container;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.jobshistory.JobsHistoryResource.queryForOlderThan;
+import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
@@ -39,7 +40,7 @@ public class JobsHistoryCleanupService extends StartOnlyService {
         return application.usingRequestScope(new Function1<Container, Response>() {
             @Override
             public Response call(Container container) throws Exception {
-                Uri uri = relativeUriOf(method(on(ScheduleResource.class).scheduleWithQueryParams(CLEANUP_JOBS_HISTORY_ID, START_TIME, DAYS.toSeconds(1), deleteOldJobHistoryItems())));
+                Uri uri = relativeUriOf(method(on(ScheduleResource.class).scheduleWithQueryParams(CLEANUP_JOBS_HISTORY_ID, some(START_TIME), DAYS.toSeconds(1), deleteOldJobHistoryItems())));
                 return application.handle(post(uri).build());
             }
         });

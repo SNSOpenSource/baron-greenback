@@ -11,7 +11,7 @@ mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
 mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1.11
 mvn://repo.bodar.com/com.googlecode.lazyrecords:lazyrecords:pack|sources:284
-mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:pack|sources:766
+mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:pack|sources:771
 mvn://repo.bodar.com/com.googlecode.yadic:yadic:pack|sources:1.5
 mvn://repo.bodar.com/com.googlecode.funclate:funclate:pack|sources:132
 mvn://repo.bodar.com/com.googlecode.lazyparsec:lazyparsec:pack|sources:12
@@ -20,3 +20,4 @@ mvn://repo.bodar.com/com.googlecode.yatspec:yatspec:jar|sources:214
 mvn:org.mozilla:rhino:jar|sources:1.7R4
 
 mvn://repo.bodar.com/net.spmiller.org.lesscss:lesscss-deps:jar:1.3.2-0
+

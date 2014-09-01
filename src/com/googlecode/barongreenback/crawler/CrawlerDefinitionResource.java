@@ -36,6 +36,7 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.crawler.Crawler.methods.extractRecordDefinition;
 import static com.googlecode.barongreenback.shared.Forms.functions.addTemplates;
 import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.Response.functions.asResponse;
@@ -240,7 +241,7 @@ public class CrawlerDefinitionResource {
     public static Uri scheduleAQueuedCrawl(UUID crawlerId, UUID schedulerId, Long interval) throws Exception {
         String crawlerJob = absolutePathOf(method(on(CrawlerDefinitionResource.class).crawl(crawlerId)));
         String queued = absolutePathOf(method(on(JobsResource.class).create(null, crawlerJob)));
-        return relativeUriOf(method(on(ScheduleResource.class).scheduleWithQueryParams(schedulerId, interval, queued)));
+        return relativeUriOf(method(on(ScheduleResource.class).scheduleWithQueryParams(schedulerId, none(String.class), interval, queued)));
     }
 
     private static String absolutePathOf(Invocation<?, ?> method) {
