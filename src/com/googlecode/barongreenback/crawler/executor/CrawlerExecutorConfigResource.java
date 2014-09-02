@@ -6,6 +6,7 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
@@ -23,6 +24,7 @@ import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.fromDisplayName;
 import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -42,19 +44,17 @@ public class CrawlerExecutorConfigResource {
 
     @GET
     @Path("list")
-    public Model list() {
-        return model().add("InputHandlerThreads", crawlerExecutors.inputHandlerThreads()).
+    public Model list(@QueryParam("message") Option<String> message, @QueryParam("category") Option<Category> category) {
+        final Model model = model().add("InputHandlerThreads", crawlerExecutors.inputHandlerThreads()).
                 add("InputHandlerCapacity", crawlerExecutors.inputHandlerCapacity()).
                 add("ProcessHandlerThreads", crawlerExecutors.processHandlerThreads()).
                 add("ProcessHandlerCapacity", crawlerExecutors.processHandlerCapacity()).
                 add("OutputHandlerThreads", crawlerExecutors.outputHandlerThreads()).
                 add("OutputHandlerCapacity", crawlerExecutors.outputHandlerCapacity());
-    }
-
-    @GET
-    @Path("list")
-    public Model list(@QueryParam("message")String message, @QueryParam("category") Category category) {
-        return list().add("message", model().add("text", message).add("category", category));
+        if (message.isDefined() && category.isDefined()) {
+            return model.add("message", model().add("text", message.get()).add("category", category.get()));
+        }
+        return model;
     }
 
     @POST
@@ -68,9 +68,9 @@ public class CrawlerExecutorConfigResource {
             Sequence<Pair<String, Integer>> values = configValues.map(toValues());
             Sequence<Pair<CrawlerConfigValues, Integer>> map1 = values.map(toParameter());
             crawlerExecutors.handlerValues(map1);
-            return redirector.seeOther(method(on(CrawlerExecutorConfigResource.class).list(("Executor Config Updated"), Category.SUCCESS)));
+            return redirector.seeOther(method(on(CrawlerExecutorConfigResource.class).list(some("Executor Config Updated"), some(Category.SUCCESS))));
         }
-        return redirector.seeOther(method(on(CrawlerExecutorConfigResource.class).list(("Error Updating Config Data"), Category.ERROR)));
+        return redirector.seeOther(method(on(CrawlerExecutorConfigResource.class).list(some("Error Updating Config Data"), some(Category.ERROR))));
     }
 
     private Callable1<Pair<String, Integer>, Pair<CrawlerConfigValues, Integer>> toParameter() {
