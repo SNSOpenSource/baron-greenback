@@ -6,14 +6,25 @@ import com.googlecode.barongreenback.shared.pager.Pager;
 import com.googlecode.barongreenback.shared.pager.RequestPager;
 import com.googlecode.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.StringFunclate;
-import com.googlecode.lazyrecords.parser.*;
-import com.googlecode.totallylazy.*;
-import com.googlecode.totallylazy.time.*;
+import com.googlecode.lazyrecords.parser.ParametrizedParser;
+import com.googlecode.lazyrecords.parser.ParserDateConverter;
+import com.googlecode.lazyrecords.parser.ParserFunctions;
+import com.googlecode.lazyrecords.parser.ParserParameters;
+import com.googlecode.lazyrecords.parser.PredicateParser;
+import com.googlecode.totallylazy.Function2;
+import com.googlecode.totallylazy.Function3;
+import com.googlecode.totallylazy.Functions;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.UnaryFunction;
+import com.googlecode.totallylazy.time.Clock;
+import com.googlecode.totallylazy.time.DateConverter;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
+import com.googlecode.utterlyidle.modules.ArgumentScopedModule;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.modules.ResourcesModule;
 import com.googlecode.yadic.Container;
@@ -27,7 +38,7 @@ import static com.googlecode.totallylazy.time.Hours.functions.subtract;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.handlers.ConvertExtensionToAcceptHeader.Replacements.replacements;
 
-public class SearchModule implements BaronGreenbackRequestScopedModule, ResourcesModule, ApplicationScopedModule, RequestScopedModule {
+public class SearchModule implements BaronGreenbackRequestScopedModule, ResourcesModule, ApplicationScopedModule, RequestScopedModule, ArgumentScopedModule {
     public Resources addResources(Resources resources) {
         return resources.add(annotatedClass(SearchResource.class));
     }
@@ -38,6 +49,7 @@ public class SearchModule implements BaronGreenbackRequestScopedModule, Resource
                 addActivator(PredicateBuilder.class, PredicateBuilderActivator.class).
                 add(CsvWriter.class);
         Containers.addIfAbsent(container, ShortcutPolicy.class, PrimaryViewShortcutPolicy.class);
+        container.decorate(ShortcutPolicy.class, DrillDownsShortcutPolicy.class);
         return Containers.addInstanceIfAbsent(container, ConvertExtensionToAcceptHeader.Replacements.class, replacements(Pair.pair("json", MediaType.APPLICATION_JSON))).
                 decorate(HttpHandler.class, ConvertExtensionToAcceptHeader.class);
     }
@@ -88,4 +100,8 @@ public class SearchModule implements BaronGreenbackRequestScopedModule, Resource
         return container;
     }
 
+    @Override
+    public Container addPerArgumentObjects(Container container) throws Exception {
+        return container.addActivator(DrillDowns.class, DrillDownsActivator.class);
+    }
 }

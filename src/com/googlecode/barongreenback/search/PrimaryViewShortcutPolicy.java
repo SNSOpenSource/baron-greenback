@@ -29,7 +29,7 @@ public class PrimaryViewShortcutPolicy implements ShortcutPolicy {
     }
 
     @Override
-    public boolean shouldShortcut(String view, String query) {
+    public boolean shouldShortcut(String view, String query, DrillDowns drillDowns) {
         Sequence<Pair<String, Number>> counts = views().filter(is(visible()).and(hasNoParent().or(hasParentIn(invisibleParents())))).
                 map(value("name", String.class)).
                 map(toCount(query).capturing()).memoize();

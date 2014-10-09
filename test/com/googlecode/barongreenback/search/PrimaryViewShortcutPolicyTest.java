@@ -1,6 +1,7 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import com.googlecode.barongreenback.persistence.InMemoryPersistentTypes;
 import com.googlecode.barongreenback.persistence.ModelMapping;
 import com.googlecode.barongreenback.shared.RecordsModelRepository;
 import com.googlecode.barongreenback.views.ViewsRepository;
@@ -18,6 +19,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,12 +31,13 @@ public class PrimaryViewShortcutPolicyTest {
     private RecordsService recordsService;
     private RecordsModelRepository modelRepository;
     private Keyword<String> keyword = Keyword.constructors.keyword("foo", String.class);
-    private BaronGreenbackRecords records = BaronGreenbackRecords.records(new MemoryRecords(new StringMappings().add(Model.class, new ModelMapping())));
+    private final StringMappings stringMappings = new StringMappings().add(Model.class, new ModelMapping());
+    private BaronGreenbackRecords records = BaronGreenbackRecords.records(new MemoryRecords(stringMappings));
 
     @Before
     public void createPolicy() {
         modelRepository = new RecordsModelRepository(records);
-        recordsService = new RecordsService(records, modelRepository, new PredicateBuilder(new StandardParser()));
+        recordsService = new RecordsService(records, modelRepository, new PredicateBuilder(new StandardParser(), baronGreenbackStringMappings(stringMappings, new InMemoryPersistentTypes())));
 
         policy = new PrimaryViewShortcutPolicy(recordsService, modelRepository);
     }
@@ -45,7 +48,7 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("someView", "foo:value"), is(true));
+        assertThat(policy.shouldShortcut("someView", "foo:value", DrillDowns.empty()), is(true));
     }
 
     @Test
@@ -55,7 +58,7 @@ public class PrimaryViewShortcutPolicyTest {
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("viewName", "foo:value"), is(false));
+        assertThat(policy.shouldShortcut("viewName", "foo:value", DrillDowns.empty()), is(false));
     }
 
     @Test
@@ -64,14 +67,14 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("someView", "foo:value"), is(false));
+        assertThat(policy.shouldShortcut("someView", "foo:value", DrillDowns.empty()), is(false));
     }
 
     @Test
     public void shouldNotShortcutWithNoData() throws Exception {
         createView(someDefinition(), "someView", true);
 
-        assertThat(policy.shouldShortcut("someView", "foo:value"), is(false));
+        assertThat(policy.shouldShortcut("someView", "foo:value", DrillDowns.empty()), is(false));
     }
 
     @Test
@@ -81,7 +84,7 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("view1", "foo:value"), is(false));
+        assertThat(policy.shouldShortcut("view1", "foo:value", DrillDowns.empty()), is(false));
     }
 
     @Test
@@ -91,7 +94,7 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("view1", "foo:value"), is(true));
+        assertThat(policy.shouldShortcut("view1", "foo:value", DrillDowns.empty()), is(true));
     }
 
     @Test
@@ -101,7 +104,7 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("view2", "foo:value"), is(true));
+        assertThat(policy.shouldShortcut("view2", "foo:value", DrillDowns.empty()), is(true));
     }
 
     @Test
@@ -111,7 +114,7 @@ public class PrimaryViewShortcutPolicyTest {
 
         records.value().add(someDefinition(), Record.constructors.record(keyword, "value"));
 
-        assertThat(policy.shouldShortcut("view1", "foo:value"), is(false));
+        assertThat(policy.shouldShortcut("view1", "foo:value", DrillDowns.empty()), is(false));
     }
 
     private Definition someDefinition() {

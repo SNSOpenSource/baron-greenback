@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
-import com.googlecode.lazyrecords.parser.PredicateParser;
 
 import java.util.concurrent.Callable;
 
@@ -14,6 +13,6 @@ public class PredicateBuilderActivator implements Callable<PredicateBuilder> {
 
     @Override
     public PredicateBuilder call() throws Exception {
-        return new PredicateBuilder(requestScope.value().get(PredicateParser.class));
+        return requestScope.value().create(PredicateBuilder.class);
     }
 }

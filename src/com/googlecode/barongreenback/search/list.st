@@ -4,15 +4,15 @@
     <title>$view$ Search</title>
     <meta name="view" content="$view$" />
     <meta name="query" content="$query$" />
+    <meta name="drills" content="$drills$" />
     <meta name="resultCount" content="$resultCount$" />
     <meta name="queryException" content="$queryException$" />
 </head>
 <body class="$view$">
-<div>
+<div id="search-results">
     <form class="search" method="get" action="shortcut">
         $if(queryException)$
-            $input(name="query", value=query, message="Invalid Query", messageType="error")$
-            <!-- $queryException$ -->
+            $input(name="query", value=query, message=queryException, messageType="error")$
         $else$
             $input(name="query", value=query)$
         $endif$
@@ -21,7 +21,7 @@
     $results()$
 </div>
 
-$include.({/$view;format="url"$/actions/list?query=$query;format="url"$$if(advanced)$&advanced$endif$}).body;format="raw"$
+$include.({/$view;format="url"$/actions/list?query=$query;format="url"$&drills=$drills;format="url"$$if(advanced)$&advanced$endif$}).body;format="raw"$
 <script src="$base$baron-greenback/shared/actions/actions.js" type="text/javascript" defer="defer"></script>
 </body>
 </html>
