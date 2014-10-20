@@ -1,0 +1,1 @@
+<a href="$url; null={$name$?id=$id$}$" class="$class; null=name$">$name$</a>
