@@ -9,8 +9,10 @@ import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.*;
 import com.googlecode.totallylazy.Block;
+import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -26,11 +28,13 @@ import org.junit.runner.RunWith;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Properties;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ID;
 import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.TITLE;
+import static com.googlecode.barongreenback.persistence.lucene.LuceneModule.LUCENE_MAX_CLAUSE_COUNT;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keyword.methods.keywords;
@@ -44,15 +48,21 @@ import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(SpecRunner.class)
 public class SearchResourceTest extends ApplicationTests {
 
+    public static final int MAX_CLAUSES = 10;
     private Definition usersView;
     private UUID viewId;
+
+    @Override
+    protected Properties getProperties() {
+        final Properties properties = super.getProperties();
+        properties.setProperty(LUCENE_MAX_CLAUSE_COUNT, String.valueOf(MAX_CLAUSES));
+        return properties;
+    }
 
     @Before
     public void addSomeData() throws Exception {
@@ -215,5 +225,27 @@ public class SearchResourceTest extends ApplicationTests {
         final Response response = application.handle(get(relativeUriOf(method(on(SearchResource.class).unique("items", "")))).accepting(APPLICATION_JSON).build());
         final String expectedResponse = "\"record\":{\"groupa\":{\"aliasc\":\"c\",\"aliasa\":\"a\"},\"groupb\":{\"aliasb\":\"b\"},\"Other\":{\"aliasd\":\"d\"}}";
         assertThat(response.entity().toString(), containsString(expectedResponse));
+    }
+
+    @Test(expected = Exception.class)
+    public void shouldThrowExceptionIfNumberOfClausesExceedsTheDefaultValue() throws Exception {
+        final String longQuery = queryWithClauses(MAX_CLAUSES + 1);
+        new SearchPage(browser, "users", longQuery);
+    }
+
+    @Test
+    public void shouldNotThrowAnExceptionIfNumberOfClausesIsBelowTheMaximumValue() throws Exception {
+        final String longQuery = queryWithClauses(MAX_CLAUSES);
+        final SearchPage searchPage = new SearchPage(browser, "users", longQuery);
+        assertThat(searchPage.numberOfResults(), is(0));
+    }
+
+    private static String queryWithClauses(int numOfCauses) {
+        return Numbers.range(1, numOfCauses).fold(new StringBuilder(), new Callable2<StringBuilder, Number, StringBuilder>() {
+            @Override
+            public StringBuilder call(StringBuilder query, Number number) throws Exception {
+                return query.append(" OR first:" + number);
+            }
+        }).substring(4);
     }
 }
