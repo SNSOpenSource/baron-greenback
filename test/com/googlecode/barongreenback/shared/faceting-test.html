@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Faceting test</title>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.10.0.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture">
+    <div id="nav-facets-container">
+        <h5>Filter by</h5>
+        <ul class="nav nav-facets">
+            <li class="nav-facet first-page-title"><span class="facet-name">First Page Title</span>
+                <ul class="facet">
+                    <li class="facet-entry"><input type="checkbox" value="Mum has triple murder charges dropped"
+                                                   class="facet-entry-checkbox"/>
+                        <span class="facet-entry-name " title="Mum has triple murder charges dropped">Mum has triple murder charges dropped</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+                    <li class="facet-entry"><input type="checkbox" value="Farage invited on leaders&#39; TV debate"
+                                                   class="facet-entry-checkbox"/>
+                        <span class="facet-entry-name " title="Farage invited on leaders&#39; TV debate">Farage invited on leaders&#39; TV debate</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+                    <li class="facet-entry"><input type="checkbox" value="Oscar Pistorius sentencing begins"
+                                                   class="facet-entry-checkbox"/>
+                        <span class="facet-entry-name " title="Oscar Pistorius sentencing begins">Oscar Pistorius sentencing begins</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+                    <li class="facet-entry"><input type="checkbox" value="Turkey &#39;agrees to US use of bases&#39;"
+                                                   class="facet-entry-checkbox"/>
+                        <span class="facet-entry-name " title="Turkey &#39;agrees to US use of bases&#39;">Turkey &#39;agrees to US use of bases&#39;</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+
+                    <li class="facet-show-more"><a
+                            href="/facets/facet?current=news&amp;query=&amp;facetName=Page+Title&amp;drills=%7B%7D&amp;decorator=none"
+                            title="Show More" class="facet-show-more-link">Show More...</a></li>
+                </ul>
+            </li>
+            <li class="nav-facet second-page-title"><span class="facet-name">Second Page Title</span>
+                <ul class="facet">
+                    <li class="facet-entry"><input value="Mum has triple murder charges dropped"
+                                                   class="facet-entry-checkbox" type="checkbox">
+                        <span class="facet-entry-name " title="Mum has triple murder charges dropped">Mum has triple murder charges dropped</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+                    <li class="facet-entry"><input value="Farage invited on leaders' TV debate"
+                                                   class="facet-entry-checkbox"
+                                                   type="checkbox">
+                        <span class="facet-entry-name " title="Farage invited on leaders' TV debate">Farage invited on leaders' TV debate</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+                    <li class="facet-entry"><input value="Government seeks buyer for Eurostar"
+                                                   class="facet-entry-checkbox"
+                                                   type="checkbox">
+                        <span class="facet-entry-name " title="Government seeks buyer for Eurostar">Government seeks buyer for Eurostar</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+                    <li class="facet-entry"><input value="New Ebola checks for NHS 111 calls"
+                                                   class="facet-entry-checkbox"
+                                                   type="checkbox">
+                        <span class="facet-entry-name " title="New Ebola checks for NHS 111 calls">New Ebola checks for NHS 111 calls</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+                    <li class="facet-entry"><input value="Scuffles at Hong Kong protest site"
+                                                   class="facet-entry-checkbox"
+                                                   type="checkbox">
+                        <span class="facet-entry-name " title="Scuffles at Hong Kong protest site">Scuffles at Hong Kong protest site</span><span
+                                class="facet-entry-count">(1)</span>
+                    </li>
+
+                    <li class="facet-show-fewer"><a href="/facets/facet?current=news&amp;query=&amp;facetName=Page+Title&amp;decorator=none" title="Show Fewer" class="facet-show-fewer-link">Show Fewer...</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src="https://cdn.rawgit.com/appendto/jquery-mockjax/v1.6.0/jquery.mockjax.js"></script>
+<script src="//code.jquery.com/qunit/qunit-1.10.0.js"></script>
+<script>
+    var addProdFiles = function (files, callback) {
+        if (files.length == 1) {
+            var testUri = document.location.href.replace('test', 'src');
+            var resourceUri = testUri.slice(0, testUri.lastIndexOf('/') + 1) + files[0];
+            var scriptNode = document.createElement("script");
+            scriptNode.setAttribute("src", resourceUri);
+            scriptNode.onload = callback;
+            document.head.appendChild(scriptNode);
+        } else {
+            // [fileA, fileB] CB -> addProdFiles ([fileA], addProdFile([fileB], CB))
+            var nextFile = files.pop();
+            addProdFiles(files, function () {
+                addProdFiles([nextFile], callback)
+            });
+        }
+    };
+
+
+    addProdFiles(['bgb.js', 'faceting.js'], function () {
+
+        QUnit.testStart(BGB.faceting.registerFacetEntriesHandlers);
+
+        QUnit.testDone(function() {
+            $.mockjax.clear();
+        });
+
+        module('Show More');
+        test('Show More makes an ajax call', function () {
+            $.mockjax({
+                url: "/facets/facet*",
+                responseText: "Mock"
+            });
+            $('.facet-show-more-link').click();
+            QUnit.equal($.mockjax.unfiredHandlers().length, 0, "Request was made");
+        });
+        asyncTest('Show More replaces facet details with response body', function (assert) {
+            expect(1);
+            $.mockjax({
+                url: "/facets/facet*",
+                response: function(settings) {
+                    this.responseText = "Mock";
+                    QUnit.start();
+                }
+            });
+            $('.facet-show-more-link').click();
+            setTimeout(function() { assert.equal($('li.nav-facet.first-page-title').text(), "Mock", "Facet body was replaced"); }, 500);
+        });
+
+        module('Show Fewer');
+        test('Show Fewer makes an ajax call', function() {
+            $.mockjax({
+                url: "/facets/facet*",
+                responseText: "Mock"
+            });
+            $('.second-page-title .facet-show-fewer-link').click();
+            QUnit.equal($.mockjax.unfiredHandlers().length, 0, "Request was made");
+        });
+        asyncTest('Show Fewer replaces facet details with response body', function (assert) {
+            expect(1);
+            $.mockjax({
+                url: "/facets/facet*",
+                response: function(settings) {
+                    this.responseText = "Mock";
+                    QUnit.start();
+                }
+            });
+            $('.second-page-title .facet-show-fewer-link').click();
+            setTimeout(function() { assert.equal($('li.nav-facet.second-page-title').text(), "Mock", "Facet body was replaced"); }, 500);
+        });
+
+        module('Drill parameter generation');
+        test('Unchecking all selected checkboxes results in an empty drill parameter', function() {
+            var selectedCheckbox = $(".facet-entry-checkbox").first();
+            var drillParam = BGB.faceting.generateDrillParameter(selectedCheckbox, '{\"First Page Title\":[\"Mum has triple murder charges dropped\"]}');
+            QUnit.equal(drillParam, "{}");
+        });
+
+        test('Selecting checkboxes populates the drill parameter', function() {
+            var selectedCheckbox = $(".facet-entry-checkbox").first();
+            var drillParam = BGB.faceting.generateDrillParameter(selectedCheckbox, "{}");
+            QUnit.equal(drillParam, "{\"First Page Title\":[\"Mum has triple murder charges dropped\"]}");
+        });
+
+        test('Selecting a checkbox in the same facet adds the value to the drill parameter', function() {
+            var selectedCheckbox = $(".facet-entry-checkbox").first();
+            var drillParam = BGB.faceting.generateDrillParameter(selectedCheckbox, '{\"First Page Title\":[\"Oscar Pistorius sentencing begins\"]}');
+            QUnit.equal(drillParam, "{\"First Page Title\":[\"Oscar Pistorius sentencing begins\",\"Mum has triple murder charges dropped\"]}");
+        });
+
+        test('Selecting a checkbox in a different facet adds the value to the drill parameter', function() {
+            var selectedCheckbox = $(".facet-entry-checkbox").first();
+            var drillParam = BGB.faceting.generateDrillParameter(selectedCheckbox, '{\"Second Page Title\":[\"Government seeks buyer for Eurostar\"]}');
+            QUnit.equal(drillParam, "{\"Second Page Title\":[\"Government seeks buyer for Eurostar\"],\"First Page Title\":[\"Mum has triple murder charges dropped\"]}");
+        });
+
+        test('Unselecting the only checkbox in a facet should keep the other facets unchanged', function() {
+            var selectedCheckbox = $(".facet-entry-checkbox").first();
+            var drillParam = BGB.faceting.generateDrillParameter(selectedCheckbox, '{\"Second Page Title\":[\"Government seeks buyer for Eurostar\"],\"First Page Title\":[\"Mum has triple murder charges dropped\"]}');
+            QUnit.equal(drillParam, "{\"Second Page Title\":[\"Government seeks buyer for Eurostar\"]}");
+        });
+
+        test('Unselecting a checkbox in a facet with multiple selected entries should keep the other values in the facet', function() {
+            var selectedCheckbox = $(".facet-entry-checkbox").first();
+            var drillParam = BGB.faceting.generateDrillParameter(selectedCheckbox, '{\"Second Page Title\":[\"Government seeks buyer for Eurostar\"],\"First Page Title\":[\"Oscar Pistorius sentencing begins\",\"Mum has triple murder charges dropped\"]}');
+            QUnit.equal(drillParam, "{\"Second Page Title\":[\"Government seeks buyer for Eurostar\"],\"First Page Title\":[\"Oscar Pistorius sentencing begins\"]}");
+        });
+
+    });
+
+</script>
+</body>
+</html>

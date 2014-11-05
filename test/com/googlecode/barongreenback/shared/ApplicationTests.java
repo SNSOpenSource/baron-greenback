@@ -8,8 +8,11 @@ import com.googlecode.barongreenback.crawler.CrawlerListPage;
 import com.googlecode.barongreenback.crawler.CrawlerReadTimeout;
 import com.googlecode.barongreenback.schedules.ScheduleListPage;
 import com.googlecode.lazyrecords.lucene.Persistence;
+import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Application;
@@ -19,6 +22,7 @@ import com.googlecode.utterlyidle.handlers.HttpClient;
 import com.googlecode.utterlyidle.html.Browser;
 import com.googlecode.utterlyidle.jobs.Completer;
 import com.googlecode.utterlyidle.jobs.CountDownCompleter;
+import com.googlecode.utterlyidle.modules.Module;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;
 import com.googlecode.utterlyidle.schedules.CountDownScheduler;
 import com.googlecode.utterlyidle.schedules.Scheduler;
@@ -29,6 +33,7 @@ import org.junit.Before;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -52,6 +57,12 @@ public abstract class ApplicationTests {
     public void deleteIndex() throws Exception {
         waitrest = serverWithDataFeed();
         application = new WebApplication(BasePath.basePath("/"), getProperties());
+        extraModules().each(new Block<Module>() {
+            @Override
+            protected void execute(Module module) throws Exception {
+                application.add(module);
+            }
+        });
         application.add(new RequestScopedModule() {
             @Override
             public Container addPerRequestObjects(Container container) throws Exception {
@@ -69,6 +80,10 @@ public abstract class ApplicationTests {
         });
         application.start();
         browser = browser(application);
+    }
+
+    protected Sequence<? extends Module> extraModules(){
+        return Sequences.empty();
     }
 
     protected Properties getProperties() {

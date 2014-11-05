@@ -9,10 +9,12 @@
         "keywords":[
             {
                 "name":"title",
-                "alias":"",
+                "alias":"Page Title",
                 "group":"",
                 "type":"java.lang.String",
                 "unique":false,
+                "showFacet":true,
+                "facetEntries":4,
                 "visible":true,
                 "subfeed":false,
                 "record":null,
@@ -46,6 +48,8 @@
                 "group":"",
                 "type":"java.util.Date",
                 "unique":false,
+                "showFacet":true,
+                "facetEntries":6,
                 "visible":true,
                 "subfeed":false,
                 "record":null,

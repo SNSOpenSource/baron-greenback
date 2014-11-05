@@ -26,8 +26,8 @@
     </div>
 </div>
 
-<div class="content">
-    $include.({$base$views/menu?current=$meta.view$&query=$urlEncode(htmlDecode(meta.query))$&drills=$urlEncode(htmlDecode(meta.drills))$}).body$
+<div class="content search-page">
+    $navigation()$
     $body$
 </div>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-1.10.2.min.js"></script>
@@ -40,5 +40,6 @@
 <script type="text/javascript" src="$base$baron-greenback/shared/tables.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/subfeed.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/expander/expander.js"></script>
+<script type="text/javascript" src="$base$baron-greenback/shared/faceting.js"></script>
 </body>
 </html>

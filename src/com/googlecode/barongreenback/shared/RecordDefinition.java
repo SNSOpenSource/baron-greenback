@@ -97,7 +97,7 @@ public class RecordDefinition {
         return new Callable1<Keyword, Model>() {
             public Model call(Keyword keyword) throws Exception {
                 return keywordDefinition(name(keyword), alias(keyword), group(keyword), type(keyword), unique(keyword),
-                        visible(keyword), subfeed(keyword), recordDefinition(keyword), checkpoint(keyword), priority(keyword));
+                        visible(keyword), subfeed(keyword), recordDefinition(keyword), checkpoint(keyword), priority(keyword), showFacet(keyword), facetEntries(keyword));
             }
         };
     }
@@ -152,6 +152,15 @@ public class RecordDefinition {
         return keyword.metadata().get(ViewsRepository.GROUP);
     }
 
+    private static Boolean showFacet(Keyword keyword) {
+        return booleanValueOf(keyword, ViewsRepository.SHOW_FACET);
+    }
+
+    private static Number facetEntries(Keyword keyword) {
+        final Number facetEntries = keyword.metadata().get(ViewsRepository.FACET_ENTRIES);
+        return facetEntries == null ? 0 : facetEntries;
+    }
+
     private static String type(Keyword keyword) {
         return keyword.forClass().getName();
     }
@@ -160,7 +169,7 @@ public class RecordDefinition {
         return model().add("name", recordName).add("keywords", Sequences.sequence(fields).toList());
     }
 
-    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, boolean subfeed, Option<Model> recordDefinition, boolean checkpoint, String priority) {
+    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, boolean subfeed, Option<Model> recordDefinition, boolean checkpoint, String priority, boolean showFacet, Number facetEntries) {
         return model().
                 add("name", name).
                 add("alias", alias).
@@ -171,7 +180,9 @@ public class RecordDefinition {
                 add(RecordDefinition.SUBFEED.name(), subfeed).
                 add("record", subfeed ? recordDefinition.getOrNull() : null).
                 add(CompositeCrawler.CHECKPOINT.name(), checkpoint).
-                add(PRIORITY.name(), priority);
+                add(PRIORITY.name(), priority).
+                add(ViewsRepository.SHOW_FACET.name(), showFacet).
+                add(ViewsRepository.FACET_ENTRIES.name(), facetEntries);
     }
 
     public static RecordDefinition convert(Model model) {
@@ -225,6 +236,8 @@ public class RecordDefinition {
                     set(Keywords.unique, model.get(Keywords.unique.name(), Keywords.unique.forClass())).
                     set(ViewsRepository.VISIBLE, model.get(ViewsRepository.VISIBLE.name(), ViewsRepository.VISIBLE.forClass())).
                     set(ViewsRepository.GROUP, model.get(ViewsRepository.GROUP.name(), ViewsRepository.GROUP.forClass())).
+                    set(ViewsRepository.SHOW_FACET, model.get(ViewsRepository.SHOW_FACET.name(), ViewsRepository.SHOW_FACET.forClass())).
+                    set(ViewsRepository.FACET_ENTRIES, model.get(ViewsRepository.FACET_ENTRIES.name(), ViewsRepository.FACET_ENTRIES.forClass())).
                     set(CompositeCrawler.CHECKPOINT, model.get(CompositeCrawler.CHECKPOINT.name(), CompositeCrawler.CHECKPOINT.forClass())).
                     set(RecordDefinition.SUBFEED, model.get(RecordDefinition.SUBFEED.name(), RecordDefinition.SUBFEED.forClass())).
                     set(RecordDefinition.PRIORITY, model.get(RecordDefinition.PRIORITY.name(), RecordDefinition.PRIORITY.forClass())).

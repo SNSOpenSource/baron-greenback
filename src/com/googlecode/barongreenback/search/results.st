@@ -24,6 +24,9 @@ $if(results)$
         <span class="message"></span>
     </div>
 </div>
+
+
+$include.({/$view;format="url"$/actions/list?query=$query;format="url"$&drills=$drills;format="url"$$if(advanced)$&advanced$endif$}).body;format="raw"$
 $else$
 <div id="no-results">
     No results found.

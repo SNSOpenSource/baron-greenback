@@ -47,6 +47,10 @@ public class SearchPage {
         return html.count("//table[contains(@class, 'results')]/tbody/tr");
     }
 
+    public int resultCount() {
+        return Integer.parseInt(html.selectContent("//meta[@name='resultCount']/@content"));
+    }
+
     public SearchPage delete() throws Exception {
         Request request = html.form("//form[contains(@class, 'delete')]").submit("descendant::input[@type='submit' and @class='delete']");
         Response response = httpHandler.handle(request);
@@ -62,7 +66,7 @@ public class SearchPage {
         return httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).exportCsv(view, query, drillDowns)))).build());
     }
 
-    private static Either<String, DrillDowns> parseDrillDowns(String drillDownsDocument) {
+    public static Either<String, DrillDowns> parseDrillDowns(String drillDownsDocument) {
         Either<String, DrillDowns> drillDowns;
         try {
             drillDowns = right(new DrillDownsActivator(drillDownsDocument).call());

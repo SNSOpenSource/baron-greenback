@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.search;
 
+import com.googlecode.totallylazy.Either;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
@@ -20,11 +21,11 @@ public class ViewSearchPage {
     private final Html html;
 
     public ViewSearchPage(HttpHandler httpHandler, String view, int rowsPerPage) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, "")))).query(ROWS_PER_PAGE_PARAM, rowsPerPage).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, "", Either.<String, DrillDowns>right(DrillDowns.empty()))))).query(ROWS_PER_PAGE_PARAM, rowsPerPage).build()));
     }
 
     public ViewSearchPage(HttpHandler httpHandler, String view, String searchQuery) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, searchQuery)))).build()));
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(SearchResource.class).list(view, searchQuery, Either.<String, DrillDowns>right(DrillDowns.empty()))))).build()));
     }
 
     public ViewSearchPage(HttpHandler httpHandler, Response response) throws Exception {

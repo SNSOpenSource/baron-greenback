@@ -21,7 +21,6 @@
     $results()$
 </div>
 
-$include.({/$view;format="url"$/actions/list?query=$query;format="url"$&drills=$drills;format="url"$$if(advanced)$&advanced$endif$}).body;format="raw"$
 <script src="$base$baron-greenback/shared/actions/actions.js" type="text/javascript" defer="defer"></script>
 </body>
 </html>

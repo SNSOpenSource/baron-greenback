@@ -21,9 +21,11 @@ import java.util.List;
 
 import static com.googlecode.lazyrecords.Keyword.functions.name;
 import static com.googlecode.totallylazy.Maps.pairs;
+import static com.googlecode.totallylazy.Predicates.alwaysFalse;
 import static com.googlecode.totallylazy.Predicates.alwaysTrue;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
@@ -52,6 +54,8 @@ public class PredicateBuilder {
     }
 
     public Predicate<Record> drilldownPredicate(final Sequence<Keyword<?>> fields, DrillDowns drillDowns) {
+        final boolean hasDrillDownNotInFields = pairs(drillDowns.value()).exists(where(Callables.first(String.class), not(in(fields.map(name)))));
+        if(hasDrillDownNotInFields) return Predicates.alwaysFalse();
         return pairs(drillDowns.value()).map(Callables.<String, List<String>, Keyword<?>>first(nameToKeywordWith(fields)))
                 .fold(alwaysTrue(Record.class), withDrilldownPredicate());
     }

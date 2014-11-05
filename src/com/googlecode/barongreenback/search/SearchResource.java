@@ -104,18 +104,11 @@ public class SearchResource {
     @GET
     @Priority(Priority.High)
     @Path("list")
-    public Model list(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query) {
-        return list(viewName, query, Either.<String, DrillDowns>right(DrillDowns.empty()));
-    }
-
-    @GET
-    @Priority(Priority.High)
-    @Path("list")
     public Model list(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
         final DrillDowns drillDownMap = drillDowns.rightOption().getOrElse(DrillDowns.empty());
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findFromView(viewName, query, drillDownMap);
         final Model drillDownExceptionModel = drillDowns.map(returns1(queryExceptionModel(INVALID_DRILLS_MESSAGE)), returns1(model()));
-        return merge(results(viewName, query, drillDowns.map(returnArgument(String.class), asString()), errorOrResults), drillDownExceptionModel);
+        return merge(results(viewName, query, drillDowns, errorOrResults), drillDownExceptionModel);
     }
 
     @GET
@@ -177,7 +170,7 @@ public class SearchResource {
         };
     }
 
-    private Model results(String viewName, String query, String facetsDrillDowns, Either<String, Sequence<Record>> errorOrResults) {
+    private Model results(String viewName, String query, Either<String, DrillDowns> facetsDrillDowns, Either<String, Sequence<Record>> errorOrResults) {
         return errorOrResults.map(handleError(viewName, query, facetsDrillDowns), listResults(viewName, query, facetsDrillDowns));
     }
 
@@ -224,7 +217,7 @@ public class SearchResource {
         final List<String> viewGroupNames = sequence(viewFields).map(value("group", String.class)).unique().toList();
         final Map<String, Map<String, Object>> groupedAliasedFields = record.map(withAliasesFor(headers(recordsService.view(viewName)))).get().fields().fold(newSortedMapUsing(viewGroupNames), groupBy(ViewsRepository.GROUP, aliasedViewFieldNames));
 
-        return baseModel(viewName, query, "").add("record", groupedAliasedFields);
+        return baseModel(viewName, query, Either.<String, DrillDowns>left("")).add("record", groupedAliasedFields);
     }
 
     private Mapper<Model, String> toAliasOrElseName() {
@@ -236,18 +229,18 @@ public class SearchResource {
         };
     }
 
-    private Model baseModel(String viewName, String query, String facetsDrillDowns) {
+    private Model baseModel(String viewName, String query, Either<String, DrillDowns> facetsDrillDowns) {
         return model()
                 .add("view", viewName)
                 .add("query", query)
-                .add("drills", facetsDrillDowns);
+                .add("drills", facetsDrillDowns.map(asString(), asString()));
     }
 
     private Model queryExceptionModel(String errorMessage) {
         return model().add("queryException", errorMessage);
     }
 
-    private Callable1<String, Model> handleError(final String viewName, final String query, final String facetsDrillDowns) {
+    private Callable1<String, Model> handleError(final String viewName, final String query, final Either<String, DrillDowns> facetsDrillDowns) {
         return new Callable1<String, Model>() {
             @Override
             public Model call(String errorMessage) throws Exception {
@@ -256,7 +249,7 @@ public class SearchResource {
         };
     }
 
-    private Callable1<Sequence<Record>, Model> listResults(final String viewName, final String query, final String facetsDrillDowns) {
+    private Callable1<Sequence<Record>, Model> listResults(final String viewName, final String query, final Either<String, DrillDowns> facetsDrillDowns) {
         return new Callable1<Sequence<Record>, Model>() {
             @Override
             public Model call(Sequence<Record> unpaged) throws Exception {
@@ -268,9 +261,11 @@ public class SearchResource {
 
                 final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
 
+                final DrillDowns drillDowns = facetsDrillDowns.isRight() ? facetsDrillDowns.right() : DrillDowns.empty();
+
                 return pager.model(sorter.model(baseModel(viewName, query, facetsDrillDowns).
                                 add("results", results.map(withAliasesFor(recordsService.visibleHeaders(viewName)).map(asModel(viewName, visibleHeaders))).toList()).
-                                add("resultCount", recordsService.count(viewName, query)),
+                                add("resultCount", recordsService.count(viewName, query, drillDowns)),
                         visibleHeaders, results
                 ));
             }

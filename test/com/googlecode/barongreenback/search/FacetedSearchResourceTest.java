@@ -71,20 +71,23 @@ public class FacetedSearchResourceTest extends ApplicationTests {
     public void listShouldReturnAnErrorIfDrillDownIsInvalid() throws Exception {
         final SearchPage searchPage = new SearchPage(browser, "users", "", "invalid drill down");
         assertThat(searchPage.numberOfResults().intValue(), is(3));
+        assertThat(searchPage.resultCount(), is(3));
         assertThat(searchPage.queryMessage(), is("Could not understand your refine-by criteria; showing results only from your query"));
         assertThat(searchPage.drillDowns(), is("invalid drill down"));
     }
 
     @Test
     public void listShouldReturnResultsAccordingToDrillDowns() throws Exception {
-        final SearchPage searchPage = new SearchPage(browser, "users", "", "{ \"first\": [ \"Dan\" ]}");
+        final SearchPage searchPage = new SearchPage(browser, "users", "", "{\"first\": [ \"Dan\" ]}");
         assertThat(searchPage.numberOfResults().intValue(), is(1));
+        assertThat(searchPage.resultCount(), is(1));
     }
 
     @Test
     public void listShouldUseBothQueryAndDrillDownsToComputeResults() throws Exception {
         final SearchPage searchPage = new SearchPage(browser, "users", "first:Matt OR first:Dan", "{ \"first\": [ \"Dan\" ]}");
         assertThat(searchPage.numberOfResults().intValue(), is(1));
+        assertThat(searchPage.resultCount(), is(1));
     }
 
     @Test

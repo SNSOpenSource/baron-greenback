@@ -1,12 +1,14 @@
 package com.googlecode.barongreenback.views;
 
 import com.googlecode.barongreenback.persistence.PersistentTypes;
+import com.googlecode.barongreenback.search.DrillDowns;
 import com.googlecode.barongreenback.search.RecordsService;
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
@@ -39,6 +41,8 @@ import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.funclate.Model.mutable.parse;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.ascending;
+import static com.googlecode.totallylazy.Callables.returns1;
+import static com.googlecode.totallylazy.Functions.identity;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -66,15 +70,14 @@ public class ViewsResource {
 
     @GET
     @Path("menu")
-    public Model menu(@QueryParam("current") @DefaultValue("") String current, @QueryParam("query") @DefaultValue("") String query) {
-        return modelsWithViewData(current, ViewsRepository.where(valueFor("visible", Boolean.class), is(true)), query);
+    public Model menu(@QueryParam("current") @DefaultValue("") String current, @QueryParam("query") @DefaultValue("") String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+        return modelsWithViewData(current, ViewsRepository.where(valueFor("visible", Boolean.class), is(true)), query, drillDowns);
     }
-
 
     @GET
     @Path("list")
     public Model list() {
-        return modelsWithViewData("", Predicates.<Second<Model>>all(), "");
+        return modelsWithViewData("", Predicates.<Second<Model>>all(), "", Either.<String, DrillDowns>right(DrillDowns.empty()));
     }
 
     @GET
@@ -149,31 +152,31 @@ public class ViewsResource {
         return redirector.seeOther(method(on(getClass()).list()));
     }
 
-    private Model modelsWithViewData(String current, Predicate<Second<Model>> predicate, String query) {
+    private Model modelsWithViewData(String current, Predicate<Second<Model>> predicate, String query, Either<String, DrillDowns> drillDowns) {
         List<Model> models = modelRepository.
                 find(Predicates.where(MODEL_TYPE, is("view"))).
                 filter(predicate).
-                mapConcurrently(asModel(current, query), viewsExecutor).
+                mapConcurrently(asModel(current, query, drillDowns), viewsExecutor).
                 sortBy(Comparators.comparators(ascending(priority()), ascending(name()))).
                 toList();
         return model().add("views", models);
     }
 
-    private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current, final String query) {
+    private Callable1<? super Pair<UUID, Model>, Model> asModel(final String current, final String query, final Either<String, DrillDowns> drillDowns) {
         return new Callable1<Pair<UUID, Model>, Model>() {
             public Model call(Pair<UUID, Model> pair) throws Exception {
-                return copyModelAndAddViewData(pair.first(), pair.second(), current, query);
+                return copyModelAndAddViewData(pair.first(), pair.second(), current, query, drillDowns);
             }
         };
     }
 
-    private Model copyModelAndAddViewData(UUID key, Model modelFromRepository, String current, String query) {
+    private Model copyModelAndAddViewData(UUID key, Model modelFromRepository, String current, String query, Either<String, DrillDowns> drillDowns) {
         Model model = modelFromRepository.get("view", Model.class).copy();
         String name = model.get("name", String.class);
         return model.set("id", key).
                 set("current", current.equals(name)).
-                set("itemsTotal", recordsService.count(name, query)).
-                set("url", redirector.uriOf(method(on(SearchResource.class).list(name, query))));
+                set("itemsTotal", recordsService.count(name, query, drillDowns.map(returns1(DrillDowns.empty()), identity(DrillDowns.class)))).
+                set("url", redirector.uriOf(method(on(SearchResource.class).list(name, query, drillDowns))));
     }
 
     private Response viewNotFound(UUID id) {
