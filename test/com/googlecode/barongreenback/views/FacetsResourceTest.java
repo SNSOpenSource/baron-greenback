@@ -45,6 +45,7 @@ import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keyword.methods.keywords;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.utterlyidle.Response.functions.status;
+import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -121,9 +122,9 @@ public class FacetsResourceTest extends ApplicationTests {
 
     @Test
     public void shouldDisplayActiveDrillDownsWhenQueryIsEmpty() throws Exception {
-        final FacetSection facetSection = facets(browser, viewWithFacets.name(), "", "{\"first\":[\"Dan\"]}");
-        assertThat(facetSection.displayedFacets(), hasItem(facet(FIRST.name()).withEntries("Dan", "Matt", "Olya")));
-        assertThat(facetSection.selectedEntries(), contains(facetEntry("Dan")));
+        final FacetSection facetSection = facets(browser, viewWithFacets.name(), "", "{\"first\":[\"Olya\", \"Dan\"]}");
+        assertThat(facetSection.displayedFacets(), hasItem(facet(FIRST.name()).withEntries("Olya", "Dan", "Matt")));
+        assertThat(facetSection.selectedEntries(), contains(facetEntry("Olya"), facetEntry("Dan")));
         assertThat(facetSection.errorMessage(), is(""));
     }
 
@@ -142,7 +143,7 @@ public class FacetsResourceTest extends ApplicationTests {
 
         final FacetSection facetSection = facets(browser, viewWithLimitedEntries.name(), "", "{}");
 
-        assertThat(QueryParameters.parse(facetSection.link(SHOW_MORE)).getValue("entryCount"), is(String.valueOf(Integer.MAX_VALUE)));
+        assertThat(QueryParameters.parse(facetSection.link(SHOW_MORE)).getValue("entryCount"), is(valueOf(Integer.MAX_VALUE)));
         assertThat(facetSection.clicking(SHOW_MORE), returns(Status.OK));
     }
 
@@ -155,7 +156,7 @@ public class FacetsResourceTest extends ApplicationTests {
 
         assertTrue(facetSection.hasLink(SHOW_MORE));
         assertFalse(facetSection.hasLink(SHOW_FEWER));
-        assertThat(QueryParameters.parse(facetSection.link(SHOW_MORE)).getValue("entryCount"), is(String.valueOf(Integer.MAX_VALUE)));
+        assertThat(QueryParameters.parse(facetSection.link(SHOW_MORE)).getValue("entryCount"), is(valueOf(Integer.MAX_VALUE)));
         assertThat(facetSection.clicking(SHOW_MORE), returns(Status.OK));
     }
 
@@ -209,14 +210,14 @@ public class FacetsResourceTest extends ApplicationTests {
     }
 
     @Test
-    public void individualFacetShouldDisplayAllCheckedEntries() throws Exception {
+    public void individualFacetShouldDisplayAllCheckedEntriesInSelectionOrder() throws Exception {
         final Definition viewWithLimitedEntries = facetedViewWhereNumberOfFacetsEntriesIs(1);
         saveView(FACETS_VIEW_ID, viewWithLimitedEntries);
 
-        final FacetSection facetSection = singleFacet(browser, viewWithLimitedEntries.name(), "", "{\"first\":[\"Dan\",\"Olya\"]}");
+        final FacetSection facetSection = singleFacet(browser, viewWithLimitedEntries.name(), "", "{\"first\":[\"Olya\",\"Dan\"]}");
 
-        assertThat(facetSection.displayedFacets(), contains(facet(FIRST.name()).withEntries("Dan", "Olya")));
-        assertThat(facetSection.selectedEntries(), contains(facetEntry("Dan"), facetEntry("Olya")));
+        assertThat(facetSection.displayedFacets(), contains(facet(FIRST.name()).withEntries("Olya", "Dan")));
+        assertThat(facetSection.selectedEntries(), contains(facetEntry("Olya"), facetEntry("Dan")));
     }
 
     @Test
