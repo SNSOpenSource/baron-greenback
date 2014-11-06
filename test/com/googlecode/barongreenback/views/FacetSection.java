@@ -42,11 +42,15 @@ public class FacetSection {
     }
 
     public static FacetSection singleFacet(HttpHandler httpHandler, String view, String query, String drillDowns) throws Exception {
-        return new FacetSection(httpHandler, httpHandler.handle(singleFacetUrl(view, query, Option.none(Integer.class), drillDowns).build()));
+        return singleFacet(httpHandler, view, FIRST.name(), query, drillDowns);
+    }
+
+    public static FacetSection singleFacet(HttpHandler httpHandler, String view, String facetName, String query, String drillDowns) throws Exception {
+        return new FacetSection(httpHandler, httpHandler.handle(singleFacetUrl(view, query, facetName, Option.none(Integer.class), drillDowns).build()));
     }
 
     public static FacetSection singleFacet(HttpHandler httpHandler, String view, String query, Integer entryCount, String drillDowns) throws Exception {
-        return new FacetSection(httpHandler, httpHandler.handle(singleFacetUrl(view, query, Option.some(entryCount), drillDowns).build()));
+        return new FacetSection(httpHandler, httpHandler.handle(singleFacetUrl(view, query, FIRST.name(), Option.some(entryCount), drillDowns).build()));
     }
 
     public static FacetSection facets(HttpHandler httpHandler, String view, String query, String drillDowns) throws Exception {
@@ -57,9 +61,9 @@ public class FacetSection {
         return html;
     }
 
-    private static RequestBuilder singleFacetUrl(String view, String query, Option<Integer> entryCount, String drillDownsDocument) throws Exception {
+    private static RequestBuilder singleFacetUrl(String view, String query, String facetName, Option<Integer> entryCount, String drillDownsDocument) throws Exception {
         Either<String, DrillDowns> drillDowns = parseDrillDowns(drillDownsDocument);
-        return get("/" + relativeUriOf(method(on(FacetsResource.class).facet(view, query, FIRST.name(), entryCount, drillDowns))));
+        return get("/" + relativeUriOf(method(on(FacetsResource.class).facet(view, query, facetName, entryCount, drillDowns))));
     }
 
     private static RequestBuilder listFacetsUrl(String view, String query, String drillDownsDocument) throws Exception {
@@ -113,7 +117,7 @@ public class FacetSection {
     }
 
     public Collection<Entry> selectedEntries() {
-        return html.selectValues("//ul[contains(@class, 'first')]/li[contains(@class, 'facet-entry')]/input[contains(@checked, 'checked')]/@value").map(entry());
+        return html.selectValues("//ul[contains(@class, 'facet')]/li[contains(@class, 'facet-entry')]/label/input[contains(@checked, 'checked')]/@value").map(entry());
     }
 
     public static Entry facetEntry(String name) {
@@ -125,11 +129,11 @@ public class FacetSection {
     }
 
     public Collection<Facet> displayedFacets() throws Exception {
-        final Sequence<String> facetNames = html.selectValues("//span[contains(@class, 'facet-name')]");
+        final Sequence<String> facetNames = html.selectValues("//h5[contains(@class, 'facet-name')]");
         return facetNames.map(new Callable1<String, Facet>() {
             @Override
             public Facet call(String facetName) throws Exception {
-                final Sequence<String> entries = html.selectValues(String.format("//li[@class='nav-facet' and ./span[text()='%s']]//span[contains(@class, 'facet-entry-name')]", facetName));
+                final Sequence<String> entries = html.selectValues(String.format("//h5[text()='%s']/following-sibling::ul//span[contains(@class, 'facet-entry-name')]", facetName));
                 return new Facet(facetName, entries.toList());
             }
         });
@@ -166,6 +170,13 @@ public class FacetSection {
         public int hashCode() {
             return name.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return "Entry{" +
+                    "name='" + name + '\'' +
+                    '}';
+        }
     }
 
     public static class Facet {
@@ -201,6 +212,14 @@ public class FacetSection {
             int result = name.hashCode();
             result = 31 * result + entries.hashCode();
             return result;
+        }
+
+        @Override
+        public String toString() {
+            return "Facet{" +
+                    "name='" + name + '\'' +
+                    ", entries=" + entries +
+                    '}';
         }
     }
 }

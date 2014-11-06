@@ -30,10 +30,13 @@ import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CompositeCrawlerTest.crawlOnePageOnly;
 import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.FIRST;
+import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.STATUS;
 import static com.googlecode.barongreenback.views.FacetSection.SHOW_FEWER;
 import static com.googlecode.barongreenback.views.FacetSection.SHOW_MORE;
 import static com.googlecode.barongreenback.views.FacetSection.facet;
 import static com.googlecode.barongreenback.views.FacetSection.facetEntry;
+import static com.googlecode.barongreenback.views.FacetSection.facets;
+import static com.googlecode.barongreenback.views.FacetSection.singleFacet;
 import static com.googlecode.barongreenback.views.ViewsRepository.FACET_ENTRIES;
 import static com.googlecode.barongreenback.views.ViewsRepository.SHOW_FACET;
 import static com.googlecode.barongreenback.views.ViewsRepository.convertToViewModel;
@@ -45,6 +48,7 @@ import static com.googlecode.utterlyidle.Response.functions.status;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -55,7 +59,7 @@ public class FacetsResourceTest extends ApplicationTests {
     private Definition viewWithFacets = facetedViewWhereNumberOfFacetsEntriesIs(3);
 
     private Definition facetedViewWhereNumberOfFacetsEntriesIs(int value) {
-        return definition("facetedView", FIRST.metadata(SHOW_FACET, true).metadata(FACET_ENTRIES, value));
+        return definition("facetedView", FIRST.metadata(SHOW_FACET, true).metadata(FACET_ENTRIES, value), STATUS.metadata(SHOW_FACET, true).metadata(FACET_ENTRIES, value));
     }
 
     @After
@@ -104,29 +108,29 @@ public class FacetsResourceTest extends ApplicationTests {
 
     @Test
     public void shouldNotDisplayAnyFacetsIfThereAreNoneConfigured() throws Exception {
-        FacetSection facetSection = FacetSection.facets(browser, usersView.name(), "", "{}");
+        final FacetSection facetSection = facets(browser, usersView.name(), "", "{}");
         assertThat(facetSection.displayedFacets().size(), is(0));
     }
 
     @Test
     public void shouldDisplayAllFacetsWhenDrillDownsIsEmpty() throws Exception {
-        FacetSection facetSection = FacetSection.facets(browser, viewWithFacets.name(), "", "{}");
-        assertThat(facetSection.displayedFacets(), contains(facet(FIRST.name()).withEntries("Dan", "Matt")));
+        final FacetSection facetSection = facets(browser, viewWithFacets.name(), "", "{}");
+        assertThat(facetSection.displayedFacets(), hasItem(facet(FIRST.name()).withEntries("Dan", "Matt", "Olya")));
         assertThat(facetSection.errorMessage(), is(""));
     }
 
     @Test
     public void shouldDisplayActiveDrillDownsWhenQueryIsEmpty() throws Exception {
-        FacetSection facetSection = FacetSection.facets(browser, viewWithFacets.name(), "", "{\"first\":[\"Dan\"]}");
-        assertThat(facetSection.displayedFacets(), contains(facet(FIRST.name()).withEntries("Dan", "Matt")));
+        final FacetSection facetSection = facets(browser, viewWithFacets.name(), "", "{\"first\":[\"Dan\"]}");
+        assertThat(facetSection.displayedFacets(), hasItem(facet(FIRST.name()).withEntries("Dan", "Matt", "Olya")));
         assertThat(facetSection.selectedEntries(), contains(facetEntry("Dan")));
         assertThat(facetSection.errorMessage(), is(""));
     }
 
     @Test
     public void shouldDisplayActiveDrillDownsWhenQueryIsPresent() throws Exception {
-        FacetSection facetSection = FacetSection.facets(browser, viewWithFacets.name(), "*a*", "{\"first\":[\"Dan\"]}");
-        assertThat(facetSection.displayedFacets(), contains(facet(FIRST.name()).withEntries("Dan", "Matt")));
+        final FacetSection facetSection = facets(browser, viewWithFacets.name(), "*a*", "{\"first\":[\"Dan\"]}");
+        assertThat(facetSection.displayedFacets(), hasItem(facet(FIRST.name()).withEntries("Dan", "Matt", "Olya")));
         assertThat(facetSection.selectedEntries(), contains(facetEntry("Dan")));
         assertThat(facetSection.errorMessage(), is(""));
     }
@@ -136,7 +140,7 @@ public class FacetsResourceTest extends ApplicationTests {
         final Definition viewWithLimitedEntries = facetedViewWhereNumberOfFacetsEntriesIs(1);
         saveView(FACETS_VIEW_ID, viewWithLimitedEntries);
 
-        FacetSection facetSection = FacetSection.facets(browser, viewWithLimitedEntries.name(), "", "{}");
+        final FacetSection facetSection = facets(browser, viewWithLimitedEntries.name(), "", "{}");
 
         assertThat(QueryParameters.parse(facetSection.link(SHOW_MORE)).getValue("entryCount"), is(String.valueOf(Integer.MAX_VALUE)));
         assertThat(facetSection.clicking(SHOW_MORE), returns(Status.OK));
@@ -147,7 +151,7 @@ public class FacetsResourceTest extends ApplicationTests {
         final Definition viewWithLimitedEntries = facetedViewWhereNumberOfFacetsEntriesIs(1);
         saveView(FACETS_VIEW_ID, viewWithLimitedEntries);
 
-        FacetSection facetSection = FacetSection.singleFacet(browser, viewWithLimitedEntries.name(), "", "{}");
+        final FacetSection facetSection = singleFacet(browser, viewWithLimitedEntries.name(), "", "{}");
 
         assertTrue(facetSection.hasLink(SHOW_MORE));
         assertFalse(facetSection.hasLink(SHOW_FEWER));
@@ -160,7 +164,7 @@ public class FacetsResourceTest extends ApplicationTests {
         final Definition viewWithLimitedEntries = facetedViewWhereNumberOfFacetsEntriesIs(1);
         saveView(FACETS_VIEW_ID, viewWithLimitedEntries);
 
-        FacetSection facetSection = FacetSection.singleFacet(browser, viewWithLimitedEntries.name(), "", Integer.MAX_VALUE, "{}");
+        final FacetSection facetSection = singleFacet(browser, viewWithLimitedEntries.name(), "", Integer.MAX_VALUE, "{}");
 
         assertFalse(facetSection.hasLink(SHOW_MORE));
         assertTrue(facetSection.hasLink(SHOW_FEWER));
@@ -173,7 +177,7 @@ public class FacetsResourceTest extends ApplicationTests {
         final Definition viewWithLimitedEntries = facetedViewWhereNumberOfFacetsEntriesIs(5);
         saveView(FACETS_VIEW_ID, viewWithLimitedEntries);
 
-        FacetSection facetSection = FacetSection.singleFacet(browser, viewWithLimitedEntries.name(), "", "{}");
+        final FacetSection facetSection = singleFacet(browser, viewWithLimitedEntries.name(), "", "{}");
 
         assertFalse(facetSection.hasLink(SHOW_MORE));
         assertFalse(facetSection.hasLink(SHOW_FEWER));
@@ -181,7 +185,7 @@ public class FacetsResourceTest extends ApplicationTests {
 
     @Test
     public void shouldReturnTheFacetsWithoutDrillDownsIfTheSpecifiedDrillDownsAreInvalid() throws Exception {
-        FacetSection facetSection = FacetSection.facets(browser, viewWithFacets.name(), "", "invalid drill downs");
+        final FacetSection facetSection = facets(browser, viewWithFacets.name(), "", "invalid drill downs");
 
         assertThat(facetSection.selectedFacetEntriesCount(), is(0));
         assertThat(facetSection.drillDownsException(), is("Drill downs can't be parsed"));
@@ -190,9 +194,9 @@ public class FacetsResourceTest extends ApplicationTests {
 
     @Test
     public void facetViewShouldUseViewEntryCountByDefault() throws Exception {
-        FacetSection facetSection = FacetSection.singleFacet(browser, viewWithFacets.name(), "", "{}");
+        final FacetSection facetSection = singleFacet(browser, viewWithFacets.name(), "", "{}");
 
-        assertThat(facetSection.facetEntryCount(), is(2));
+        assertThat(facetSection.facetEntryCount(), is(3));
     }
 
     @Test
@@ -200,7 +204,41 @@ public class FacetsResourceTest extends ApplicationTests {
         final Definition viewWithLimitedEntries = facetedViewWhereNumberOfFacetsEntriesIs(3);
         saveView(FACETS_VIEW_ID, viewWithLimitedEntries);
 
-        FacetSection facetSection = FacetSection.singleFacet(browser, viewWithFacets.name(), "", 1, "{}");
+        final FacetSection facetSection = singleFacet(browser, viewWithFacets.name(), "", 1, "{}");
+        assertThat(facetSection.facetEntryCount(), is(1));
+    }
+
+    @Test
+    public void individualFacetShouldDisplayAllCheckedEntries() throws Exception {
+        final Definition viewWithLimitedEntries = facetedViewWhereNumberOfFacetsEntriesIs(1);
+        saveView(FACETS_VIEW_ID, viewWithLimitedEntries);
+
+        final FacetSection facetSection = singleFacet(browser, viewWithLimitedEntries.name(), "", "{\"first\":[\"Dan\",\"Olya\"]}");
+
+        assertThat(facetSection.displayedFacets(), contains(facet(FIRST.name()).withEntries("Dan", "Olya")));
+        assertThat(facetSection.selectedEntries(), contains(facetEntry("Dan"), facetEntry("Olya")));
+    }
+
+    @Test
+    public void individualFacetShouldDisplayCheckedEntriesBeforeUncheckedEntries() throws Exception {
+        final FacetSection facetSection = singleFacet(browser, viewWithFacets.name(), "", "{\"first\":[\"Dan\",\"Olya\"]}");
+
+        assertThat(facetSection.displayedFacets(), contains(facet(FIRST.name()).withEntries("Dan", "Olya", "Matt")));
+        assertThat(facetSection.selectedEntries(), contains(facetEntry("Dan"), facetEntry("Olya")));
+    }
+
+    @Test
+    public void listShouldDisplayCheckedEntriesBeforeUncheckedEntries() throws Exception {
+        final FacetSection facetSection = facets(browser, viewWithFacets.name(), "", "{\"first\":[\"Dan\",\"Olya\"]}");
+
+        assertThat(facetSection.displayedFacets(), hasItem(facet(FIRST.name()).withEntries("Dan", "Olya", "Matt")));
+        assertThat(facetSection.selectedEntries(), contains(facetEntry("Dan"), facetEntry("Olya")));
+    }
+
+    @Test
+    public void individualFacetShouldWorkWhenFacetingAnotherField() throws Exception {
+        final FacetSection facetSection = singleFacet(browser, viewWithFacets.name(), STATUS.name(), "", "{\"first\":[\"Dan\"]}");
+
         assertThat(facetSection.facetEntryCount(), is(1));
     }
 

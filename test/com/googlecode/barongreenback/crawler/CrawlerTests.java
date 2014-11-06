@@ -22,6 +22,7 @@ public abstract class CrawlerTests extends ApplicationTests {
         restClient.handle(put(uri(waitrestURL, "entry1.xml")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("entry1.xml")).build());
         restClient.handle(put(uri(waitrestURL, "entry1pony.xml")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("entry1pony.xml")).build());
         restClient.handle(put(uri(waitrestURL, "entry2.xml")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("entry2.xml")).build());
+        restClient.handle(put(uri(waitrestURL, "entry3.xml")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("entry3.xml")).build());
         restClient.handle(put(uri(waitrestURL, "invalid.xml")).header(CONTENT_TYPE, TEXT_XML).entity(contentOf("invalid.xml")).build());
         return waitrest;
     }
