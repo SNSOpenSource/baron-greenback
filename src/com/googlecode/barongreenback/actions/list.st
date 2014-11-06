@@ -7,7 +7,7 @@
 <body>
 <div class="actions">
     $actions: {url |
-        $include.({$url$}).body;format="raw"$
+        $include.({$url;format="raw"$}).body;format="raw"$
     }$
 </div>
 </body>

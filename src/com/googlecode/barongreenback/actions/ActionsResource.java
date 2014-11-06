@@ -1,9 +1,11 @@
 package com.googlecode.barongreenback.actions;
 
+import com.googlecode.barongreenback.search.DrillDowns;
 import com.googlecode.barongreenback.search.RecordsService;
 import com.googlecode.barongreenback.search.SearchResource;
 import com.googlecode.barongreenback.shared.AdvancedMode;
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
@@ -41,41 +43,41 @@ public class ActionsResource {
 
     @GET
     @Path("list")
-    public Model get(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        Sequence<Uri> normalActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).exportModel(viewName, query))));
-        Sequence<Uri> advancedActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).deleteModel(viewName, query))));
+    public Model get(@PathParam("view") String viewName, @QueryParam("query") String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+        Sequence<Uri> normalActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).exportModel(viewName, query, drillDowns))));
+        Sequence<Uri> advancedActions = Sequences.sequence(redirector.uriOf(method(on(ActionsResource.class).deleteModel(viewName, query, drillDowns))));
 
         Sequence<Uri> actions = (AdvancedMode.Enable.equals(mode)) ? normalActions.join(advancedActions) : normalActions;
 
         return model().add("actions", actions.toList());
     }
 
-    private Model action(final Uri uri, final String query, final String name, final String method) {
+    private Model action(final Uri uri, final String query, final DrillDowns drillDowns, final String name, final String method) {
         final Model model = model().
                 add("name", name).
                 add("url", uri).
                 add("method", method);
-        return method.equalsIgnoreCase("get") ? model.add("query", query) : model;
+        return method.equalsIgnoreCase("get") ? model.add("query", query).add("drills", drillDowns.toString()) : model;
     }
 
     @GET
     @Path("export")
-    public Model exportModel(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        return action(redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query))), query, "export", "GET");
+    public Model exportModel(@PathParam("view") String viewName, @QueryParam("query") String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+        return action(redirector.uriOf(method(on(SearchResource.class).exportCsv(viewName, query, drillDowns))), query, drillDowns.right(), "export", "GET");
     }
 
     @GET
     @Path("delete")
-    public Model deleteModel(@PathParam("view") String viewName, @QueryParam("query") String query) {
-        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query, Sequences.<String>empty()))), null, "delete", "POST");
+    public Model deleteModel(@PathParam("view") String viewName, @QueryParam("query") String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+        return action(redirector.uriOf(method(on(ActionsResource.class).delete(viewName, query, drillDowns))), null, null, "delete", "POST");
     }
 
 
     @POST
     @Path("delete")
-    public Response delete(@PathParam("view") String viewName, @QueryParam("query") @DefaultValue("") String query) {
-        recordsService.delete(viewName, query);
-        return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
+    public Response delete(@PathParam("view") String viewName, @QueryParam("query") @DefaultValue("") String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+        recordsService.delete(viewName, query, drillDowns.right());
+        return redirector.seeOther(method(on(SearchResource.class).list(viewName, query,  drillDowns)));
     }
 
 
@@ -83,7 +85,7 @@ public class ActionsResource {
     @Path("delete")
     public Response delete(@PathParam("view") String viewName, @QueryParam("query") String query, @FormParam("id") Iterable<String> id) {
         String idName = unwrap(recordsService.view(viewName)).get("keywords", Model.class).get("name", String.class);
-        delete(viewName, sequence(id).map(Strings.replace("\"", "\\\"")).map(Strings.format(idName + ":\"%s\"")).toString(" OR "));
-        return redirector.seeOther(method(on(SearchResource.class).list(viewName, query)));
+        delete(viewName, sequence(id).map(Strings.replace("\"", "\\\"")).map(Strings.format(idName + ":\"%s\"")).toString(" OR "), Either.<String, DrillDowns>right(DrillDowns.empty()));
+        return redirector.seeOther(method(on(SearchResource.class).list(viewName, query,  Either.<String, DrillDowns>right(DrillDowns.empty()))));
     }
 }

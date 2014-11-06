@@ -43,18 +43,22 @@ public class RecordsService {
         this.predicateBuilder = predicateBuilder;
     }
 
-    public void delete(String viewName, String query) {
+    public void delete(String viewName, String query, DrillDowns drillDowns) {
         Model view = view(viewName);
-        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithImplicitViewQuery(view, query), headersForQuery(view)).right();
+        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithImplicitViewQuery(view, query), headersForQuery(view), drillDowns).right();
         records.remove(Definition.constructors.definition(viewName(view), Sequences.<Keyword<?>>empty()), predicate);
     }
 
     public Number count(String viewName, String query) {
+        return count(viewName, query, DrillDowns.empty());
+    }
+
+    public Number count(String viewName, String query, DrillDowns drillDowns) {
         Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return 0;
 
         Model view = optionalView.get();
-        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headersForQuery(view));
+        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headersForQuery(view), drillDowns);
         return recordsFound.map(Callables.<String, Number>ignoreAndReturn(0), size());
     }
 
@@ -72,24 +76,17 @@ public class RecordsService {
         if (optionalView.isEmpty()) return none();
 
         Model view = optionalView.get();
-        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headersForQuery(view));
+        Either<String, Sequence<Record>> recordsFound = getRecords(view, query, headersForQuery(view), DrillDowns.empty());
         return recordsFound.map(ignoreAndReturn(Option.none(Record.class)), firstResult());
     }
 
-    public Either<String, Sequence<Record>> findAll(String viewName, String query) {
+
+    public Either<String, Sequence<Record>> findFromView(final String viewName, final String query, DrillDowns drillDowns) {
         Option<Model> optionalView = findView(viewName);
         if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
 
         Model view = optionalView.get();
-        return getRecordsWithQuery(view, query, headersForQuery(view));
-    }
-
-    public Either<String, Sequence<Record>> findFromView(final String viewName, final String query) {
-        Option<Model> optionalView = findView(viewName);
-        if (optionalView.isEmpty()) return Either.right(Sequences.<Record>empty());
-
-        Model view = optionalView.get();
-        return getRecords(view, query, headersForQuery(view));
+        return getRecords(view, query, headersForQuery(view), drillDowns);
     }
 
     public static String prefixQueryWithImplicitViewQuery(Model view, final String query) {
@@ -100,12 +97,12 @@ public class RecordsService {
         return model.get("view", Model.class).get("query", String.class);
     }
 
-    private Either<String, Sequence<Record>> getRecords(Model view, String query, Sequence<Keyword<?>> visibleHeaders) {
-        return getRecordsWithQuery(view, prefixQueryWithImplicitViewQuery(view, query), visibleHeaders);
+    private Either<String, Sequence<Record>> getRecords(Model view, String query, Sequence<Keyword<?>> visibleHeaders, DrillDowns drillDowns) {
+        return getRecordsWithQuery(view, prefixQueryWithImplicitViewQuery(view, query), visibleHeaders, drillDowns);
     }
 
-    private Either<String, Sequence<Record>> getRecordsWithQuery(Model view, String query, Sequence<Keyword<?>> visibleHeaders) {
-        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(query, visibleHeaders);
+    private Either<String, Sequence<Record>> getRecordsWithQuery(Model view, String query, Sequence<Keyword<?>> visibleHeaders, DrillDowns drillDowns) {
+        Either<String, Predicate<Record>> invalidQueryOrPredicate = predicateBuilder.build(query, visibleHeaders, drillDowns);
         if (invalidQueryOrPredicate.isLeft()) return Either.left(invalidQueryOrPredicate.left());
 
         return right(getRecords(view, invalidQueryOrPredicate.right()));
@@ -113,7 +110,8 @@ public class RecordsService {
 
     public Sequence<Record> getRecords(Model view, Predicate<Record> predicate) {
         final Definition viewDefinition = definition(view);
-        final Definition unaliasedDefinition = Definition.constructors.definition(viewDefinition.name(), viewDefinition.fields().map(unalias()));
+        final Sequence<Keyword<?>> fields = viewDefinition.fields();
+        final Definition unaliasedDefinition = Definition.constructors.definition(viewDefinition.name(), fields.map(unalias()));
         return records.get(unaliasedDefinition).filter(predicate);
     }
 
@@ -140,7 +138,6 @@ public class RecordsService {
     private static Sequence<Keyword<?>> visibleHeaders(Sequence<Keyword<?>> headers) {
         return headers.filter(where(metadata(ViewsRepository.VISIBLE), is(notNullValue(Boolean.class).and(is(true))))).realise();
     }
-
 
     public static Sequence<Keyword<?>> headers(Model view) {
         return toKeywords(unwrap(view));

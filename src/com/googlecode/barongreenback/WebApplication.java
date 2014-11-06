@@ -10,21 +10,26 @@ import com.googlecode.barongreenback.less.LessCssModule;
 import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.search.SearchModule;
 import com.googlecode.barongreenback.shared.SharedModule;
+import com.googlecode.barongreenback.views.FacetsModule;
 import com.googlecode.barongreenback.views.ViewsModule;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
+import com.googlecode.utterlyidle.Request;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.RestApplication;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.handlers.GZipPolicy;
 import com.googlecode.utterlyidle.jobs.JobsModule;
-import com.googlecode.utterlyidle.schedules.ScheduleModule;
 import com.googlecode.utterlyidle.modules.Modules;
 import com.googlecode.utterlyidle.modules.PerformanceModule;
 import com.googlecode.utterlyidle.profiling.ProfilingModule;
+import com.googlecode.utterlyidle.schedules.ScheduleModule;
 import com.googlecode.utterlyidle.sitemesh.ActivateSiteMeshModule;
 import com.googlecode.utterlyidle.sitemesh.DecoratorProvider;
 import com.googlecode.utterlyidle.sitemesh.DecoratorRule;
@@ -60,6 +65,7 @@ public class WebApplication extends RestApplication {
         add(stringTemplateDecorators(packageUrl(SharedModule.class),
                 queryParamRule("decorator"),
                 metaTagRule("decorator"),
+                staticRule(contentType(TEXT_HTML).and(pathContains("search/list")), templateName("search-decorator")),
                 staticRule(contentType(TEXT_HTML), templateName("decorator"))));
         add(new ProfilingModule());
         // must come after sitemesh
@@ -71,6 +77,16 @@ public class WebApplication extends RestApplication {
                 return container;
             }
         });
+    }
+
+
+    public static Predicate<? super Pair<Request, Response>> pathContains(final String s) {
+        return new Predicate<Pair<Request, Response>>() {
+            @Override
+            public boolean matches(Pair<Request, Response> other) {
+                return other.first().uri().path().contains(s);
+            }
+        };
     }
 
     private ActivateSiteMeshModule stringTemplateDecorators(final URL templatesUrl, final DecoratorRule... rules) {
@@ -123,6 +139,7 @@ public class WebApplication extends RestApplication {
         application.add(new JobsHistoryModule());
         application.add(new BatchModule());
         application.add(new ExecutorModule());
+        application.add(new FacetsModule());
         application.add(bindingsModule(bindings(in(packageUrl(WebApplication.class)).path("baron-greenback"))));
     }
 

@@ -1,19 +1,22 @@
 package com.googlecode.barongreenback;
 
 import com.googlecode.barongreenback.persistence.PersistenceUri;
-import com.googlecode.barongreenback.persistence.lucene.SearcherPoolActivator;
-import com.googlecode.lazyrecords.lucene.LucenePool;
+import com.googlecode.barongreenback.persistence.lucene.NameBasedIndexFacetingPolicy;
+import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.httpserver.RestServer;
+import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
+import com.googlecode.yadic.Container;
 
 import java.io.File;
 import java.util.Properties;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneDirectory;
+import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 
@@ -21,8 +24,16 @@ public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
         PersistenceUri.set(properties, luceneDirectory(new File("/dev/shm/penfold/test-server")));
-        SearcherPoolActivator.setSearchPool(properties, LucenePool.class);
         Application application = new WebApplication(BasePath.basePath("/"), properties);
+        application.add(new ApplicationScopedModule() {
+            @Override
+            public Container addPerApplicationObjects(Container container) throws Exception {
+                final Container bgbApplicationScope = container.get(BaronGreenbackApplicationScope.class).value();
+                bgbApplicationScope.remove(NameBasedIndexFacetingPolicy.class);
+                bgbApplicationScope.addInstance(NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(is("news")));
+                return container;
+            }
+        });
         new RestServer(
                 application,
                 defaultConfiguration().port(9000));

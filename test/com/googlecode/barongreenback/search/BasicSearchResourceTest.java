@@ -1,26 +1,29 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.crawler.CompositeCrawlerTest;
+import com.googlecode.barongreenback.crawler.CrawlerTestFixtures;
 import com.googlecode.barongreenback.crawler.CrawlerTests;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ApplicationTests;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.*;
+import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Block;
-import com.googlecode.totallylazy.Callable2;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.waitrest.Waitrest;
 import com.googlecode.yadic.Container;
 import com.googlecode.yatspec.junit.Row;
-import com.googlecode.yatspec.junit.SpecRunner;
 import com.googlecode.yatspec.junit.Table;
+import com.googlecode.yatspec.junit.TableRunner;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,13 +31,11 @@ import org.junit.runner.RunWith;
 
 import java.io.InputStream;
 import java.util.Date;
-import java.util.Properties;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ID;
 import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.TITLE;
-import static com.googlecode.barongreenback.persistence.lucene.LuceneModule.LUCENE_MAX_CLAUSE_COUNT;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keyword.methods.keywords;
@@ -46,23 +47,18 @@ import static com.googlecode.utterlyidle.HttpHeaders.LOCATION;
 import static com.googlecode.utterlyidle.MediaType.APPLICATION_JSON;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Response.methods.header;
+import static com.googlecode.utterlyidle.Status.BAD_REQUEST;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
-@RunWith(SpecRunner.class)
-public class SearchResourceTest extends ApplicationTests {
+@RunWith(TableRunner.class)
+public class BasicSearchResourceTest extends ApplicationTests {
 
-    public static final int MAX_CLAUSES = 10;
     private Definition usersView;
     private UUID viewId;
-
-    @Override
-    protected Properties getProperties() {
-        final Properties properties = super.getProperties();
-        properties.setProperty(LUCENE_MAX_CLAUSE_COUNT, String.valueOf(MAX_CLAUSES));
-        return properties;
-    }
 
     @Before
     public void addSomeData() throws Exception {
@@ -161,7 +157,7 @@ public class SearchResourceTest extends ApplicationTests {
         RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).shortcut("users", ""))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
-        assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query="));
+        assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query=&drills=%7B%7D"));
     }
 
     @Test
@@ -169,14 +165,14 @@ public class SearchResourceTest extends ApplicationTests {
         RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).shortcut("users", "BAD_QUERY"))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
-        assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query=BAD_QUERY"));
+        assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query=BAD_QUERY&drills=%7B%7D"));
     }
 
     @Test
     public void canExportToCsv() throws Exception {
         RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).exportCsv("users", "first:Dan OR first:Matt"))));
         Response response = application.handle(requestBuilder.build());
-        InputStream resourceAsStream = SearchResourceTest.class.getResourceAsStream("csvTest.csv");
+        InputStream resourceAsStream = BasicSearchResourceTest.class.getResourceAsStream("csvTest.csv");
         String expected = Strings.toString(resourceAsStream);
         assertThat(response.entity().toString(), Matchers.is(expected));
     }
@@ -211,7 +207,8 @@ public class SearchResourceTest extends ApplicationTests {
 
     @Test
     public void fieldsShouldBePresentedInViewDefinitionOrder() throws Exception {
-        final Model viewDefinition = Model.persistent.parse(Strings.toString(SearchResourceTest.class.getResourceAsStream("testViewDefinition.json")));
+
+        final Model viewDefinition = Model.persistent.parse(Strings.toString(BasicSearchResourceTest.class.getResourceAsStream("testViewDefinition.json")));
         final Definition recordDefinition = definition("items", keyword("fielda").metadata(Keywords.unique, true), keyword("fieldb"), keyword("fieldc"), keyword("fieldd"));
         final Record record = record(keyword("fielda"), "a", keyword("fieldb"), "b", keyword("fieldc"), "c", keyword("fieldd"), "d");
 
@@ -227,25 +224,9 @@ public class SearchResourceTest extends ApplicationTests {
         assertThat(response.entity().toString(), containsString(expectedResponse));
     }
 
-    @Test(expected = Exception.class)
-    public void shouldThrowExceptionIfNumberOfClausesExceedsTheDefaultValue() throws Exception {
-        final String longQuery = queryWithClauses(MAX_CLAUSES + 1);
-        new SearchPage(browser, "users", longQuery);
-    }
-
     @Test
-    public void shouldNotThrowAnExceptionIfNumberOfClausesIsBelowTheMaximumValue() throws Exception {
-        final String longQuery = queryWithClauses(MAX_CLAUSES);
-        final SearchPage searchPage = new SearchPage(browser, "users", longQuery);
-        assertThat(searchPage.numberOfResults(), is(0));
-    }
-
-    private static String queryWithClauses(int numOfCauses) {
-        return Numbers.range(1, numOfCauses).fold(new StringBuilder(), new Callable2<StringBuilder, Number, StringBuilder>() {
-            @Override
-            public StringBuilder call(StringBuilder query, Number number) throws Exception {
-                return query.append(" OR first:" + number);
-            }
-        }).substring(4);
+    public void shouldReturnAnErrorWhenRequestingCsvWithAnInvalidQuery() throws Exception {
+        final Response csvResponse = SearchPage.exportToCsv(browser, "users", " OR AND ", "");
+        assertThat(csvResponse.status(), Matchers.is(BAD_REQUEST));
     }
 }

@@ -28,7 +28,7 @@ public class RecordsJobsHistoryRepositoryTest {
     public void initialiseRepository() throws Exception {
         final BaronGreenbackStringMappings baronGreenbackStringMappings = baronGreenbackStringMappings(new StringMappings(), new InMemoryPersistentTypesActivator().call());
         final PredicateParser parser = new StandardParserActivator(new ParserUkDateConverter(), baronGreenbackStringMappings).call();
-        repository = new RecordsJobsHistoryRepository(records(new MemoryRecords(baronGreenbackStringMappings.value())), new PredicateBuilder(parser));
+        repository = new RecordsJobsHistoryRepository(records(new MemoryRecords(baronGreenbackStringMappings.value())), new PredicateBuilder(parser, baronGreenbackStringMappings));
     }
 
     @Test

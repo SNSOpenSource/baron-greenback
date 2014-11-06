@@ -7,13 +7,14 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import org.junit.Test;
 
+import static com.googlecode.totallylazy.matchers.NumberMatcher.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RecordDefinitionTest {
     @Test
     public void allFieldsShouldFlatten() throws Exception {
         Sequence<Keyword<?>> keywords = Crawler.methods.keywords(CrawlerTestFixtures.ENTRIES);
-        assertThat(keywords.size(), NumberMatcher.is(6));
+        assertThat(keywords.size(), is(7));
 
     }
 }

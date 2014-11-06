@@ -15,8 +15,10 @@ import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 public class CrawlerTestFixtures {
     public static final Keyword<Integer> USER_ID = keyword("summary/userId", Integer.class).metadata(Keywords.unique, true);
     public static final Keyword<String> FIRST = keyword("first", String.class);
+    public static final Keyword<String> STATUS = keyword("status", String.class);
     public static final Keyword<String> FIRST_NAME = keyword("summary/firstName", String.class).as(FIRST);
-    public static final Definition USER = definition("/user", USER_ID, FIRST_NAME);
+    public static final Keyword<String> STATUS_CODE = keyword("summary/statusCode", String.class).as(STATUS);
+    public static final Definition USER = definition("/user", USER_ID, FIRST_NAME, STATUS_CODE);
     public static final RecordDefinition ENTRY_DEFINITION = new RecordDefinition(USER);
     public static final Keyword<String> ID = keyword("id", String.class).metadata(Keywords.unique, true).metadata(ViewsRepository.VISIBLE, true);
     public static final Keyword<URI> LINK = keyword("link/@href", URI.class).

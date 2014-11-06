@@ -1,5 +1,6 @@
 package com.googlecode.barongreenback.views;
 
+import com.googlecode.barongreenback.search.SearchPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
@@ -16,14 +17,14 @@ public class MenuPage {
     private final HttpHandler httpHandler;
     private final Html html;
 
-    public MenuPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(ViewsResource.class).menu("", "")))).build()));
-    }
-
     public MenuPage(HttpHandler httpHandler, Response response) throws Exception {
         this.httpHandler = httpHandler;
         this.html = Html.html(response);
         assertThat(html.title(), containsString("Menu"));
+    }
+
+    public MenuPage(HttpHandler httpHandler, String drilldowns) throws Exception {
+        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(ViewsResource.class).menu("", "", SearchPage.parseDrillDowns(drilldowns))))).build()));
     }
 
     public Link link(String value) {
@@ -32,5 +33,9 @@ public class MenuPage {
 
     public Number numberOfItems() {
         return html.count("//a[contains(@class, 'tab')]");
+    }
+
+    public int count(String view) {
+        return Integer.parseInt(html.selectContent("//li[contains(@class, '" + view +"')]//span").replaceAll("[\\(\\)]",""));
     }
 }

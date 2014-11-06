@@ -17,6 +17,7 @@ import com.googlecode.totallylazy.Second;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.numbers.Numbers;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
@@ -31,6 +32,8 @@ public class ViewsRepository {
     public static final Keyword<Boolean> VISIBLE = keyword("visible", Boolean.class);
     public static final Keyword<String> GROUP = keyword("group", String.class);
     public static final String ROOT = "view";
+    public static final Keyword<Boolean> SHOW_FACET = keyword("showFacet", Boolean.class);
+    public static final Keyword<Number> FACET_ENTRIES = keyword("facetEntries", Number.class);
 
     private final ModelRepository modelRepository;
 
@@ -61,7 +64,7 @@ public class ViewsRepository {
     }
 
     public static Model clean(Model root) {
-        return new ModelCleaner(in("view", "name", "alias", "parent", "records", "query", "priority", "keywords", "group", "type", "unique", "visible")).clean(root);
+        return new ModelCleaner(in("view", "name", "alias", "parent", "records", "query", "priority", "keywords", "group", "type", "unique", "visible", "showFacet", "facetEntries")).clean(root);
     }
 
     public static Model convertToViewModel(Definition definition) {
@@ -85,7 +88,9 @@ public class ViewsRepository {
                         add("group", metadata.get(GROUP)).
                         add("type", keyword.forClass().getName()).
                         add("unique", metadata.get(Keywords.unique)).
-                        add("visible", metadata.get(VISIBLE));
+                        add("visible", metadata.get(VISIBLE)).
+                        add("showFacet", metadata.get(SHOW_FACET)).
+                        add("facetEntries", metadata.get(FACET_ENTRIES));
             }
         };
     }
