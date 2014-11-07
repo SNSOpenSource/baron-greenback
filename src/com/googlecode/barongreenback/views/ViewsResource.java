@@ -70,7 +70,7 @@ public class ViewsResource {
 
     @GET
     @Path("menu")
-    public Model menu(@QueryParam("current") @DefaultValue("") String current, @QueryParam("query") @DefaultValue("") String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+    public Model menu(@QueryParam("current") @DefaultValue("") String current, @QueryParam("query") @DefaultValue("") String query, @QueryParam("drills") @DefaultValue("") Either<String, DrillDowns> drillDowns) {
         return modelsWithViewData(current, ViewsRepository.where(valueFor("visible", Boolean.class), is(true)), query, drillDowns);
     }
 

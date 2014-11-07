@@ -104,7 +104,7 @@ public class SearchResource {
     @GET
     @Priority(Priority.High)
     @Path("list")
-    public Model list(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+    public Model list(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query, @QueryParam("drills") @DefaultValue("") Either<String, DrillDowns> drillDowns) {
         final DrillDowns drillDownMap = drillDowns.rightOption().getOrElse(DrillDowns.empty());
         final Either<String, Sequence<Record>> errorOrResults = recordsService.findFromView(viewName, query, drillDownMap);
         final Model drillDownExceptionModel = drillDowns.map(returns1(queryExceptionModel(INVALID_DRILLS_MESSAGE)), returns1(model()));
@@ -129,7 +129,7 @@ public class SearchResource {
     @GET
     @Produces(MediaType.TEXT_CSV)
     @Path("csv")
-    public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+    public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("query") @DefaultValue("") final String query, @QueryParam("drills") @DefaultValue("") Either<String, DrillDowns> drillDowns) {
         if (drillDowns.isLeft()) {
             return response(BAD_REQUEST).entity(INVALID_DRILLS_MESSAGE).build();
         }
@@ -180,13 +180,7 @@ public class SearchResource {
 
     @GET
     @Path("shortcut")
-    public Response shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query) {
-        return shortcut(viewName, query, Either.<String, DrillDowns>right(DrillDowns.empty()));
-    }
-
-    @GET
-    @Path("shortcut")
-    public Response shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query, @QueryParam("drills") Either<String, DrillDowns> drillDowns) {
+    public Response shortcut(@PathParam("view") final String viewName, @QueryParam("query") final String query, @QueryParam("drills") @DefaultValue("") Either<String, DrillDowns> drillDowns) {
         if (drillDowns.isRight() && shortcutPolicy.shouldShortcut(viewName, query, drillDowns.right())) {
             final Sequence<Keyword<?>> visibleHeaders = recordsService.visibleHeaders(viewName);
             final Option<Record> optionalRecord = recordsService.findUnique(viewName, query);

@@ -1,7 +1,6 @@
 package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.crawler.CompositeCrawlerTest;
-import com.googlecode.barongreenback.crawler.CrawlerTestFixtures;
 import com.googlecode.barongreenback.crawler.CrawlerTests;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.ApplicationTests;
@@ -14,6 +13,7 @@ import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Block;
+import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.RequestBuilder;
@@ -146,7 +146,7 @@ public class BasicSearchResourceTest extends ApplicationTests {
 
     @Test
     public void supportsShortcutToUniquePage() throws Exception {
-        RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).shortcut("users", "id:\"urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1\""))));
+        RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).shortcut("users", "id:\"urn:uuid:c356d2c5-f975-4c4d-8e2a-a698158c6ef1\"", Either.<String, DrillDowns>right(DrillDowns.empty())))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
         assertThat(header(response, LOCATION), Matchers.is("/users/search/unique?query=id%3A%22urn%3Auuid%3Ac356d2c5-f975-4c4d-8e2a-a698158c6ef1%22"));
@@ -154,7 +154,7 @@ public class BasicSearchResourceTest extends ApplicationTests {
 
     @Test
     public void supportsShortcutToListPage() throws Exception {
-        RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).shortcut("users", ""))));
+        RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).shortcut("users", "", Either.<String, DrillDowns>right(DrillDowns.empty())))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
         assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query=&drills=%7B%7D"));
@@ -162,7 +162,7 @@ public class BasicSearchResourceTest extends ApplicationTests {
 
     @Test
     public void shortCut() throws Exception {
-        RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).shortcut("users", "BAD_QUERY"))));
+        RequestBuilder requestBuilder = get("/" + relativeUriOf(method(on(SearchResource.class).shortcut("users", "BAD_QUERY", Either.<String, DrillDowns>right(DrillDowns.empty())))));
         Response response = application.handle(requestBuilder.build());
         assertThat(response.status(), Matchers.is(Status.SEE_OTHER));
         assertThat(header(response, LOCATION), Matchers.is("/users/search/list?query=BAD_QUERY&drills=%7B%7D"));
