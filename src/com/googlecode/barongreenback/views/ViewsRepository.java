@@ -10,7 +10,9 @@ import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Second;
@@ -54,6 +56,17 @@ public class ViewsRepository {
                 add("priority", priority).
                 add("keywords", keywords.map(asModel()).toList());
         return model().add(ROOT, parent.fold(view, Model.functions.add("parent")));
+    }
+
+    public static Mapper<Keyword<?>, Pair<Keyword<?>, Integer>> toKeywordAndFacetEntries() {
+        return new Mapper<Keyword<?>, Pair<Keyword<?>, Integer>>() {
+
+            @Override
+            public Pair<Keyword<?>, Integer> call(Keyword<?> header) throws Exception {
+                final int facetEntries = header.metadata().get(FACET_ENTRIES).intValue();
+                return Pair.<Keyword<?>, Integer>pair(header, facetEntries);
+            }
+        };
     }
 
     public void ensureViewForCrawlerExists(Model crawler, Sequence<Keyword<?>> keywords) {

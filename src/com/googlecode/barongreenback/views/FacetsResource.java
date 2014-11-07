@@ -3,7 +3,6 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.barongreenback.search.DrillDowns;
 import com.googlecode.barongreenback.search.PredicateBuilder;
-import com.googlecode.barongreenback.search.RecordsService;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Facet;
@@ -22,6 +21,7 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.annotations.DefaultValue;
@@ -41,7 +41,6 @@ import static com.googlecode.barongreenback.views.ViewsRepository.FACET_ENTRIES;
 import static com.googlecode.barongreenback.views.ViewsRepository.SHOW_FACET;
 import static com.googlecode.barongreenback.views.ViewsRepository.find;
 import static com.googlecode.funclate.Model.functions.value;
-import static com.googlecode.funclate.Model.methods.merge;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.lazyrecords.Facet.FacetEntry;
 import static com.googlecode.lazyrecords.FacetDrillDown.facetDrillDown;
@@ -53,6 +52,7 @@ import static com.googlecode.totallylazy.Callables.returns1;
 import static com.googlecode.totallylazy.Maps.entries;
 import static com.googlecode.totallylazy.Maps.pairs;
 import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.empty;
@@ -89,18 +89,19 @@ public class FacetsResource {
 
         final Option<Model> viewOption = find(modelRepository, currentView);
         if (viewOption.isEmpty()) {
-            return merge(facetsResponseModel(Sequences.<Model>empty(), currentView, query, drillDowns), drillDownsExceptionModel);
+            return facetsResponseModel(Sequences.<Model>empty(), currentView, query, drillDowns).merge(drillDownsExceptionModel);
         }
 
         final Sequence<Keyword<?>> viewHeaders = headers(viewOption.get()).map(unalias());
-        final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(query, viewHeaders, DrillDowns.empty());
+        final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(query, viewHeaders);
 
         final Map<Keyword<?>, Integer> keywordAndFacetEntries = Maps.map(viewHeaders.filter(where(metadata(SHOW_FACET), is(notNullValue(Boolean.class).and(is(true)))))
-                .map(toKeywordAndFacetEntries()));
+                .map(ViewsRepository.toKeywordAndFacetEntries()));
         final Sequence<FacetRequest> facetRequests = entries(keywordAndFacetEntries).map(asFacetRequest());
         final Sequence<FacetDrillDown> facetDrillDowns = calculateDrillDowns(drillDowns.rightOption().getOrElse(DrillDowns.empty()), viewHeaders);
         final Sequence<Facet<FacetEntry>> facets = records.facetResults(queryPredicate.right(), facetRequests, facetDrillDowns);
-        return merge(facetsResponseModel(facets.map(asFacetModel(keywordAndFacetEntries, facetDrillDowns, currentView, query, drillDowns)), currentView, query, drillDowns), drillDownsExceptionModel);
+        final Sequence<Model> facetsModels = facets.map(toSortedEntriesModels(facetDrillDowns)).map(toFacetModel(keywordAndFacetEntries, currentView, query, drillDowns, Option.<Integer>none()));
+        return facetsResponseModel(facetsModels, currentView, query, drillDowns).merge(drillDownsExceptionModel);
     }
 
     @GET
@@ -110,38 +111,66 @@ public class FacetsResource {
 
         final Option<Model> viewOption = find(modelRepository, currentView);
         if (viewOption.isEmpty()) {
-            return merge(model().add("entries", empty()), drillDownsExceptionModel);
+            return model().merge(drillDownsExceptionModel);
         }
 
         final Option<Keyword<?>> viewHeader = headers(viewOption.get()).find(where(name(), is(facetName)));
         final Keyword<?> facetKeyword = viewHeader.getOrThrow(new RuntimeException("No facet found with name " + facetName));
-        final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(query, Sequences.<Keyword<?>>one(facetKeyword), DrillDowns.empty());
-        final Sequence<FacetDrillDown> facetDrillDowns = calculateDrillDowns(drillDowns.right(), headers(viewOption.get()));
-        final Facet<FacetEntry> facet = records.facetResults(queryPredicate.right(), one(facetRequest(facetKeyword)), facetDrillDowns).first();
-        final Pair<Sequence<Model>, Sequence<Model>> facetEntries = facet.map(asFacetEntryModel(facetKeyword, facetDrillDowns)).partition(where(value("drilledDown", Boolean.class), is(true)));
-        final Option<FacetDrillDown> drillDownForCurrentFacet = facetDrillDowns.find(drillDownKeyIs(facetKeyword));
-        final Sequence<Model> drilledDownEntries = drillDownForCurrentFacet.isDefined() ? facetEntries.first().sortBy(positionIn(drillDownForCurrentFacet.get())) : Sequences.<Model>empty();
-        final Sequence<Model> otherEntries = facetEntries.second();
-        final int totalSize = facet.size();
+        final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(query, Sequences.<Keyword<?>>one(facetKeyword));
         final int viewDefinitionConfiguredSize = facetKeyword.metadata().get(FACET_ENTRIES).intValue();
-        final Integer displayedSize = Math.max(drilledDownEntries.size(), entryCount.getOrElse(viewDefinitionConfiguredSize));
 
-        Model facetModel = model().
-                add("name", facetName).
-                add("class-name", classNameOf(facetName)).
-                add("entries", drilledDownEntries.join(otherEntries).take(displayedSize));
+        final Sequence<FacetDrillDown> facetDrillDowns = calculateDrillDowns(drillDowns.right(), headers(viewOption.get()));
 
-        if (totalSize > displayedSize) {
-            facetModel = facetModel.add("more", redirector.absoluteUriOf(method(on(FacetsResource.class).facet(currentView, query, facet.key().name(), Option.some(Integer.MAX_VALUE), drillDowns))).toString());
-        }
-        if (otherEntries.size() > 0 && totalSize > viewDefinitionConfiguredSize && displayedSize > totalSize) {
-            facetModel = facetModel.add("fewer", redirector.absoluteUriOf(method(on(FacetsResource.class).facet(currentView, query, facet.key().name(), Option.none(Integer.class), drillDowns))).toString());
-        }
-        return merge(
-                model().
-                        add("facet", facetModel).
-                        add("drills", drillDowns.map(asString(), asString())),
-                drillDownsExceptionModel);
+        final Model facetModel = records.facetResults(queryPredicate.right(), one(facetRequest(facetKeyword)), facetDrillDowns).
+                map(toSortedEntriesModels(facetDrillDowns)).
+                map(toFacetModel(Collections.<Keyword<?>, Integer>singletonMap(facetKeyword, viewDefinitionConfiguredSize), currentView, query, drillDowns, entryCount)).
+                first();
+
+        return model().
+                add("facet", facetModel).
+                add("drills", drillDowns.map(asString(), asString())).
+                merge(drillDownsExceptionModel);
+    }
+
+    private Mapper<Facet<FacetEntry>, Pair<Keyword<?>, Sequence<Model>>> toSortedEntriesModels(final Sequence<FacetDrillDown> facetDrillDowns) {
+        return new Mapper<Facet<FacetEntry>, Pair<Keyword<?>, Sequence<Model>>>() {
+            @Override
+            public Pair<Keyword<?>, Sequence<Model>> call(Facet<FacetEntry> facet) throws Exception {
+                final Keyword<?> facetKeyword = facet.key();
+                final Pair<Sequence<Model>, Sequence<Model>> facetEntries = facet.map(asFacetEntryModel(facetKeyword, facetDrillDowns)).partition(isEntryDrilledDown());
+                final Option<FacetDrillDown> drillDownForCurrentFacet = facetDrillDowns.find(drillDownKeyIs(facetKeyword));
+                final Sequence<Model> drilledDownEntries = drillDownForCurrentFacet.isDefined() ? facetEntries.first().sortBy(positionIn(drillDownForCurrentFacet.get())) : Sequences.<Model>empty();
+                final Sequence<Model> otherEntries = facetEntries.second();
+                return Pair.<Keyword<?>, Sequence<Model>>pair(facetKeyword, drilledDownEntries.join(otherEntries));
+            }
+        };
+    }
+
+    private LogicalPredicate<Model> isEntryDrilledDown() {
+        return where(value("drilledDown", Boolean.class), is(true));
+    }
+
+    private Mapper<Pair<Keyword<?>, Sequence<Model>>, Model> toFacetModel(final Map<Keyword<?>, Integer> keywordAndFacetEntries, final String currentView, final String query, final Either<String, DrillDowns> drillDowns, final Option<Integer> requestedEntryCount) {
+        return new Mapper<Pair<Keyword<?>, Sequence<Model>>, Model>() {
+            @Override
+            public Model call(Pair<Keyword<?>, Sequence<Model>> entriesModels) throws Exception {
+                final Keyword<?> facetKeyword = entriesModels.first();
+                final Sequence<Model> entries = entriesModels.second();
+                final int drilledDownCount = entries.filter(isEntryDrilledDown()).size();
+                final int entriesToDisplay = Math.max(requestedEntryCount.getOrElse(keywordAndFacetEntries.get(facetKeyword)), drilledDownCount);
+                Model base = model().
+                        add("name", facetKeyword.name()).
+                        add("class-name", classNameOf(facetKeyword.name())).
+                        add("entries", entries.take(entriesToDisplay));
+                if (entries.size() > entriesToDisplay) {
+                    base = base.add("more", redirector.absoluteUriOf(method(on(FacetsResource.class).facet(currentView, query, facetKeyword.name(), Option.some(Integer.MAX_VALUE), drillDowns))).toString());
+                }
+                if (entries.filter(not(isEntryDrilledDown())).size() > 0 && entries.size() > keywordAndFacetEntries.get(facetKeyword) && entriesToDisplay > entries.size()) {
+                    base = base.add("fewer", redirector.absoluteUriOf(method(on(FacetsResource.class).facet(currentView, query, facetKeyword.name(), Option.none(Integer.class), drillDowns))).toString());
+                }
+                return base;
+            }
+        };
     }
 
     private Model facetsResponseModel(Sequence<Model> facets, String currentView, String query, Either<String, DrillDowns> drillDowns) {
@@ -164,6 +193,7 @@ public class FacetsResource {
         return pairs(drillDowns.value()).map(toFacetDrillDown(viewHeaders));
     }
 
+
     private Mapper<Pair<String, List<String>>, FacetDrillDown> toFacetDrillDown(final Sequence<Keyword<?>> viewHeaders) {
         return new Mapper<Pair<String, List<String>>, FacetDrillDown>() {
             @Override
@@ -174,47 +204,11 @@ public class FacetsResource {
         };
     }
 
-
     private Mapper<Map.Entry<Keyword<?>, Integer>, FacetRequest> asFacetRequest() {
         return new Mapper<Map.Entry<Keyword<?>, Integer>, FacetRequest>() {
             @Override
             public FacetRequest call(Map.Entry<Keyword<?>, Integer> keywordAndEntries) throws Exception {
                 return facetRequest(keywordAndEntries.getKey());
-            }
-        };
-    }
-
-    private Mapper<Keyword<?>, Pair<Keyword<?>, Integer>> toKeywordAndFacetEntries() {
-        return new Mapper<Keyword<?>, Pair<Keyword<?>, Integer>>() {
-
-            @Override
-            public Pair<Keyword<?>, Integer> call(Keyword<?> header) throws Exception {
-                final int facetEntries = header.metadata().get(FACET_ENTRIES).intValue();
-                return Pair.<Keyword<?>, Integer>pair(header, facetEntries);
-            }
-        };
-    }
-
-    private Mapper<Facet<FacetEntry>, Model> asFacetModel(final Map<Keyword<?>, Integer> keywordAndFacetEntries, final Sequence<FacetDrillDown> facetDrillDowns, final String currentView, final String query, final Either<String, DrillDowns> drillDowns) throws IOException {
-        return new Mapper<Facet<FacetEntry>, Model>() {
-            @Override
-            public Model call(Facet<FacetEntry> facet) throws Exception {
-                final Keyword<?> facetKeyword = facet.key();
-                final int totalSize = facet.size();
-                final Pair<Sequence<Model>, Sequence<Model>> facetEntries = facet.map(asFacetEntryModel(facetKeyword, facetDrillDowns)).partition(where(value("drilledDown", Boolean.class), is(true)));
-                final int configuredSize = keywordAndFacetEntries.get(facetKeyword);
-                final Option<FacetDrillDown> drillDownForCurrentFacet = facetDrillDowns.find(drillDownKeyIs(facetKeyword));
-                final Sequence<Model> drilledDownEntries = drillDownForCurrentFacet.isDefined() ? facetEntries.first().sortBy(positionIn(drillDownForCurrentFacet.get())) : Sequences.<Model>empty();
-                final Sequence<Model> otherEntries = facetEntries.second();
-                final int entriesToDisplay = Math.max(configuredSize, drilledDownEntries.size());
-                final Model base = model().
-                        add("name", facet.key().name()).
-                        add("class-name", classNameOf(facet.key().name())).
-                        add("entries", drilledDownEntries.join(otherEntries).take(entriesToDisplay));
-                if (totalSize > entriesToDisplay) {
-                    return base.add("more", redirector.absoluteUriOf(method(on(FacetsResource.class).facet(currentView, query, facet.key().name(), Option.some(Integer.MAX_VALUE), drillDowns))).toString());
-                }
-                return base;
             }
         };
     }
