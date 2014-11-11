@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.barongreenback.search.DrillDowns;
 import com.googlecode.barongreenback.search.PredicateBuilder;
+import com.googlecode.barongreenback.search.RecordsService;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Facet;
@@ -112,7 +113,7 @@ public class FacetsResource {
 
     private Sequence<Model> facetResults(String currentView, String query, Either<String, DrillDowns> drillDowns, Model view, Option<Integer> requestedEntryCount) throws IOException {
         final Sequence<Keyword<?>> viewHeaders = headers(view).map(unalias());
-        final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(query, viewHeaders);
+        final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(RecordsService.prefixQueryWithImplicitViewQuery(view, query), viewHeaders);
 
         final Map<Keyword<?>, Integer> keywordAndConfiguredCounts = Maps.map(viewHeaders.filter(where(metadata(SHOW_FACET), is(notNullValue(Boolean.class).and(is(true)))))
                 .map(ViewsRepository.toKeywordAndFacetEntries()).map(Callables.<Keyword<?>, String, Integer>second(Callables.<String, Number, Integer>compose(Numbers.valueOf, Numbers.intValue))));

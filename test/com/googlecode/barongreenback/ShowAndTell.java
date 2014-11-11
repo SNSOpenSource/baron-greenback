@@ -30,7 +30,7 @@ public class ShowAndTell {
             public Container addPerApplicationObjects(Container container) throws Exception {
                 final Container bgbApplicationScope = container.get(BaronGreenbackApplicationScope.class).value();
                 bgbApplicationScope.remove(NameBasedIndexFacetingPolicy.class);
-                bgbApplicationScope.addInstance(NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(in("news", "booze")));
+                bgbApplicationScope.addInstance(NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(in("news", "flooze")));
                 return container;
             }
         });
