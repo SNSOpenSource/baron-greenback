@@ -16,21 +16,21 @@ import java.util.Properties;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneDirectory;
-import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 
 public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        PersistenceUri.set(properties, luceneDirectory(new File("/dev/shm/penfold/test-server")));
+        PersistenceUri.set(properties, luceneDirectory(new File("/dev/shm/bg/test-server")));
         Application application = new WebApplication(BasePath.basePath("/"), properties);
         application.add(new ApplicationScopedModule() {
             @Override
             public Container addPerApplicationObjects(Container container) throws Exception {
                 final Container bgbApplicationScope = container.get(BaronGreenbackApplicationScope.class).value();
                 bgbApplicationScope.remove(NameBasedIndexFacetingPolicy.class);
-                bgbApplicationScope.addInstance(NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(is("news")));
+                bgbApplicationScope.addInstance(NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(in("news", "booze")));
                 return container;
             }
         });

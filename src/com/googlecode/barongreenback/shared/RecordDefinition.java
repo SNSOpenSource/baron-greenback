@@ -15,6 +15,7 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.numbers.Numbers;
 
 import java.util.List;
 
@@ -156,9 +157,9 @@ public class RecordDefinition {
         return booleanValueOf(keyword, ViewsRepository.SHOW_FACET);
     }
 
-    private static Number facetEntries(Keyword keyword) {
-        final Number facetEntries = keyword.metadata().get(ViewsRepository.FACET_ENTRIES);
-        return facetEntries == null ? 0 : facetEntries;
+    private static String facetEntries(Keyword keyword) {
+        final Option<String> facetEntries = keyword.metadata().getOption(ViewsRepository.FACET_ENTRIES);
+        return facetEntries.getOrElse(String.valueOf(Integer.MAX_VALUE));
     }
 
     private static String type(Keyword keyword) {
@@ -169,7 +170,7 @@ public class RecordDefinition {
         return model().add("name", recordName).add("keywords", Sequences.sequence(fields).toList());
     }
 
-    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, boolean subfeed, Option<Model> recordDefinition, boolean checkpoint, String priority, boolean showFacet, Number facetEntries) {
+    public static Model keywordDefinition(String name, String alias, String group, String type, boolean unique, boolean visible, boolean subfeed, Option<Model> recordDefinition, boolean checkpoint, String priority, boolean showFacet, String facetEntries) {
         return model().
                 add("name", name).
                 add("alias", alias).

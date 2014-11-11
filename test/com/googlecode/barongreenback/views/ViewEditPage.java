@@ -3,6 +3,7 @@ package com.googlecode.barongreenback.views;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.html.Checkbox;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Input;
 
@@ -50,6 +51,8 @@ public class ViewEditPage {
     }
 
     public static final String fieldName = "//input[@id='view.keywords[%s].name']";
+    public static final String showFacet = "//input[@id='view.keywords[%s].showFacet']";
+    public static final String facetEntries = "//input[@id='view.keywords[%s].facetEntries']";
     public static final String fieldAlias = "//input[@id='view.keywords[%s].alias']";
 
     public Input fieldName(int index) {
@@ -58,6 +61,14 @@ public class ViewEditPage {
 
     public Input fieldAlias(int index) {
         return html.input(String.format(fieldAlias, index));
+    }
+
+    public Checkbox showFacet(int index) {
+        return html.checkbox(String.format(showFacet, index));
+    }
+
+    public Input facetEntries(int index) {
+        return html.input(String.format(facetEntries, index));
     }
 
     public ViewListPage save() throws Exception {

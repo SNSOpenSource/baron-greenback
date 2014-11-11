@@ -11,6 +11,7 @@
 $if(drillDownsException)$
 <div class="error">Could not understand your refine-by criteria; showing all results</div>
 $endif$
+$if(facets)$
 <div id="nav-facets-container">
 <h4>Filter by</h4>
     <ul class="nav nav-facets">
@@ -18,6 +19,7 @@ $endif$
         <li class="nav-facet">$facet()$</li>
     }$
 </ul>
- </div>
+</div>
+$endif$
 </body>
 </html>

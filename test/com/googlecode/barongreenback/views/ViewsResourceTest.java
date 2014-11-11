@@ -54,6 +54,8 @@ public class ViewsResourceTest extends ApplicationTests {
                                 add("parent", "someParent").
                                 add("keywords", list(model().
                                         add("name", "first").
+                                        add("showFacet", true).
+                                        add("facetEntries", "5").
                                         add("alias", "").
                                         add("group", "").
                                         add("type", "java.lang.String").
@@ -148,6 +150,8 @@ public class ViewsResourceTest extends ApplicationTests {
         assertThat(edit.query().value(), is(""));
         assertThat(edit.parent().value(), is("someParent"));
         assertThat(edit.fieldName(1).value(), is("first"));
+        assertThat(edit.showFacet(1).checked(), is(true));
+        assertThat(edit.facetEntries(1).value(), is("5"));
         edit.name().value("people");
         edit.records().value("people");
         edit.query().value("firstname:dan");

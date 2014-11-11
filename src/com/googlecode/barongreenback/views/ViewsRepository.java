@@ -5,6 +5,7 @@ import com.googlecode.barongreenback.shared.ModelCleaner;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.ImmutableKeyword;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 import com.googlecode.lazyrecords.Record;
@@ -19,7 +20,6 @@ import com.googlecode.totallylazy.Second;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.numbers.Numbers;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
@@ -35,7 +35,7 @@ public class ViewsRepository {
     public static final Keyword<String> GROUP = keyword("group", String.class);
     public static final String ROOT = "view";
     public static final Keyword<Boolean> SHOW_FACET = keyword("showFacet", Boolean.class);
-    public static final Keyword<Number> FACET_ENTRIES = keyword("facetEntries", Number.class);
+    public static final Keyword<String> FACET_ENTRIES = keyword("facetEntries", String.class);
 
     private final ModelRepository modelRepository;
 
@@ -58,13 +58,12 @@ public class ViewsRepository {
         return model().add(ROOT, parent.fold(view, Model.functions.add("parent")));
     }
 
-    public static Mapper<Keyword<?>, Pair<Keyword<?>, Integer>> toKeywordAndFacetEntries() {
-        return new Mapper<Keyword<?>, Pair<Keyword<?>, Integer>>() {
-
+    public static Mapper<Keyword<?>, Pair<Keyword<?>, String>> toKeywordAndFacetEntries() {
+        return new Mapper<Keyword<?>, Pair<Keyword<?>, String>>() {
             @Override
-            public Pair<Keyword<?>, Integer> call(Keyword<?> header) throws Exception {
-                final int facetEntries = header.metadata().get(FACET_ENTRIES).intValue();
-                return Pair.<Keyword<?>, Integer>pair(header, facetEntries);
+            public Pair<Keyword<?>, String> call(Keyword<?> header) throws Exception {
+                final Option<String> facetEntries = header.metadata().getOption(FACET_ENTRIES);
+                return Pair.<Keyword<?>, String>pair(header, facetEntries.getOrElse(String.valueOf(Integer.MAX_VALUE)));
             }
         };
     }

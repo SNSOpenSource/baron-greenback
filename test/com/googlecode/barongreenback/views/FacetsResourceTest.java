@@ -60,7 +60,7 @@ public class FacetsResourceTest extends ApplicationTests {
     private Definition viewWithFacets = facetedViewWhereNumberOfFacetsEntriesIs(3);
 
     private Definition facetedViewWhereNumberOfFacetsEntriesIs(int value) {
-        return definition("facetedView", FIRST.metadata(SHOW_FACET, true).metadata(FACET_ENTRIES, value), STATUS.metadata(SHOW_FACET, true).metadata(FACET_ENTRIES, value));
+        return definition("facetedView", FIRST.metadata(SHOW_FACET, true).metadata(FACET_ENTRIES, Integer.toString(value)), STATUS.metadata(SHOW_FACET, true).metadata(FACET_ENTRIES, Integer.toString(value)));
     }
 
     @After

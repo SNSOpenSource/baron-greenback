@@ -12,7 +12,9 @@ import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Group;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Maps;
@@ -22,6 +24,7 @@ import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
@@ -112,7 +115,7 @@ public class FacetsResource {
         final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(query, viewHeaders);
 
         final Map<Keyword<?>, Integer> keywordAndConfiguredCounts = Maps.map(viewHeaders.filter(where(metadata(SHOW_FACET), is(notNullValue(Boolean.class).and(is(true)))))
-                .map(ViewsRepository.toKeywordAndFacetEntries()));
+                .map(ViewsRepository.toKeywordAndFacetEntries()).map(Callables.<Keyword<?>, String, Integer>second(Callables.<String, Number, Integer>compose(Numbers.valueOf, Numbers.intValue))));
         final Sequence<FacetDrillDown> facetDrillDowns = calculateDrillDowns(drillDowns.rightOption().getOrElse(DrillDowns.empty()), viewHeaders);
         final Sequence<Facet<FacetEntry>> facets = records.facetResults(queryPredicate.right(), sequence(keywordAndConfiguredCounts.keySet()).map(facetRequest()), facetDrillDowns);
         return facets.map(toSortedEntriesModels(facetDrillDowns)).map(toFacetModel(keywordAndConfiguredCounts, currentView, query, drillDowns, requestedEntryCount));
