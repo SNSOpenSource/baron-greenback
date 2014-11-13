@@ -5,7 +5,7 @@
     <meta name="decorator" content="none"/>
 </head>
 <body>
-
+<div class="views-menu">
 <div id="nav-views-container">
     <h4>Show results in</h4>
 <ul class="nav nav-views">
@@ -15,6 +15,7 @@
     </li>
     }$
 </ul>
+</div>
 </div>
 </body>
 </html>

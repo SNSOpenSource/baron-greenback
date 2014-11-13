@@ -9,7 +9,8 @@ $record.keys:{ groupName | $record.(groupName).keys:{ name |
 }$}$
 
 </head>
-<body class="$view$">
+<body class="$view$ unique">
+    <div class="unique-data">
     $record.keys:{ groupName |
         $group(name=groupName, content={
             $record.(groupName).keys:{ name |
@@ -17,5 +18,6 @@ $record.keys:{ groupName | $record.(groupName).keys:{ name |
             }$
         })$
     }$
+    </div>
 </body>
 </html>

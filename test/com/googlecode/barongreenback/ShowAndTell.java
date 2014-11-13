@@ -23,7 +23,7 @@ import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguratio
 public class ShowAndTell {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        PersistenceUri.set(properties, luceneDirectory(new File("/dev/shm/bg/test-server")));
+        PersistenceUri.set(properties, luceneDirectory(new File("/tmp/bg/test-server")));
         Application application = new WebApplication(BasePath.basePath("/"), properties);
         application.add(new ApplicationScopedModule() {
             @Override
