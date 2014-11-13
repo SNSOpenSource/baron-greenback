@@ -7,7 +7,7 @@
 <body>
 <div class="views-menu">
 <div id="nav-views-container">
-    <h4>Show results in</h4>
+    <h4 class="title">Show results in</h4>
 <ul class="nav nav-views">
     $views:{ view |
     <li class="view $view.name$ count$view.itemsTotal$ $if(view.current)$ active $endif$">
