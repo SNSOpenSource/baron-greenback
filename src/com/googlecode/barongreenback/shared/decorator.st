@@ -28,7 +28,9 @@
 
 <div class="content">
     $include.({$base$views/menu?current=$meta.view$&query=$urlEncode(htmlDecode(meta.query))$&drills=$urlEncode(htmlDecode(meta.drills))$}).body$
-    $body$
+    <div class="results-data">
+      $body$
+    </div>
 </div>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-1.10.2.min.js"></script>
 <script type="text/javascript" src="$base$baron-greenback/shared/jquery-migrate-1.2.1.min.js"></script>
