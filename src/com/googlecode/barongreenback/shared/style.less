@@ -159,6 +159,10 @@ div.container, .container {
     width: auto;
 }
 
+.content {
+    padding: 10px;
+}
+
 .shadow(#D3D3D3); // Dan: Fixes wierd bug in less.js where it can't find .border-radius in next section
 
 div.fieldset {
@@ -171,6 +175,10 @@ div.fieldset {
     padding-right: .5em;
 
     position: relative;
+
+    &:first-child {
+        margin-top: 0;
+    }
     
     div.legend {
         .border-radius;
@@ -647,11 +655,8 @@ ul.facet {
   float: left;
 }
 
-#search-results {
-  padding-top: 10px;
-}
-
 #search-results, .results-data {
+  padding-top: 10px;
   width: 100%;
   padding-left: 260px;
   box-sizing: border-box;
