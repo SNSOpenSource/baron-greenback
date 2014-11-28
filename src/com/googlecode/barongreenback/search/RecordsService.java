@@ -9,15 +9,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.UnaryFunction;
-import com.googlecode.totallylazy.Unchecked;
+import com.googlecode.totallylazy.*;
 
 import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
@@ -26,10 +18,10 @@ import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Callables.ignoreAndReturn;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
-import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Strings.blank;
+import static com.googlecode.totallylazy.Strings.format;
 
 public class RecordsService {
 
@@ -90,7 +82,7 @@ public class RecordsService {
     }
 
     public static String prefixQueryWithImplicitViewQuery(Model view, final String query) {
-        return sequence(queryFrom(view)).append(query != null ? query : "").toString(" ");
+        return sequence(queryFrom(view), query).filter(not(blank)).map(format("(%s)")).toString(" ");
     }
 
     private static String queryFrom(Model model) {
