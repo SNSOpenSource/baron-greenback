@@ -2,32 +2,25 @@ package com.googlecode.barongreenback.search;
 
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.barongreenback.shared.RecordsModelRepository;
+import com.googlecode.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.AliasedKeyword;
-import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.ImmutableKeyword;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.*;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
+import com.googlecode.lazyrecords.parser.StandardParser;
+import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.googlecode.barongreenback.search.RecordsService.headers;
-import static com.googlecode.barongreenback.search.RecordsService.unalias;
-import static com.googlecode.barongreenback.views.ViewsRepository.GROUP;
-import static com.googlecode.barongreenback.views.ViewsRepository.VISIBLE;
-import static com.googlecode.barongreenback.views.ViewsRepository.viewModel;
-import static com.googlecode.barongreenback.views.ViewsRepository.viewName;
+import static com.googlecode.barongreenback.search.RecordsService.*;
+import static com.googlecode.barongreenback.views.ViewsRepository.*;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Predicates.all;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class RecordsServiceTest {
     private BaronGreenbackRecords records;
@@ -71,6 +64,56 @@ public class RecordsServiceTest {
 
         assertThat(unaliased.metadata(VISIBLE).value(), is(true));
         assertThat(unaliased.metadata(GROUP).value(), is("Group"));
+    }
+
+    @Test
+    public void prefxingQueryShouldSupportORs() throws Exception {
+        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery("keywordA:foo"), "keywordB:stu OR keywordA:foobar");
+
+        final Record shouldMatch = record(keyword("keywordA"), "foo", keyword("keywordB"), "stu");
+        final Record shouldNotMatch = record(keyword("keywordA"), "foobar", keyword("keywordB"), "stu");
+
+        assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
+        assertThat(parsedQuery(prefixedQuery).matches(shouldNotMatch), is(false));
+    }
+
+    @Test
+    public void prefixingShouldSupportEmptyQueries() throws Exception {
+        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery("keywordA:foo"), "");
+
+        final Record shouldMatch = record(keyword("keywordA"), "foo");
+        final Record shouldNotMatch = record(keyword("keywordA"), "foobar");
+
+        assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
+        assertThat(parsedQuery(prefixedQuery).matches(shouldNotMatch), is(false));
+    }
+
+    @Test
+    public void prefixingShouldSupportEmptyViews() throws Exception {
+        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery(""), "keywordA:foo");
+
+        final Record shouldMatch = record(keyword("keywordA"), "foo");
+        final Record shouldNotMatch = record(keyword("keywordA"), "foobar");
+
+        assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
+        assertThat(parsedQuery(prefixedQuery).matches(shouldNotMatch), is(false));
+    }
+
+    @Test
+    public void prefixingShouldSupportEmptyArguments() throws Exception {
+        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery(""), "");
+
+        final Record shouldMatch = record(keyword("keywordA"), "foo");
+
+        assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
+    }
+
+    private Model viewWithQuery(String query) {
+        return ViewsRepository.viewModel(Sequences.<Keyword<?>>empty(), "viewName", "source", query, true, "");
+    }
+
+    private Predicate<Record> parsedQuery(String prefixedQuery) {
+        return new StandardParser().parse(prefixedQuery, Sequences.<Keyword<?>>empty());
     }
 
 }
