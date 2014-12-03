@@ -1,0 +1,11 @@
+$decorator(content={
+    <div class="views-menu">
+        $include.({$base$views/menu?current=$meta.view$&query=$urlEncode(htmlDecode(meta.query))$&drills=$urlEncode(htmlDecode(meta.drills))$}).body$
+        <div id="quicklinks">
+            $div.quicklinks$
+        </div>
+    </div>
+    <div class="results-data">
+        $div.uniquedata$
+    </div>
+}, contentClass="unique-page")$

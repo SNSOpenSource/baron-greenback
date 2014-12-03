@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<user>
+  <summary>
+    <userId>1234</userId>
+    <statusCode>Created</statusCode>
+    <firstName>Dan</firstName>
+    <createdDate>2011-02-19T13:45:58</createdDate>
+    <pony href="http://localhost:9001/entry1pony.xml" />
+  </summary>
+  <sourceSystem>xxx</sourceSystem>
+</user>
