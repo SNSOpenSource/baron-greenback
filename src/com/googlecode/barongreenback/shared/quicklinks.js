@@ -3,13 +3,11 @@ jQuery(document).ready(function () {
     var originalLabelColor = $('div.legend').css('background-color');
     var originalBorderColor = $('div.fieldset').css('border-color');
 
-    $('div.legend').each(function () {
-        if (this.offsetParent != null) {
-            var legend = $(this).text();
-            var quickLink = $('<a></a>').attr('href', '#').addClass('quicklink').text(legend);
-            var listElement = $('<li></li>').append(quickLink);
-            $('#quicklinks ul').append(listElement);
-        }
+    $('div.legend:visible').each(function () {
+        var legend = $(this).text();
+        var quickLink = $('<a></a>').attr('href', '#').addClass('quicklink').text(legend);
+        var listElement = $('<li></li>').append(quickLink);
+        $('#quicklinks ul').append(listElement);
     });
 
     $('#quicklinks a').click(function (e) {
