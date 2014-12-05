@@ -5,11 +5,7 @@ import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
 import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.lazyrecords.lucene.CaseInsensitive;
-import com.googlecode.lazyrecords.lucene.LucenePartitionedRecords;
-import com.googlecode.lazyrecords.lucene.LuceneQueryPreprocessor;
-import com.googlecode.lazyrecords.lucene.PartitionedIndex;
-import com.googlecode.lazyrecords.lucene.Persistence;
+import com.googlecode.lazyrecords.lucene.*;
 import com.googlecode.lazyrecords.lucene.mappings.LuceneMappings;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
@@ -48,8 +44,10 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
     public Container addPerApplicationObjects(Container applicationScope) {
         final Container container = applicationScope.get(BaronGreenbackApplicationScope.class).value();
         addInstanceIfAbsent(container, NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(alwaysFalse(String.class)));
-        addIfAbsent(container, LuceneStorageActivator.class, NameBasedFacetedLuceneStorageActivator.class);
-        addActivatorIfAbsent(container, PartitionedIndex.class, PartitionedIndexActivator.class);
+        addActivatorIfAbsent(container, NameToLuceneDirectoryFunction.class, NameToLuceneDirectoryFunctionActivator.class);
+        addActivatorIfAbsent(container, NameToLuceneStorageFunction.class, CaseInsensitiveNameToLuceneStorageFunctionActivator.class);
+        container.decorate(NameToLuceneStorageFunction.class, TaxonomyNameToLuceneStorageFunction.class);
+        addIfAbsent(container, PartitionedIndex.class, LucenePartitionedIndex.class);
         return applicationScope;
     }
 
