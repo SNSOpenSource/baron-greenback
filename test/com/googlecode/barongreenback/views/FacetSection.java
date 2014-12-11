@@ -149,6 +149,10 @@ public class FacetSection {
         };
     }
 
+    public Option<String> removeFiltersLink() {
+        return html.selectValues("//a[text()='Remove all filters']").headOption();
+    }
+
     public static class Entry {
         private final String name;
 

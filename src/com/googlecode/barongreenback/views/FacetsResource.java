@@ -6,34 +6,15 @@ import com.googlecode.barongreenback.search.PredicateBuilder;
 import com.googlecode.barongreenback.search.RecordsService;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.Facet;
-import com.googlecode.lazyrecords.FacetDrillDown;
-import com.googlecode.lazyrecords.FacetedRecords;
-import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.*;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Group;
-import com.googlecode.totallylazy.Mapper;
-import com.googlecode.totallylazy.Maps;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.annotations.DefaultValue;
-import com.googlecode.utterlyidle.annotations.GET;
-import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.Produces;
-import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.googlecode.utterlyidle.annotations.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -53,11 +34,7 @@ import static com.googlecode.lazyrecords.Keyword.functions.name;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.returns1;
 import static com.googlecode.totallylazy.Maps.pairs;
-import static com.googlecode.totallylazy.Predicates.contains;
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.not;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
-import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -172,7 +149,8 @@ public class FacetsResource {
                 .add("facets", facets)
                 .add("query", query)
                 .add("view", currentView)
-                .add("drills", drillDowns.map(asString(), asString()));
+                .add("drills", drillDowns.map(asString(), asString()))
+                .add("hasFilters", drillDowns.isRight() && !drillDowns.right().equals(DrillDowns.empty()));
     }
 
     private String classNameOf(String name) {

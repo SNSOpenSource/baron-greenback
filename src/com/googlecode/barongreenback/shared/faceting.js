@@ -15,15 +15,23 @@ BGB.namespace('faceting').registerFacetEntriesHandlers = function() {
         var facets = jQuery('meta[name=drills]').attr('content');
 
         var drillParam  = BGB.namespace('faceting').generateDrillParameter($(this), facets);
+        reloadWithDrills(drillParam);
+    });
 
+    body.on('click', '.remove-all-filters-link', function (e) {
+        e.preventDefault();
+        reloadWithDrills('{}');
+    });
+
+    function reloadWithDrills(drillDowns) {
         var currentPageHref = window.location.href;
         if (currentPageHref.indexOf("drills=") > -1) {
-            window.location = currentPageHref.replace(/drills=.*&?/, 'drills=' + encodeURIComponent(drillParam));
+            window.location = currentPageHref.replace(/drills=.*&?/, 'drills=' + encodeURIComponent(drillDowns));
         } else {
             var separator = window.location.search ? '&' : '?';
-            window.location = currentPageHref + separator + 'drills=' + encodeURIComponent(drillParam);
+            window.location = currentPageHref + separator + 'drills=' + encodeURIComponent(drillDowns);
         }
-    });
+    }
 
     function rebuildFacet(e){
         e.preventDefault();

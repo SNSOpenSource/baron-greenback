@@ -8,11 +8,7 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.totallylazy.Block;
-import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
-import com.googlecode.totallylazy.matchers.Matchers;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.QueryParameters;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -31,25 +27,20 @@ import java.util.UUID;
 import static com.googlecode.barongreenback.crawler.CompositeCrawlerTest.crawlOnePageOnly;
 import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.FIRST;
 import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.STATUS;
-import static com.googlecode.barongreenback.views.FacetSection.SHOW_FEWER;
-import static com.googlecode.barongreenback.views.FacetSection.SHOW_MORE;
-import static com.googlecode.barongreenback.views.FacetSection.facet;
-import static com.googlecode.barongreenback.views.FacetSection.facetEntry;
-import static com.googlecode.barongreenback.views.FacetSection.facets;
-import static com.googlecode.barongreenback.views.FacetSection.singleFacet;
-import static com.googlecode.barongreenback.views.ViewsRepository.FACET_ENTRIES;
-import static com.googlecode.barongreenback.views.ViewsRepository.SHOW_FACET;
-import static com.googlecode.barongreenback.views.ViewsRepository.convertToViewModel;
+import static com.googlecode.barongreenback.views.FacetSection.*;
+import static com.googlecode.barongreenback.views.ViewsRepository.*;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keyword.methods.keywords;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.matchers.Matchers.matcher;
 import static com.googlecode.utterlyidle.Response.functions.status;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -243,8 +234,21 @@ public class FacetsResourceTest extends ApplicationTests {
         assertThat(facetSection.facetEntryCount(), is(1));
     }
 
+    @Test
+    public void shouldNotDisplayRemoveAllFiltersLinkIfNoFacetsSelected() throws Exception {
+        final FacetSection facetSection = facets(browser, usersView.name(), "", "{}");
+        assertThat(facetSection.removeFiltersLink(), is(Option.<String>none()));
+    }
+
+
+    @Test
+    public void shouldDisplayRemoveAllFiltersLinkIfSomeFacetsSelected() throws Exception {
+        final FacetSection facetSection = facets(browser, viewWithFacets.name(), "", "{\"first\":[\"Dan\",\"Olya\"]}");
+        assertThat(facetSection.removeFiltersLink(), is(not(matcher(Predicates.<String>empty()))));
+    }
+
     private Matcher<? super Response> returns(Status status) {
-        return Matchers.matcher(where(status(), Predicates.is(status)));
+        return matcher(where(status(), Predicates.is(status)));
     }
 
 }
