@@ -1,7 +1,7 @@
 jQuery(document).ready(function () {
 
     var originalLabelColor = $('div.legend').css('background-color');
-    var originalBorderColor = $('div.fieldset').css('border-color');
+    var originalBorderColor = $('div.fieldset').css('border-top-color');
 
     $('div.legend:visible').each(function () {
         var legend = $(this).text();
