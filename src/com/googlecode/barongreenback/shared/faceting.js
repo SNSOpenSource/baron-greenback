@@ -8,7 +8,6 @@ BGB.namespace('faceting').registerFacetEntriesHandlers = function() {
         BGB.tables.hideFixedHeader();
         $('.views-menu-container').first().toggle();
         mainContent.css('padding-left', mainContentSize);
-//        $('#search-results').css('padding-left', mainContentSize);
         BGB.tables.redrawFixedHeader();
     }
 

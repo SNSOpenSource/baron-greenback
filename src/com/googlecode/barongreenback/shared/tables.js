@@ -117,7 +117,7 @@ BGB.namespace('tables').init = (function () {
         new FixedHeader(resultsTable, { offsetTop: $('.navbar').height()});
 
         /* This has to be done here because the FixedHeader plugin introduces some logic to reposition the header that we want to override. */
-        registerAfterDrawCallback(resultsTable, BGB.tables.updateFixedHeaderPosition());
+        registerAfterDrawCallback(resultsTable, BGB.tables.updateFixedHeaderPosition);
 
 
         $('div.dataTables_wrapper').css('position', '');
