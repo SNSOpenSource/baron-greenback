@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Actions test</title>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.10.0.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture">
+    <meta name="query" content="queryForTest"/>
+    <div id="results">
+        <table class="results paged zebra-striped">
+            <thead>
+            <tr>
+                <th class="title blue title headerSortUp header"><a
+                        href="?query=&amp;page.sort.column=title&amp;page.sort.direction=asc">title</a></th>
+                <th class="description green description  header"><a href="?query=&amp;page.sort.column=description">description</a>
+                </th>
+                <th class="link orange link  header"><a href="?query=&amp;page.sort.column=link">link</a></th>
+                <th class="pubDate purple pubDate  header"><a href="?query=&amp;page.sort.column=pubDate">pubDate</a>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="title">id1</td>
+                <td class="description">description1</td>
+                <td class="link">http://www.link1.com</td>
+                <td class="pubDate">2012/11/15 12:52:24</td>
+            </tr>
+            <tr>
+                <td class="title">id2</td>
+                <td class="description">description2</td>
+                <td class="link">http://www.link2.com</td>
+                <td class="pubDate">2012/11/16 16:33:10</td>
+            </tr>
+            <tr>
+                <td class="title">id3</td>
+                <td class="description">description3</td>
+                <td class="link">http://www.link3.com</td>
+                <td class="pubDate">2012/11/19 00:05:12</td>
+            </tr>
+            <tr>
+                <td class="title">id4</td>
+                <td class="description">description4</td>
+                <td class="link">http://www.link4.com</td>
+                <td class="pubDate">2012/11/19 08:12:14</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <div class="selectors">
+            <a href="#" class="clearSelection">Clear Selection</a>
+            <a href="#" class="selectPage">Select Page</a>
+            <a href="#" class="selectAll">Select ALL</a>
+        </div>
+    </div>
+
+    <div class="actions">
+        <form action="/news/search/csv?query=" method="GET" class="export"><input type="submit" class="export"
+                                                                                  value="export"/></form>
+        <form action="/news/search/json?query=" method="GET" class="json"><input type="submit" class="json"
+                                                                                 value="json"/></form>
+
+        <div class="message"></div>
+    </div>
+</div>
+<script src="http://code.jquery.com/qunit/qunit-1.10.0.js"></script>
+<script>
+    var addProdFiles = function (files, callback) {
+        if (files.length == 1) {
+            var testUri = document.location.href.replace('test', 'src');
+            var resourceUri = testUri.slice(0, testUri.lastIndexOf('/') + 1) + files[0];
+            var scriptNode = document.createElement("script");
+            scriptNode.setAttribute("src", resourceUri);
+            scriptNode.onload = callback;
+            document.head.appendChild(scriptNode);
+        } else {
+            // [fileA, fileB] CB -> addProdFiles ([fileA], addProdFile([fileB], CB))
+            var nextFile = files.pop();
+            addProdFiles(files, function () {
+                addProdFiles([nextFile], callback)
+            });
+        }
+    };
+
+
+    addProdFiles(['jquery-1.10.2.min.js', 'jquery.dataTables.min.js', 'FixedHeader.nightly.min.js', 'bgb.js', 'actions/actions.js'], function () {
+        var firstRow = function () {
+            return $('td.description:first');
+        };
+
+        var allRows = function() {
+            return $('table.results tbody tr');
+        }
+
+        var selectPage = function() {
+            return $('.selectors a.selectPage');
+        };
+
+        var selectAll = function() {
+            return $('.selectors a.selectAll');
+        };
+
+        var clearSelection = function() {
+            return $('.selectors a.clearSelection');
+        };
+
+        var selectedRowsFor = function (name) {
+            return $.map($('#qunit-fixture div.actions form.' + name + ' input[name="id"]'), function (input) {
+                return $(input).attr('value');
+            });
+        };
+
+        var selectedQueryFor = function (name) {
+            return $.map($('#qunit-fixture div.actions form.' + name + ' input[name="query"]'), function (input) {
+                return $(input).attr('value');
+            });
+        };
+
+        var hasSelectedSetTo = function (selected) {
+            return function (index, element) {
+                QUnit.equal($(element).hasClass('selected'), selected);
+            };
+        };
+
+        QUnit.config.reorder = false;
+        QUnit.testStart(BGB.search.bulk.actions.attach);
+
+        module('API');
+        test('API provided', function () {
+            QUnit.ok(BGB.search.selectedRowCount, 'Finds all ids used for bulk actions');
+            QUnit.ok(BGB.search.bulk.actions.removeAllIdentifiers, 'Removes all ids used for bulk actions');
+            QUnit.ok(BGB.search.bulk.actions.attach, 'Attaches behaviour to results table');
+        });
+
+        module('Single row clicks');
+        test('Clicking a row toggles the highlight class', function () {
+            firstRow().click();
+            QUnit.equal(firstRow().parent().hasClass('selected'), true);
+            firstRow().click();
+            QUnit.equal(firstRow().parent().hasClass('selected'), false);
+        });
+
+        test('Clicking a row and puts its id into all bulk forms', function () {
+            firstRow().click();
+            QUnit.deepEqual(selectedRowsFor('export'), ['id1']);
+            QUnit.deepEqual(selectedRowsFor('json'), ['id1']);
+        });
+
+        module('Selecting multiple');
+        test('Clicking select all adds the query to all bulk forms', function () {
+            selectAll().click();
+            QUnit.deepEqual(selectedQueryFor('export'), ['queryForTest']);
+            QUnit.deepEqual(selectedQueryFor('json'), ['queryForTest']);
+        });
+
+        test('Clicking select all adds a query with double quote correctly', function () {
+            $("meta[name=query]").attr("content", "query\"doublequote");
+            selectAll().click();
+            QUnit.deepEqual(selectedQueryFor('export'), ["query\"doublequote"]);
+            QUnit.deepEqual(selectedQueryFor('json'), ["query\"doublequote"]);
+        });
+
+        test('Clicking select page adds all ids on page into all bulk forms', function () {
+            selectPage().click();
+            QUnit.deepEqual(selectedRowsFor('export'), ['id1', 'id2', 'id3', 'id4']);
+            QUnit.deepEqual(selectedRowsFor('json'), ['id1', 'id2', 'id3', 'id4']);
+        });
+
+        test('Clicking select page adds highlighting to all page rows', function () {
+            selectPage().click();
+            allRows().each(hasSelectedSetTo(true));
+        });
+
+        test('Clicking select all adds highlighting to all page rows', function () {
+            selectAll().click();
+            allRows().each(hasSelectedSetTo(true));
+        });
+
+        module('Clearing selection');
+        test('Clicking clear selection removes all ids from all bulk forms', function () {
+            selectPage().click();
+            clearSelection().click();
+            QUnit.deepEqual(selectedRowsFor('export'), []);
+            QUnit.deepEqual(selectedRowsFor('json'), []);
+        });
+
+        test('Clicking clear selection after select all removes the query from all bulk forms', function () {
+            selectPage().click();
+            clearSelection().click();
+            QUnit.deepEqual(selectedQueryFor('export'), []);
+            QUnit.deepEqual(selectedQueryFor('json'), []);
+        });
+
+        test('Clicking clear selection removes all highlighting', function () {
+            selectPage().click();
+            clearSelection().click();
+            allRows().each(hasSelectedSetTo(false));
+        });
+
+        test('Deselecting a row after selecting all resets the "all rows selected" flag', function(){
+            selectAll().click();
+            firstRow().click();
+            QUnit.equal(BGB.search.allPagesSelected, false);
+        });
+    });
+
+</script>
+</body>
+</html>
