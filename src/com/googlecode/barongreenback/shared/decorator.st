@@ -30,7 +30,11 @@
     $if(content)$
     $content$
     $else$
-    $include.({$base$views/menu?current=$meta.view$&query=$urlEncode(htmlDecode(meta.query))$&drills=$urlEncode(htmlDecode(meta.drills))$}).body$
+    <div class="side-menu">
+        <div class="views-menu-container">
+            $include.({$base$views/menu?current=$meta.view$&query=$urlEncode(htmlDecode(meta.query))$&drills=$urlEncode(htmlDecode(meta.drills))$}).body$
+        </div>
+    </div>
     <div class="results-data">
       $body$
     </div>
