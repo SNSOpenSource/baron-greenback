@@ -113,10 +113,11 @@ public class SearchResource {
 
     @GET
     @Produces(MediaType.TEXT_CSV)
+    @Priority(Priority.High)
     @Path("csv")
     public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("id") Iterable<String> id) {
         String idName = unwrap(recordsService.view(viewName)).get("keywords", Model.class).get("name", String.class);
-        return exportCsv(viewName, sequence(id).map(Strings.format(idName + ":%s")).toString(" OR "));
+        return exportCsv(viewName, sequence(id).map(Strings.format("\"" + idName + "\"" + ":\"%s\"")).toString(" OR "));
     }
 
     @GET
