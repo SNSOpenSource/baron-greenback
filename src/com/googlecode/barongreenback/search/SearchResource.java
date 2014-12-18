@@ -56,6 +56,7 @@ import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.functions.value;
 import static com.googlecode.funclate.Model.methods.merge;
 import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.lazyrecords.Keyword.functions.name;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.descending;
@@ -116,7 +117,7 @@ public class SearchResource {
     @Priority(Priority.High)
     @Path("csv")
     public Response exportCsv(@PathParam("view") final String viewName, @QueryParam("id") Iterable<String> id) {
-        String idName = unwrap(recordsService.view(viewName)).get("keywords", Model.class).get("name", String.class);
+        final String idName = RecordsService.visibleHeaders(recordsService.view(viewName)).headOption().map(name()).get();
         return exportCsv(viewName, sequence(id).map(Strings.format("\"" + idName + "\"" + ":\"%s\"")).toString(" OR "));
     }
 
