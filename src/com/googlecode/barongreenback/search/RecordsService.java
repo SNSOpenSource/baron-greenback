@@ -82,7 +82,7 @@ public class RecordsService {
     }
 
     public static String prefixQueryWithImplicitViewQuery(Model view, final String query) {
-        return sequence(queryFrom(view), query).filter(not(blank)).map(format("(%s)")).toString(" ");
+        return sequence(queryFrom(view), query).filter(not(blank)).map(Strings.trim()).map(format("(%s)")).toString(" ");
     }
 
     private static String queryFrom(Model model) {

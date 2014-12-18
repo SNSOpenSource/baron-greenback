@@ -108,6 +108,15 @@ public class RecordsServiceTest {
         assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
     }
 
+    @Test
+    public void prefixingShouldHandleWhitespace() throws Exception {
+        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery("keywordA:foo "), "");
+
+        final Record shouldMatch = record(keyword("keywordA"), "foo");
+
+        assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
+    }
+
     private Model viewWithQuery(String query) {
         return ViewsRepository.viewModel(Sequences.<Keyword<?>>empty(), "viewName", "source", query, true, "");
     }
