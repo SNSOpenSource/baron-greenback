@@ -1,8 +1,9 @@
 package com.googlecode.barongreenback.persistence.lucene;
 
-import com.googlecode.lazyrecords.lucene.NameToLuceneDirectoryFunction;
+import com.googlecode.lazyrecords.lucene.FieldBasedFacetingPolicy;
 import com.googlecode.lazyrecords.lucene.LucenePartitionedIndex;
 import com.googlecode.lazyrecords.lucene.LuceneStorage;
+import com.googlecode.lazyrecords.lucene.NameToLuceneDirectoryFunction;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Function1;
 import org.apache.lucene.store.Directory;
@@ -19,12 +20,15 @@ import static com.googlecode.barongreenback.persistence.lucene.TaxonomyNameToLuc
 import static com.googlecode.totallylazy.Predicates.alwaysFalse;
 import static com.googlecode.totallylazy.Predicates.is;
 import static java.nio.file.Files.createTempDirectory;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class TaxonomyLuceneStorageFactoryTest {
     private static String indexLocation;
     private static final NameBasedIndexFacetingPolicy NO_FACETED_STORAGE_POLICY = new NameBasedIndexFacetingPolicy(alwaysFalse(String.class));
     private static final NameBasedIndexFacetingPolicy WITH_FACETED_STORAGE_POLICY = new NameBasedIndexFacetingPolicy(is("shard"));
+    private static final FieldBasedFacetingPolicy NO_FACETED_FIELDS_POLICY = new FieldBasedFacetingPolicy(alwaysFalse(String.class));
 
     @Before
     public void createTempIndexDirectory() throws Exception {
@@ -41,7 +45,7 @@ public class TaxonomyLuceneStorageFactoryTest {
     public void canCreateInMemoryIndex() throws Exception {
         final NameToLuceneDirectoryFunction luceneDirectoryActivator = new NameToLuceneDirectoryFunction(directoryActivatorFor("lucene:mem"));
         final CaseInsensitiveNameToLuceneStorageFunctionActivator storageFunction = new CaseInsensitiveNameToLuceneStorageFunctionActivator(luceneDirectoryActivator);
-        final TaxonomyNameToLuceneStorageFunction taxonomyStorageFunction = new TaxonomyNameToLuceneStorageFunction(storageFunction.call(), luceneDirectoryActivator, NO_FACETED_STORAGE_POLICY);
+        final TaxonomyNameToLuceneStorageFunction taxonomyStorageFunction = new TaxonomyNameToLuceneStorageFunction(storageFunction.call(), luceneDirectoryActivator, NO_FACETED_STORAGE_POLICY, NO_FACETED_FIELDS_POLICY);
         final LucenePartitionedIndex lucenePartitionedIndex = new LucenePartitionedIndex(taxonomyStorageFunction);
         final LuceneStorage storage = lucenePartitionedIndex.partition("shard");
         assertThat(storage, CoreMatchers.<LuceneStorage>notNullValue());
@@ -52,7 +56,7 @@ public class TaxonomyLuceneStorageFactoryTest {
         final Function1<String, Directory> directoryActivator = directoryActivatorFor("lucene:nio://" + indexLocation);
         final NameToLuceneDirectoryFunction luceneDirectoryActivator = new NameToLuceneDirectoryFunction(directoryActivator);
         final CaseInsensitiveNameToLuceneStorageFunctionActivator storageFunction = new CaseInsensitiveNameToLuceneStorageFunctionActivator(luceneDirectoryActivator);
-        final TaxonomyNameToLuceneStorageFunction taxonomyStorageFunction = new TaxonomyNameToLuceneStorageFunction(storageFunction.call(), luceneDirectoryActivator, NO_FACETED_STORAGE_POLICY);
+        final TaxonomyNameToLuceneStorageFunction taxonomyStorageFunction = new TaxonomyNameToLuceneStorageFunction(storageFunction.call(), luceneDirectoryActivator, NO_FACETED_STORAGE_POLICY, NO_FACETED_FIELDS_POLICY);
         new LucenePartitionedIndex(taxonomyStorageFunction).partition("shard");
         assertTrue(new File(indexLocation + "/shard").exists());
         assertFalse(new File(indexLocation + "/shard" + TAXONOMY_SUFFIX).exists());
@@ -63,7 +67,7 @@ public class TaxonomyLuceneStorageFactoryTest {
         final Function1<String, Directory> directoryActivator = directoryActivatorFor("lucene:nio://" + indexLocation);
         final NameToLuceneDirectoryFunction luceneDirectoryActivator = new NameToLuceneDirectoryFunction(directoryActivator);
         final CaseInsensitiveNameToLuceneStorageFunctionActivator storageFunction = new CaseInsensitiveNameToLuceneStorageFunctionActivator(luceneDirectoryActivator);
-        final TaxonomyNameToLuceneStorageFunction taxonomyStorageFunction = new TaxonomyNameToLuceneStorageFunction(storageFunction.call(), luceneDirectoryActivator, WITH_FACETED_STORAGE_POLICY);
+        final TaxonomyNameToLuceneStorageFunction taxonomyStorageFunction = new TaxonomyNameToLuceneStorageFunction(storageFunction.call(), luceneDirectoryActivator, WITH_FACETED_STORAGE_POLICY, NO_FACETED_FIELDS_POLICY);
         new LucenePartitionedIndex(taxonomyStorageFunction).partition("different_shard");
         assertTrue(new File(indexLocation + "/different_shard").exists());
         assertFalse(new File(indexLocation + "/different_shard" + TAXONOMY_SUFFIX).exists());
@@ -74,7 +78,7 @@ public class TaxonomyLuceneStorageFactoryTest {
         final Function1<String, Directory> directoryActivator = directoryActivatorFor("lucene:nio://" + indexLocation);
         final NameToLuceneDirectoryFunction luceneDirectoryActivator = new NameToLuceneDirectoryFunction(directoryActivator);
         final CaseInsensitiveNameToLuceneStorageFunctionActivator storageFunction = new CaseInsensitiveNameToLuceneStorageFunctionActivator(luceneDirectoryActivator);
-        final TaxonomyNameToLuceneStorageFunction taxonomyStorageFunction = new TaxonomyNameToLuceneStorageFunction(storageFunction.call(), luceneDirectoryActivator, WITH_FACETED_STORAGE_POLICY);
+        final TaxonomyNameToLuceneStorageFunction taxonomyStorageFunction = new TaxonomyNameToLuceneStorageFunction(storageFunction.call(), luceneDirectoryActivator, WITH_FACETED_STORAGE_POLICY, NO_FACETED_FIELDS_POLICY);
         new LucenePartitionedIndex(taxonomyStorageFunction).partition("shard");
         assertTrue(new File(indexLocation + "/shard").exists());
         assertTrue(new File(indexLocation + "/shard" + TAXONOMY_SUFFIX).exists());

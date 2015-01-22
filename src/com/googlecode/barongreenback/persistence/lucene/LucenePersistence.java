@@ -21,7 +21,7 @@ public class LucenePersistence {
     }
 
     public static String luceneRam() {
-        return String.format("%s:%s", PersistenceModule.LUCENE, DirectoryType.Memory);
+        return String.format("%s:%s", PersistenceModule.LUCENE, DirectoryType.Memory.value());
     }
 
     public static String luceneTemporaryDirectory(String name) {

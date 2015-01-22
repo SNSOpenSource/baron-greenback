@@ -8,6 +8,7 @@ import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
+import com.googlecode.lazyrecords.lucene.FieldBasedFacetingPolicy;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.QueryParameters;
 import com.googlecode.utterlyidle.Response;
@@ -84,6 +85,8 @@ public class FacetsResourceTest extends ApplicationTests {
                 final Container bgbApplicationScope = container.get(BaronGreenbackApplicationScope.class).value();
                 bgbApplicationScope.remove(NameBasedIndexFacetingPolicy.class);
                 bgbApplicationScope.addInstance(NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(Predicates.is(viewWithFacets.name())));
+                bgbApplicationScope.remove(FieldBasedFacetingPolicy.class);
+                bgbApplicationScope.addInstance(FieldBasedFacetingPolicy.class, new FieldBasedFacetingPolicy(Predicates.in(FIRST.name(), STATUS.name())));
                 return container;
             }
         });

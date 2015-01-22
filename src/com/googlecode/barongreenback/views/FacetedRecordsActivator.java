@@ -20,8 +20,6 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
-import com.googlecode.utterlyidle.QueryParameters;
-import com.googlecode.utterlyidle.Request;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -34,23 +32,21 @@ public class FacetedRecordsActivator implements Callable<FacetedRecords> {
     private final PartitionedIndex partitionedIndex;
     private final NameBasedIndexFacetingPolicy nameBasedIndexFacetingPolicy;
     private final LuceneQueryPreprocessor luceneQueryPreprocessor;
-    private final Request request;
     private final ModelRepository modelRepository;
+    private final CurrentView currentView;
 
-    public FacetedRecordsActivator(BaronGreenbackApplicationScope baronGreenbackApplicationScope, BaronGreenbackRequestScope baronGreenbackRequestScope, ModelRepository modelRepository, Request request) {
+    public FacetedRecordsActivator(BaronGreenbackApplicationScope baronGreenbackApplicationScope, BaronGreenbackRequestScope baronGreenbackRequestScope, ModelRepository modelRepository, CurrentView currentView) {
         this.modelRepository = modelRepository;
         this.luceneMappings = baronGreenbackRequestScope.value().get(LuceneMappings.class);
         this.partitionedIndex = baronGreenbackApplicationScope.value().get(PartitionedIndex.class);
         this.nameBasedIndexFacetingPolicy = baronGreenbackApplicationScope.value().get(NameBasedIndexFacetingPolicy.class);
         this.luceneQueryPreprocessor = baronGreenbackRequestScope.value().get(LuceneQueryPreprocessor.class);
-        this.request = request;
+        this.currentView = currentView;
     }
 
     @Override
     public FacetedRecords call() throws Exception {
-        final QueryParameters queryParameters = QueryParameters.parse(request.uri().query());
-        final String viewName = queryParameters.getValue("current");
-        final Option<Model> view = ViewsRepository.find(modelRepository, viewName);
+        final Option<Model> view = ViewsRepository.find(modelRepository, currentView.value());
         final Predicate<String> definitionPredicate = nameBasedIndexFacetingPolicy.value();
         if (view.isDefined() && definitionPredicate.matches(ViewsRepository.viewName(view.get()))) {
             final FacetedLuceneStorage facetedStorage = cast(partitionedIndex.partition(ViewsRepository.viewName(view.get())));

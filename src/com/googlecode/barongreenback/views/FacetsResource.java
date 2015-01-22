@@ -6,15 +6,33 @@ import com.googlecode.barongreenback.search.PredicateBuilder;
 import com.googlecode.barongreenback.search.RecordsService;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.*;
+import com.googlecode.lazyrecords.Facet;
+import com.googlecode.lazyrecords.FacetDrillDown;
+import com.googlecode.lazyrecords.FacetedRecords;
+import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.Group;
+import com.googlecode.totallylazy.Mapper;
+import com.googlecode.totallylazy.Maps;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.annotations.*;
+import com.googlecode.utterlyidle.annotations.DefaultValue;
+import com.googlecode.utterlyidle.annotations.GET;
+import com.googlecode.utterlyidle.annotations.Path;
+import com.googlecode.utterlyidle.annotations.Produces;
+import com.googlecode.utterlyidle.annotations.QueryParam;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +52,10 @@ import static com.googlecode.lazyrecords.Keyword.functions.name;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.returns1;
 import static com.googlecode.totallylazy.Maps.pairs;
-import static com.googlecode.totallylazy.Predicates.*;
+import static com.googlecode.totallylazy.Predicates.contains;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
@@ -103,16 +124,16 @@ public class FacetsResource {
         return drillDowns.map(returns1(model().add("drillDownsException", "Drill downs can't be parsed")), returns1(model()));
     }
 
-    private Mapper<Facet<FacetEntry>, Pair<Keyword<?>, Sequence<Model>>> toSortedEntriesModels(final Sequence<FacetDrillDown> facetDrillDowns) {
-        return new Mapper<Facet<FacetEntry>, Pair<Keyword<?>, Sequence<Model>>>() {
+    private Mapper<Facet<FacetEntry>, Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>> toSortedEntriesModels(final Sequence<FacetDrillDown> facetDrillDowns) {
+        return new Mapper<Facet<FacetEntry>, Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>>() {
             @Override
-            public Pair<Keyword<?>, Sequence<Model>> call(Facet<FacetEntry> facet) throws Exception {
+            public Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>> call(Facet<FacetEntry> facet) throws Exception {
                 final Keyword<?> facetKeyword = facet.key();
                 final Pair<Sequence<Model>, Sequence<Model>> facetEntries = facet.map(asFacetEntryModel(facetKeyword, facetDrillDowns)).partition(isEntryDrilledDown());
                 final Option<FacetDrillDown> drillDownForCurrentFacet = facetDrillDowns.find(where(Group.functions.<Keyword<?>, String>key(), Predicates.<Keyword<?>>is(facetKeyword)));
                 final Sequence<Model> drilledDownEntries = drillDownForCurrentFacet.isDefined() ? facetEntries.first().sortBy(positionIn(drillDownForCurrentFacet.get())) : Sequences.<Model>empty();
                 final Sequence<Model> otherEntries = facetEntries.second();
-                return Pair.<Keyword<?>, Sequence<Model>>pair(facetKeyword, drilledDownEntries.join(otherEntries));
+                return Pair.<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>pair(facetKeyword, Pair.pair(drilledDownEntries, otherEntries));
             }
         };
     }
@@ -121,22 +142,25 @@ public class FacetsResource {
         return where(value("drilledDown", Boolean.class), is(true));
     }
 
-    private Mapper<Pair<Keyword<?>, Sequence<Model>>, Model> toFacetModel(final Map<Keyword<?>, Integer> keywordAndFacetEntries, final String currentView, final String query, final Either<String, DrillDowns> drillDowns, final Option<Integer> requestedEntryCount) {
-        return new Mapper<Pair<Keyword<?>, Sequence<Model>>, Model>() {
+    private Mapper<Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>, Model> toFacetModel(final Map<Keyword<?>, Integer> keywordAndFacetEntries, final String currentView, final String query, final Either<String, DrillDowns> drillDowns, final Option<Integer> requestedEntryCount) {
+        return new Mapper<Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>, Model>() {
             @Override
-            public Model call(Pair<Keyword<?>, Sequence<Model>> entriesModels) throws Exception {
+            public Model call(Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>> entriesModels) throws Exception {
                 final Keyword<?> facetKeyword = entriesModels.first();
-                final Sequence<Model> entries = entriesModels.second();
-                final int drilledDownCount = entries.filter(isEntryDrilledDown()).size();
+                final Sequence<Model> drilledDownEntries = entriesModels.second().first();
+                final Sequence<Model> otherEntries = entriesModels.second().second();
+                final Sequence<Model> entries = drilledDownEntries.join(otherEntries);
+                int drilledDownCount = drilledDownEntries.size();
+                final int entriesCount = entries.size();
                 final int entriesToDisplay = Math.max(requestedEntryCount.getOrElse(keywordAndFacetEntries.get(facetKeyword)), drilledDownCount);
                 Model base = model().
                         add("name", facetKeyword.name()).
                         add("class-name", classNameOf(facetKeyword.name())).
                         add("entries", entries.take(entriesToDisplay));
-                if (entries.size() > entriesToDisplay) {
+                if (entriesCount > entriesToDisplay) {
                     base = base.add("more", redirector.absoluteUriOf(method(on(FacetsResource.class).facet(currentView, query, facetKeyword.name(), Option.some(Integer.MAX_VALUE), drillDowns))).toString());
                 }
-                if (entries.filter(not(isEntryDrilledDown())).size() > 0 && entries.size() > keywordAndFacetEntries.get(facetKeyword) && entriesToDisplay > entries.size()) {
+                if ((entriesCount - drilledDownCount) > 0 && entriesCount > keywordAndFacetEntries.get(facetKeyword) && entriesToDisplay > entriesCount) {
                     base = base.add("fewer", redirector.absoluteUriOf(method(on(FacetsResource.class).facet(currentView, query, facetKeyword.name(), Option.none(Integer.class), drillDowns))).toString());
                 }
                 return base;

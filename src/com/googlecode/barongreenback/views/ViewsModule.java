@@ -16,7 +16,7 @@ public class ViewsModule implements ResourcesModule, RequestScopedModule, Applic
     }
 
     public Container addPerRequestObjects(Container container) throws Exception {
-        return container.add(RecordsService.class).add(ViewsRepository.class);
+        return container.add(RecordsService.class).add(ViewsRepository.class).addActivator(CurrentView.class, CurrentViewFromRequestActivator.class);
     }
 
     @Override

@@ -5,7 +5,15 @@ import com.googlecode.barongreenback.persistence.PersistenceModule;
 import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
 import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.lazyrecords.lucene.*;
+import com.googlecode.lazyrecords.lucene.CaseInsensitive;
+import com.googlecode.lazyrecords.lucene.FieldBasedFacetingPolicy;
+import com.googlecode.lazyrecords.lucene.LucenePartitionedIndex;
+import com.googlecode.lazyrecords.lucene.LucenePartitionedRecords;
+import com.googlecode.lazyrecords.lucene.LuceneQueryPreprocessor;
+import com.googlecode.lazyrecords.lucene.NameToLuceneDirectoryFunction;
+import com.googlecode.lazyrecords.lucene.NameToLuceneStorageFunction;
+import com.googlecode.lazyrecords.lucene.PartitionedIndex;
+import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.lazyrecords.lucene.mappings.LuceneMappings;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
@@ -25,7 +33,9 @@ import static com.googlecode.barongreenback.persistence.lucene.DirectoryType.Fil
 import static com.googlecode.totallylazy.Predicates.alwaysFalse;
 import static com.googlecode.totallylazy.URLs.uri;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
-import static com.googlecode.yadic.Containers.*;
+import static com.googlecode.yadic.Containers.addActivatorIfAbsent;
+import static com.googlecode.yadic.Containers.addIfAbsent;
+import static com.googlecode.yadic.Containers.addInstanceIfAbsent;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 
@@ -44,6 +54,7 @@ public class LuceneModule implements ApplicationScopedModule, RequestScopedModul
     public Container addPerApplicationObjects(Container applicationScope) {
         final Container container = applicationScope.get(BaronGreenbackApplicationScope.class).value();
         addInstanceIfAbsent(container, NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(alwaysFalse(String.class)));
+        addInstanceIfAbsent(container, FieldBasedFacetingPolicy.class, new FieldBasedFacetingPolicy(alwaysFalse(String.class)));
         addActivatorIfAbsent(container, NameToLuceneDirectoryFunction.class, NameToLuceneDirectoryFunctionActivator.class);
         addActivatorIfAbsent(container, NameToLuceneStorageFunction.class, CaseInsensitiveNameToLuceneStorageFunctionActivator.class);
         container.decorate(NameToLuceneStorageFunction.class, TaxonomyNameToLuceneStorageFunction.class);

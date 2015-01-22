@@ -3,6 +3,7 @@ package com.googlecode.barongreenback;
 import com.googlecode.barongreenback.persistence.PersistenceUri;
 import com.googlecode.barongreenback.persistence.lucene.NameBasedIndexFacetingPolicy;
 import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
+import com.googlecode.lazyrecords.lucene.FieldBasedFacetingPolicy;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.utterlyidle.BasePath;
@@ -31,6 +32,8 @@ public class ShowAndTell {
                 final Container bgbApplicationScope = container.get(BaronGreenbackApplicationScope.class).value();
                 bgbApplicationScope.remove(NameBasedIndexFacetingPolicy.class);
                 bgbApplicationScope.addInstance(NameBasedIndexFacetingPolicy.class, new NameBasedIndexFacetingPolicy(in("news", "flooze")));
+                bgbApplicationScope.remove(FieldBasedFacetingPolicy.class);
+                bgbApplicationScope.addInstance(FieldBasedFacetingPolicy.class, new FieldBasedFacetingPolicy(in("title", "description", "link", "pubDate")));
                 return container;
             }
         });
