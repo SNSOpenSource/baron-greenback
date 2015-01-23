@@ -124,16 +124,16 @@ public class FacetsResource {
         return drillDowns.map(returns1(model().add("drillDownsException", "Drill downs can't be parsed")), returns1(model()));
     }
 
-    private Mapper<Facet<FacetEntry>, Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>> toSortedEntriesModels(final Sequence<FacetDrillDown> facetDrillDowns) {
-        return new Mapper<Facet<FacetEntry>, Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>>() {
+    private Mapper<Facet<FacetEntry>, Pair<Keyword<?>, DisplayedFacetEntries>> toSortedEntriesModels(final Sequence<FacetDrillDown> facetDrillDowns) {
+        return new Mapper<Facet<FacetEntry>, Pair<Keyword<?>, DisplayedFacetEntries>>() {
             @Override
-            public Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>> call(Facet<FacetEntry> facet) throws Exception {
+            public Pair<Keyword<?>, DisplayedFacetEntries> call(Facet<FacetEntry> facet) throws Exception {
                 final Keyword<?> facetKeyword = facet.key();
                 final Pair<Sequence<Model>, Sequence<Model>> facetEntries = facet.map(asFacetEntryModel(facetKeyword, facetDrillDowns)).partition(isEntryDrilledDown());
                 final Option<FacetDrillDown> drillDownForCurrentFacet = facetDrillDowns.find(where(Group.functions.<Keyword<?>, String>key(), Predicates.<Keyword<?>>is(facetKeyword)));
                 final Sequence<Model> drilledDownEntries = drillDownForCurrentFacet.isDefined() ? facetEntries.first().sortBy(positionIn(drillDownForCurrentFacet.get())) : Sequences.<Model>empty();
                 final Sequence<Model> otherEntries = facetEntries.second();
-                return Pair.<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>pair(facetKeyword, Pair.pair(drilledDownEntries, otherEntries));
+                return Pair.<Keyword<?>, DisplayedFacetEntries>pair(facetKeyword, new DisplayedFacetEntries(drilledDownEntries, otherEntries));
             }
         };
     }
@@ -142,21 +142,19 @@ public class FacetsResource {
         return where(value("drilledDown", Boolean.class), is(true));
     }
 
-    private Mapper<Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>, Model> toFacetModel(final Map<Keyword<?>, Integer> keywordAndFacetEntries, final String currentView, final String query, final Either<String, DrillDowns> drillDowns, final Option<Integer> requestedEntryCount) {
-        return new Mapper<Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>>, Model>() {
+    private Mapper<Pair<Keyword<?>, DisplayedFacetEntries>, Model> toFacetModel(final Map<Keyword<?>, Integer> keywordAndFacetEntries, final String currentView, final String query, final Either<String, DrillDowns> drillDowns, final Option<Integer> requestedEntryCount) {
+        return new Mapper<Pair<Keyword<?>, DisplayedFacetEntries>, Model>() {
             @Override
-            public Model call(Pair<Keyword<?>, Pair<Sequence<Model>, Sequence<Model>>> entriesModels) throws Exception {
+            public Model call(Pair<Keyword<?>, DisplayedFacetEntries> entriesModels) throws Exception {
                 final Keyword<?> facetKeyword = entriesModels.first();
-                final Sequence<Model> drilledDownEntries = entriesModels.second().first();
-                final Sequence<Model> otherEntries = entriesModels.second().second();
-                final Sequence<Model> entries = drilledDownEntries.join(otherEntries);
-                int drilledDownCount = drilledDownEntries.size();
-                final int entriesCount = entries.size();
+                final DisplayedFacetEntries displayedFacetEntries = entriesModels.second();
+                int drilledDownCount = displayedFacetEntries.drillDownCount();
+                final int entriesCount = displayedFacetEntries.allEntries().size();
                 final int entriesToDisplay = Math.max(requestedEntryCount.getOrElse(keywordAndFacetEntries.get(facetKeyword)), drilledDownCount);
                 Model base = model().
                         add("name", facetKeyword.name()).
                         add("class-name", classNameOf(facetKeyword.name())).
-                        add("entries", entries.take(entriesToDisplay));
+                        add("entries", displayedFacetEntries.allEntries().take(entriesToDisplay));
                 if (entriesCount > entriesToDisplay) {
                     base = base.add("more", redirector.absoluteUriOf(method(on(FacetsResource.class).facet(currentView, query, facetKeyword.name(), Option.some(Integer.MAX_VALUE), drillDowns))).toString());
                 }
@@ -217,5 +215,23 @@ public class FacetsResource {
                         .add("drilledDown", drilledDown);
             }
         };
+    }
+
+    private class DisplayedFacetEntries {
+        private final Sequence<Model> allEntries;
+        private final int drillDownCount;
+
+        protected DisplayedFacetEntries(Sequence<Model> drilledDownEntries, Sequence<Model> otherEntries) {
+            this.allEntries = drilledDownEntries.join(otherEntries);
+            drillDownCount = drilledDownEntries.size();
+        }
+
+        public Sequence<Model> allEntries() {
+            return allEntries;
+        }
+
+        public int drillDownCount() {
+            return drillDownCount;
+        }
     }
 }
