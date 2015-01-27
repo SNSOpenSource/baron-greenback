@@ -29,6 +29,21 @@ public class BatchCrawlerResourceTest extends ApplicationTests {
     }
 
     @Test
+    public void ignoresDisabledCrawlersWhenCrawlingAll() throws Exception {
+        ScheduleListPage scheduleListPage = new ScheduleListPage(browser);
+        final int existingJobs = scheduleListPage.numberOfJobs();
+
+        final UUID crawlerId = randomUUID();
+        CrawlerListPage crawlerListPage = importCrawlerWithId(crawlerId, contentOf("crawler.json"), browser);
+        crawlerListPage.disable("news");
+
+        crawlerListPage.crawlAll();
+
+        scheduleListPage = new ScheduleListPage(browser);
+        assertThat(scheduleListPage.numberOfJobs(), is(existingJobs));
+    }
+
+    @Test
     public void canDeleteAll() throws Exception {
         importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);
         CrawlerListPage crawlerListPage = importCrawlerWithId(randomUUID(), contentOf("crawler.json"), browser);

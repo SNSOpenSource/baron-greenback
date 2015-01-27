@@ -128,4 +128,8 @@ public class CrawlerListPage {
     public CrawlerListPage copy(String crawlerName) throws Exception {
         return new CrawlerListPage(httpHandler, httpHandler.handle(html.form(formFor(crawlerName, "copy")).submit(button("copy"))));
     }
+
+    public CrawlerListPage disable(String crawlerName) throws Exception {
+        return new CrawlerListPage(httpHandler, httpHandler.handle(html.form(formFor(crawlerName, "disable")).submit(button("disable"))));
+    }
 }

@@ -4,12 +4,7 @@ import com.googlecode.barongreenback.shared.Forms;
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.*;
 
 import java.util.UUID;
 
@@ -104,14 +99,25 @@ public class CrawlerRepository {
         String more = form.get("more", String.class);
         String checkpoint = form.get("checkpoint", String.class);
         String checkpointType = form.get("checkpointType", String.class);
-        Boolean disabled = !enabled(root);
+        Boolean disabled = !predicates.enabled(root);
         Model record = form.get("record", Model.class);
         RecordDefinition recordDefinition = convert(record);
         modelRepository.set(id, Forms.crawler(name, update, from, more, checkpoint, checkpointType, disabled, recordDefinition.toModel()));
     }
 
-    public Boolean enabled(Model model) {
-        return !option(model.get("form", Model.class).get("disabled", Boolean.class)).getOrElse(false);
+    public static class predicates {
+        public static Predicate<Model> enabled() {
+            return new Predicate<Model>() {
+                @Override
+                public boolean matches(Model model) {
+                    return enabled(model);
+                }
+            };
+        }
+
+        public static Boolean enabled(Model model) {
+            return !option(model.get("form", Model.class).get("disabled", Boolean.class)).getOrElse(false);
+        }
     }
 
 }

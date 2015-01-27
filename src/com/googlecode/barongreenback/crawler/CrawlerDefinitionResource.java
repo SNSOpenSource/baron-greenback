@@ -182,7 +182,7 @@ public class CrawlerDefinitionResource {
         return new Callable1<Model, Response>() {
             @Override
             public Response call(Model model) throws Exception {
-                if (repository.enabled(model)) {
+                if (CrawlerRepository.predicates.enabled(model)) {
                     return numberOfRecordsUpdated(crawler.crawl(id), log);
                 }
                 return forbidden(model);

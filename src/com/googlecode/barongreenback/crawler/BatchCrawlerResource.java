@@ -2,23 +2,21 @@ package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.utterlyidle.Application;
-import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.Redirector;
-import com.googlecode.utterlyidle.Response;
+import com.googlecode.totallylazy.*;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.handlers.InvocationHandler;
+import com.googlecode.utterlyidle.schedules.ScheduleResource;
 
 import java.util.UUID;
 
 import static com.googlecode.barongreenback.crawler.CrawlerDefinitionResource.scheduleAQueuedCrawl;
+import static com.googlecode.barongreenback.crawler.CrawlerRepository.predicates.enabled;
 import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.totallylazy.Callables.first;
+import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.proxy.Call.method;
@@ -47,27 +45,31 @@ public class BatchCrawlerResource {
     @POST
     @Path("crawlAll")
     public Response crawlAll() throws Exception {
-        return forAll(ids(), crawl());
+        return forAll(enabledIds(), crawl()).getOrElse(redirector.seeOther(method(on(ScheduleResource.class).list())));
     }
 
     @POST
     @Path("resetAll")
     public Response resetAll() throws Exception {
-        return forAll(ids(), reset());
+        return forAll(ids(), reset()).getOrElse(redirector.seeOther(method(on(CrawlerDefinitionResource.class).list(Option.<String>none()))));
     }
 
     @POST
     @Path("deleteAll")
     public Response deleteAll() throws Exception {
-        return forAll(ids(), delete());
+        return forAll(ids(), delete()).getOrElse(redirector.seeOther(method(on(CrawlerDefinitionResource.class).list(Option.<String>none()))));
     }
 
     private Sequence<UUID> ids() {
         return allCrawlerModels().map(first(UUID.class));
     }
 
-    public static <T> Response forAll(final Sequence<T> sequence, final Callable1<T, Response> callable) throws Exception {
-        return sequence.map(callable).last();
+    private Sequence<UUID> enabledIds() {
+        return new CrawlerRepository(modelRepository).allCrawlerModels().filter(where(second(Model.class), enabled())).map(first(UUID.class));
+    }
+
+    public static <T> Option<Response> forAll(final Sequence<T> sequence, final Callable1<T, Response> callable) throws Exception {
+        return sequence.map(callable).lastOption();
     }
 
     public Callable1<UUID, Response> crawl() {

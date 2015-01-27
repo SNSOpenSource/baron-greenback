@@ -36,7 +36,7 @@ public class BatchViewsResource {
     @POST
     @Path("deleteAll")
     public Response deleteAll() throws Exception {
-        return forAll(ids(), delete());
+        return forAll(ids(), delete()).get();
     }
 
     private Sequence<UUID> ids() {
