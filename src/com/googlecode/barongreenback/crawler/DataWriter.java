@@ -9,15 +9,7 @@ import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
-import com.googlecode.totallylazy.Block;
-import com.googlecode.totallylazy.Callable1;
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.CountLatch;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Group;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Triple;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.concurrent.NamedExecutors;
 import com.googlecode.utterlyidle.Application;
 import com.googlecode.yadic.Container;
@@ -27,11 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.PriorityMerge.priorityMergeBy;
@@ -45,7 +33,7 @@ import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class DataWriter implements JobExecutor<PriorityJobRunnable> {
-    private final BlockingQueue<Triple<Definition, Sequence<Record>, CountLatch>> data;
+    private final BlockingQueue<Triple<Definition, Sequence<Record>, Phaser>> data;
     private final Application application;
     private final int threads;
     private final int seconds;
@@ -60,7 +48,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
         this.seconds = seconds;
         this.name = name;
         executor = createExecutor();
-        data = new LinkedBlockingQueue<Triple<Definition, Sequence<Record>, CountLatch>>(capacity);
+        data = new LinkedBlockingQueue<Triple<Definition, Sequence<Record>, Phaser>>(capacity);
     }
 
     private ExecutorService createExecutor() {
@@ -73,7 +61,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
         return new Function1<Sequence<Record>, Number>() {
             @Override
             public Number call(final Sequence<Record> newData) throws Exception {
-                CountLatch latch = container.get(CountLatch.class);
+                Phaser latch = container.get(Phaser.class);
                 int count = container.get(CrawlerExecutors.class).outputHandler(job).queue(job, newData, latch);
                 container.get(AtomicInteger.class).addAndGet(count);
                 return count;
@@ -86,7 +74,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
         command.run();
     }
 
-    public int queue(Job job, Sequence<Record> newData, CountLatch latch) throws InterruptedException {
+    public int queue(Job job, Sequence<Record> newData, Phaser latch) throws InterruptedException {
         Definition destination = job.destination();
         if (newData.isEmpty()) return 0;
 
@@ -95,25 +83,25 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
             return 0;
         }
 
-        latch.countUp();
+        latch.register();
         data.put(Triple.triple(destination, newData, latch));
         return newData.size();
     }
 
     private void batchWrite(final Records records) {
-        List<Triple<Definition, Sequence<Record>, CountLatch>> newDataToWrite = new LinkedList<Triple<Definition, Sequence<Record>, CountLatch>>();
+        List<Triple<Definition, Sequence<Record>, Phaser>> newDataToWrite = new LinkedList<Triple<Definition, Sequence<Record>, Phaser>>();
         data.drainTo(newDataToWrite);
 
         sequence(newDataToWrite).
                 groupBy(first(Definition.class).then(Definition.functions.name)).
-                eachConcurrently(new Block<Group<String, Triple<Definition, Sequence<Record>, CountLatch>>>() {
+                eachConcurrently(new Block<Group<String, Triple<Definition, Sequence<Record>, Phaser>>>() {
                     @Override
-                    public void execute(final Group<String, Triple<Definition, Sequence<Record>, CountLatch>> newDataGroupedByDefinitionName) throws Exception {
+                    public void execute(final Group<String, Triple<Definition, Sequence<Record>, Phaser>> newDataGroupedByDefinitionName) throws Exception {
                         newDataGroupedByDefinitionName.
                                 groupBy(firstUniqueField()).
-                                forEach(new Block<Group<Keyword<?>, Triple<Definition, Sequence<Record>, CountLatch>>>() {
+                                forEach(new Block<Group<Keyword<?>, Triple<Definition, Sequence<Record>, Phaser>>>() {
                                     @Override
-                                    public void execute(Group<Keyword<?>, Triple<Definition, Sequence<Record>, CountLatch>> newDataGroupedByUnique) throws Exception {
+                                    public void execute(Group<Keyword<?>, Triple<Definition, Sequence<Record>, Phaser>> newDataGroupedByUnique) throws Exception {
                                         Keyword<?> uniqueField = newDataGroupedByUnique.key();
                                         String definitionName = newDataGroupedByDefinitionName.key();
                                         Definition mergedDefinition = definition(definitionName, mergeFields(newDataGroupedByUnique));
@@ -126,23 +114,23 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
                     }
                 });
 
-        for (Triple<Definition, Sequence<Record>, CountLatch> aNewData : newDataToWrite) {
-            aNewData.third().countDown();
+        for (Triple<Definition, Sequence<Record>, Phaser> aNewData : newDataToWrite) {
+            aNewData.third().arriveAndDeregister();
         }
     }
 
-    private Callable1<Triple<Definition, Sequence<Record>, CountLatch>, Keyword<?>> firstUniqueField() {
-        return new Callable1<Triple<Definition, Sequence<Record>, CountLatch>, Keyword<?>>() {
+    private Callable1<Triple<Definition, Sequence<Record>, Phaser>, Keyword<?>> firstUniqueField() {
+        return new Callable1<Triple<Definition, Sequence<Record>, Phaser>, Keyword<?>>() {
             @Override
-            public Keyword<?> call(Triple<Definition, Sequence<Record>, CountLatch> triple) throws Exception {
+            public Keyword<?> call(Triple<Definition, Sequence<Record>, Phaser> triple) throws Exception {
                 return uniqueFields(triple.first()).head();
             }
         };
     }
 
-    private Set<Keyword<?>> mergeFields(Group<?, Triple<Definition, Sequence<Record>, CountLatch>> data) {
+    private Set<Keyword<?>> mergeFields(Group<?, Triple<Definition, Sequence<Record>, Phaser>> data) {
         final Set<Keyword<?>> mergedFields = new LinkedHashSet<Keyword<?>>();
-        for (Triple<Definition, Sequence<Record>, CountLatch> trio : data) {
+        for (Triple<Definition, Sequence<Record>, Phaser> trio : data) {
             mergedFields.addAll(trio.first().fields());
         }
         return mergedFields;

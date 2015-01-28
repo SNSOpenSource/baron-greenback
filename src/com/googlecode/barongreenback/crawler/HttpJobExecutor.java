@@ -5,11 +5,15 @@ import com.googlecode.barongreenback.crawler.executor.JobExecutor;
 import com.googlecode.barongreenback.crawler.executor.PriorityJobRunnable;
 import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Block;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 import java.io.PrintStream;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.googlecode.barongreenback.crawler.DataWriter.write;
@@ -17,18 +21,19 @@ import static com.googlecode.barongreenback.crawler.HttpReader.getInput;
 
 public class HttpJobExecutor {
     private final CrawlerExecutors executors;
-    private final CountLatch latch;
+    private final Phaser latch;
     private final Container crawlerScope;
 
-    public HttpJobExecutor(CrawlerExecutors executors, CountLatch latch, Container crawlerScope) {
+    public HttpJobExecutor(CrawlerExecutors executors, Phaser latch, Container crawlerScope) {
         this.executors = executors;
         this.latch = latch;
         this.crawlerScope = crawlerScope;
     }
 
     public int executeAndWait(Job job) throws InterruptedException {
+        latch.register();
         execute(job);
-        latch.await();
+        latch.awaitAdvance(latch.arriveAndDeregister());
         return crawlerScope.get(AtomicInteger.class).get();
     }
 
@@ -39,7 +44,7 @@ public class HttpJobExecutor {
     }
 
     private void submit(Job job, JobExecutor<PriorityJobRunnable> jobExecutor, final Runnable function) {
-        latch.countUp();
+        latch.register();
         Runnable logExceptionsRunnable = logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class));
         PriorityJobRunnable priorityJobRunnable = new PriorityJobRunnable(job, logExceptionsRunnable); 
 		jobExecutor.execute(priorityJobRunnable);
@@ -61,7 +66,7 @@ public class HttpJobExecutor {
                 try {
                     function.run();
                 } finally {
-                    latch.countDown();
+                    latch.arriveAndDeregister();
                 }
             }
         };
