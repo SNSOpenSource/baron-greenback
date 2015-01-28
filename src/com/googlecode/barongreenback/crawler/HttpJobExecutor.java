@@ -45,9 +45,14 @@ public class HttpJobExecutor {
 
     private void submit(Job job, JobExecutor<PriorityJobRunnable> jobExecutor, final Runnable function) {
         latch.register();
-        Runnable logExceptionsRunnable = logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class));
-        PriorityJobRunnable priorityJobRunnable = new PriorityJobRunnable(job, logExceptionsRunnable); 
-		jobExecutor.execute(priorityJobRunnable);
+        try {
+            Runnable logExceptionsRunnable = logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class));
+            PriorityJobRunnable priorityJobRunnable = new PriorityJobRunnable(job, logExceptionsRunnable);
+            jobExecutor.execute(priorityJobRunnable);
+        } catch (RuntimeException e) {
+            latch.arriveAndDeregister();
+            throw e;
+        }
     }
 
     private <T> Block<T> submit(final Job job, final JobExecutor<PriorityJobRunnable> jobExecutor, final Function1<T, ?> runnable) {
