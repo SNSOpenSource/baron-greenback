@@ -1,15 +1,20 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.failures.FailureHandler;
+import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.handlers.Auditor;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;
-import com.googlecode.yadic.*;
+import com.googlecode.yadic.Container;
+import com.googlecode.yadic.ContainerException;
+import com.googlecode.yadic.Containers;
+import com.googlecode.yadic.Resolver;
+import com.googlecode.yadic.SimpleContainer;
+import com.googlecode.yadic.TypeMap;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CrawlerScope implements Container {
@@ -17,7 +22,7 @@ public class CrawlerScope implements Container {
 
     private CrawlerScope(Container requestScope, CheckpointUpdater checkpointUpdater) {
         container = new SimpleContainer(requestScope);
-        container.add(Phaser.class);
+        container.add(CountLatch.class);
         container.add(HttpJobExecutor.class);
         container.add(Auditor.class, PrintAuditor.class);
         container.add(FailureHandler.class);

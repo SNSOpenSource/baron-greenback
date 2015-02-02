@@ -1,10 +1,16 @@
 package com.googlecode.barongreenback.crawler;
 
 import com.googlecode.barongreenback.crawler.datasources.DataSource;
+import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
 import com.googlecode.barongreenback.crawler.jobs.Job;
 import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.lazyrecords.*;
+import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Keywords;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
+import com.googlecode.totallylazy.CountLatch;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Application;
@@ -17,7 +23,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
@@ -47,10 +52,10 @@ public class DataWriterTest {
 
         Records records = new MemoryRecords();
         DataWriter dataWriter = new DataWriter(applicationWithRecords(records), 1, 1, "test", 2);
-        Phaser latch = new Phaser();
+        CountLatch latch = new CountLatch();
         dataWriter.queue(jobWithDefinition(aPartial), one(aRecord), latch);
         dataWriter.queue(jobWithDefinition(bPartial), one(bRecord), latch);
-        latch.awaitAdvanceInterruptibly(latch.getPhase(), 10, TimeUnit.SECONDS);
+        latch.await(10, TimeUnit.SECONDS);
 
         assertThat(records.get(fullDefinition).toList(), is(Arrays.asList(Record.methods.merge(aRecord, bRecord))));
     }
@@ -76,15 +81,14 @@ public class DataWriterTest {
 
         Records records = new MemoryRecords();
         DataWriter dataWriter = new DataWriter(applicationWithRecords(records), 1, 1, "test", 4);
-        Phaser latch = new Phaser();
-        latch.register();
+        CountLatch latch = new CountLatch();
         dataWriter.queue(jobWithDefinition(definition1), sequence(aRecord1), latch);
         dataWriter.queue(jobWithDefinition(definition2), sequence(aRecord2), latch);
-        latch.awaitAdvanceInterruptibly(latch.arrive(), 10, TimeUnit.SECONDS);
+        latch.await(10, TimeUnit.SECONDS);
 
         dataWriter.queue(jobWithDefinition(definition1), sequence(bRecord1), latch);
         dataWriter.queue(jobWithDefinition(definition2), sequence(bRecord2, cRecord2), latch);
-        latch.awaitAdvanceInterruptibly(latch.arriveAndDeregister(), 10, TimeUnit.SECONDS);
+        latch.await(10, TimeUnit.SECONDS);
 
         assertThat(records.get(definition1).first(), is(Record.methods.merge(aRecord1, bRecord1)));
         assertThat(records.get(definition2).second(), is(Record.methods.merge(aRecord2, bRecord2)));
