@@ -48,7 +48,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
         this.seconds = seconds;
         this.name = name;
         executor = createExecutor();
-        data = new LinkedBlockingQueue<Triple<Definition, Sequence<Record>, Phaser>>(capacity);
+        data = new LinkedBlockingQueue<>(capacity);
     }
 
     private ExecutorService createExecutor() {
@@ -89,36 +89,44 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
     }
 
     private void batchWrite(final Records records) {
-        List<Triple<Definition, Sequence<Record>, Phaser>> newDataToWrite = new LinkedList<Triple<Definition, Sequence<Record>, Phaser>>();
+        List<Triple<Definition, Sequence<Record>, Phaser>> newDataToWrite = new LinkedList<>();
         data.drainTo(newDataToWrite);
+
         try {
-            sequence(newDataToWrite).
-                    groupBy(first(Definition.class).then(Definition.functions.name)).
-                    eachConcurrently(new Block<Group<String, Triple<Definition, Sequence<Record>, Phaser>>>() {
-                        @Override
-                        public void execute(final Group<String, Triple<Definition, Sequence<Record>, Phaser>> newDataGroupedByDefinitionName) throws Exception {
-                            newDataGroupedByDefinitionName.
-                                    groupBy(firstUniqueField()).
-                                    forEach(new Block<Group<Keyword<?>, Triple<Definition, Sequence<Record>, Phaser>>>() {
-                                        @Override
-                                        public void execute(Group<Keyword<?>, Triple<Definition, Sequence<Record>, Phaser>> newDataGroupedByUnique) throws Exception {
-                                            Keyword<?> uniqueField = newDataGroupedByUnique.key();
-                                            String definitionName = newDataGroupedByDefinitionName.key();
-                                            Definition mergedDefinition = definition(definitionName, mergeFields(newDataGroupedByUnique));
-
-                                            Sequence<Record> mergedRecords = priorityMergeBy(newDataGroupedByUnique.flatMap(Callables.<Sequence<Record>>second()), uniqueField);
-
-                                            records.put(mergedDefinition, update(using(uniqueField), mergedRecords));
-                                        }
-                                    });
-                        }
-                    });
+            updateRecords(records, newDataToWrite);
+        } catch(RuntimeException ex){
+            ex.printStackTrace();
+            throw ex;
         } finally {
             for (Triple<Definition, Sequence<Record>, Phaser> aNewData : newDataToWrite) {
                 aNewData.third().arriveAndDeregister();
             }
 
         }
+    }
+
+    private void updateRecords(final Records records, List<Triple<Definition, Sequence<Record>, Phaser>> newDataToWrite) {
+        sequence(newDataToWrite).
+                groupBy(first(Definition.class).then(Definition.functions.name)).
+                eachConcurrently(new Block<Group<String, Triple<Definition, Sequence<Record>, Phaser>>>() {
+                    @Override
+                    public void execute(final Group<String, Triple<Definition, Sequence<Record>, Phaser>> newDataGroupedByDefinitionName) throws Exception {
+                        newDataGroupedByDefinitionName.
+                                groupBy(firstUniqueField()).
+                                forEach(new Block<Group<Keyword<?>, Triple<Definition, Sequence<Record>, Phaser>>>() {
+                                    @Override
+                                    public void execute(Group<Keyword<?>, Triple<Definition, Sequence<Record>, Phaser>> newDataGroupedByUnique) throws Exception {
+                                        Keyword<?> uniqueField = newDataGroupedByUnique.key();
+                                        String definitionName = newDataGroupedByDefinitionName.key();
+                                        Definition mergedDefinition = definition(definitionName, mergeFields(newDataGroupedByUnique));
+
+                                        Sequence<Record> mergedRecords = priorityMergeBy(newDataGroupedByUnique.flatMap(Callables.<Sequence<Record>>second()), uniqueField);
+
+                                        records.put(mergedDefinition, update(using(uniqueField), mergedRecords));
+                                    }
+                                });
+                    }
+                });
     }
 
     private Callable1<Triple<Definition, Sequence<Record>, Phaser>, Keyword<?>> firstUniqueField() {
@@ -131,7 +139,7 @@ public class DataWriter implements JobExecutor<PriorityJobRunnable> {
     }
 
     private Set<Keyword<?>> mergeFields(Group<?, Triple<Definition, Sequence<Record>, Phaser>> data) {
-        final Set<Keyword<?>> mergedFields = new LinkedHashSet<Keyword<?>>();
+        final Set<Keyword<?>> mergedFields = new LinkedHashSet<>();
         for (Triple<Definition, Sequence<Record>, Phaser> trio : data) {
             mergedFields.addAll(trio.first().fields());
         }

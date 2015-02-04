@@ -13,11 +13,6 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.yadic.Container;
 
 import java.io.PrintStream;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,22 +21,18 @@ import static com.googlecode.barongreenback.crawler.HttpReader.getInput;
 
 public class HttpJobExecutor {
     private final CrawlerExecutors executors;
-    private final Map<UUID, Set<UUID>> latches = new ConcurrentHashMap<UUID, Set<UUID>>();
     private final Container crawlerScope;
+    private final Phaser phaser;
 
     public HttpJobExecutor(CrawlerExecutors executors, Container crawlerScope) {
         this.executors = executors;
         this.crawlerScope = crawlerScope;
+        phaser =  crawlerScope.get(Phaser.class);
     }
 
     public int executeAndWait(Job job) throws InterruptedException {
-        latches.put(job.crawlerId(), new ConcurrentSkipListSet<UUID>());
-        final Phaser phaser = crawlerScope.get(Phaser.class);
         phaser.register();
         execute(job);
-        while(!latches.get(job.crawlerId()).isEmpty()) {
-            Thread.sleep(500);
-        }
         phaser.awaitAdvance(phaser.arriveAndDeregister());
         return crawlerScope.get(AtomicInteger.class).get();
     }
@@ -53,10 +44,8 @@ public class HttpJobExecutor {
     }
 
     private void submit(Job job, JobExecutor<PriorityJobRunnable> jobExecutor, final Runnable function) {
-        final PriorityJobRunnable countDownLatch = countLatchDownAfter(job, function);
-        latches.get(job.crawlerId()).add(countDownLatch.id());
-        Runnable logExceptionsRunnable = logExceptions(countDownLatch, crawlerScope.get(PrintStream.class));
-        PriorityJobRunnable priorityJobRunnable = new PriorityJobRunnable(job, logExceptionsRunnable);
+        phaser.register();
+        PriorityJobRunnable priorityJobRunnable = new PriorityJobRunnable(job, logExceptions(countLatchDownAfter(function), crawlerScope.get(PrintStream.class)));
         jobExecutor.execute(priorityJobRunnable);
     }
 
@@ -69,14 +58,14 @@ public class HttpJobExecutor {
         };
     }
 
-    private PriorityJobRunnable countLatchDownAfter(final Job job, final Runnable function) {
-        return new PriorityJobRunnable(job, function) {
+    private Runnable countLatchDownAfter(final Runnable function) {
+        return new Runnable() {
             @Override
             public void run() {
                 try {
                     function.run();
                 } finally {
-                    latches.get(job.crawlerId()).remove(this.id());
+                    phaser.arriveAndDeregister();
                 }
             }
         };
