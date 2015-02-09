@@ -1,0 +1,45 @@
+{ "view": {
+    "keywords": [
+        {
+            "group": "groupa",
+            "type": "java.lang.String",
+            "name": "fieldc",
+            "visible": true,
+            "alias": "aliasc"
+        },
+        {
+            "group": "groupa",
+            "type": "java.lang.String",
+            "name": "fielda",
+            "visible": true,
+            "alias": "aliasa",
+            "unique": true
+        },
+        {
+            "group": "groupb",
+            "name": "fieldb",
+            "visible": true,
+            "type": "java.lang.String",
+            "alias": "aliasb"
+        },
+        {
+            "group": "",
+            "name": "fieldd",
+            "visible": true,
+            "type": "java.lang.String",
+            "alias": "aliasd"
+        },
+        {
+            "name": "fieldNotExistingInTheRecord",
+            "visible": true,
+            "type": "java.lang.String"
+        }
+    ],
+    "name": "items",
+    "priority": "1",
+    "query": "",
+    "records": "items",
+    "visible": true,
+    "version": "1"
+}
+}

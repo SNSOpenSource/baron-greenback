@@ -1,0 +1,753 @@
+@import "/baron-greenback/shared/expander/expander.less";
+@import "/baron-greenback/shared/twitter/bootstrap.less";
+
+@baseFontSize:          12px;
+@baseLineHeight:          14px;
+@blur-radius: 3px;
+
+.content {
+  z-index: 0;
+  position: relative;
+}
+
+.navbar {
+  z-index: 10;
+  position: relative;
+}
+
+#results {
+  position: relative;
+}
+
+.border-radius {
+    .border-radius(5px);
+}
+
+select, input[type=file] {
+    height: @baseLineHeight * 2;
+}
+
+@grayDark:          lighten(@black, 15%);
+@gray:              lighten(@black, 30%);
+
+.t+l{
+    color: red;
+    &:hover {
+        border: 1px solid red;
+    }
+}
+
+.large-input {
+    width: 270px;
+}
+
+.extra-large-input {
+    width: 530px;
+}
+
+.shadow (@shadow-color) {
+    @spread-radius: 1px;
+    -moz-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    -webkit-box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+    box-shadow: 0 0 @blur-radius @spread-radius @shadow-color;
+}
+
+.inlineBlock {
+    display: inline-block;
+    zoom: 1; // IE6-7 only
+    *display: inline; // IE6-7 only
+}
+
+.label {
+    padding: 0;
+    display: block;
+    float: none;
+    width: auto;
+    font-weight: bold;
+    text-align: left;
+    line-height: 20px;
+    padding-top: 0;
+    color: @grayDark;
+    background: none;
+    font-size: 13px;
+    text-transform: capitalize;
+}
+
+h1, h2, h3, h4, h5, h6, .btn, a.update {
+    text-transform: capitalize;
+}
+
+.btn {
+    &-primary, &-danger, &-success, &-info {
+        &:hover {
+            color: #fff;
+        }
+    }
+    &-success {
+        .gradientBar(lighten(@green, 15%), @green);
+    }
+    &-danger {
+        .gradientBar(lighten(@red, 15%), @red);
+    }
+}
+
+input[type="submit"], input[type="number"] {
+    .btn;
+}
+
+input.crawl, input.search, a.new, input.import, input.save, input[type=submit].start, body.views a.edit, input.backup, input.restore {
+    .btn;
+    .btn-primary;
+}
+
+input.crawl-and-create-view {
+    .btn;
+    .btn-info;
+}
+
+input.more, a.export, a.import, a.edit, a.cancel, a.download, a.selectPage, a.selectAll{
+    .btn;
+}
+
+input.delete, input.stop, input.reset, input.resetAll, input.deleteAll, input.ignore, input.ignoreAll, input.disable {
+    .btn;
+    .btn-danger;
+}
+
+input.enable, a.crawler-status, a.crawler-failures {
+    .btn;
+    .btn-success;
+}
+
+.fixIE7Overlapping {
+    position: relative;
+}
+
+div.nameValue {
+    vertical-align: top;
+    .fixIE7Overlapping;
+}
+
+div.control, div.nameValue {
+    .inlineBlock;
+    margin: 5px;
+    span.message {
+        .help-block;
+    }
+}
+
+div.message {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+select, input[type="text"] {
+    margin: 0;
+}
+
+ul.nav-tabs {
+    float: none;
+    margin-bottom: 0;
+}
+
+th, ul.nav-tabs li {
+    text-transform: capitalize;
+}
+
+div.container, .container {
+    margin: 0 0 0 40px;
+    width: auto;
+}
+
+.content {
+    padding: 10px;
+  padding-left: 0px;
+}
+
+.shadow(#D3D3D3); // Dan: Fixes wierd bug in less.js where it can't find .border-radius in next section
+
+div.fieldset {
+    .border-radius;
+    border: 1px solid #959595;
+    margin: @blur-radius;
+    margin-top: 1.5em;
+    padding-top: .3em;
+    padding-left: .5em;
+    padding-right: .5em;
+
+    position: relative;
+
+    &:first-child {
+        margin-top: 0;
+    }
+    
+    div.legend {
+        .border-radius;
+        display: inline;
+        border: 1px solid #959595;
+        background-color: #BDBDBD;
+        color: #191919;
+        margin: 0;
+        padding: 0.3ex 0.6ex 0.4ex;
+        position: absolute;
+        top: @baseLineHeight * -0.8;
+        font-size: 110%;
+        font-weight: normal;
+        text-transform: capitalize;
+        z-index: 1000;
+    }
+}
+
+div.recordDefinitionTemplate, li.keywordTemplate {
+    display:none;
+}
+
+form input.from, form input#query, form input.query, input.location {
+    .extra-large-input;
+}
+
+form.import {
+    div.control {
+        display: block;
+    }
+    input.id {
+        .large-input;
+    }
+    textarea.model {
+        .extra-large-input;
+        height: 20em;
+    }
+}
+
+form.view {
+    div.rootXPath, div.alias, div.subfeed, div.checkpoint {
+        display: none;
+    }
+}
+
+.subrecordDefinition div.checkpoint {
+    display: none;
+}
+
+form.search {
+    .inlineBlock;
+    input.search {
+        vertical-align: top;
+        margin-top: 4px;
+    }
+}
+
+form.delete, form.crawl, form.crawl-and-create-view, form.start, form.stop, form.copy, form.reset, form.crawlAll, form.resetAll, form.deleteAll, form.restore, form.backup, form.retryAll, form.ignoreAll, form.retry, form.ignore, form.enable, form.disable {
+    margin: 0;
+    padding: 0;
+    .inlineBlock;
+}
+
+body {
+    form {
+        input[type=text], input[type=password], textarea, select {
+            color: #333;
+        }
+    }
+}
+
+.actions {
+    margin-top: 10px;
+}
+
+.table-actions {
+    margin-top: 10px;
+}
+
+
+.navbar {
+    a.home {
+        background: left no-repeat url(small-logo.png);
+        padding-left: 40px;
+    }
+    .navbar-fixed-top;
+}
+
+body {
+    padding-top: 40px; /* needed when using .navbar-fixed-top */
+}
+
+table {
+    .table;
+    .table-bordered;
+
+    th, td {
+        padding: 5px 7px 4px;
+    }
+
+    &.results {
+        .table-striped;
+        th a {
+            color: inherit;
+        }
+        span.jobstatus {
+            text-transform: capitalize;
+            padding-left: 20px;
+        }
+        span.jobstatus.running {
+                background: url(running.gif) no-repeat;
+        }
+        span.jobstatus.idle {
+                background: url(idle.gif) no-repeat;
+        }
+        tfoot tr td {
+            border-top: 1px solid #ddd;
+        }
+        tr.selected, tr.selected:hover {
+            td {
+                background-color: lighten(@yellow, 35%) !important;
+            }
+        }
+        tr:hover {
+            cursor: pointer;
+            td {
+                background-color: lighten(@yellow, 42%) !important;
+            }
+        }
+    }
+}
+
+ol.fields {
+    padding-top:10px;
+    li:hover {
+        border: 1px solid @grayLighter;
+    }
+    li {
+        border: 1px solid #fff;
+        position: relative;
+        padding-right: 20px;
+        .closeIcon {
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        .moveIcon {
+            cursor: pointer;
+            position: absolute;
+            top: 24px;
+            right: 0;
+        }
+    }
+    li.ui-sortable-helper {
+        background-color: #fff;
+        border: solid 1px @grayLighter;
+        cursor: move;
+    }
+    li.placeholder {
+        height: 5em;
+        background-color: @grayLight;
+    }
+}
+
+.icon {
+    background: #fff no-repeat;
+    width: 16px;
+    height: 16px;
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    margin: 4px;
+}
+
+.closeIcon {
+    .icon;
+    background: url('icons-red.png') -96px -128px;
+}
+
+.moveIcon {
+    .icon;
+    background: url('icons-grey.png') -128px 0;
+}
+
+form div.error {
+  @error-color: desaturate(lighten(@red, 25%), 25%);
+  > label, span.message {
+    color: @red;
+  }
+  input,
+  textarea {
+    border-color: @error-color;
+    .box-shadow(0 0 3px rgba(171,41,32,.25));
+    &:focus {
+      border-color: darken(@error-color, 10%);
+      .box-shadow(0 0 6px rgba(171,41,32,.5));
+    }
+  }
+}
+
+div.pagination div.control {
+    vertical-align: top;
+}
+
+div.clear { clear:both; }
+
+div.rowsPerPage {
+    label {
+        padding-right: 5px;
+    }
+    select.rowsPerPage {
+        width: 60px;
+    }
+}
+
+body.jobs, body.failures  {
+    div.entity {
+        white-space: pre;
+    }
+    table.results {
+        table-layout: fixed;
+        td {
+            overflow: hidden;
+        }
+        div.entity {
+            height: 2em;
+        }
+        form {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.rawMessage{
+  display: none !important;
+}
+
+body.failures .Actions {
+    width: 130px;
+}
+
+div.crawler {
+    vertical-align: top;
+    margin: 0px;
+}
+
+div.actions form {
+    .inlineBlock;
+}
+
+div.table-actions form {
+  .inlineBlock;
+}
+
+.selectors {
+    .clearSelection {
+        .btn;
+        .btn-danger;
+    }
+    .inlineBlock;
+    margin-top: 5px;
+}
+
+.bgb { // BGB Only Styles
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        padding-bottom: 1em;
+        background-color: @navbarInverseBackground;
+        li a {
+            color: @navbarInverseLinkColor !important;
+        }
+    }
+
+    .dropdown-menu:hover {
+        display: block;
+    }
+
+    .dropdown:hover .dropdown-menu {
+        display: block;
+        li a:hover {
+            color: @navbarInverseLinkColorHover !important;
+        }
+    }
+
+    .dropdown {
+        position: relative;
+        width: 160px;
+    }
+
+    .dropdown-toggle {
+        width: 160px;
+    }
+
+}
+
+.resources .resource ul {
+    list-style: none;
+}
+
+.pagination-controls {
+  float: right;
+}
+
+.pager-and-rowpager .pagination, .pager-and-rowpager .rowpager {
+  .inlineBlock;
+  margin: 0;
+  margin-right:1px;
+  padding: 0;
+  form {
+      margin: 0;
+      padding: 0;
+      select, input {
+        height: 24px;
+      }
+  }
+}
+
+
+.pager-and-rowpager div {
+    vertical-align: middle;
+}
+
+body.jobsHistory {
+  td.action {
+    text-transform: capitalize;
+  }
+}
+
+/* Tablesorter css, removed from Bootstrap 2.0 */
+table .header {
+    cursor: pointer;
+    background-color: #ffffff;
+}
+table .header:after {
+  content: "";
+  float: right;
+  margin-top: 7px;
+  border-width: 0 4px 4px;
+  border-style: solid;
+  border-color: #000000 transparent;
+  visibility: hidden;
+}
+table .headerSortUp, table .headerSortDown {
+  background-color: #f7f7f9;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+}
+table .header:hover:after {
+  visibility: visible;
+}
+table .headerSortDown:after, table .headerSortDown:hover:after {
+  visibility: visible;
+  filter: alpha(opacity=60);
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+}
+table .headerSortUp:after {
+  border-bottom: none;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000000;
+  visibility: visible;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  filter: alpha(opacity=60);
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+}
+
+
+/* table header colours, also removed from 2.0 */
+table {
+  // Blue Table Headings
+  .blue {
+    color: @blue;
+    border-bottom-color: @blue;
+  }
+  .headerSortUp.blue,
+  .headerSortDown.blue {
+    background-color: lighten(@blue, 40%);
+  }
+  // Green Table Headings
+  .green, .green a {
+    color: @green;
+    border-bottom-color: @green;
+  }
+  .headerSortUp.green,
+  .headerSortDown.green {
+    background-color: lighten(@green, 40%);
+  }
+  // Red Table Headings
+  .red, .red a {
+    color: @red;
+    border-bottom-color: @red;
+  }
+  .headerSortUp.red,
+  .headerSortDown.red {
+    background-color: lighten(@red, 50%);
+  }
+  // Yellow Table Headings
+  .yellow, .yellow a{
+    color: @yellow;
+    border-bottom-color: @yellow;
+  }
+  .headerSortUp.yellow,
+  .headerSortDown.yellow {
+    background-color: lighten(@yellow, 40%);
+  }
+  // Orange Table Headings
+  .orange, .orange a {
+    color: @orange;
+    border-bottom-color: @orange;
+  }
+  .headerSortUp.orange,
+  .headerSortDown.orange {
+    background-color: lighten(@orange, 40%);
+  }
+  // Purple Table Headings
+  .purple, .purple a {
+    color: @purple;
+    border-bottom-color: @purple;
+  }
+  .headerSortUp.purple,
+  .headerSortDown.purple {
+    background-color: lighten(@purple, 40%);
+  }
+}
+
+ul.facet {
+  margin-top: 10px;
+  margin-left: 5px;
+  margin-bottom: 10px;
+}
+
+.facet li, .nav-quicklinks li {
+  list-style: none;
+}
+
+.facet-name {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.facet-entry-name {
+  margin-left: 10px;
+  width: 135px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.facet label {
+  display: inline-block;
+}
+
+.drilled-down {
+  font-weight: bold;
+}
+
+.views-menu {
+  width: 211px;
+  vertical-align: top;
+}
+
+.side-menu {
+  border-right: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+  vertical-align: top;
+  border-bottom-right-radius: 4px;
+  -moz-border-bottom-right-radius: 4px;
+  -webkit-border-bottom-right-radius: 4px;
+  float: left;
+  display: table;
+}
+
+#search-results, .results-data {
+  padding-top: 10px;
+  width: 100%;
+  padding-left: 260px;
+  box-sizing: border-box;
+}
+
+ul.nav-facets, ul.nav-views, ul.nav-quicklinks {
+  padding-left: 5px;
+}
+
+ul.nav-views,  ul.nav-quicklinks {
+  font-size: 14px;
+  li.active {
+    font-weight: bold;
+  }
+  a {
+    text-transform: capitalize;
+    line-height: 18px;
+  }
+}
+
+body.unique {
+  .views-menu h4.title {
+    display: none;
+  }
+}
+
+#nav-views-container, #nav-facets-container, #quicklinks {
+  padding-left: 5px;
+}
+
+// Mucking about here
+.facet-entry {
+  input {
+    margin: 0;
+  }
+
+  * {
+    vertical-align: middle;
+  }
+}
+
+.facet-entry-count:before {
+  content: "(";
+}
+
+.facet-entry-count:after {
+  content: ")";
+}
+.remove-all-filters {
+  font-size: 12px;
+  font-weight: normal;
+}
+
+
+.selectedSection {
+  background-color: #fff0c0 !important;
+}
+
+.table-striped {
+  tbody {
+    > tr:nth-child(even) > td,
+    > tr:nth-child(even) > th {
+      background-color: white;
+    }
+  }
+}
+
+.side-menu-toggle-close {
+  background: url(arrow-73-24.png) #e7e7e7;
+  background-repeat: no-repeat;
+  width: 24px;
+  display:table-cell;
+  cursor:pointer;
+}
+
+
+.side-menu-toggle-open {
+  background: url(arrow-48-24.png) #e7e7e7;
+  background-repeat: no-repeat;
+  width: 24px;
+  display:table-cell;
+  height: 120px;
+  cursor:pointer;
+}
+
+.views-menu-container {
+  display:table-cell;
+}
