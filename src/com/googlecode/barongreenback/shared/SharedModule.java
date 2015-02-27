@@ -54,7 +54,8 @@ public class SharedModule implements ApplicationScopedModule, ResponseHandlersMo
     @Override
     public Container addPerApplicationObjects(Container container) throws Exception {
         addIfAbsent(container, BaronGreenbackApplicationScope.class);
-        return container.add(BaronGreenbackProperties.class).add(ModelCache.class);
+        addIfAbsent(container, BaronGreenbackProperties.class);
+        return container.add(ModelCache.class);
     }
 
     @Override
