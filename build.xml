@@ -6,7 +6,7 @@
     <property name="reports" value="${artifacts}/reports"/>
     <property name="src" value="${basedir}/src"/>
     <property name="test" value="${basedir}/test"/>
-    <property name="release.version" value="${build.number}"/>
+    <property name="release.version" value="${BUILD_NUMBER}"/>
     <property name="release.name" value="${ant.project.name}-${release.version}"/>
     <property name="release.jar" value="${release.name}.jar"/>
     <property name="release.pom" value="${release.name}.pom"/>
@@ -100,14 +100,14 @@
             <entry key="release.path" value="sky/sns/${ant.project.name}/${ant.project.name}/${release.version}/"/>
             <entry key="release.files" value="${release.jar},${release.pom},${release.src},${tests.jar},${tests.src}"/>
             <entry key="${release.jar}.labels" value="Jar"/>
-            <entry key="${release.pom}.description" value="Maven POM file build:${build.number}"/>
+            <entry key="${release.pom}.description" value="Maven POM file build:${BUILD_NUMBER}"/>
             <entry key="${release.pom}.labels" value="POM"/>
-            <entry key="${release.src}.description" value="Source file build:${build.number}"/>
+            <entry key="${release.src}.description" value="Source file build:${BUILD_NUMBER}"/>
             <entry key="${release.src}.labels" value="Source"/>
-            <entry key="${tests.jar}.description" value="Tests jar build:${build.number}"/>
+            <entry key="${tests.jar}.description" value="Tests jar build:${BUILD_NUMBER}"/>
             <entry key="${tests.jar}.labels" value="Tests"/>
 
-            <entry key="${tests.src}.description" value="Test sources jar build:${build.number}"/>
+            <entry key="${tests.src}.description" value="Test sources jar build:${BUILD_NUMBER}"/>
             <entry key="${tests.src}.labels" value="Test Sources"/>
         </propertyfile>
 
