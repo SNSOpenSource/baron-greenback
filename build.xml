@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="baron-greenback" default="build">
-    <property name="build.number" value="dev.build"/>
+    <property name="BUILD_NUMBER" value="dev.build"/>
     <property name="build" value="${basedir}/build"/>
     <property name="artifacts" value="${build}/artifacts"/>
     <property name="reports" value="${artifacts}/reports"/>
