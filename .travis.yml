@@ -1,10 +1,8 @@
 language: java
 jdk:
 - oraclejdk7
-script: "ant"
+script: "ant -DBUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER"
 env:
-  global:
-  - BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
 after_success:
   - BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
   - BINTRAY_KEY=276298114650ddba4c0fa6da8e672d6999cbef3d
