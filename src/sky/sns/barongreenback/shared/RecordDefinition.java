@@ -1,7 +1,7 @@
-package com.googlecode.barongreenback.shared;
+package sky.sns.barongreenback.shared;
 
-import com.googlecode.barongreenback.crawler.CompositeCrawler;
-import com.googlecode.barongreenback.views.ViewsRepository;
+import sky.sns.barongreenback.crawler.CompositeCrawler;
+import sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.AliasedKeyword;
 import com.googlecode.lazyrecords.Definition;
@@ -19,7 +19,7 @@ import com.googlecode.totallylazy.numbers.Numbers;
 
 import java.util.List;
 
-import static com.googlecode.barongreenback.shared.RecordDefinition.ExpensiveModelToKeyword.expensiveModelToKeyword;
+import static sky.sns.barongreenback.shared.RecordDefinition.ExpensiveModelToKeyword.expensiveModelToKeyword;
 import static com.googlecode.funclate.Model.functions.value;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;

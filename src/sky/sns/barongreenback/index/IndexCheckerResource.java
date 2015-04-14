@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.index;
+package sky.sns.barongreenback.index;
 
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
+import sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.lucene.LuceneStorage;
 import com.googlecode.lazyrecords.lucene.PartitionedIndex;

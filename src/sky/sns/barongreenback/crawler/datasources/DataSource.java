@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler.datasources;
+package sky.sns.barongreenback.crawler.datasources;
 
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.totallylazy.Uri;

@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback.shared;
+package sky.sns.barongreenback.shared;
 
 
-import com.googlecode.barongreenback.shared.pager.PagerRenderer;
-import com.googlecode.barongreenback.shared.pager.RequestPager;
+import sky.sns.barongreenback.shared.pager.PagerRenderer;
+import sky.sns.barongreenback.shared.pager.RequestPager;
 import com.googlecode.funclate.Renderer;
 import com.googlecode.funclate.stringtemplate.EnhancedStringTemplateGroup;
 import com.googlecode.totallylazy.Block;

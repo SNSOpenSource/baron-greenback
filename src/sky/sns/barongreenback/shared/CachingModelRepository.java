@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.shared;
+package sky.sns.barongreenback.shared;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Record;
@@ -6,7 +6,7 @@ import com.googlecode.totallylazy.*;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.shared.RecordsModelRepository.toRecord;
+import static sky.sns.barongreenback.shared.RecordsModelRepository.toRecord;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.always;
 

@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.crawler.executor.CrawlerExecutors;
-import com.googlecode.barongreenback.crawler.failures.Failures;
-import com.googlecode.barongreenback.views.ViewsExecutor;
+import sky.sns.barongreenback.crawler.executor.CrawlerExecutors;
+import sky.sns.barongreenback.crawler.failures.Failures;
+import sky.sns.barongreenback.views.ViewsExecutor;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.utterlyidle.MediaType;

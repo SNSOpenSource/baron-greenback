@@ -1,7 +1,7 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.shared.ApplicationTests;
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
+import sky.sns.barongreenback.shared.ApplicationTests;
+import sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.parser.ParserParameters;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.time.Clock;

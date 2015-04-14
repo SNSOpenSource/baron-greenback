@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.batch;
+package sky.sns.barongreenback.batch;
 
-import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
+import sky.sns.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Value;
 

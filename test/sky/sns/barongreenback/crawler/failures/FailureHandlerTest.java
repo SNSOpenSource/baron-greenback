@@ -1,11 +1,11 @@
-package com.googlecode.barongreenback.crawler.failures;
+package sky.sns.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.Crawler;
-import com.googlecode.barongreenback.crawler.CrawlerRepository;
-import com.googlecode.barongreenback.crawler.CrawlerTests;
-import com.googlecode.barongreenback.crawler.datasources.DataSource;
-import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
-import com.googlecode.barongreenback.crawler.jobs.HttpJob;
+import sky.sns.barongreenback.crawler.Crawler;
+import sky.sns.barongreenback.crawler.CrawlerRepository;
+import sky.sns.barongreenback.crawler.CrawlerTests;
+import sky.sns.barongreenback.crawler.datasources.DataSource;
+import sky.sns.barongreenback.crawler.datasources.HttpDataSource;
+import sky.sns.barongreenback.crawler.jobs.HttpJob;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
@@ -23,7 +23,7 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.failures.Failure.failure;
+import static sky.sns.barongreenback.crawler.failures.Failure.failure;
 import static com.googlecode.totallylazy.Exceptions.asString;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Uri.uri;

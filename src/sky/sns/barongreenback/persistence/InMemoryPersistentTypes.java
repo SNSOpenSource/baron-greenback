@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.persistence;
+package sky.sns.barongreenback.persistence;
 
 import com.googlecode.lazyrecords.mappings.StringMapping;
 import com.googlecode.lazyrecords.mappings.StringMappings;

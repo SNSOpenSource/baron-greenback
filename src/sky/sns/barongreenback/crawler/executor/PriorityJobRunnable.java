@@ -1,7 +1,7 @@
-package com.googlecode.barongreenback.crawler.executor;
+package sky.sns.barongreenback.crawler.executor;
 
-import com.googlecode.barongreenback.crawler.jobs.Job;
-import com.googlecode.barongreenback.crawler.jobs.JobComparator;
+import sky.sns.barongreenback.crawler.jobs.Job;
+import sky.sns.barongreenback.crawler.jobs.JobComparator;
 
 import java.util.Comparator;
 import java.util.UUID;

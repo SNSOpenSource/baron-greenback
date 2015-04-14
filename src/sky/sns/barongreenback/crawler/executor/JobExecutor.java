@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.crawler.executor;
+package sky.sns.barongreenback.crawler.executor;
 
-import com.googlecode.barongreenback.crawler.StatusMonitor;
+import sky.sns.barongreenback.crawler.StatusMonitor;
 
 import java.io.Closeable;
 

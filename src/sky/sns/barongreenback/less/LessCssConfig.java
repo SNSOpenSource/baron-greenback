@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.less;
+package sky.sns.barongreenback.less;
 
 public interface LessCssConfig {
     boolean useCache();

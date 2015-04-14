@@ -1,10 +1,10 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
-import com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings;
-import com.googlecode.barongreenback.search.DrillDowns;
-import com.googlecode.barongreenback.search.PredicateBuilder;
-import com.googlecode.barongreenback.search.RecordsService;
-import com.googlecode.barongreenback.shared.ModelRepository;
+import sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
+import sky.sns.barongreenback.search.DrillDowns;
+import sky.sns.barongreenback.search.PredicateBuilder;
+import sky.sns.barongreenback.search.RecordsService;
+import sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Facet;
 import com.googlecode.lazyrecords.FacetDrillDown;
@@ -38,10 +38,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static com.googlecode.barongreenback.search.RecordsService.headers;
-import static com.googlecode.barongreenback.search.RecordsService.unalias;
-import static com.googlecode.barongreenback.views.ViewsRepository.SHOW_FACET;
-import static com.googlecode.barongreenback.views.ViewsRepository.find;
+import static sky.sns.barongreenback.search.RecordsService.headers;
+import static sky.sns.barongreenback.search.RecordsService.unalias;
+import static sky.sns.barongreenback.views.ViewsRepository.SHOW_FACET;
+import static sky.sns.barongreenback.views.ViewsRepository.find;
 import static com.googlecode.funclate.Model.functions.value;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.lazyrecords.Facet.FacetEntry;

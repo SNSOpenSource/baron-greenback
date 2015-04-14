@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback.persistence.sql;
+package sky.sns.barongreenback.persistence.sql;
 
-import com.googlecode.barongreenback.persistence.PersistencePassword;
-import com.googlecode.barongreenback.persistence.PersistenceUri;
-import com.googlecode.barongreenback.persistence.PersistenceUser;
+import sky.sns.barongreenback.persistence.PersistencePassword;
+import sky.sns.barongreenback.persistence.PersistenceUri;
+import sky.sns.barongreenback.persistence.PersistenceUser;
 import com.googlecode.totallylazy.Closeables;
 
 import java.io.Closeable;

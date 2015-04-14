@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;

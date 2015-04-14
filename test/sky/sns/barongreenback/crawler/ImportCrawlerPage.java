@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;

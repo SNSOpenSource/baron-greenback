@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.crawler.executor;
+package sky.sns.barongreenback.crawler.executor;
 
-import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
+import sky.sns.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.utterlyidle.Application;
 
 import java.util.concurrent.Callable;

@@ -1,12 +1,12 @@
-package com.googlecode.barongreenback.shared;
+package sky.sns.barongreenback.shared;
 
-import com.googlecode.barongreenback.WebApplication;
-import com.googlecode.barongreenback.crawler.CrawlerConnectTimeout;
-import com.googlecode.barongreenback.crawler.CrawlerHttpClient;
-import com.googlecode.barongreenback.crawler.CrawlerImportPage;
-import com.googlecode.barongreenback.crawler.CrawlerListPage;
-import com.googlecode.barongreenback.crawler.CrawlerReadTimeout;
-import com.googlecode.barongreenback.schedules.ScheduleListPage;
+import sky.sns.barongreenback.WebApplication;
+import sky.sns.barongreenback.crawler.CrawlerConnectTimeout;
+import sky.sns.barongreenback.crawler.CrawlerHttpClient;
+import sky.sns.barongreenback.crawler.CrawlerImportPage;
+import sky.sns.barongreenback.crawler.CrawlerListPage;
+import sky.sns.barongreenback.crawler.CrawlerReadTimeout;
+import sky.sns.barongreenback.schedules.ScheduleListPage;
 import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Callable1;
@@ -38,7 +38,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
+import static sky.sns.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
 import static com.googlecode.utterlyidle.handlers.RoutingClient.allTrafficTo;
 import static com.googlecode.utterlyidle.html.Browser.browser;
 

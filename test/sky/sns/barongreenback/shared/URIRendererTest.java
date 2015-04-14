@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.shared;
+package sky.sns.barongreenback.shared;
 
 import org.junit.Test;
 

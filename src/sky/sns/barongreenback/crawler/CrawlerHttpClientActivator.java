@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
 import java.util.concurrent.Callable;
 

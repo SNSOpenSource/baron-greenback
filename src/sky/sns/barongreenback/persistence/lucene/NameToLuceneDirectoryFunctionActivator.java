@@ -1,11 +1,11 @@
-package com.googlecode.barongreenback.persistence.lucene;
+package sky.sns.barongreenback.persistence.lucene;
 
-import com.googlecode.barongreenback.persistence.PersistenceUri;
+import sky.sns.barongreenback.persistence.PersistenceUri;
 import com.googlecode.lazyrecords.lucene.NameToLuceneDirectoryFunction;
 
 import java.util.concurrent.Callable;
 
-import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.directoryActivatorFor;
+import static sky.sns.barongreenback.persistence.lucene.LucenePersistence.directoryActivatorFor;
 
 public class NameToLuceneDirectoryFunctionActivator implements Callable<NameToLuceneDirectoryFunction> {
 

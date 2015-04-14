@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.jobshistory;
+package sky.sns.barongreenback.jobshistory;
 
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Either;

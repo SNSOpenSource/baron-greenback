@@ -1,7 +1,7 @@
-package com.googlecode.barongreenback.crawler.executor;
+package sky.sns.barongreenback.crawler.executor;
 
-import com.googlecode.barongreenback.crawler.DataWriter;
-import com.googlecode.barongreenback.crawler.jobs.Job;
+import sky.sns.barongreenback.crawler.DataWriter;
+import sky.sns.barongreenback.crawler.jobs.Job;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.Application;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.googlecode.barongreenback.crawler.executor.CrawlerConfigValues.*;
+import static sky.sns.barongreenback.crawler.executor.CrawlerConfigValues.*;
 import static com.googlecode.totallylazy.Callables.value;
 import static com.googlecode.totallylazy.Closeables.safeClose;
 import static com.googlecode.totallylazy.Sequences.sequence;

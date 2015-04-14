@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.crawler.datasources.DataSource;
-import com.googlecode.barongreenback.crawler.jobs.Job;
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import sky.sns.barongreenback.crawler.datasources.DataSource;
+import sky.sns.barongreenback.crawler.jobs.Job;
+import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.*;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.totallylazy.Pair;

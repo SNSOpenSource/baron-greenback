@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
-import com.googlecode.barongreenback.shared.ModelRepository;
+import sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Pair;
@@ -14,8 +14,8 @@ import com.googlecode.utterlyidle.handlers.InvocationHandler;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.BatchCrawlerResource.forAll;
-import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
+import static sky.sns.barongreenback.crawler.BatchCrawlerResource.forAll;
+import static sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;

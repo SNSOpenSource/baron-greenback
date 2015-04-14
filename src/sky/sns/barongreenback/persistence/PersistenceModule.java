@@ -1,9 +1,9 @@
-package com.googlecode.barongreenback.persistence;
+package sky.sns.barongreenback.persistence;
 
-import com.googlecode.barongreenback.persistence.lucene.LuceneModule;
-import com.googlecode.barongreenback.persistence.sql.SqlModule;
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScopedModule;
+import sky.sns.barongreenback.persistence.lucene.LuceneModule;
+import sky.sns.barongreenback.persistence.sql.SqlModule;
+import sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
+import sky.sns.barongreenback.shared.BaronGreenbackRequestScopedModule;
 import com.googlecode.lazyrecords.IgnoreLogger;
 import com.googlecode.lazyrecords.Logger;
 import com.googlecode.lazyrecords.lucene.Persistence;

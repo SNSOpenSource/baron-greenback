@@ -1,13 +1,13 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.crawler.datasources.DataSource;
+import sky.sns.barongreenback.crawler.datasources.DataSource;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import org.junit.Test;
 
 import java.util.Set;
 
-import static com.googlecode.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
+import static sky.sns.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
 import static com.googlecode.totallylazy.Sequences.first;
 import static com.googlecode.totallylazy.Uri.uri;
 import static org.hamcrest.CoreMatchers.is;

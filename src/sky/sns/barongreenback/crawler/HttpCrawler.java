@@ -1,9 +1,9 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.crawler.datasources.DataSource;
-import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
-import com.googlecode.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
-import com.googlecode.barongreenback.shared.RecordDefinition;
+import sky.sns.barongreenback.crawler.datasources.DataSource;
+import sky.sns.barongreenback.crawler.datasources.HttpDataSource;
+import sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
+import sky.sns.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -13,7 +13,7 @@ import com.googlecode.yadic.Container;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.jobs.MasterPaginatedHttpJob.masterPaginatedHttpJob;
+import static sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob.masterPaginatedHttpJob;
 import static java.lang.String.format;
 
 public class HttpCrawler implements Crawler {

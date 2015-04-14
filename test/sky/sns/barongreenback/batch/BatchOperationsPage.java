@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.batch;
+package sky.sns.barongreenback.batch;
 
-import com.googlecode.barongreenback.shared.messages.Category;
+import sky.sns.barongreenback.shared.messages.Category;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;

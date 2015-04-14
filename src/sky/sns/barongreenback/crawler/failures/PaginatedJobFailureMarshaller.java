@@ -1,14 +1,14 @@
-package com.googlecode.barongreenback.crawler.failures;
+package sky.sns.barongreenback.crawler.failures;
 
-import com.googlecode.barongreenback.crawler.CheckpointHandler;
-import com.googlecode.barongreenback.crawler.CrawlerRepository;
-import com.googlecode.barongreenback.crawler.HttpVisitedFactory;
-import com.googlecode.barongreenback.crawler.jobs.PaginatedHttpJob;
+import sky.sns.barongreenback.crawler.CheckpointHandler;
+import sky.sns.barongreenback.crawler.CrawlerRepository;
+import sky.sns.barongreenback.crawler.HttpVisitedFactory;
+import sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.time.Clock;
 
-import static com.googlecode.barongreenback.crawler.failures.FailureRepository.DURATION;
-import static com.googlecode.barongreenback.crawler.failures.FailureRepository.REASON;
+import static sky.sns.barongreenback.crawler.failures.FailureRepository.DURATION;
+import static sky.sns.barongreenback.crawler.failures.FailureRepository.REASON;
 
 public class PaginatedJobFailureMarshaller extends AbstractFailureMarshaller {
 

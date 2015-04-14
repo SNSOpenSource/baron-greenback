@@ -1,10 +1,10 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.barongreenback.persistence.lucene.NameBasedIndexFacetingPolicy;
-import com.googlecode.barongreenback.shared.ApplicationTests;
-import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
-import com.googlecode.barongreenback.shared.ModelRepository;
+import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import sky.sns.barongreenback.persistence.lucene.NameBasedIndexFacetingPolicy;
+import sky.sns.barongreenback.shared.ApplicationTests;
+import sky.sns.barongreenback.shared.BaronGreenbackApplicationScope;
+import sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CompositeCrawlerTest.crawlOnePageOnly;
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.FIRST;
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.STATUS;
-import static com.googlecode.barongreenback.views.FacetSection.*;
-import static com.googlecode.barongreenback.views.ViewsRepository.*;
+import static sky.sns.barongreenback.crawler.CompositeCrawlerTest.crawlOnePageOnly;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.FIRST;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.STATUS;
+import static sky.sns.barongreenback.views.FacetSection.*;
+import static sky.sns.barongreenback.views.ViewsRepository.*;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keyword.methods.keywords;

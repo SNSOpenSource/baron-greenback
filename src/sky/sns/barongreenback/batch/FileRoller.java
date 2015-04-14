@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.batch;
+package sky.sns.barongreenback.batch;
 
 import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Runnables;

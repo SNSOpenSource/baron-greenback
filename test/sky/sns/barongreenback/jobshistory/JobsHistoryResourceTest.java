@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback.jobshistory;
+package sky.sns.barongreenback.jobshistory;
 
-import com.googlecode.barongreenback.shared.ApplicationTests;
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
-import com.googlecode.barongreenback.shared.DateRenderer;
+import sky.sns.barongreenback.shared.ApplicationTests;
+import sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
+import sky.sns.barongreenback.shared.DateRenderer;
 import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
@@ -42,9 +42,9 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static com.googlecode.barongreenback.jobshistory.JobsHistoryPage.JobHistoryItem.functions.timestamp;
-import static com.googlecode.barongreenback.jobshistory.JobsHistoryResource.queryForOlderThan;
-import static com.googlecode.barongreenback.shared.DateRenderer.DEFAULT_DATE_FORMAT;
+import static sky.sns.barongreenback.jobshistory.JobsHistoryPage.JobHistoryItem.functions.timestamp;
+import static sky.sns.barongreenback.jobshistory.JobsHistoryResource.queryForOlderThan;
+import static sky.sns.barongreenback.shared.DateRenderer.DEFAULT_DATE_FORMAT;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.trim;
 import static com.googlecode.totallylazy.proxy.Call.method;

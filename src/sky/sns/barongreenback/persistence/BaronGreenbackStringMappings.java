@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.persistence;
+package sky.sns.barongreenback.persistence;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.mappings.StringMapping;

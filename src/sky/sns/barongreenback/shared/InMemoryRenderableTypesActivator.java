@@ -1,7 +1,7 @@
-package com.googlecode.barongreenback.shared;
+package sky.sns.barongreenback.shared;
 
-import com.googlecode.barongreenback.jobshistory.JobId;
-import com.googlecode.barongreenback.jobshistory.JobsHistoryResource;
+import sky.sns.barongreenback.jobshistory.JobId;
+import sky.sns.barongreenback.jobshistory.JobsHistoryResource;
 import com.googlecode.funclate.Renderer;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.Redirector;

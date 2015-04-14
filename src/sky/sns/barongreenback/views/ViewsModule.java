@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
-import com.googlecode.barongreenback.search.RecordsService;
+import sky.sns.barongreenback.search.RecordsService;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;
 import com.googlecode.utterlyidle.modules.RequestScopedModule;

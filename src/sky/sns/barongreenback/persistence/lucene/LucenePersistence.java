@@ -1,15 +1,15 @@
-package com.googlecode.barongreenback.persistence.lucene;
+package sky.sns.barongreenback.persistence.lucene;
 
-import com.googlecode.barongreenback.persistence.PersistenceModule;
+import sky.sns.barongreenback.persistence.PersistenceModule;
 import com.googlecode.totallylazy.Function1;
 import org.apache.lucene.store.Directory;
 
 import java.io.File;
 
-import static com.googlecode.barongreenback.persistence.lucene.DirectoryType.Memory;
-import static com.googlecode.barongreenback.persistence.lucene.DirectoryType.Nio;
-import static com.googlecode.barongreenback.persistence.lucene.LuceneModule.fileUrl;
-import static com.googlecode.barongreenback.persistence.lucene.LuceneModule.lucene;
+import static sky.sns.barongreenback.persistence.lucene.DirectoryType.Memory;
+import static sky.sns.barongreenback.persistence.lucene.DirectoryType.Nio;
+import static sky.sns.barongreenback.persistence.lucene.LuceneModule.fileUrl;
+import static sky.sns.barongreenback.persistence.lucene.LuceneModule.lucene;
 import static com.googlecode.lazyrecords.lucene.PartitionedIndex.functions.mmapDirectory;
 import static com.googlecode.lazyrecords.lucene.PartitionedIndex.functions.nioDirectory;
 import static com.googlecode.lazyrecords.lucene.PartitionedIndex.functions.ramDirectory;

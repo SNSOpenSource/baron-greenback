@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback;
+package sky.sns.barongreenback;
 
-import com.googlecode.barongreenback.persistence.PersistenceUri;
-import com.googlecode.barongreenback.persistence.lucene.NameBasedIndexFacetingPolicy;
-import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
+import sky.sns.barongreenback.persistence.PersistenceUri;
+import sky.sns.barongreenback.persistence.lucene.NameBasedIndexFacetingPolicy;
+import sky.sns.barongreenback.shared.BaronGreenbackApplicationScope;
 import com.googlecode.lazyrecords.lucene.FieldBasedFacetingPolicy;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.Application;
@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.Properties;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.luceneDirectory;
+import static sky.sns.barongreenback.persistence.lucene.LucenePersistence.luceneDirectory;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;

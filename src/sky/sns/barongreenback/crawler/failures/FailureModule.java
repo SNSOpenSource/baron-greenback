@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler.failures;
+package sky.sns.barongreenback.crawler.failures;
 
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;

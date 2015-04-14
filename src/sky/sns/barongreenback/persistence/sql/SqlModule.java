@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.persistence.sql;
+package sky.sns.barongreenback.persistence.sql;
 
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
+import sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.Schema;
 import com.googlecode.lazyrecords.SchemaGeneratingRecords;

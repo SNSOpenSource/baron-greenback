@@ -1,7 +1,7 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.crawler.datasources.DataSource;
-import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
+import sky.sns.barongreenback.crawler.datasources.DataSource;
+import sky.sns.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Value;
 
 import java.util.Map;

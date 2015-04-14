@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.batch;
+package sky.sns.barongreenback.batch;
 
 import java.util.concurrent.Callable;
 

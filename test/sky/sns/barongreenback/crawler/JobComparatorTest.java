@@ -1,20 +1,20 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.crawler.jobs.HttpJob;
-import com.googlecode.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
-import com.googlecode.barongreenback.crawler.jobs.PaginatedHttpJob;
+import sky.sns.barongreenback.crawler.jobs.HttpJob;
+import sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
+import sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Sequence;
 import org.junit.Test;
 
 import java.util.Date;
 
-import static com.googlecode.barongreenback.crawler.jobs.HttpJob.httpJob;
-import static com.googlecode.barongreenback.crawler.jobs.MasterPaginatedHttpJob.masterPaginatedHttpJob;
-import static com.googlecode.barongreenback.crawler.jobs.JobComparator.masterJobsFirst;
-import static com.googlecode.barongreenback.crawler.jobs.JobComparator.masterJobsThenNewest;
-import static com.googlecode.barongreenback.crawler.jobs.JobComparator.newestJobsFirst;
-import static com.googlecode.barongreenback.crawler.jobs.PaginatedHttpJob.paginatedHttpJob;
+import static sky.sns.barongreenback.crawler.jobs.HttpJob.httpJob;
+import static sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob.masterPaginatedHttpJob;
+import static sky.sns.barongreenback.crawler.jobs.JobComparator.masterJobsFirst;
+import static sky.sns.barongreenback.crawler.jobs.JobComparator.masterJobsThenNewest;
+import static sky.sns.barongreenback.crawler.jobs.JobComparator.newestJobsFirst;
+import static sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob.paginatedHttpJob;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.matchers.Matchers.is;

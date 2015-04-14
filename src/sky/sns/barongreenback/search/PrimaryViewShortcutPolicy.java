@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.shared.ModelRepository;
+import sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Function1;
@@ -10,7 +10,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 
-import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
+import static sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.funclate.Model.functions.value;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;

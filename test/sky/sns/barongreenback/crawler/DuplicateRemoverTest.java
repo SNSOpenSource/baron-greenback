@@ -1,11 +1,11 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import org.junit.Test;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ATOM_DEFINITION;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.ATOM_DEFINITION;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

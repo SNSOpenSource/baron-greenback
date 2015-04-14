@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.barongreenback.persistence.ModelMapping;
-import com.googlecode.barongreenback.shared.RecordsModelRepository;
+import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import sky.sns.barongreenback.persistence.ModelMapping;
+import sky.sns.barongreenback.shared.RecordsModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.mappings.StringMappings;

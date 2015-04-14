@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.BaronGreenbackProperties;
+import sky.sns.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Value;
 
 import static java.lang.Integer.parseInt;

@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.schedules;
+package sky.sns.barongreenback.schedules;
 
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;

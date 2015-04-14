@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.shared.InMemoryRenderableTypes;
+import sky.sns.barongreenback.shared.InMemoryRenderableTypes;
 import com.googlecode.funclate.Renderer;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.io.StringWriter;
 
-import static com.googlecode.barongreenback.search.CsvWriter.ROW_SEPARATOR;
+import static sky.sns.barongreenback.search.CsvWriter.ROW_SEPARATOR;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Sequences.sequence;

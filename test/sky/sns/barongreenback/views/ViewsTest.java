@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keywords;

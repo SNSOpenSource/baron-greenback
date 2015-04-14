@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler.executor;
+package sky.sns.barongreenback.crawler.executor;
 
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ApplicationScopedModule;

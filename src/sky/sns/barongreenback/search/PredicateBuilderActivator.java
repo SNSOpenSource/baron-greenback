@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.shared.BaronGreenbackRequestScope;
+import sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
 
 import java.util.concurrent.Callable;
 

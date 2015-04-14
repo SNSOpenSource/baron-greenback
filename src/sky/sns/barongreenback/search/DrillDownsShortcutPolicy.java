@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
 public class DrillDownsShortcutPolicy implements ShortcutPolicy {
 

@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.schedules.ScheduleListPage;
+import sky.sns.barongreenback.schedules.ScheduleListPage;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Request;

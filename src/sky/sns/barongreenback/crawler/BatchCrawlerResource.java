@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.ModelRepository;
+import sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.*;
@@ -12,9 +12,9 @@ import com.googlecode.utterlyidle.schedules.ScheduleResource;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CrawlerDefinitionResource.scheduleAQueuedCrawl;
-import static com.googlecode.barongreenback.crawler.CrawlerRepository.predicates.enabled;
-import static com.googlecode.barongreenback.shared.ModelRepository.MODEL_TYPE;
+import static sky.sns.barongreenback.crawler.CrawlerDefinitionResource.scheduleAQueuedCrawl;
+import static sky.sns.barongreenback.crawler.CrawlerRepository.predicates.enabled;
+import static sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;

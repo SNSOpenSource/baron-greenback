@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.barongreenback.shared.ModelRepository;
-import com.googlecode.barongreenback.views.ViewsRepository;
+import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import sky.sns.barongreenback.shared.ModelRepository;
+import sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.AliasedKeyword;
 import com.googlecode.lazyrecords.Definition;
@@ -11,9 +11,9 @@ import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.*;
 
-import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
-import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
-import static com.googlecode.barongreenback.views.ViewsRepository.viewName;
+import static sky.sns.barongreenback.shared.RecordDefinition.toKeywords;
+import static sky.sns.barongreenback.views.ViewsRepository.unwrap;
+import static sky.sns.barongreenback.views.ViewsRepository.viewName;
 import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Callables.ignoreAndReturn;
 import static com.googlecode.totallylazy.Either.right;

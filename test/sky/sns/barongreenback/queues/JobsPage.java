@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.queues;
+package sky.sns.barongreenback.queues;
 
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.HttpHandler;

@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.persistence.lucene;
+package sky.sns.barongreenback.persistence.lucene;
 
 import com.googlecode.lazyrecords.lucene.FieldBasedFacetingPolicy;
 import com.googlecode.lazyrecords.lucene.LucenePartitionedIndex;
@@ -15,8 +15,8 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.file.Path;
 
-import static com.googlecode.barongreenback.persistence.lucene.LucenePersistence.directoryActivatorFor;
-import static com.googlecode.barongreenback.persistence.lucene.TaxonomyNameToLuceneStorageFunction.TAXONOMY_SUFFIX;
+import static sky.sns.barongreenback.persistence.lucene.LucenePersistence.directoryActivatorFor;
+import static sky.sns.barongreenback.persistence.lucene.TaxonomyNameToLuceneStorageFunction.TAXONOMY_SUFFIX;
 import static com.googlecode.totallylazy.Predicates.alwaysFalse;
 import static com.googlecode.totallylazy.Predicates.is;
 import static java.nio.file.Files.createTempDirectory;

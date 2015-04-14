@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.persistence.lucene;
+package sky.sns.barongreenback.persistence.lucene;
 
-import com.googlecode.barongreenback.shared.BaronGreenbackApplicationScope;
+import sky.sns.barongreenback.shared.BaronGreenbackApplicationScope;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.yadic.Container;
 import org.apache.lucene.store.Directory;

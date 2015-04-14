@@ -1,7 +1,7 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.RecordDefinition;
-import com.googlecode.barongreenback.shared.RecordDefinitionActivator;
+import sky.sns.barongreenback.shared.RecordDefinition;
+import sky.sns.barongreenback.shared.RecordDefinitionActivator;
 import com.googlecode.totallylazy.StringPrintStream;
 import com.googlecode.utterlyidle.Resources;
 import com.googlecode.utterlyidle.modules.ArgumentScopedModule;

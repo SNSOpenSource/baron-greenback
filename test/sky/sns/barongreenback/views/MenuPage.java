@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
-import com.googlecode.barongreenback.search.SearchPage;
+import sky.sns.barongreenback.search.SearchPage;
 import com.googlecode.utterlyidle.HttpHandler;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;

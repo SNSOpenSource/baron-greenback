@@ -1,8 +1,8 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.shared.pager.Pager;
-import com.googlecode.barongreenback.shared.sorter.Sorter;
-import com.googlecode.barongreenback.views.ViewsRepository;
+import sky.sns.barongreenback.shared.pager.Pager;
+import sky.sns.barongreenback.shared.sorter.Sorter;
+import sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.AliasedKeyword;
 import com.googlecode.lazyrecords.Definition;
@@ -48,11 +48,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.googlecode.barongreenback.search.RecordsService.unalias;
-import static com.googlecode.barongreenback.search.RecordsService.visibleHeaders;
-import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
-import static com.googlecode.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
-import static com.googlecode.barongreenback.views.ViewsRepository.unwrap;
+import static sky.sns.barongreenback.search.RecordsService.unalias;
+import static sky.sns.barongreenback.search.RecordsService.visibleHeaders;
+import static sky.sns.barongreenback.shared.RecordDefinition.toKeywords;
+import static sky.sns.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
+import static sky.sns.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.functions.value;
 import static com.googlecode.funclate.Model.methods.merge;
 import static com.googlecode.funclate.Model.mutable.model;

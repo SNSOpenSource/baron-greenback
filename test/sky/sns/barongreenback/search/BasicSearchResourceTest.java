@@ -1,11 +1,11 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.crawler.CompositeCrawlerTest;
-import com.googlecode.barongreenback.crawler.CrawlerTests;
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.barongreenback.shared.ApplicationTests;
-import com.googlecode.barongreenback.shared.ModelRepository;
-import com.googlecode.barongreenback.views.ViewsRepository;
+import sky.sns.barongreenback.crawler.CompositeCrawlerTest;
+import sky.sns.barongreenback.crawler.CrawlerTests;
+import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import sky.sns.barongreenback.shared.ApplicationTests;
+import sky.sns.barongreenback.shared.ModelRepository;
+import sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -34,8 +34,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ID;
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.TITLE;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.ID;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.TITLE;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keyword.methods.keywords;

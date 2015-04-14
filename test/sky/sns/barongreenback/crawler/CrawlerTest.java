@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.ApplicationTests;
+import sky.sns.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;

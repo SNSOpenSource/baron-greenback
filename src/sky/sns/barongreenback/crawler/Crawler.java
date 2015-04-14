@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.RecordDefinition;
+import sky.sns.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -10,9 +10,9 @@ import com.googlecode.totallylazy.Uri;
 import java.util.List;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.DuplicateRemover.ignoreAlias;
-import static com.googlecode.barongreenback.shared.RecordDefinition.convert;
-import static com.googlecode.barongreenback.shared.RecordDefinition.toKeywords;
+import static sky.sns.barongreenback.crawler.DuplicateRemover.ignoreAlias;
+import static sky.sns.barongreenback.shared.RecordDefinition.convert;
+import static sky.sns.barongreenback.shared.RecordDefinition.toKeywords;
 import static com.googlecode.totallylazy.Uri.uri;
 
 public interface Crawler {

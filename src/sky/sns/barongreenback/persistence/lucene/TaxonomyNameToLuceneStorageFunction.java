@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.persistence.lucene;
+package sky.sns.barongreenback.persistence.lucene;
 
 import com.googlecode.lazyrecords.lucene.FieldBasedFacetingPolicy;
 import com.googlecode.lazyrecords.lucene.LuceneStorage;

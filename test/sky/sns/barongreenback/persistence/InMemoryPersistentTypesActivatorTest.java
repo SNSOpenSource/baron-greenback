@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.persistence;
+package sky.sns.barongreenback.persistence;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;

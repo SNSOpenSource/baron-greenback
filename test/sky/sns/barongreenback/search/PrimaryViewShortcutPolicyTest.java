@@ -1,10 +1,10 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
-import com.googlecode.barongreenback.persistence.InMemoryPersistentTypes;
-import com.googlecode.barongreenback.persistence.ModelMapping;
-import com.googlecode.barongreenback.shared.RecordsModelRepository;
-import com.googlecode.barongreenback.views.ViewsRepository;
+import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import sky.sns.barongreenback.persistence.InMemoryPersistentTypes;
+import sky.sns.barongreenback.persistence.ModelMapping;
+import sky.sns.barongreenback.shared.RecordsModelRepository;
+import sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
+import static sky.sns.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static org.hamcrest.MatcherAssert.assertThat;

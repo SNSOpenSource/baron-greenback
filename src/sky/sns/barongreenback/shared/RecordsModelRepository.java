@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.shared;
+package sky.sns.barongreenback.shared;
 
-import com.googlecode.barongreenback.persistence.BaronGreenbackRecords;
+import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;

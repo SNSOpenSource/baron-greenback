@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.shared.RecordDefinition;
+import sky.sns.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Sequence;
 

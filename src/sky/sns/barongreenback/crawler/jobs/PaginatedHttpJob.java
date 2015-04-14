@@ -1,9 +1,9 @@
-package com.googlecode.barongreenback.crawler.jobs;
+package sky.sns.barongreenback.crawler.jobs;
 
-import com.googlecode.barongreenback.crawler.CheckpointStopper;
-import com.googlecode.barongreenback.crawler.CompositeCrawler;
-import com.googlecode.barongreenback.crawler.datasources.DataSource;
-import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
+import sky.sns.barongreenback.crawler.CheckpointStopper;
+import sky.sns.barongreenback.crawler.CompositeCrawler;
+import sky.sns.barongreenback.crawler.datasources.DataSource;
+import sky.sns.barongreenback.crawler.datasources.HttpDataSource;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
@@ -23,9 +23,9 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.crawler.CheckpointStopper.matchesCurrentCheckpoint;
-import static com.googlecode.barongreenback.crawler.DataTransformer.loadDocument;
-import static com.googlecode.barongreenback.crawler.DataTransformer.transformData;
+import static sky.sns.barongreenback.crawler.CheckpointStopper.matchesCurrentCheckpoint;
+import static sky.sns.barongreenback.crawler.DataTransformer.loadDocument;
+import static sky.sns.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.is;

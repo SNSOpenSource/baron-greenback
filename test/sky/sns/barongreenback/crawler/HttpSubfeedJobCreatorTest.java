@@ -1,10 +1,10 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
-import com.googlecode.barongreenback.crawler.datasources.DataSource;
-import com.googlecode.barongreenback.crawler.datasources.HttpDataSource;
-import com.googlecode.barongreenback.crawler.jobs.HttpSubfeedJobCreator;
-import com.googlecode.barongreenback.crawler.jobs.Job;
-import com.googlecode.barongreenback.shared.RecordDefinition;
+import sky.sns.barongreenback.crawler.datasources.DataSource;
+import sky.sns.barongreenback.crawler.datasources.HttpDataSource;
+import sky.sns.barongreenback.crawler.jobs.HttpSubfeedJobCreator;
+import sky.sns.barongreenback.crawler.jobs.Job;
+import sky.sns.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.UUID;
 
-import static com.googlecode.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
+import static sky.sns.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keywords.unique;

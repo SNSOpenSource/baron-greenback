@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.search;
+package sky.sns.barongreenback.search;
 
-import com.googlecode.barongreenback.persistence.InMemoryPersistentTypes;
+import sky.sns.barongreenback.persistence.InMemoryPersistentTypes;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.mappings.StringMappings;
@@ -12,8 +12,8 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import org.junit.Test;
 
-import static com.googlecode.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
-import static com.googlecode.barongreenback.search.DrillDowns.drillDowns;
+import static sky.sns.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
+import static sky.sns.barongreenback.search.DrillDowns.drillDowns;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static java.util.Arrays.asList;

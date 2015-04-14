@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -8,7 +8,7 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Unchecked;
 
-import static com.googlecode.barongreenback.shared.RecordDefinition.priority;
+import static sky.sns.barongreenback.shared.RecordDefinition.priority;
 import static com.googlecode.lazyrecords.Keyword.methods.matchKeyword;
 import static com.googlecode.totallylazy.Sequences.reduce;
 import static com.googlecode.totallylazy.comparators.NullComparator.Direction.Up;

@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler.executor;
+package sky.sns.barongreenback.crawler.executor;
 
 import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Callable1;
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.googlecode.barongreenback.crawler.executor.Queues.functions;
+import static sky.sns.barongreenback.crawler.executor.Queues.functions;
 import static com.googlecode.totallylazy.Callers.call;
 import static com.googlecode.totallylazy.LazyException.lazyException;
 import static com.googlecode.totallylazy.Sequences.sequence;

@@ -1,7 +1,7 @@
-package com.googlecode.barongreenback.views;
+package sky.sns.barongreenback.views;
 
-import com.googlecode.barongreenback.search.DrillDowns;
-import com.googlecode.barongreenback.search.DrillDownsActivator;
+import sky.sns.barongreenback.search.DrillDowns;
+import sky.sns.barongreenback.search.DrillDownsActivator;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.FIRST;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.FIRST;
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.proxy.Call.method;

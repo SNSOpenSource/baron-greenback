@@ -1,6 +1,6 @@
-package com.googlecode.barongreenback.shared;
+package sky.sns.barongreenback.shared;
 
-import com.googlecode.barongreenback.persistence.PersistentTypes;
+import sky.sns.barongreenback.persistence.PersistentTypes;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequences;

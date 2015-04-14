@@ -1,4 +1,4 @@
-package com.googlecode.barongreenback.crawler;
+package sky.sns.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Sequence;
@@ -7,10 +7,10 @@ import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ATOM_DEFINITION;
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.FIRST;
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.ID;
-import static com.googlecode.barongreenback.crawler.CrawlerTestFixtures.USER_ID;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.ATOM_DEFINITION;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.FIRST;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.ID;
+import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.USER_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
