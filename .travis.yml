@@ -5,4 +5,6 @@ script: "ant"
 env:
   global:
   - build.number=1.$TRAVIS_BUILD_NUMBER
-
+  - BINTRAY_KEY=276298114650ddba4c0fa6da8e672d6999cbef3d
+after_success:
+  - curl -T build/artifacts/baron-greenback-${build.number}.jar -uspmiller:$BINTRAY_KEY https://api.bintray.com/content/sns/baron-greenback/sns/sky/sns/baron-greenback/baron-greenback/${build.number}/baron-greenback-${build.number}.jar?publish=1
