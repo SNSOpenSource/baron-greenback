@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
+echo "Deploying to bintray"
+
 shopt -s nullglob
 for f in artifacts/baron-greenback-$BUILD_NUMBER*
 do
