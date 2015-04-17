@@ -1,8 +1,9 @@
 language: java
 jdk:
 - oraclejdk7
-script: ant -DBUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
-after_success:
-- secure: JUFcrRexSZCndh8ZGn1+tcCgYMCWvR7m3LmpojUtpAE1phO8/EeZA4IKsFd27DG+dNzHffrY5HiEL3VFACZrJE7kT7Fm1Hb1ExMdY9LYTJum1TkmtLExrdDI9wMF713F/AV5w/Ro0crL1jie323IQ28/NAxisVrkVvAAy+ZqX90=
-- BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
-- ./build/bintrayUpload.sh
+script: ant -DBUILD_NUMBER=$BUILD_NUMBER
+after_success: ./build/bintrayUpload.sh
+env:
+  global:
+	  - BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
+	  - secure: JUFcrRexSZCndh8ZGn1+tcCgYMCWvR7m3LmpojUtpAE1phO8/EeZA4IKsFd27DG+dNzHffrY5HiEL3VFACZrJE7kT7Fm1Hb1ExMdY9LYTJum1TkmtLExrdDI9wMF713F/AV5w/Ro0crL1jie323IQ28/NAxisVrkVvAAy+ZqX90=
