@@ -1,15 +1,15 @@
-package sky.sns.barongreenback.batch;
+package com.sky.sns.barongreenback.batch;
 
-import sky.sns.barongreenback.crawler.CrawlerListPage;
-import sky.sns.barongreenback.crawler.ImportCrawlerPage;
-import sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.crawler.CrawlerListPage;
+import com.sky.sns.barongreenback.crawler.ImportCrawlerPage;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.File;
 
-import static sky.sns.barongreenback.crawler.CrawlerTests.contentOf;
-import static sky.sns.barongreenback.shared.messages.Category.SUCCESS;
+import static com.sky.sns.barongreenback.crawler.CrawlerTests.contentOf;
+import static com.sky.sns.barongreenback.shared.messages.Category.SUCCESS;
 import static com.googlecode.totallylazy.Files.delete;
 import static com.googlecode.totallylazy.Files.randomFilename;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;

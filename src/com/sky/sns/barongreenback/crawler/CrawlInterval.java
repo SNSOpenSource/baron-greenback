@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.shared.BaronGreenbackProperties;
+import com.sky.sns.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Value;
 
 public class CrawlInterval implements Value<Long> {

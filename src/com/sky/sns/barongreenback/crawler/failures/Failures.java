@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler.failures;
+package com.sky.sns.barongreenback.crawler.failures;
 
-import sky.sns.barongreenback.crawler.StatusMonitor;
+import com.sky.sns.barongreenback.crawler.StatusMonitor;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Option;
@@ -10,7 +10,7 @@ import com.googlecode.yadic.Container;
 
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.failures.FailureRepository.ID;
+import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.ID;
 import static com.googlecode.totallylazy.Predicates.all;
 
 public class Failures implements StatusMonitor {

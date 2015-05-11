@@ -1,8 +1,8 @@
-package sky.sns.barongreenback.crawler.failures;
+package com.sky.sns.barongreenback.crawler.failures;
 
-import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
-import sky.sns.barongreenback.shared.Finder;
-import sky.sns.barongreenback.shared.Repository;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.shared.Finder;
+import com.sky.sns.barongreenback.shared.Repository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;

@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.persistence;
+package com.sky.sns.barongreenback.persistence;
 
-import sky.sns.barongreenback.jobshistory.JobId;
+import com.sky.sns.barongreenback.jobshistory.JobId;
 import com.googlecode.lazyrecords.mappings.LexicalLongMapping;
 import com.googlecode.lazyrecords.mappings.LongMapping;
 import com.googlecode.lazyrecords.mappings.StringMapping;

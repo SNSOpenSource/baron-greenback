@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.shared.RecordDefinition;
+import com.sky.sns.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -8,7 +8,7 @@ import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
 
-import static sky.sns.barongreenback.shared.RecordDefinition.uniqueFields;
+import static com.sky.sns.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.SelectCallable.select;
 

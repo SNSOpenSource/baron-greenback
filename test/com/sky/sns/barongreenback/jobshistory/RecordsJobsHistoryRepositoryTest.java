@@ -1,10 +1,10 @@
-package sky.sns.barongreenback.jobshistory;
+package com.sky.sns.barongreenback.jobshistory;
 
-import sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
-import sky.sns.barongreenback.persistence.InMemoryPersistentTypesActivator;
-import sky.sns.barongreenback.search.ParserUkDateConverter;
-import sky.sns.barongreenback.search.PredicateBuilder;
-import sky.sns.barongreenback.search.StandardParserActivator;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
+import com.sky.sns.barongreenback.persistence.InMemoryPersistentTypesActivator;
+import com.sky.sns.barongreenback.search.ParserUkDateConverter;
+import com.sky.sns.barongreenback.search.PredicateBuilder;
+import com.sky.sns.barongreenback.search.StandardParserActivator;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import com.googlecode.lazyrecords.parser.PredicateParser;
@@ -14,8 +14,8 @@ import org.junit.Test;
 import java.util.Date;
 import java.util.UUID;
 
-import static sky.sns.barongreenback.persistence.BaronGreenbackRecords.records;
-import static sky.sns.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
+import static com.sky.sns.barongreenback.persistence.BaronGreenbackRecords.records;
+import static com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings.baronGreenbackStringMappings;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static java.lang.String.format;

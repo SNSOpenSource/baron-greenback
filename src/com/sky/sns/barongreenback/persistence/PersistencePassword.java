@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.persistence;
+package com.sky.sns.barongreenback.persistence;
 
-import sky.sns.barongreenback.shared.BaronGreenbackProperties;
+import com.sky.sns.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Value;
 
 public class PersistencePassword implements Value<String> {

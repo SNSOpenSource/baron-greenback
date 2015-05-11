@@ -1,7 +1,7 @@
-package sky.sns.barongreenback.crawler.jobs;
+package com.sky.sns.barongreenback.crawler.jobs;
 
-import sky.sns.barongreenback.crawler.datasources.DataSource;
-import sky.sns.barongreenback.crawler.datasources.HttpDataSource;
+import com.sky.sns.barongreenback.crawler.datasources.DataSource;
+import com.sky.sns.barongreenback.crawler.datasources.HttpDataSource;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.DataTransformer.loadDocument;
-import static sky.sns.barongreenback.crawler.DataTransformer.transformData;
+import static com.sky.sns.barongreenback.crawler.DataTransformer.loadDocument;
+import static com.sky.sns.barongreenback.crawler.DataTransformer.transformData;
 import static com.googlecode.funclate.Model.persistent.model;
 
 public class HttpJob implements Job {

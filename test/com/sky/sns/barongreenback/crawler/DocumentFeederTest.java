@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Predicates;
@@ -13,9 +13,9 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.ATOM_DEFINITION;
-import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.ENTRY_DEFINITION;
-import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.FIRST;
+import static com.sky.sns.barongreenback.crawler.CrawlerTestFixtures.ATOM_DEFINITION;
+import static com.sky.sns.barongreenback.crawler.CrawlerTestFixtures.ENTRY_DEFINITION;
+import static com.sky.sns.barongreenback.crawler.CrawlerTestFixtures.FIRST;
 import static com.googlecode.totallylazy.Uri.uri;
 import static com.googlecode.totallylazy.Xml.document;
 import static com.googlecode.totallylazy.matchers.NumberMatcher.is;

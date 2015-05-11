@@ -1,13 +1,13 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.schedules.ScheduleListPage;
-import sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.schedules.ScheduleListPage;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
 import com.googlecode.utterlyidle.handlers.HttpClient;
 import org.junit.Test;
 
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.CrawlerTests.contentOf;
+import static com.sky.sns.barongreenback.crawler.CrawlerTests.contentOf;
 import static java.util.UUID.randomUUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;

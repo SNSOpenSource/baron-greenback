@@ -1,8 +1,8 @@
-package sky.sns.barongreenback.views;
+package com.sky.sns.barongreenback.views;
 
-import sky.sns.barongreenback.EndToEndTest;
-import sky.sns.barongreenback.search.ViewSearchPage;
-import sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.EndToEndTest;
+import com.sky.sns.barongreenback.search.ViewSearchPage;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import org.junit.Test;
 

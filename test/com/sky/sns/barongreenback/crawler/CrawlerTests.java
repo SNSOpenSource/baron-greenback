@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.Uri;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;

@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.shared.pager;
+package com.sky.sns.barongreenback.shared.pager;
 
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.matchers.NumberMatcher;

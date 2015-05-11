@@ -1,17 +1,17 @@
-package sky.sns.barongreenback.crawler.failures;
+package com.sky.sns.barongreenback.crawler.failures;
 
-import sky.sns.barongreenback.crawler.CheckpointHandler;
-import sky.sns.barongreenback.crawler.Crawler;
-import sky.sns.barongreenback.crawler.CrawlerRepository;
-import sky.sns.barongreenback.crawler.CrawlerTests;
-import sky.sns.barongreenback.crawler.HttpVisitedFactory;
-import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
-import sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
-import sky.sns.barongreenback.persistence.InMemoryPersistentTypesActivator;
-import sky.sns.barongreenback.persistence.ModelMapping;
-import sky.sns.barongreenback.persistence.PersistentTypes;
-import sky.sns.barongreenback.shared.ModelRepository;
-import sky.sns.barongreenback.shared.RecordsModelRepository;
+import com.sky.sns.barongreenback.crawler.CheckpointHandler;
+import com.sky.sns.barongreenback.crawler.Crawler;
+import com.sky.sns.barongreenback.crawler.CrawlerRepository;
+import com.sky.sns.barongreenback.crawler.CrawlerTests;
+import com.sky.sns.barongreenback.crawler.HttpVisitedFactory;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
+import com.sky.sns.barongreenback.persistence.InMemoryPersistentTypesActivator;
+import com.sky.sns.barongreenback.persistence.ModelMapping;
+import com.sky.sns.barongreenback.persistence.PersistentTypes;
+import com.sky.sns.barongreenback.shared.ModelRepository;
+import com.sky.sns.barongreenback.shared.RecordsModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
@@ -29,11 +29,11 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
-import static sky.sns.barongreenback.crawler.jobs.HttpJob.httpJob;
-import static sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob.masterPaginatedHttpJob;
-import static sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob.paginatedHttpJob;
-import static sky.sns.barongreenback.crawler.HttpVisitedFactory.visitedFactory;
+import static com.sky.sns.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
+import static com.sky.sns.barongreenback.crawler.jobs.HttpJob.httpJob;
+import static com.sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob.masterPaginatedHttpJob;
+import static com.sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob.paginatedHttpJob;
+import static com.sky.sns.barongreenback.crawler.HttpVisitedFactory.visitedFactory;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Uri.uri;

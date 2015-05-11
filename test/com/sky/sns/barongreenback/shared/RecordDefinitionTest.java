@@ -1,7 +1,7 @@
-package sky.sns.barongreenback.shared;
+package com.sky.sns.barongreenback.shared;
 
-import sky.sns.barongreenback.crawler.Crawler;
-import sky.sns.barongreenback.crawler.CrawlerTestFixtures;
+import com.sky.sns.barongreenback.crawler.Crawler;
+import com.sky.sns.barongreenback.crawler.CrawlerTestFixtures;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.matchers.NumberMatcher;

@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.shared.pager;
+package com.sky.sns.barongreenback.shared.pager;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.funclate.Renderer;

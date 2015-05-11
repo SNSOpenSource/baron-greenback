@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.persistence;
+package com.sky.sns.barongreenback.persistence;
 
-import sky.sns.barongreenback.shared.BaronGreenbackProperties;
+import com.sky.sns.barongreenback.shared.BaronGreenbackProperties;
 import com.googlecode.totallylazy.Uri;
 
 import java.util.Properties;

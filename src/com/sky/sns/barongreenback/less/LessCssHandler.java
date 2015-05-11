@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.less;
+package com.sky.sns.barongreenback.less;
 
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Function;
@@ -16,8 +16,8 @@ import com.googlecode.utterlyidle.rendering.ExceptionRenderer;
 import java.io.IOException;
 import java.util.Date;
 
-import static sky.sns.barongreenback.less.CompiledLess.functions.less;
-import static sky.sns.barongreenback.less.CompiledLess.functions.stale;
+import static com.sky.sns.barongreenback.less.CompiledLess.functions.less;
+import static com.sky.sns.barongreenback.less.CompiledLess.functions.stale;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.utterlyidle.HttpHeaders.LAST_MODIFIED;
 import static com.googlecode.utterlyidle.RequestBuilder.get;

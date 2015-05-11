@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.crawler.failures.FailureHandler;
+import com.sky.sns.barongreenback.crawler.failures.FailureHandler;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.handlers.Auditor;
 import com.googlecode.utterlyidle.handlers.PrintAuditor;

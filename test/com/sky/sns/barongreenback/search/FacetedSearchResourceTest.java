@@ -1,11 +1,11 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
-import sky.sns.barongreenback.crawler.CompositeCrawlerTest;
-import sky.sns.barongreenback.crawler.CrawlerTests;
-import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
-import sky.sns.barongreenback.shared.ApplicationTests;
-import sky.sns.barongreenback.shared.ModelRepository;
-import sky.sns.barongreenback.views.ViewsRepository;
+import com.sky.sns.barongreenback.crawler.CompositeCrawlerTest;
+import com.sky.sns.barongreenback.crawler.CrawlerTests;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.shared.ModelRepository;
+import com.sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static sky.sns.barongreenback.search.DrillDowns.drillDowns;
+import static com.sky.sns.barongreenback.search.DrillDowns.drillDowns;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.lazyrecords.Keyword.methods.keywords;

@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.views;
+package com.sky.sns.barongreenback.views;
 
 import com.googlecode.lazyrecords.FacetedRecords;
 import com.googlecode.utterlyidle.Resources;

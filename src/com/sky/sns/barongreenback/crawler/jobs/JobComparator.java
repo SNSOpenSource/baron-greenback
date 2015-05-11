@@ -1,12 +1,12 @@
-package sky.sns.barongreenback.crawler.jobs;
+package com.sky.sns.barongreenback.crawler.jobs;
 
-import sky.sns.barongreenback.crawler.jobs.Job;
-import sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
-import sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob;
+import com.sky.sns.barongreenback.crawler.jobs.Job;
+import com.sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
+import com.sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob;
 
 import java.util.Comparator;
 
-import static sky.sns.barongreenback.crawler.jobs.Job.functions.createdDate;
+import static com.sky.sns.barongreenback.crawler.jobs.Job.functions.createdDate;
 import static com.googlecode.totallylazy.Callables.descending;
 import static com.googlecode.totallylazy.comparators.Comparators.comparators;
 

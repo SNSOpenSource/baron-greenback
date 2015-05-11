@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.jobshistory;
+package com.sky.sns.barongreenback.jobshistory;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Uri;
@@ -10,7 +10,7 @@ import com.googlecode.yadic.Container;
 
 import java.util.UUID;
 
-import static sky.sns.barongreenback.jobshistory.JobsHistoryResource.queryForOlderThan;
+import static com.sky.sns.barongreenback.jobshistory.JobsHistoryResource.queryForOlderThan;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;

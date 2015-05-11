@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.shared;
+package com.sky.sns.barongreenback.shared;
 
-import sky.sns.barongreenback.crawler.CrawlerDefinitionResource;
+import com.sky.sns.barongreenback.crawler.CrawlerDefinitionResource;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.Redirector;
 import com.googlecode.utterlyidle.Response;

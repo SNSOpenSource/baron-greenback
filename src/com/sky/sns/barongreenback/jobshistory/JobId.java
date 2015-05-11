@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.jobshistory;
+package com.sky.sns.barongreenback.jobshistory;
 
 import com.googlecode.totallylazy.Value;
 

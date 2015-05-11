@@ -1,13 +1,13 @@
-package sky.sns.barongreenback.crawler.failures;
+package com.sky.sns.barongreenback.crawler.failures;
 
-import sky.sns.barongreenback.crawler.CheckpointHandler;
-import sky.sns.barongreenback.crawler.CheckpointUpdater;
-import sky.sns.barongreenback.crawler.CrawlerRepository;
-import sky.sns.barongreenback.crawler.CrawlerScope;
-import sky.sns.barongreenback.crawler.HttpJobExecutor;
-import sky.sns.barongreenback.crawler.jobs.Job;
-import sky.sns.barongreenback.shared.pager.Pager;
-import sky.sns.barongreenback.shared.sorter.Sorter;
+import com.sky.sns.barongreenback.crawler.CheckpointHandler;
+import com.sky.sns.barongreenback.crawler.CheckpointUpdater;
+import com.sky.sns.barongreenback.crawler.CrawlerRepository;
+import com.sky.sns.barongreenback.crawler.CrawlerScope;
+import com.sky.sns.barongreenback.crawler.HttpJobExecutor;
+import com.sky.sns.barongreenback.crawler.jobs.Job;
+import com.sky.sns.barongreenback.shared.pager.Pager;
+import com.sky.sns.barongreenback.shared.sorter.Sorter;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -30,12 +30,12 @@ import com.googlecode.yadic.Container;
 
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.failures.FailureRepository.DURATION;
-import static sky.sns.barongreenback.crawler.failures.FailureRepository.ID;
-import static sky.sns.barongreenback.crawler.failures.FailureRepository.REASON;
-import static sky.sns.barongreenback.crawler.failures.FailureRepository.REQUEST_TIME;
-import static sky.sns.barongreenback.crawler.failures.FailureRepository.URI;
-import static sky.sns.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
+import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.DURATION;
+import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.ID;
+import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.REASON;
+import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.REQUEST_TIME;
+import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.URI;
+import static com.sky.sns.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.all;

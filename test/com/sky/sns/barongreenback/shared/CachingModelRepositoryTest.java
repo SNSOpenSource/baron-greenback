@@ -1,7 +1,7 @@
-package sky.sns.barongreenback.shared;
+package com.sky.sns.barongreenback.shared;
 
-import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
-import sky.sns.barongreenback.persistence.ModelMapping;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.persistence.ModelMapping;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.lazyrecords.mappings.StringMappings;

@@ -1,7 +1,7 @@
-package sky.sns.barongreenback.views;
+package com.sky.sns.barongreenback.views;
 
-import sky.sns.barongreenback.crawler.executor.ExecutorFactory;
-import sky.sns.barongreenback.crawler.executor.JobExecutor;
+import com.sky.sns.barongreenback.crawler.executor.ExecutorFactory;
+import com.sky.sns.barongreenback.crawler.executor.JobExecutor;
 import com.googlecode.totallylazy.Value;
 
 import java.io.Closeable;

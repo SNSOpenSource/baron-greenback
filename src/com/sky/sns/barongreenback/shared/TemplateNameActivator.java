@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.shared;
+package com.sky.sns.barongreenback.shared;
 
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.io.HierarchicalPath;

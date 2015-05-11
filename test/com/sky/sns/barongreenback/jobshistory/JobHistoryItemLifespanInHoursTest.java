@@ -1,11 +1,11 @@
-package sky.sns.barongreenback.jobshistory;
+package com.sky.sns.barongreenback.jobshistory;
 
 import org.junit.Test;
 
 import java.util.Properties;
 
-import static sky.sns.barongreenback.jobshistory.JobHistoryItemLifespanInHours.DEFAULT;
-import static sky.sns.barongreenback.jobshistory.JobHistoryItemLifespanInHours.PROPERTY_NAME;
+import static com.sky.sns.barongreenback.jobshistory.JobHistoryItemLifespanInHours.DEFAULT;
+import static com.sky.sns.barongreenback.jobshistory.JobHistoryItemLifespanInHours.PROPERTY_NAME;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static org.junit.Assert.*;
 

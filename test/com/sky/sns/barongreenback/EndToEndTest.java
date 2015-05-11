@@ -1,12 +1,12 @@
-package sky.sns.barongreenback;
+package com.sky.sns.barongreenback;
 
-import sky.sns.barongreenback.crawler.CrawlerListPage;
-import sky.sns.barongreenback.crawler.CrawlerPage;
-import sky.sns.barongreenback.search.ViewSearchPage;
-import sky.sns.barongreenback.shared.ApplicationTests;
-import sky.sns.barongreenback.shared.sorter.Sorter;
-import sky.sns.barongreenback.views.ViewEditPage;
-import sky.sns.barongreenback.views.ViewListPage;
+import com.sky.sns.barongreenback.crawler.CrawlerListPage;
+import com.sky.sns.barongreenback.crawler.CrawlerPage;
+import com.sky.sns.barongreenback.search.ViewSearchPage;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.shared.sorter.Sorter;
+import com.sky.sns.barongreenback.views.ViewEditPage;
+import com.sky.sns.barongreenback.views.ViewListPage;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.matchers.NumberMatcher;
 import com.googlecode.totallylazy.time.Dates;

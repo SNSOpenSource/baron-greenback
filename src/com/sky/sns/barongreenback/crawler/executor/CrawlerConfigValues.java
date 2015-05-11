@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.crawler.executor;
+package com.sky.sns.barongreenback.crawler.executor;
 
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Predicates;

@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.jobshistory;
+package com.sky.sns.barongreenback.jobshistory;
 
-import sky.sns.barongreenback.shared.pager.Pager;
+import com.sky.sns.barongreenback.shared.pager.Pager;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.HttpHandler;
@@ -15,10 +15,10 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static sky.sns.barongreenback.shared.sorter.Sorter.ASCENDING_SORT_DIRECTION;
-import static sky.sns.barongreenback.shared.sorter.Sorter.DESCENDING_SORT_DIRECTION;
-import static sky.sns.barongreenback.shared.sorter.Sorter.SORT_COLUMN_QUERY_PARAM;
-import static sky.sns.barongreenback.shared.sorter.Sorter.SORT_DIRECTION_QUERY_PARAM;
+import static com.sky.sns.barongreenback.shared.sorter.Sorter.ASCENDING_SORT_DIRECTION;
+import static com.sky.sns.barongreenback.shared.sorter.Sorter.DESCENDING_SORT_DIRECTION;
+import static com.sky.sns.barongreenback.shared.sorter.Sorter.SORT_COLUMN_QUERY_PARAM;
+import static com.sky.sns.barongreenback.shared.sorter.Sorter.SORT_DIRECTION_QUERY_PARAM;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.get;

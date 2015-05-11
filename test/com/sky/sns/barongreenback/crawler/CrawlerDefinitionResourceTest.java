@@ -1,8 +1,8 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.queues.JobsPage;
-import sky.sns.barongreenback.queues.JobsPage;
-import sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.queues.JobsPage;
+import com.sky.sns.barongreenback.queues.JobsPage;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
 import com.googlecode.funclate.Model;
 import com.googlecode.utterlyidle.Status;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.Date;
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.CrawlerTests.contentOf;
+import static com.sky.sns.barongreenback.crawler.CrawlerTests.contentOf;
 import static com.googlecode.funclate.Model.mutable.parse;
 import static java.util.UUID.randomUUID;
 import static org.hamcrest.MatcherAssert.assertThat;

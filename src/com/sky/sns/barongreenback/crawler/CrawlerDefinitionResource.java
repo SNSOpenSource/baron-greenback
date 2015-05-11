@@ -1,10 +1,10 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.crawler.failures.FailureRepository;
-import sky.sns.barongreenback.persistence.PersistentTypes;
-import sky.sns.barongreenback.shared.Forms;
-import sky.sns.barongreenback.shared.RecordDefinition;
-import sky.sns.barongreenback.views.ViewsRepository;
+import com.sky.sns.barongreenback.crawler.failures.FailureRepository;
+import com.sky.sns.barongreenback.persistence.PersistentTypes;
+import com.sky.sns.barongreenback.shared.Forms;
+import com.sky.sns.barongreenback.shared.RecordDefinition;
+import com.sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.totallylazy.Callable1;
@@ -33,8 +33,8 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.Crawler.methods.extractRecordDefinition;
-import static sky.sns.barongreenback.shared.Forms.functions.addTemplates;
+import static com.sky.sns.barongreenback.crawler.Crawler.methods.extractRecordDefinition;
+import static com.sky.sns.barongreenback.shared.Forms.functions.addTemplates;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.proxy.Call.method;

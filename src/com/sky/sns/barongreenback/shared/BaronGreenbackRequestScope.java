@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.shared;
+package com.sky.sns.barongreenback.shared;
 
-import sky.sns.barongreenback.shared.BaronGreenbackApplicationScope;
+import com.sky.sns.barongreenback.shared.BaronGreenbackApplicationScope;
 import com.googlecode.totallylazy.Value;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.Resolver;

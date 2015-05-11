@@ -1,10 +1,10 @@
-package sky.sns.barongreenback.batch;
+package com.sky.sns.barongreenback.batch;
 
-import sky.sns.barongreenback.crawler.executor.CrawlerExecutors;
-import sky.sns.barongreenback.shared.ModelCache;
-import sky.sns.barongreenback.shared.ModelRepository;
-import sky.sns.barongreenback.shared.messages.Category;
-import sky.sns.barongreenback.shared.messages.Messages;
+import com.sky.sns.barongreenback.crawler.executor.CrawlerExecutors;
+import com.sky.sns.barongreenback.shared.ModelCache;
+import com.sky.sns.barongreenback.shared.ModelRepository;
+import com.sky.sns.barongreenback.shared.messages.Category;
+import com.sky.sns.barongreenback.shared.messages.Messages;
 import com.googlecode.funclate.Model;
 import com.googlecode.funclate.json.Json;
 import com.googlecode.lazyrecords.Record;
@@ -37,8 +37,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static sky.sns.barongreenback.shared.messages.Messages.error;
-import static sky.sns.barongreenback.shared.messages.Messages.success;
+import static com.sky.sns.barongreenback.shared.messages.Messages.error;
+import static com.sky.sns.barongreenback.shared.messages.Messages.success;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Files.hasSuffix;
 import static com.googlecode.totallylazy.Files.recursiveFiles;

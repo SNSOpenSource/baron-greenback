@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.shared.sorter;
+package com.sky.sns.barongreenback.shared.sorter;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Keyword;

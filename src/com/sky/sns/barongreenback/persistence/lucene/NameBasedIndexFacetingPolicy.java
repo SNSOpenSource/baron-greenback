@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.persistence.lucene;
+package com.sky.sns.barongreenback.persistence.lucene;
 
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Value;

@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.actions;
+package com.sky.sns.barongreenback.actions;
 
 import com.googlecode.utterlyidle.Request;
 import com.googlecode.utterlyidle.Resources;

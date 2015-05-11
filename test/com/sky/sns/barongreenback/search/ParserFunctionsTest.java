@@ -1,8 +1,8 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
 
-import sky.sns.barongreenback.shared.ApplicationTests;
-import sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
 import com.googlecode.lazyrecords.Grammar;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;

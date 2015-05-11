@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
 import com.googlecode.totallylazy.Either;
 import com.googlecode.utterlyidle.HttpHandler;
@@ -6,7 +6,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.Link;
 
-import static sky.sns.barongreenback.shared.pager.Pager.ROWS_PER_PAGE_PARAM;
+import static com.sky.sns.barongreenback.shared.pager.Pager.ROWS_PER_PAGE_PARAM;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.get;

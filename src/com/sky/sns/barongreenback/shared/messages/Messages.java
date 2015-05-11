@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.shared.messages;
+package com.sky.sns.barongreenback.shared.messages;
 
 import com.googlecode.funclate.Model;
 

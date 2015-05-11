@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.shared.RecordDefinition;
+import com.sky.sns.barongreenback.shared.RecordDefinition;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.RecordsReader;

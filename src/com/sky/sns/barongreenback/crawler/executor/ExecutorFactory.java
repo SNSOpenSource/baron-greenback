@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.crawler.executor;
+package com.sky.sns.barongreenback.crawler.executor;
 
 import java.io.Closeable;
 import java.util.concurrent.BlockingQueue;

@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.persistence.sql;
+package com.sky.sns.barongreenback.persistence.sql;
 
 import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.lazyrecords.sql.SqlRecords;

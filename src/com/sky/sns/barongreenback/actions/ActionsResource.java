@@ -1,9 +1,9 @@
-package sky.sns.barongreenback.actions;
+package com.sky.sns.barongreenback.actions;
 
-import sky.sns.barongreenback.search.DrillDowns;
-import sky.sns.barongreenback.search.RecordsService;
-import sky.sns.barongreenback.search.SearchResource;
-import sky.sns.barongreenback.shared.AdvancedMode;
+import com.sky.sns.barongreenback.search.DrillDowns;
+import com.sky.sns.barongreenback.search.RecordsService;
+import com.sky.sns.barongreenback.search.SearchResource;
+import com.sky.sns.barongreenback.shared.AdvancedMode;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Sequence;
@@ -22,7 +22,7 @@ import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
-import static sky.sns.barongreenback.views.ViewsRepository.unwrap;
+import static com.sky.sns.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.proxy.Call.method;

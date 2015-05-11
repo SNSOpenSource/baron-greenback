@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler.failures;
+package com.sky.sns.barongreenback.crawler.failures;
 
-import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.memory.MemoryRecords;
 import org.junit.Test;

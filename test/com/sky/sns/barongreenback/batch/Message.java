@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.batch;
+package com.sky.sns.barongreenback.batch;
 
-import sky.sns.barongreenback.shared.messages.Category;
+import com.sky.sns.barongreenback.shared.messages.Category;
 
 import static java.lang.String.format;
 

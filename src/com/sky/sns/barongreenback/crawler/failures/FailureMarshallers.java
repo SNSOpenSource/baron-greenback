@@ -1,9 +1,9 @@
-package sky.sns.barongreenback.crawler.failures;
+package com.sky.sns.barongreenback.crawler.failures;
 
-import sky.sns.barongreenback.crawler.jobs.HttpJob;
-import sky.sns.barongreenback.crawler.jobs.Job;
-import sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
-import sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob;
+import com.sky.sns.barongreenback.crawler.jobs.HttpJob;
+import com.sky.sns.barongreenback.crawler.jobs.Job;
+import com.sky.sns.barongreenback.crawler.jobs.MasterPaginatedHttpJob;
+import com.sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequences;

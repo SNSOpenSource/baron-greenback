@@ -56,7 +56,7 @@
 
     <target name="compile">
         <compile.and.jar src="${src}" jar="${release.jar.path}" classpathref="all.dependancies"
-                         version="${release.version}" main.class="sky.sns.barongreenback.WebApplication"/>
+                         version="${release.version}" main.class="com.sky.sns.barongreenback.WebApplication"/>
         <compile.and.jar src="${test}" jar="${tests.jar.path}" classpathref="all.jars" version="${release.version}"/>
     </target>
 
@@ -111,7 +111,7 @@
             <entry key="${tests.src}.labels" value="Test Sources"/>
         </propertyfile>
 
-        <generate.pom artifact.uri="mvn:sky.sns.${ant.project.name}:${ant.project.name}:jar:${release.version}"
+        <generate.pom artifact.uri="mvn:com.sky.sns:${ant.project.name}:jar:${release.version}"
                              dependencies="build/runtime.dependencies"
                              directory="${artifacts}"/>
 
@@ -124,8 +124,8 @@
         </parallel>
         <antcall target="compile"/>
         <parallel>
-            <!-- Temporary for getting Travis working <antcall target="test"/>
-            <antcall target="testjs"/>-->
+            <antcall target="test"/>
+            <antcall target="testjs"/>
             <antcall target="package"/>
         </parallel>
     </target>

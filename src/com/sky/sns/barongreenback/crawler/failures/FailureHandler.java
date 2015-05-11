@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler.failures;
+package com.sky.sns.barongreenback.crawler.failures;
 
-import sky.sns.barongreenback.crawler.jobs.Job;
+import com.sky.sns.barongreenback.crawler.jobs.Job;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.time.Clock;
 import com.googlecode.utterlyidle.Request;
@@ -9,7 +9,7 @@ import com.googlecode.utterlyidle.Status;
 
 import java.util.Date;
 
-import static sky.sns.barongreenback.crawler.failures.Failure.failure;
+import static com.sky.sns.barongreenback.crawler.failures.Failure.failure;
 import static com.googlecode.totallylazy.Exceptions.asString;
 import static com.googlecode.totallylazy.callables.TimeCallable.calculateMilliseconds;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;

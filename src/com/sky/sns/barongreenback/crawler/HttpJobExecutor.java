@@ -1,9 +1,9 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.crawler.executor.CrawlerExecutors;
-import sky.sns.barongreenback.crawler.executor.JobExecutor;
-import sky.sns.barongreenback.crawler.executor.PriorityJobRunnable;
-import sky.sns.barongreenback.crawler.jobs.Job;
+import com.sky.sns.barongreenback.crawler.executor.CrawlerExecutors;
+import com.sky.sns.barongreenback.crawler.executor.JobExecutor;
+import com.sky.sns.barongreenback.crawler.executor.PriorityJobRunnable;
+import com.sky.sns.barongreenback.crawler.jobs.Job;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Block;
 import com.googlecode.totallylazy.Function1;
@@ -16,8 +16,8 @@ import java.io.PrintStream;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static sky.sns.barongreenback.crawler.DataWriter.write;
-import static sky.sns.barongreenback.crawler.HttpReader.getInput;
+import static com.sky.sns.barongreenback.crawler.DataWriter.write;
+import static com.sky.sns.barongreenback.crawler.HttpReader.getInput;
 
 public class HttpJobExecutor {
     private final CrawlerExecutors executors;

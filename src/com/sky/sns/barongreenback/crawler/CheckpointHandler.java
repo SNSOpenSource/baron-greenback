@@ -1,7 +1,7 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
-import sky.sns.barongreenback.shared.ModelRepository;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
+import com.sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Option;

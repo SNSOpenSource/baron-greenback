@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob;
+import com.sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.time.Dates;
@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static sky.sns.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
-import static sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob.paginatedHttpJob;
+import static com.sky.sns.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
+import static com.sky.sns.barongreenback.crawler.jobs.PaginatedHttpJob.paginatedHttpJob;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;

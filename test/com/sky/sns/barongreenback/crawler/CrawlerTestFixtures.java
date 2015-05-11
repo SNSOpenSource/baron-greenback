@@ -1,14 +1,14 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.shared.RecordDefinition;
-import sky.sns.barongreenback.views.ViewsRepository;
+import com.sky.sns.barongreenback.shared.RecordDefinition;
+import com.sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Keywords;
 
 import java.net.URI;
 
-import static sky.sns.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
+import static com.sky.sns.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 

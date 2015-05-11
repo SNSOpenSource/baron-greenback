@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
 import com.googlecode.totallylazy.Option;
 

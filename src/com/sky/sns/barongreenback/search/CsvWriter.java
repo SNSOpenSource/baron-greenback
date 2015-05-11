@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
-import sky.sns.barongreenback.shared.RenderableTypes;
+import com.sky.sns.barongreenback.shared.RenderableTypes;
 import com.googlecode.funclate.Renderer;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;

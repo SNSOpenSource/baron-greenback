@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.shared;
+package com.sky.sns.barongreenback.shared;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;

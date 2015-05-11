@@ -1,10 +1,10 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.crawler.executor.CrawlerExecutors;
-import sky.sns.barongreenback.crawler.executor.JobExecutor;
-import sky.sns.barongreenback.crawler.executor.PriorityJobRunnable;
-import sky.sns.barongreenback.crawler.jobs.Job;
-import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.crawler.executor.CrawlerExecutors;
+import com.sky.sns.barongreenback.crawler.executor.JobExecutor;
+import com.sky.sns.barongreenback.crawler.executor.PriorityJobRunnable;
+import com.sky.sns.barongreenback.crawler.jobs.Job;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static sky.sns.barongreenback.crawler.PriorityMerge.priorityMergeBy;
-import static sky.sns.barongreenback.shared.RecordDefinition.uniqueFields;
+import static com.sky.sns.barongreenback.crawler.PriorityMerge.priorityMergeBy;
+import static com.sky.sns.barongreenback.shared.RecordDefinition.uniqueFields;
 import static com.googlecode.lazyrecords.Definition.constructors.definition;
 import static com.googlecode.lazyrecords.Record.methods.update;
 import static com.googlecode.lazyrecords.Using.using;

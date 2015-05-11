@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.less;
+package com.sky.sns.barongreenback.less;
 
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callers;

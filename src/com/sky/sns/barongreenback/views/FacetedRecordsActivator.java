@@ -1,9 +1,9 @@
-package sky.sns.barongreenback.views;
+package com.sky.sns.barongreenback.views;
 
-import sky.sns.barongreenback.persistence.lucene.NameBasedIndexFacetingPolicy;
-import sky.sns.barongreenback.shared.BaronGreenbackApplicationScope;
-import sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
-import sky.sns.barongreenback.shared.ModelRepository;
+import com.sky.sns.barongreenback.persistence.lucene.NameBasedIndexFacetingPolicy;
+import com.sky.sns.barongreenback.shared.BaronGreenbackApplicationScope;
+import com.sky.sns.barongreenback.shared.BaronGreenbackRequestScope;
+import com.sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Facet;
 import com.googlecode.lazyrecords.FacetedRecords;

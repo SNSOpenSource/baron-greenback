@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler.jobs;
+package com.sky.sns.barongreenback.crawler.jobs;
 
-import sky.sns.barongreenback.crawler.datasources.DataSource;
+import com.sky.sns.barongreenback.crawler.datasources.DataSource;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Function1;

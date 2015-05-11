@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
-import sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.lazyrecords.mappings.DateMapping;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.lazyrecords.parser.PredicateParser;

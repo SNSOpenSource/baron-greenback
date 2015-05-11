@@ -1,9 +1,9 @@
-package sky.sns.barongreenback.crawler.jobs;
+package com.sky.sns.barongreenback.crawler.jobs;
 
-import sky.sns.barongreenback.crawler.CheckpointUpdater;
-import sky.sns.barongreenback.crawler.HttpVisitedFactory;
-import sky.sns.barongreenback.crawler.datasources.DataSource;
-import sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
+import com.sky.sns.barongreenback.crawler.CheckpointUpdater;
+import com.sky.sns.barongreenback.crawler.HttpVisitedFactory;
+import com.sky.sns.barongreenback.crawler.datasources.DataSource;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
@@ -20,7 +20,7 @@ import org.w3c.dom.Document;
 import java.util.Date;
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.DataTransformer.loadDocument;
+import static com.sky.sns.barongreenback.crawler.DataTransformer.loadDocument;
 
 public class MasterPaginatedHttpJob extends PaginatedHttpJob {
     private MasterPaginatedHttpJob(Model context) {

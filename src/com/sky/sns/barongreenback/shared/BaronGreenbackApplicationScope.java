@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.shared;
+package com.sky.sns.barongreenback.shared;
 
 import com.googlecode.totallylazy.Value;
 import com.googlecode.yadic.Container;

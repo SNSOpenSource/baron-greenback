@@ -1,13 +1,13 @@
-package sky.sns.barongreenback.views;
+package com.sky.sns.barongreenback.views;
 
-import sky.sns.barongreenback.crawler.CompositeCrawlerTest;
-import sky.sns.barongreenback.crawler.CrawlerTests;
-import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
-import sky.sns.barongreenback.search.DrillDowns;
-import sky.sns.barongreenback.search.SearchPage;
-import sky.sns.barongreenback.search.SearchResource;
-import sky.sns.barongreenback.shared.ApplicationTests;
-import sky.sns.barongreenback.shared.ModelRepository;
+import com.sky.sns.barongreenback.crawler.CompositeCrawlerTest;
+import com.sky.sns.barongreenback.crawler.CrawlerTests;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.search.DrillDowns;
+import com.sky.sns.barongreenback.search.SearchPage;
+import com.sky.sns.barongreenback.search.SearchResource;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;

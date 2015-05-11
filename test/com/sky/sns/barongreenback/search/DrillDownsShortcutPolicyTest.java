@@ -1,11 +1,11 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 
-import static sky.sns.barongreenback.search.DrillDowns.drillDowns;
+import static com.sky.sns.barongreenback.search.DrillDowns.drillDowns;
 import static com.googlecode.totallylazy.matchers.Matchers.is;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertThat;

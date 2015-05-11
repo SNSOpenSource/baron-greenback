@@ -1,7 +1,7 @@
-package sky.sns.barongreenback.crawler.jobs;
+package com.sky.sns.barongreenback.crawler.jobs;
 
-import sky.sns.barongreenback.crawler.datasources.DataSource;
-import sky.sns.barongreenback.crawler.datasources.HttpDataSource;
+import com.sky.sns.barongreenback.crawler.datasources.DataSource;
+import com.sky.sns.barongreenback.crawler.datasources.HttpDataSource;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -16,9 +16,9 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
-import static sky.sns.barongreenback.crawler.PriorityMerge.priorityMerge;
-import static sky.sns.barongreenback.crawler.jobs.Job.functions.dataSource;
-import static sky.sns.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
+import static com.sky.sns.barongreenback.crawler.PriorityMerge.priorityMerge;
+import static com.sky.sns.barongreenback.crawler.jobs.Job.functions.dataSource;
+import static com.sky.sns.barongreenback.shared.RecordDefinition.RECORD_DEFINITION;
 import static com.googlecode.lazyrecords.Keyword.functions.metadata;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.is;

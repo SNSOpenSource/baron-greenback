@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
 import com.googlecode.totallylazy.Value;
 import com.googlecode.totallylazy.json.Json;

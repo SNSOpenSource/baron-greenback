@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler.failures;
+package com.sky.sns.barongreenback.crawler.failures;
 
-import sky.sns.barongreenback.crawler.jobs.Job;
+import com.sky.sns.barongreenback.crawler.jobs.Job;
 import com.googlecode.totallylazy.Eq;
 import com.googlecode.totallylazy.annotations.multimethod;
 

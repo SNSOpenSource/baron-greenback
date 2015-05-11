@@ -1,15 +1,15 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.shared.Forms;
-import sky.sns.barongreenback.shared.ModelRepository;
-import sky.sns.barongreenback.shared.RecordDefinition;
+import com.sky.sns.barongreenback.shared.Forms;
+import com.sky.sns.barongreenback.shared.ModelRepository;
+import com.sky.sns.barongreenback.shared.RecordDefinition;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.*;
 
 import java.util.UUID;
 
-import static sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
-import static sky.sns.barongreenback.shared.RecordDefinition.convert;
+import static com.sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
+import static com.sky.sns.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.funclate.Model.mutable.parse;
 import static com.googlecode.totallylazy.Option.option;

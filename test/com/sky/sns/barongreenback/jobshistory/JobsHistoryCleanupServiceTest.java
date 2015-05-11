@@ -1,11 +1,11 @@
-package sky.sns.barongreenback.jobshistory;
+package com.sky.sns.barongreenback.jobshistory;
 
-import sky.sns.barongreenback.schedules.ScheduleListPage;
-import sky.sns.barongreenback.shared.ApplicationTests;
+import com.sky.sns.barongreenback.schedules.ScheduleListPage;
+import com.sky.sns.barongreenback.shared.ApplicationTests;
 import org.junit.After;
 import org.junit.Test;
 
-import static sky.sns.barongreenback.jobshistory.JobsHistoryResource.queryForOlderThan;
+import static com.sky.sns.barongreenback.jobshistory.JobsHistoryResource.queryForOlderThan;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.relativeUriOf;

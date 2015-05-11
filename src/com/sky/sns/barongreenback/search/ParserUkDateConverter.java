@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
 import com.googlecode.lazyrecords.parser.ParserDateConverter;
 import com.googlecode.totallylazy.time.DateConverter;

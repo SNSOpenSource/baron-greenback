@@ -1,8 +1,8 @@
-package sky.sns.barongreenback.views;
+package com.sky.sns.barongreenback.views;
 
-import sky.sns.barongreenback.crawler.Crawler;
-import sky.sns.barongreenback.shared.ModelCleaner;
-import sky.sns.barongreenback.shared.ModelRepository;
+import com.sky.sns.barongreenback.crawler.Crawler;
+import com.sky.sns.barongreenback.shared.ModelCleaner;
+import com.sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.ImmutableKeyword;
@@ -22,7 +22,7 @@ import com.googlecode.totallylazy.numbers.Numbers;
 
 import java.util.UUID;
 
-import static sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
+import static com.sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
 import static com.googlecode.totallylazy.Callables.second;

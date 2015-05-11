@@ -1,4 +1,4 @@
-package sky.sns.barongreenback.search;
+package com.sky.sns.barongreenback.search;
 
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.totallylazy.Callable1;
@@ -11,7 +11,7 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.html.Html;
 import com.googlecode.utterlyidle.html.TableRow;
 
-import static sky.sns.barongreenback.crawler.CrawlerTestFixtures.TITLE;
+import static com.sky.sns.barongreenback.crawler.CrawlerTestFixtures.TITLE;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;

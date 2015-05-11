@@ -1,7 +1,7 @@
-package sky.sns.barongreenback.jobshistory;
+package com.sky.sns.barongreenback.jobshistory;
 
-import sky.sns.barongreenback.persistence.BaronGreenbackRecords;
-import sky.sns.barongreenback.search.PredicateBuilder;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.search.PredicateBuilder;
 import com.googlecode.lazyrecords.Record;
 import com.googlecode.lazyrecords.Records;
 import com.googlecode.totallylazy.Either;
@@ -9,12 +9,12 @@ import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 
-import static sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.action;
-import static sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.elapsedTime;
-import static sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.jobId;
-import static sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.jobsHistory;
-import static sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.message;
-import static sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.timestamp;
+import static com.sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.action;
+import static com.sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.elapsedTime;
+import static com.sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.jobId;
+import static com.sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.jobsHistory;
+import static com.sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.message;
+import static com.sky.sns.barongreenback.jobshistory.JobHistoryItemDefinition.timestamp;
 import static com.googlecode.totallylazy.Either.right;
 
 public class RecordsJobsHistoryRepository implements JobsHistoryRepository {

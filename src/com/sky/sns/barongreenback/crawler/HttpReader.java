@@ -1,7 +1,7 @@
-package sky.sns.barongreenback.crawler;
+package com.sky.sns.barongreenback.crawler;
 
-import sky.sns.barongreenback.crawler.failures.FailureHandler;
-import sky.sns.barongreenback.crawler.jobs.Job;
+import com.sky.sns.barongreenback.crawler.failures.FailureHandler;
+import com.sky.sns.barongreenback.crawler.jobs.Job;
 import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Uri;

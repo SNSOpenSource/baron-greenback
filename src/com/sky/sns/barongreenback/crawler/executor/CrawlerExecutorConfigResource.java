@@ -1,6 +1,6 @@
-package sky.sns.barongreenback.crawler.executor;
+package com.sky.sns.barongreenback.crawler.executor;
 
-import sky.sns.barongreenback.shared.messages.Category;
+import com.sky.sns.barongreenback.shared.messages.Category;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Callable1;
 import com.googlecode.totallylazy.Callables;
@@ -22,7 +22,7 @@ import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
 
-import static sky.sns.barongreenback.crawler.executor.CrawlerConfigValues.fromDisplayName;
+import static com.sky.sns.barongreenback.crawler.executor.CrawlerConfigValues.fromDisplayName;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.not;
