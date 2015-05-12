@@ -21,18 +21,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 public class JobsPage {
-    private final HttpHandler httpHandler;
-    private final Html html;
+    private HttpHandler httpHandler;
+    private Html html;
 
     public JobsPage(HttpHandler httpHandler) throws Exception {
-        this(httpHandler, httpHandler.handle(get("/" + relativeUriOf(method(on(JobsResource.class).list()))).build()));
+        this(httpHandler, listAll(httpHandler));
     }
 
     public JobsPage(HttpHandler httpHandler, Response response) throws Exception {
         this.httpHandler = httpHandler;
-        assertThat(response.status(), is(Status.OK));
-        this.html = Html.html(response);
-        assertThat(html.title(), containsString("Jobs"));
+        this.html = htmlFrom(response);
     }
 
     public int numberOfCompletedJobs() {
@@ -50,9 +48,34 @@ public class JobsPage {
         return new JobsPage(httpHandler, httpHandler.handle(request));
     }
 
-    public int responseStatusFor(UUID crawlerId) {
-        return Integer.valueOf(html.selectContent(format("//*[@class='completed' and descendant::*[@class='entity' and contains(text(), '%s')]]/descendant::*[@class='response']/*[@class='code']/text()", crawlerId)));
+    public int responseStatusFor(UUID crawlerId) throws Exception {
+        return tryResponseStatusFor(crawlerId, 3);
     }
+
+    public int tryResponseStatusFor(UUID crawlerId, int attempts) throws Exception {
+        if (attempts == 0) {
+            throw new IllegalStateException("Couldn't find crawler id entry for " + crawlerId);
+        }
+        try {
+            return Integer.valueOf(html.selectContent(format("//*[@class='completed' and descendant::*[@class='entity' and contains(text(), '%s')]]/descendant::*[@class='response']/*[@class='code']/text()", crawlerId)));
+        } catch (NumberFormatException e) {
+            Thread.sleep(1000);
+            html = htmlFrom(listAll(httpHandler));
+            return tryResponseStatusFor(crawlerId, --attempts);
+        }
+    }
+
+    private static Response listAll(HttpHandler httpHandler) throws Exception {
+        return httpHandler.handle(get("/" + relativeUriOf(method(on(JobsResource.class).list()))).build());
+    }
+
+    private Html htmlFrom(Response response) throws Exception {
+        assertThat(response.status(), is(Status.OK));
+        Html html = Html.html(response);
+        assertThat(html.title(), containsString("Jobs"));
+        return html;
+    }
+
 
     @Override
     public String toString() {
