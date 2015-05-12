@@ -14,7 +14,9 @@ deploy:
   api_key:
     secure: EYtUF0T1vaoOFeJcluvi3okjNfTQD94H+oS/x21csmxdXPAmePx7D3iym0UNSNy2CW+yBGGhIqPmNAS+Tx1PdqI6BqDeI3iKMG+/2exgwoCDG7PKy+YBI+Fr87/ui00hK5LcJ2AdC0vqk3TkEsR97ORD7IjzMJ9dau1K74/xo7k=
   file: 
-    - '*.jar'
-    - '*.pom.xml'
+    - './build/artifacts/*.jar'
+    - './build/artifacts/*.pom.xml'
+  skip_cleanup: true
   on:
     repo: SNSOpenSource/baron-greenback
+    tags: true
