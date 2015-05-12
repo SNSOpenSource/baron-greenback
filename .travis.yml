@@ -3,8 +3,18 @@ jdk:
 - oraclejdk7
 script: ant -DBUILD_NUMBER=$BUILD_NUMBER
 after_success: ./build/bintrayUpload.sh
-after_failure: grep -lEr "(</failure>)|(</error>)" ./build/artifacts/reports | xargs cat
+after_failure: grep -lEr "(</failure>)|(</error>)" ./build/artifacts/reports | xargs
+  cat
 env:
   global:
-      - BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
-      - secure: JUFcrRexSZCndh8ZGn1+tcCgYMCWvR7m3LmpojUtpAE1phO8/EeZA4IKsFd27DG+dNzHffrY5HiEL3VFACZrJE7kT7Fm1Hb1ExMdY9LYTJum1TkmtLExrdDI9wMF713F/AV5w/Ro0crL1jie323IQ28/NAxisVrkVvAAy+ZqX90=
+  - BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
+  - secure: JUFcrRexSZCndh8ZGn1+tcCgYMCWvR7m3LmpojUtpAE1phO8/EeZA4IKsFd27DG+dNzHffrY5HiEL3VFACZrJE7kT7Fm1Hb1ExMdY9LYTJum1TkmtLExrdDI9wMF713F/AV5w/Ro0crL1jie323IQ28/NAxisVrkVvAAy+ZqX90=
+deploy:
+  provider: releases
+  api_key:
+    secure: EYtUF0T1vaoOFeJcluvi3okjNfTQD94H+oS/x21csmxdXPAmePx7D3iym0UNSNy2CW+yBGGhIqPmNAS+Tx1PdqI6BqDeI3iKMG+/2exgwoCDG7PKy+YBI+Fr87/ui00hK5LcJ2AdC0vqk3TkEsR97ORD7IjzMJ9dau1K74/xo7k=
+  file: 
+    - '*.jar'
+    - '*.pom.xml'
+  on:
+    repo: SNSOpenSource/baron-greenback
