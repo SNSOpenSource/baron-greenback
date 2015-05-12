@@ -3,6 +3,7 @@ jdk:
 - oraclejdk7
 script: ant -DBUILD_NUMBER=$BUILD_NUMBER
 after_success: ./build/bintrayUpload.sh
+after_failure: grep -lEr "(</failure>)|(</error>)" ./build/artifacts/reports | xargs cat
 env:
   global:
       - BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
