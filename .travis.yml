@@ -9,14 +9,25 @@ env:
   global:
   - BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
   - secure: JUFcrRexSZCndh8ZGn1+tcCgYMCWvR7m3LmpojUtpAE1phO8/EeZA4IKsFd27DG+dNzHffrY5HiEL3VFACZrJE7kT7Fm1Hb1ExMdY9LYTJum1TkmtLExrdDI9wMF713F/AV5w/Ro0crL1jie323IQ28/NAxisVrkVvAAy+ZqX90=
-deploy:
-  provider: releases
   api_key:
     secure: EYtUF0T1vaoOFeJcluvi3okjNfTQD94H+oS/x21csmxdXPAmePx7D3iym0UNSNy2CW+yBGGhIqPmNAS+Tx1PdqI6BqDeI3iKMG+/2exgwoCDG7PKy+YBI+Fr87/ui00hK5LcJ2AdC0vqk3TkEsR97ORD7IjzMJ9dau1K74/xo7k=
+before_deploy:
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - export GIT_TAG=$BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $BUILD_NUMBER"
+  - git push -q https://$api_key@github.com/SNSOpenSource/baron-greenback --tags
+deploy:
+  provider: releases
   file: 
     - './build/artifacts/*.jar'
     - './build/artifacts/*.pom.xml'
   skip_cleanup: true
   on:
     repo: SNSOpenSource/baron-greenback
-    tags: true
+    tags: false
+    all_branches: true
+
+branches:
+  except:
+    - /^*-v[0-9]/
