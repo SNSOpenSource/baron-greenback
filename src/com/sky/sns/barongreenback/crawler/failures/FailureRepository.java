@@ -33,7 +33,7 @@ public class FailureRepository implements Repository<UUID, Record>, Finder<Recor
     public static final Keyword<String> RECORD = keyword("record", String.class);
     public static final Keyword<String> VISITED = keyword("visited", String.class);
 
-    private static final Definition FAILURES = Definition.constructors.definition("failures", ID, JOB_TYPE, REASON, URI, REQUEST_TIME, DURATION, CRAWLER_ID, SOURCE, RECORD, VISITED);
+    public static final Definition FAILURES = Definition.constructors.definition("failures", ID, JOB_TYPE, REASON, URI, REQUEST_TIME, DURATION, CRAWLER_ID, SOURCE, RECORD, VISITED);
 
     private final Records records;
 
@@ -53,7 +53,7 @@ public class FailureRepository implements Repository<UUID, Record>, Finder<Recor
 
     @Override
     public void remove(UUID id) {
-        records.remove(FAILURES, where(ID, is(id)));
+        remove(where(ID, is(id)));
     }
 
     @Override
@@ -74,6 +74,10 @@ public class FailureRepository implements Repository<UUID, Record>, Finder<Recor
     }
 
     public void removeAllForCrawler(final UUID crawlerId) {
-        records.remove(FAILURES, where(CRAWLER_ID, is(crawlerId)));
+        remove(where(CRAWLER_ID, is(crawlerId)));
+    }
+
+    public int remove(Predicate<? super Record> predicate) {
+        return records.remove(FAILURES, predicate).intValue();
     }
 }

@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.where;
 import static org.junit.Assert.assertTrue;
 
 public class FailureRepositoryTest {
@@ -28,6 +30,21 @@ public class FailureRepositoryTest {
         failureRepository.set(ANOTHER_FAILURE_ID, record2);
 
         failureRepository.removeAllForCrawler(CRAWLER_ID);
+
+        assertTrue(failureRepository.get(FAILURE_ID).isEmpty());
+        assertTrue(failureRepository.get(ANOTHER_FAILURE_ID).isDefined());
+    }
+
+    @Test
+    public void shouldDeleteFailuresForAQuery() throws Exception {
+        final Record record = Record.constructors.record(FailureRepository.CRAWLER_ID, CRAWLER_ID);
+        final Record record2 = Record.constructors.record(FailureRepository.CRAWLER_ID, ANOTHER_CRAWLER_ID);
+
+        failureRepository = new FailureRepository(BaronGreenbackRecords.records(new MemoryRecords()));
+        failureRepository.set(FAILURE_ID, record);
+        failureRepository.set(ANOTHER_FAILURE_ID, record2);
+
+        failureRepository.remove(where(FailureRepository.CRAWLER_ID, is(CRAWLER_ID)));
 
         assertTrue(failureRepository.get(FAILURE_ID).isEmpty());
         assertTrue(failureRepository.get(ANOTHER_FAILURE_ID).isDefined());
