@@ -37,10 +37,10 @@ public class Sorter {
     private Option<String> sortDirection;
     private QueryParameters queryParameters;
 
-    public Sorter(Request request) {
-        queryParameters = Requests.query(request);
-        this.sortColumn = queryParameters.valueOption(SORT_COLUMN_QUERY_PARAM);
-        this.sortDirection = queryParameters.valueOption(SORT_DIRECTION_QUERY_PARAM);
+    public Sorter(QueryParameters queryParameters, Option<String> sortColumn, Option<String> sortDirection) {
+        this.queryParameters = queryParameters;
+        this.sortColumn = sortColumn;
+        this.sortDirection = sortDirection;
     }
 
     private static List<Map<String, Object>> headers(Sequence<Keyword<?>> headers, Sequence<Record> results) {

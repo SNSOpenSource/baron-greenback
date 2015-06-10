@@ -39,8 +39,10 @@ import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.Responses.response;
+import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.CRAWLER_ID;
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.DURATION;
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.ID;
+import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.JOB_TYPE;
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.REASON;
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.REQUEST_TIME;
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.URI;
@@ -57,7 +59,7 @@ public class FailureResource {
     private final Sorter sorter;
     private final FailureRepository failureRepository;
     private final PredicateBuilder predicateBuilder;
-    public static final Sequence<Keyword<?>> HEADERS = Sequences.<Keyword<?>>sequence(URI, REASON, REQUEST_TIME, DURATION);
+    public static final Sequence<Keyword<?>> HEADERS = Sequences.<Keyword<?>>sequence(URI, CRAWLER_ID, JOB_TYPE, REASON, REQUEST_TIME, DURATION);
 
     public FailureResource(Failures failures, FailureRepository failureRepository, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager, Sorter sorter, PredicateBuilder predicateBuilder) {
         this.failures = failures;
@@ -84,8 +86,8 @@ public class FailureResource {
                 add("items", paged.map(toModel()).toList()), HEADERS, paged));
         return message.fold(model, toMessageModel()).
                 add("query", query).
-                add("retryUrl", redirector.absoluteUriOf(method(on(FailureResource.class).retry(null)))).
-                add("deleteUrl", redirector.absoluteUriOf(method(on(FailureResource.class).delete(null)))).
+                add("retryUrl", redirector.absoluteUriOf(method(on(FailureResource.class).retry(null, query)))).
+                add("deleteUrl", redirector.absoluteUriOf(method(on(FailureResource.class).delete(null, query)))).
                 add("retryAll", redirector.absoluteUriOf(method(on(FailureResource.class).retryAll(query)))).
                 add("deleteAll", redirector.absoluteUriOf(method(on(FailureResource.class).deleteAll(query))));
     }
@@ -101,14 +103,14 @@ public class FailureResource {
 
     @POST
     @Path("retry")
-    public Response retry(@FormParam("id") UUID id) {
-        return failures.get(id).map(toRetry(id, "")).getOrElse(response(Status.NOT_FOUND));
+    public Response retry(@FormParam("id") UUID id, @QueryParam("query") @DefaultValue("") final String query) {
+        return failures.get(id).map(toRetry(id, query)).getOrElse(response(Status.NOT_FOUND));
     }
 
     @POST
     @Path("delete")
-    public Response delete(@FormParam("id") UUID id) {
-        return failures.get(id).map(toDelete(id, "")).getOrElse(response(Status.NOT_FOUND));
+    public Response delete(@FormParam("id") UUID id, @QueryParam("query") @DefaultValue("") final String query) {
+        return failures.get(id).map(toDelete(id, query)).getOrElse(response(Status.NOT_FOUND));
     }
 
     @POST
@@ -117,7 +119,7 @@ public class FailureResource {
         final Predicate<Record> queryPredicate = getPredicateFromQuery(query);
         Sequence<UUID> uuids = failureRepository.find(queryPredicate).map(toUUID());
         int failuresToRetry = uuids.size();
-        uuids.each(retry());
+        uuids.each(retry(query));
         return backToMe(failuresToRetry + " failures have been added to the job queue", query);
     }
 
@@ -126,7 +128,7 @@ public class FailureResource {
     public Response deleteAll(@QueryParam("query") @DefaultValue("") final String query) {
         final Predicate<Record> queryPredicate = getPredicateFromQuery(query);
         int deleted = failureRepository.remove(queryPredicate);
-        return backToMe(deleted + " failures(s) have been deleted", query);
+        return backToMe(deleted + " failure(s) have been deleted", query);
     }
 
     private Predicate<Record> getPredicateFromQuery(String query) {
@@ -137,11 +139,11 @@ public class FailureResource {
         return invalidQueryOrPredicate.right();
     }
 
-    private Block<UUID> retry() {
+    private Block<UUID> retry(final String query) {
         return new Block<UUID>() {
             @Override
             protected void execute(UUID uuid) throws Exception {
-                retry(uuid);
+                retry(uuid, query);
             }
         };
     }
@@ -187,6 +189,8 @@ public class FailureResource {
             public Model call(Record record) throws Exception {
                 return model().
                         add("uri", record.get(URI)).
+                        add("crawlerId", record.get(CRAWLER_ID)).
+                        add("jobType", record.get(JOB_TYPE)).
                         add("reason", record.get(REASON)).
                         add("requestTime", record.get(REQUEST_TIME)).
                         add("duration", record.get(DURATION)).

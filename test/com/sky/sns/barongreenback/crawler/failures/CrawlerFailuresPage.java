@@ -45,6 +45,6 @@ public class CrawlerFailuresPage {
     }
 
     public String getMessage(){
-        return html.selectValues("//span[@class='message']").first();
+        return html.selectValues("//div[@id='results']//span[@class='message']").first();
     }
 }

@@ -5,7 +5,7 @@
     <a href="$base$crawler/status">Crawler Status</a>
 </li>
 <li class="menu">
-    <a href="$base$crawler/failures/list?page.sort.column=request+time">Crawler Failures</a>
+    <a href="$base$crawler/failures/list">Crawler Failures</a>
 </li>
 <li class="menu">
     <a href="$base$views/list">Views</a>

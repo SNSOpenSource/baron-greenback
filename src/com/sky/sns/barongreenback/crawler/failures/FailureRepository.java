@@ -1,8 +1,5 @@
 package com.sky.sns.barongreenback.crawler.failures;
 
-import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
-import com.sky.sns.barongreenback.shared.Finder;
-import com.sky.sns.barongreenback.shared.Repository;
 import com.googlecode.lazyrecords.Definition;
 import com.googlecode.lazyrecords.Keyword;
 import com.googlecode.lazyrecords.Record;
@@ -11,6 +8,9 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Uri;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackRecords;
+import com.sky.sns.barongreenback.shared.Finder;
+import com.sky.sns.barongreenback.shared.Repository;
 
 import java.util.Date;
 import java.util.UUID;
@@ -67,10 +67,6 @@ public class FailureRepository implements Repository<UUID, Record>, Finder<Recor
 
     public boolean isEmpty() {
         return records.get(FAILURES).isEmpty();
-    }
-
-    public int removeAll() {
-        return records.remove(FAILURES).intValue();
     }
 
     public void removeAllForCrawler(final UUID crawlerId) {

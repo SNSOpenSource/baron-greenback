@@ -12,13 +12,12 @@ $if(queryException)$
     <input type="submit" value="Search" class="search"/>
 </form>
 $else$
-
-$message()$
 <form class="search" method="get" action="">
     $input(name="query", value=query, message="")$
     <input type="submit" value="Search" class="search"/>
 </form>
 <div id="results">
+    $message()$
     <table class="$if(pager.paged)$paged$endif$ shouldExpand results">
         <thead>
         <tr>
@@ -40,8 +39,8 @@ $message()$
     <div class="actions">
         $get(url={$base$crawler/status}, class="crawler-status", name="Status")$
         $if(items)$
-        $post(name="retryAll", value="Retry All")$
-        $post(name="deleteAll", value="Delete All")$
+        $post(url=retryAll, name="retryAll", value="Retry All")$
+        $post(url=deleteAll, name="deleteAll", value="Delete All")$
         $else$
         $post(name="retryAll", value="Retry All", disabled="true")$
         $post(name="deleteAll", value="Delete All", disabled="true")$

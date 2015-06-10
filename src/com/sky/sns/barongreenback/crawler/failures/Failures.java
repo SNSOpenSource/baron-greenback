@@ -59,10 +59,6 @@ public class Failures implements StatusMonitor {
         return repository.isEmpty();
     }
 
-    public int removeAll() {
-        return repository.removeAll();
-    }
-
     private Failure unmarshal(Record record) {
         return FailureMarshallers.valueOf(record.get(FailureRepository.JOB_TYPE)).marshaller(scope).unmarshal(record);
     }

@@ -1,23 +1,31 @@
 package com.sky.sns.barongreenback.crawler.failures;
 
+import com.googlecode.funclate.Model;
+import com.googlecode.lazyrecords.Definition;
+import com.googlecode.lazyrecords.Keyword;
+import com.googlecode.lazyrecords.Record;
+import com.googlecode.lazyrecords.mappings.StringMapping;
+import com.googlecode.lazyrecords.mappings.StringMappings;
+import com.googlecode.totallylazy.Function2;
+import com.googlecode.totallylazy.LazyException;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.time.Clock;
 import com.sky.sns.barongreenback.crawler.CheckpointHandler;
 import com.sky.sns.barongreenback.crawler.Crawler;
 import com.sky.sns.barongreenback.crawler.CrawlerRepository;
 import com.sky.sns.barongreenback.crawler.HttpVisitedFactory;
 import com.sky.sns.barongreenback.crawler.datasources.HttpDataSource;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.sky.sns.barongreenback.shared.RecordDefinition;
-import com.googlecode.funclate.Model;
-import com.googlecode.lazyrecords.Definition;
-import com.googlecode.lazyrecords.Keyword;
-import com.googlecode.lazyrecords.Record;
-import com.googlecode.totallylazy.Function2;
-import com.googlecode.totallylazy.LazyException;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.time.Clock;
 
 import java.util.List;
 import java.util.UUID;
 
+import static com.googlecode.funclate.Model.mutable.model;
+import static com.googlecode.funclate.Model.mutable.parse;
+import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
+import static com.googlecode.lazyrecords.Record.constructors.record;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.sky.sns.barongreenback.crawler.datasources.HttpDataSource.httpDataSource;
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.CRAWLER_ID;
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.DURATION;
@@ -28,22 +36,19 @@ import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.REQU
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.SOURCE;
 import static com.sky.sns.barongreenback.crawler.failures.FailureRepository.URI;
 import static com.sky.sns.barongreenback.shared.RecordDefinition.convert;
-import static com.googlecode.funclate.Model.mutable.model;
-import static com.googlecode.funclate.Model.mutable.parse;
-import static com.googlecode.lazyrecords.Keyword.constructors.keyword;
-import static com.googlecode.lazyrecords.Record.constructors.record;
-import static com.googlecode.totallylazy.Sequences.sequence;
 
 abstract public class AbstractFailureMarshaller implements FailureMarshaller {
     private final CrawlerRepository crawlerRepository;
     private final CheckpointHandler checkpointHandler;
     protected final HttpVisitedFactory visited;
     protected final Clock clock;
+    private final StringMappings stringMappings;
 
-    public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, HttpVisitedFactory visited, Clock clock) {
+    public AbstractFailureMarshaller(CrawlerRepository crawlerRepository, CheckpointHandler checkpointHandler, HttpVisitedFactory visited, BaronGreenbackStringMappings stringMappings, Clock clock) {
         this.crawlerRepository = crawlerRepository;
         this.checkpointHandler = checkpointHandler;
         this.visited = visited;
+        this.stringMappings = stringMappings.value();
         this.clock = clock;
     }
 
@@ -93,7 +98,8 @@ abstract public class AbstractFailureMarshaller implements FailureMarshaller {
                 String name = model.get("name", String.class);
                 Class<?> type = Class.forName(model.get("type", String.class));
                 Keyword<Object> keyword = keyword(name, type);
-                return record.set(keyword, model.get("value"));
+                final Object value = model.get("value");
+                return record.set(keyword, value == null ? null : stringMappings.get(type).toValue(value.toString()));
             }
         };
     }
