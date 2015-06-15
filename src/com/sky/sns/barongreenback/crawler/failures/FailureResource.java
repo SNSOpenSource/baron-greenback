@@ -202,7 +202,7 @@ public class FailureResource {
     private HttpJobExecutor executor(Job job) {
         CrawlerScope crawlerScope = CrawlerScope.crawlerScope(requestScope,
                 new CheckpointUpdater(requestScope.get(CheckpointHandler.class), job.crawlerId(),
-                        crawlerRepository.modelFor(job.crawlerId()).get()));
+                        crawlerRepository.crawlerFor(job.crawlerId())));
         return crawlerScope.get(HttpJobExecutor.class);
     }
 }
