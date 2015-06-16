@@ -12,9 +12,7 @@
         $item.jobId$
     </td>
     <td>$if(item.shortMessage)$
-        <div class="shortMessage">
-            $item.shortMessage$
-        </div>
+        <div class="shortMessage">$item.shortMessage$</div>
         $endif$
 
         $if(item.rawMessage)$
