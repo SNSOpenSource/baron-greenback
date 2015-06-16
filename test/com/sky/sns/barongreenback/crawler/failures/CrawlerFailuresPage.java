@@ -39,7 +39,7 @@ public class CrawlerFailuresPage {
         return html.table("//body[@class='failures']").bodyRows().map(new Mapper<TableRow, String>() {
             @Override
             public String call(TableRow tableRow) throws Exception {
-                return tableRow.cells().first().value();
+                return tableRow.cells().second().value();
             }
         });
     }

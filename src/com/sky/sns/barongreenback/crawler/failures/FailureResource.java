@@ -59,7 +59,7 @@ public class FailureResource {
     private final Sorter sorter;
     private final FailureRepository failureRepository;
     private final PredicateBuilder predicateBuilder;
-    public static final Sequence<Keyword<?>> HEADERS = Sequences.<Keyword<?>>sequence(URI, CRAWLER_ID, JOB_TYPE, REASON, REQUEST_TIME, DURATION);
+    public static final Sequence<Keyword<?>> HEADERS = Sequences.<Keyword<?>>sequence(REQUEST_TIME, URI, CRAWLER_ID, JOB_TYPE, REASON, DURATION);
 
     public FailureResource(Failures failures, FailureRepository failureRepository, Redirector redirector, CrawlerRepository crawlerRepository, Container requestScope, Pager pager, Sorter sorter, PredicateBuilder predicateBuilder) {
         this.failures = failures;

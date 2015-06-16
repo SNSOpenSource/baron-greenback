@@ -45,7 +45,7 @@ public class SearchModule implements BaronGreenbackRequestScopedModule, Resource
 
     public Container addPerRequestObjects(Container container) throws Exception {
         container.add(Pager.class, RequestPager.class).
-                addActivator(Sorter.class, SorterActivator.class).
+                add(Sorter.class, Sorter.class).
                 addActivator(PredicateBuilder.class, PredicateBuilderActivator.class).
                 add(CsvWriter.class);
         Containers.addIfAbsent(container, ShortcutPolicy.class, PrimaryViewShortcutPolicy.class);
