@@ -413,6 +413,23 @@ body.jobs, body.failures, body.jobsHistory  {
     }
 }
 
+body.failures  {
+  table.results {
+    .jobType {
+       min-width: 60px;
+    }
+    .entity.reason {
+        width: 235px;
+        height: 1em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .Actions {
+        min-width: 70px;
+    }
+  }
+}
+
 .rawMessage{
   display: none !important;
 }
