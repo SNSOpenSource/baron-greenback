@@ -1,11 +1,11 @@
 package com.sky.sns.barongreenback.crawler;
 
-import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
-import com.sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.mappings.StringMappings;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
+import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
+import com.sky.sns.barongreenback.shared.ModelRepository;
 
 import java.util.UUID;
 
@@ -46,12 +46,12 @@ public class CheckpointHandler {
     }
 
     private String getCheckpointType(Object checkpoint) {
-        if(checkpoint == null) return String.class.getName();
+        if (checkpoint == null) return String.class.getName();
         return checkpoint.getClass().getName();
     }
 
     private String mapAsString(Object instance) {
-        if(instance == null) return "";
+        if (instance == null) return "";
         return mappings.toString(instance.getClass(), instance);
     }
 }
