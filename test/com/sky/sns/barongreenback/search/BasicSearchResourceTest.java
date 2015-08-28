@@ -229,4 +229,42 @@ public class BasicSearchResourceTest extends ApplicationTests {
         final Response csvResponse = SearchPage.exportToCsv(browser, "users", " OR AND ", "");
         assertThat(csvResponse.status(), Matchers.is(BAD_REQUEST));
     }
+
+    @Test
+    public void shouldNotIncludeAFieldWithEmptyValue() throws Exception {
+
+        final Model viewDefinition = Model.persistent.parse(Strings.toString(BasicSearchResourceTest.class.getResourceAsStream("testViewDefinition.json")));
+        final Definition recordDefinition = definition("items", keyword("fielda"), keyword("fieldb").metadata(Keywords.unique, true), keyword("fieldc"), keyword("fieldd"));
+        final Record record = record(keyword("fielda"), "", keyword("fieldb"), "b", keyword("fieldc"), "c", keyword("fieldd"), "d");
+
+        application.usingRequestScope(new Block<Container>() {
+            public void execute(Container container) throws Exception {
+                container.get(BaronGreenbackRecords.class).value().add(recordDefinition, record);
+                container.get(ViewsRepository.class).set(UUID.randomUUID(), viewDefinition);
+            }
+        });
+
+        final Response response = application.handle(get(relativeUriOf(method(on(SearchResource.class).unique("items", "")))).accepting(APPLICATION_JSON).build());
+        final String expectedResponse = "\"record\":{\"groupa\":{\"aliasc\":\"c\"},\"groupb\":{\"aliasb\":\"b\"},\"Other\":{\"aliasd\":\"d\"}}";
+        assertThat(response.entity().toString(), containsString(expectedResponse));
+    }
+
+    @Test
+    public void shouldNotIncludeAGroupWithEmptyValues() throws Exception {
+
+        final Model viewDefinition = Model.persistent.parse(Strings.toString(BasicSearchResourceTest.class.getResourceAsStream("testViewDefinition.json")));
+        final Definition recordDefinition = definition("items", keyword("fielda"), keyword("fieldb").metadata(Keywords.unique, true), keyword("fieldc"), keyword("fieldd"));
+        final Record record = record(keyword("fielda"), "", keyword("fieldb"), "b", keyword("fieldc"), "", keyword("fieldd"), "d");
+
+        application.usingRequestScope(new Block<Container>() {
+            public void execute(Container container) throws Exception {
+                container.get(BaronGreenbackRecords.class).value().add(recordDefinition, record);
+                container.get(ViewsRepository.class).set(UUID.randomUUID(), viewDefinition);
+            }
+        });
+
+        final Response response = application.handle(get(relativeUriOf(method(on(SearchResource.class).unique("items", "")))).accepting(APPLICATION_JSON).build());
+        final String expectedResponse = "\"record\":{\"groupb\":{\"aliasb\":\"b\"},\"Other\":{\"aliasd\":\"d\"}}";
+        assertThat(response.entity().toString(), containsString(expectedResponse));
+    }
 }
