@@ -1,8 +1,5 @@
 package com.sky.sns.barongreenback.search;
 
-import com.sky.sns.barongreenback.shared.pager.Pager;
-import com.sky.sns.barongreenback.shared.sorter.Sorter;
-import com.sky.sns.barongreenback.views.ViewsRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.AliasedKeyword;
 import com.googlecode.lazyrecords.Definition;
@@ -38,6 +35,9 @@ import com.googlecode.utterlyidle.annotations.PathParam;
 import com.googlecode.utterlyidle.annotations.Priority;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.annotations.QueryParam;
+import com.sky.sns.barongreenback.shared.pager.Pager;
+import com.sky.sns.barongreenback.shared.sorter.Sorter;
+import com.sky.sns.barongreenback.views.ViewsRepository;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -48,11 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.sky.sns.barongreenback.search.RecordsService.unalias;
-import static com.sky.sns.barongreenback.search.RecordsService.visibleHeaders;
-import static com.sky.sns.barongreenback.shared.RecordDefinition.toKeywords;
-import static com.sky.sns.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
-import static com.sky.sns.barongreenback.views.ViewsRepository.unwrap;
 import static com.googlecode.funclate.Model.functions.value;
 import static com.googlecode.funclate.Model.methods.merge;
 import static com.googlecode.funclate.Model.mutable.model;
@@ -60,7 +55,6 @@ import static com.googlecode.lazyrecords.Keyword.functions.name;
 import static com.googlecode.lazyrecords.Record.constructors.record;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Callables.descending;
-import static com.googlecode.totallylazy.Callables.returnArgument;
 import static com.googlecode.totallylazy.Callables.returns1;
 import static com.googlecode.totallylazy.Closeables.using;
 import static com.googlecode.totallylazy.GenericType.functions.forClass;
@@ -77,6 +71,11 @@ import static com.googlecode.utterlyidle.HttpHeaders.CONTENT_TYPE;
 import static com.googlecode.utterlyidle.MediaType.TEXT_CSV;
 import static com.googlecode.utterlyidle.ResponseBuilder.response;
 import static com.googlecode.utterlyidle.Status.BAD_REQUEST;
+import static com.sky.sns.barongreenback.search.RecordsService.unalias;
+import static com.sky.sns.barongreenback.search.RecordsService.visibleHeaders;
+import static com.sky.sns.barongreenback.shared.RecordDefinition.toKeywords;
+import static com.sky.sns.barongreenback.shared.sorter.Sorter.sortKeywordFromRequest;
+import static com.sky.sns.barongreenback.views.ViewsRepository.unwrap;
 import static java.lang.String.format;
 
 
@@ -211,9 +210,19 @@ public class SearchResource {
         final List<Model> viewFields = recordsService.findView(viewName).get().get("view", Model.class).getValues("keywords", Model.class);
         final List<String> aliasedViewFieldNames = sequence(viewFields).map(toAliasOrElseName()).unique().toList();
         final List<String> viewGroupNames = sequence(viewFields).map(value("group", String.class)).unique().toList();
-        final Map<String, Map<String, Object>> groupedAliasedFields = record.map(withAliasesFor(headers(recordsService.view(viewName)))).get().fields().fold(newSortedMapUsing(viewGroupNames), groupBy(ViewsRepository.GROUP, aliasedViewFieldNames));
+        final Sequence<Pair<Keyword<?>, Object>> fields = record.map(withAliasesFor(headers(recordsService.view(viewName)))).get().fields().filter(emptyStrings());
+        final Map<String, Map<String, Object>> groupedAliasedFields = fields.fold(newSortedMapUsing(viewGroupNames), groupBy(ViewsRepository.GROUP, aliasedViewFieldNames));
 
         return baseModel(viewName, query, Either.<String, DrillDowns>right(DrillDowns.empty())).add("record", groupedAliasedFields);
+    }
+
+    private Predicate<Pair<Keyword<?>, Object>> emptyStrings() {
+        return new Predicate<Pair<Keyword<?>, Object>>() {
+            @Override
+            public boolean matches(Pair<Keyword<?>, Object> other) {
+                return !(other.getValue() instanceof String && Strings.isBlank((String) other.getValue()));
+            }
+        };
     }
 
     private Mapper<Model, String> toAliasOrElseName() {
