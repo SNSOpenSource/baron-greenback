@@ -1,25 +1,27 @@
 package com.sky.sns.barongreenback.crawler;
 
+import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.*;
 import com.sky.sns.barongreenback.shared.Forms;
 import com.sky.sns.barongreenback.shared.ModelRepository;
 import com.sky.sns.barongreenback.shared.RecordDefinition;
-import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.*;
 
 import java.util.UUID;
 
-import static com.sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
-import static com.sky.sns.barongreenback.shared.RecordDefinition.convert;
 import static com.googlecode.funclate.Model.mutable.model;
 import static com.googlecode.funclate.Model.mutable.parse;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.sky.sns.barongreenback.crawler.Crawler.methods.name;
+import static com.sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
+import static com.sky.sns.barongreenback.shared.RecordDefinition.convert;
 import static java.util.UUID.randomUUID;
 
 public class CrawlerRepository {
-    public static final String NAME = "name";
-    public static final String UPDATE = "update";
+    private static final String NAME = "name";
+    private static final String UPDATE = "update";
+    private static final String COPY_PREFIX = "copy of ";
     private final ModelRepository modelRepository;
 
     public CrawlerRepository(final ModelRepository modelRepository) {
@@ -67,7 +69,7 @@ public class CrawlerRepository {
             public Model call(Model crawler) throws Exception {
                 Model root = crawler.get("form", Model.class);
                 root.set("disabled", true);
-                root.set(NAME, "copy of " + root.get(NAME, String.class));
+                root.set(NAME, COPY_PREFIX + root.get(NAME, String.class));
                 return crawler;
             }
         };
@@ -117,6 +119,19 @@ public class CrawlerRepository {
 
         public static Boolean enabled(Model model) {
             return !option(model.get("form", Model.class).get("disabled", Boolean.class)).getOrElse(false);
+        }
+
+        public static Predicate<Model> isCopy() {
+            return new Predicate<Model>() {
+                @Override
+                public boolean matches(Model model) {
+                    return isCopy(model);
+                }
+            };
+        }
+
+        public static Boolean isCopy(Model model) {
+            return name(model.get("form", Model.class)).startsWith(COPY_PREFIX);
         }
     }
 

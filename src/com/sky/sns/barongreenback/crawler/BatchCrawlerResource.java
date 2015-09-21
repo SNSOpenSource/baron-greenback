@@ -1,20 +1,23 @@
 package com.sky.sns.barongreenback.crawler;
 
-import com.sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.*;
-import com.googlecode.utterlyidle.*;
+import com.googlecode.totallylazy.Callable1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.utterlyidle.Application;
+import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Redirector;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import com.googlecode.utterlyidle.handlers.InvocationHandler;
 import com.googlecode.utterlyidle.schedules.ScheduleResource;
+import com.sky.sns.barongreenback.shared.ModelRepository;
 
 import java.util.UUID;
 
-import static com.sky.sns.barongreenback.crawler.CrawlerDefinitionResource.scheduleAQueuedCrawl;
-import static com.sky.sns.barongreenback.crawler.CrawlerRepository.predicates.enabled;
-import static com.sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
 import static com.googlecode.totallylazy.Callables.first;
 import static com.googlecode.totallylazy.Callables.second;
 import static com.googlecode.totallylazy.Predicates.is;
@@ -22,6 +25,10 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.proxy.Call.method;
 import static com.googlecode.totallylazy.proxy.Call.on;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
+import static com.sky.sns.barongreenback.crawler.CrawlerDefinitionResource.scheduleAQueuedCrawl;
+import static com.sky.sns.barongreenback.crawler.CrawlerRepository.predicates.enabled;
+import static com.sky.sns.barongreenback.crawler.CrawlerRepository.predicates.isCopy;
+import static com.sky.sns.barongreenback.shared.ModelRepository.MODEL_TYPE;
 
 @Path("crawler")
 @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
@@ -58,6 +65,16 @@ public class BatchCrawlerResource {
     @Path("deleteAll")
     public Response deleteAll() throws Exception {
         return forAll(ids(), delete()).getOrElse(redirector.seeOther(method(on(CrawlerDefinitionResource.class).list(Option.<String>none()))));
+    }
+
+    @POST
+    @Path("deleteAllBackups")
+    public Response deleteAllBackups() throws Exception {
+        return forAll(backupIds(), delete()).getOrElse(redirector.seeOther(method(on(CrawlerDefinitionResource.class).list(Option.<String>none()))));
+    }
+
+    private Sequence<UUID> backupIds() {
+        return new CrawlerRepository(modelRepository).allCrawlerModels().filter(where(second(Model.class), isCopy())).map(first(UUID.class));
     }
 
     private Sequence<UUID> ids() {

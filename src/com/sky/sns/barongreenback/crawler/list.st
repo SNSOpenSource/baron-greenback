@@ -21,10 +21,12 @@ $message()$
         $post(name="crawlAll", value="Crawl All")$
         $post(name="resetAll", value="Reset All")$
         $post(name="deleteAll", value="Delete All")$
+        $post(name="deleteAllBackups", value="Delete All Backups")$
     $else$
         $post(name="crawlAll", value="Crawl All", disabled="true")$
         $post(name="resetAll", value="Reset All", disabled="true")$
         $post(name="deleteAll", value="Delete All", disabled="true")$
+        $post(name="deleteAllBackups", value="Delete All Backups", disabled="true")$
     $endif$
 
     $get(url={$base$crawler/status}, class="crawler-status", name="Status")$
