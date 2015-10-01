@@ -22,6 +22,11 @@ public class CrawlerTest extends ApplicationTests {
         importAndCrawl("oneUnique.json");
     }
 
+    @Test
+    public void shouldCrawlOkWhenRelativePath() throws Exception {
+        importAndCrawl("relativePath.json");
+    }
+
     private void importAndCrawl(String filename) throws Exception {
         CrawlerImportPage importer = new CrawlerImportPage(browser);
         UUID id = UUID.randomUUID();
