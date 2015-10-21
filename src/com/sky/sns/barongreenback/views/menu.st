@@ -10,7 +10,7 @@
     <h4 class="title">Show results in</h4>
 <ul class="nav nav-views">
     $views:{ view |
-    <li class="view $view.name$ count$view.itemsTotal$ $if(view.current)$ active $endif$">
+    <li class="view $dashes(view.name)$ count$view.itemsTotal$ $if(view.current)$ active $endif$">
         <a class="tab" href="$view.url$">$view.name$ <span class="count">($view.itemsTotal$)</span></a>
     </li>
     }$
