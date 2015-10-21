@@ -1,11 +1,10 @@
 package com.sky.sns.barongreenback.shared;
 
+import com.googlecode.utterlyidle.SmartHttpClient;
+import com.googlecode.utterlyidle.handlers.InternalHttpHandler;
+import com.googlecode.utterlyidle.handlers.RoutingClient;
 import com.sky.sns.barongreenback.WebApplication;
-import com.sky.sns.barongreenback.crawler.CrawlerConnectTimeout;
-import com.sky.sns.barongreenback.crawler.CrawlerHttpClient;
-import com.sky.sns.barongreenback.crawler.CrawlerImportPage;
-import com.sky.sns.barongreenback.crawler.CrawlerListPage;
-import com.sky.sns.barongreenback.crawler.CrawlerReadTimeout;
+import com.sky.sns.barongreenback.crawler.*;
 import com.sky.sns.barongreenback.schedules.ScheduleListPage;
 import com.googlecode.lazyrecords.lucene.Persistence;
 import com.googlecode.totallylazy.Block;
@@ -36,6 +35,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
 import static com.sky.sns.barongreenback.crawler.CrawlerTests.serverWithDataFeed;
@@ -67,8 +67,8 @@ public abstract class ApplicationTests {
             @Override
             public Container addPerRequestObjects(Container container) throws Exception {
                 container.removeOption(CrawlerHttpClient.class);
-                BaronGreenbackProperties properties = container.get(BaronGreenbackProperties.class);
-                return container.addInstance(CrawlerHttpClient.class, new CrawlerHttpClient(allTrafficTo(new CrawlerHttpClient(new CrawlerConnectTimeout(properties), new CrawlerReadTimeout(properties)), feed().authority())));
+                container.addInstance(Waitrest.class, waitrest);
+                return container.addActivator(CrawlerHttpClient.class, RoutingCrawlerHttpClientActivator.class);
             }
         });
         application.usingRequestScope(new Callable1<Container, Object>() {
@@ -78,6 +78,7 @@ public abstract class ApplicationTests {
                 return null;
             }
         });
+
         application.start();
         browser = browser(application);
     }
@@ -107,10 +108,34 @@ public abstract class ApplicationTests {
     }
 
     protected Uri feed() {
+        return feed(waitrest);
+    }
+
+    protected static Uri feed(Waitrest waitrest) {
         return Uri.uri(waitrest.getURL().toString()).mergePath("data");
     }
 
     protected HttpClient feedClient() {
         return allTrafficTo(new ClientHttpHandler(), feed().authority());
+    }
+
+    public static class RoutingCrawlerHttpClientActivator implements Callable<CrawlerHttpClient> {
+        private final BaronGreenbackProperties properties;
+        private final InternalHttpHandler internalHttpHandler;
+        private final Waitrest waitrest;
+
+
+        public RoutingCrawlerHttpClientActivator(BaronGreenbackProperties properties, InternalHttpHandler internalHttpHandler, Waitrest waitrest) {
+            this.properties = properties;
+            this.internalHttpHandler = internalHttpHandler;
+            this.waitrest = waitrest;
+        }
+
+        @Override
+        public CrawlerHttpClient call() throws Exception {
+            ClientHttpHandler httpHandler = new ClientHttpHandler(new CrawlerConnectTimeout(properties).value(), new CrawlerReadTimeout(properties).value());
+            final RoutingClient routingClient = allTrafficTo(httpHandler, feed(waitrest).authority());
+            return new CrawlerHttpClient(new SmartHttpClient(internalHttpHandler, routingClient));
+        }
     }
 }

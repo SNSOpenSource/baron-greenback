@@ -81,14 +81,14 @@ public class CrawlerExecutors implements Closeable {
     }
 
     public JobExecutor<PriorityJobRunnable> inputHandler(Job job) {
-        final String authority = job.dataSource().uri().authority();
-        inputHandler.putIfAbsent(authority, new Lazy<JobExecutor<PriorityJobRunnable>>() {
+        final String key = Option.option(job.dataSource().uri().authority()).getOrElse(job.dataSource().uri().path());
+        inputHandler.putIfAbsent(key, new Lazy<JobExecutor<PriorityJobRunnable>>() {
             @Override
             protected JobExecutor get() throws Exception {
-                return inputExecutor(authority);
+                return inputExecutor(key);
             }
         });
-        return inputHandler.get(authority).value();
+        return inputHandler.get(key).value();
     }
 
     public JobExecutor<PriorityJobRunnable> processHandler(Job job) {
