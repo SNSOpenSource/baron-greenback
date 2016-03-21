@@ -77,10 +77,7 @@
         </ul>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mockjax/1.6.2/jquery.mockjax.min.js"></script>
-<script src="https://code.jquery.com/qunit/qunit-1.10.0.js"></script>
+<script src="http://code.jquery.com/qunit/qunit-1.10.0.js"></script>
 <script>
     var addProdFiles = function (files, callback) {
         if (files.length == 1) {
@@ -100,7 +97,7 @@
     };
 
 
-    addProdFiles(['bgb.js', 'faceting.js'], function () {
+    addProdFiles(['jquery-1.10.2.min.js','jquery-migrate-1.2.1.min.js','bgb.js', 'faceting.js','jquery.mockjax.min.js'], function () {
 
         QUnit.testStart(BGB.faceting.registerFacetEntriesHandlers);
 
