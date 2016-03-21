@@ -13,22 +13,20 @@ before_deploy:
 - export GIT_TAG=$BUILD_NUMBER
 - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $BUILD_NUMBER" > /dev/null
   2>&1
-- git push -q https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG --tags
+- git push -q https://team-meerkat:$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG --tags
 deploy:
   provider: releases
-  api_key:
-    secure: L+BbO5jp31X0DsPRUFaIRc0Zhu8uSfkN1tLM5+sL7wsdAZfIQu3KxooJHgEq+CIFFALoTvnHYblqlBX3PFpapQMHz3q9sjzvVrvplZaSwD/zBF6pKEVGyLY9fD5XrSQUDsmgOK0QfZr0sH9w8S2cvwiAkqFSmmo/vP+WIyQDzRs=
   file_glob: true
   file:
     - ./build/artifacts/*.jar
     - ./build/artifacts/*.pom.xml
   skip_cleanup: true
+  api_key:
+    secure: NLlKCG1vJYhHPEHFeGpLBiT1DO5j7iiddKGqkY3qJ20/GMAhJzSAzwdw/aA2LKoduJDI1uLCsUXaz6LkDZvKaCi6E0FHFRzzYAlb1NI5QRDhJVjIMrhF9aW+dI4/20gofljkGY4ihNRTuNBH8+Z0fr3vFlxLvp2rlBt6o1I3o3A=
   on:
     repo: SNSOpenSource/baron-greenback
     tags: false
     all_branches: true
-
 branches:
-  # Don't build tags
   except:
-  - /^[0-9].[0-9]*/
+  - "/^[0-9].[0-9]*/"
