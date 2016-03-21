@@ -18,8 +18,8 @@ deploy:
   provider: releases
   file_glob: true
   file:
-    - ./build/artifacts/*.jar
-    - ./build/artifacts/*.pom.xml
+  - "./build/artifacts/*.jar"
+  - "./build/artifacts/*.pom.xml"
   skip_cleanup: true
   api_key:
     secure: NLlKCG1vJYhHPEHFeGpLBiT1DO5j7iiddKGqkY3qJ20/GMAhJzSAzwdw/aA2LKoduJDI1uLCsUXaz6LkDZvKaCi6E0FHFRzzYAlb1NI5QRDhJVjIMrhF9aW+dI4/20gofljkGY4ihNRTuNBH8+Z0fr3vFlxLvp2rlBt6o1I3o3A=
