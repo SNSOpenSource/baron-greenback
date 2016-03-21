@@ -50,6 +50,7 @@ public class SearchModule implements BaronGreenbackRequestScopedModule, Resource
                 add(CsvWriter.class);
         Containers.addIfAbsent(container, ShortcutPolicy.class, PrimaryViewShortcutPolicy.class);
         container.decorate(ShortcutPolicy.class, DrillDownsShortcutPolicy.class);
+        container.add(SearchFilter.class, DoNothingSearchFilter.class);
         return Containers.addInstanceIfAbsent(container, ConvertExtensionToAcceptHeader.Replacements.class, replacements(Pair.pair("json", MediaType.APPLICATION_JSON))).
                 decorate(HttpHandler.class, ConvertExtensionToAcceptHeader.class);
     }
