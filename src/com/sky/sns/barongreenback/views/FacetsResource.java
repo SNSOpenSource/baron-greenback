@@ -4,6 +4,7 @@ import com.sky.sns.barongreenback.persistence.BaronGreenbackStringMappings;
 import com.sky.sns.barongreenback.search.DrillDowns;
 import com.sky.sns.barongreenback.search.PredicateBuilder;
 import com.sky.sns.barongreenback.search.RecordsService;
+import com.sky.sns.barongreenback.search.SearchFilter;
 import com.sky.sns.barongreenback.shared.ModelRepository;
 import com.googlecode.funclate.Model;
 import com.googlecode.lazyrecords.Facet;
@@ -68,15 +69,17 @@ public class FacetsResource {
     private final ModelRepository modelRepository;
     private final StringMappings stringMappings;
     private final Redirector redirector;
+    private final SearchFilter searchFilter;
 
     public FacetsResource(FacetedRecords records,
                           PredicateBuilder predicateBuilder,
                           ModelRepository modelRepository,
-                          BaronGreenbackStringMappings baronGreenbackStringMappings, Redirector redirector) {
+                          BaronGreenbackStringMappings baronGreenbackStringMappings, Redirector redirector, SearchFilter searchFilter) {
         this.records = records;
         this.predicateBuilder = predicateBuilder;
         this.modelRepository = modelRepository;
         this.redirector = redirector;
+        this.searchFilter = searchFilter;
         this.stringMappings = baronGreenbackStringMappings.value();
     }
 
@@ -111,7 +114,7 @@ public class FacetsResource {
 
     private Sequence<Model> facetResults(String currentView, String query, Either<String, DrillDowns> drillDowns, Model view, Option<Integer> requestedEntryCount) throws IOException {
         final Sequence<Keyword<?>> viewHeaders = headers(view).map(unalias());
-        final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(RecordsService.prefixQueryWithImplicitViewQuery(view, query), viewHeaders);
+        final Either<String, Predicate<Record>> queryPredicate = predicateBuilder.build(RecordsService.prefixQueryWithFilters(view, query, searchFilter), viewHeaders);
 
         final Map<Keyword<?>, Integer> keywordAndConfiguredCounts = Maps.map(viewHeaders.filter(where(metadata(SHOW_FACET), is(notNullValue(Boolean.class).and(is(true)))))
                 .map(ViewsRepository.toKeywordAndFacetEntries()).map(Callables.<Keyword<?>, String, Integer>second(Callables.<String, Number, Integer>compose(Numbers.valueOf, Numbers.intValue))));

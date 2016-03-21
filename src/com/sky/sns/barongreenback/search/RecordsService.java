@@ -28,8 +28,11 @@ public class RecordsService {
     private final Records records;
     private final ModelRepository modelRepository;
     private final PredicateBuilder predicateBuilder;
+    private final SearchFilter searchFilter;
 
-    public RecordsService(final BaronGreenbackRecords records, final ModelRepository modelRepository, final PredicateBuilder predicateBuilder) {
+
+    public RecordsService(final BaronGreenbackRecords records, final ModelRepository modelRepository, final PredicateBuilder predicateBuilder, SearchFilter searchFilter) {
+        this.searchFilter = searchFilter;
         this.records = records.value();
         this.modelRepository = modelRepository;
         this.predicateBuilder = predicateBuilder;
@@ -37,7 +40,7 @@ public class RecordsService {
 
     public void delete(String viewName, String query, DrillDowns drillDowns) {
         Model view = view(viewName);
-        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithImplicitViewQuery(view, query), headersForQuery(view), drillDowns).right();
+        Predicate<Record> predicate = predicateBuilder.build(prefixQueryWithFilters(view, query, searchFilter), headersForQuery(view), drillDowns).right();
         records.remove(Definition.constructors.definition(viewName(view), Sequences.<Keyword<?>>empty()), predicate);
     }
 
@@ -81,8 +84,13 @@ public class RecordsService {
         return getRecords(view, query, headersForQuery(view), drillDowns);
     }
 
-    public static String prefixQueryWithImplicitViewQuery(Model view, final String query) {
-        return sequence(queryFrom(view), query).filter(not(blank)).map(Strings.trim()).map(format("(%s)")).toString(" ");
+    public static String prefixQueryWithFilters(Model view, final String query, final SearchFilter searchFilter) {
+        return sequence(queryFrom(view), query, searchFilter.getFilter()).filter(not(blank)).map(Strings.trim()).map(format("(%s)")).toString(" ");
+    }
+
+
+    public static String prefixQueryWithFilters(Model view, final String query) {
+        return prefixQueryWithFilters(view, query, new DoNothingSearchFilter());
     }
 
     private static String queryFrom(Model model) {
@@ -90,7 +98,7 @@ public class RecordsService {
     }
 
     private Either<String, Sequence<Record>> getRecords(Model view, String query, Sequence<Keyword<?>> visibleHeaders, DrillDowns drillDowns) {
-        return getRecordsWithQuery(view, prefixQueryWithImplicitViewQuery(view, query), visibleHeaders, drillDowns);
+        return getRecordsWithQuery(view, prefixQueryWithFilters(view, query,  searchFilter), visibleHeaders, drillDowns);
     }
 
     private Either<String, Sequence<Record>> getRecordsWithQuery(Model view, String query, Sequence<Keyword<?>> visibleHeaders, DrillDowns drillDowns) {
