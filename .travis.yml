@@ -2,33 +2,31 @@ language: java
 jdk:
 - oraclejdk7
 script: ant -DBUILD_NUMBER=$BUILD_NUMBER
-after_success: ./build/bintrayUpload.sh
-after_failure: grep -lEr "(</failure>)|(</error>)" ./build/artifacts/reports | xargs cat
+after_success: "./build/bintrayUpload.sh"
+after_failure: grep -lEr "(</failure>)|(</error>)" ./build/artifacts/reports | xargs  cat
 env:
   global:
   - BUILD_NUMBER=1.$TRAVIS_BUILD_NUMBER
-  - secure: JUFcrRexSZCndh8ZGn1+tcCgYMCWvR7m3LmpojUtpAE1phO8/EeZA4IKsFd27DG+dNzHffrY5HiEL3VFACZrJE7kT7Fm1Hb1ExMdY9LYTJum1TkmtLExrdDI9wMF713F/AV5w/Ro0crL1jie323IQ28/NAxisVrkVvAAy+ZqX90=
-  - secure: nrDZjXurrDlbihtPN0xX5nuXaZrom060dgLknCHntZaSNgR2JU7gZZi//G+NbSIJkClYuVZU8mSMCcInmBEsOSRYthm0cWrZgvwh+0ElDoPWxWpSYYThHTYSvI6KkiJ1TWVBLohKyDGI3JS9slqjiEKW7TpdbPmWchDC0UU4Kvg=
 before_deploy:
 - git config --global user.email "builds@travis-ci.com"
 - git config --global user.name "Travis CI"
 - export GIT_TAG=$BUILD_NUMBER
-- git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $BUILD_NUMBER" > /dev/null 2>&1
-- git push -q https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG --tags
+- git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $BUILD_NUMBER" > /dev/null
+  2>&1
+- git push -q https://team-meerkat:$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG --tags
 deploy:
   provider: releases
-  api_key: $GITHUB_API_KEY
   file_glob: true
   file:
-  - ./build/artifacts/*.jar
-  - ./build/artifacts/*.pom.xml
+  - "./build/artifacts/*.jar"
+  - "./build/artifacts/*.pom.xml"
   skip_cleanup: true
+  api_key:
+    secure: NLlKCG1vJYhHPEHFeGpLBiT1DO5j7iiddKGqkY3qJ20/GMAhJzSAzwdw/aA2LKoduJDI1uLCsUXaz6LkDZvKaCi6E0FHFRzzYAlb1NI5QRDhJVjIMrhF9aW+dI4/20gofljkGY4ihNRTuNBH8+Z0fr3vFlxLvp2rlBt6o1I3o3A=
   on:
     repo: SNSOpenSource/baron-greenback
     tags: false
     all_branches: true
-
 branches:
-  # Don't build tags
   except:
-  - /^[0-9].[0-9]*/
+  - "/^[0-9].[0-9]*/"
