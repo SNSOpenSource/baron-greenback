@@ -37,7 +37,7 @@ public class PrimaryViewShortcutPolicyTest {
     @Before
     public void createPolicy() {
         modelRepository = new RecordsModelRepository(records);
-        recordsService = new RecordsService(records, modelRepository, new PredicateBuilder(new StandardParser(), baronGreenbackStringMappings(stringMappings, new InMemoryPersistentTypes())));
+        recordsService = new RecordsService(records, modelRepository, new PredicateBuilder(new StandardParser(), baronGreenbackStringMappings(stringMappings, new InMemoryPersistentTypes())), new DoNothingSearchFilter());
 
         policy = new PrimaryViewShortcutPolicy(recordsService, modelRepository);
     }

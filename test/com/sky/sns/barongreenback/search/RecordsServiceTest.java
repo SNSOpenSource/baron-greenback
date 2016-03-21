@@ -40,7 +40,7 @@ public class RecordsServiceTest {
 
     @Test
     public void supportsDirectRecordAccess() throws Exception {
-        final RecordsService recordsService = new RecordsService(records, new RecordsModelRepository(records), null);
+        final RecordsService recordsService = new RecordsService(records, new RecordsModelRepository(records), null, new DoNothingSearchFilter());
 
         final Sequence<Record> results = recordsService.getRecords(view, all(Record.class));
         assertThat(results, contains(expected));
@@ -68,7 +68,7 @@ public class RecordsServiceTest {
 
     @Test
     public void prefxingQueryShouldSupportORs() throws Exception {
-        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery("keywordA:foo"), "keywordB:stu OR keywordA:foobar");
+        final String prefixedQuery = prefixQueryWithFilters(viewWithQuery("keywordA:foo"), "keywordB:stu OR keywordA:foobar");
 
         final Record shouldMatch = record(keyword("keywordA"), "foo", keyword("keywordB"), "stu");
         final Record shouldNotMatch = record(keyword("keywordA"), "foobar", keyword("keywordB"), "stu");
@@ -79,7 +79,7 @@ public class RecordsServiceTest {
 
     @Test
     public void prefixingShouldSupportEmptyQueries() throws Exception {
-        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery("keywordA:foo"), "");
+        final String prefixedQuery = prefixQueryWithFilters(viewWithQuery("keywordA:foo"), "");
 
         final Record shouldMatch = record(keyword("keywordA"), "foo");
         final Record shouldNotMatch = record(keyword("keywordA"), "foobar");
@@ -90,7 +90,7 @@ public class RecordsServiceTest {
 
     @Test
     public void prefixingShouldSupportEmptyViews() throws Exception {
-        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery(""), "keywordA:foo");
+        final String prefixedQuery = prefixQueryWithFilters(viewWithQuery(""), "keywordA:foo");
 
         final Record shouldMatch = record(keyword("keywordA"), "foo");
         final Record shouldNotMatch = record(keyword("keywordA"), "foobar");
@@ -101,7 +101,7 @@ public class RecordsServiceTest {
 
     @Test
     public void prefixingShouldSupportEmptyArguments() throws Exception {
-        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery(""), "");
+        final String prefixedQuery = prefixQueryWithFilters(viewWithQuery(""), "");
 
         final Record shouldMatch = record(keyword("keywordA"), "foo");
 
@@ -110,12 +110,41 @@ public class RecordsServiceTest {
 
     @Test
     public void prefixingShouldHandleWhitespace() throws Exception {
-        final String prefixedQuery = prefixQueryWithImplicitViewQuery(viewWithQuery("keywordA:foo "), "");
+        final String prefixedQuery = prefixQueryWithFilters(viewWithQuery("keywordA:foo "), "");
 
         final Record shouldMatch = record(keyword("keywordA"), "foo");
 
         assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
     }
+
+    @Test
+    public void prefixingShouldHandleFilters() throws Exception {
+        final String prefixedQuery = prefixQueryWithFilters(viewWithQuery("keywordA:foo "), "", new SimpleSearchFilter("keywordA:f*"));
+
+        final Record shouldMatch = record(keyword("keywordA"), "foo");
+
+        assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
+    }
+
+
+    @Test
+    public void prefixingShouldHandleEmptyFilters() throws Exception {
+        final String prefixedQuery = prefixQueryWithFilters(viewWithQuery("keywordA:foo "), "", new DoNothingSearchFilter());
+
+        final Record shouldMatch = record(keyword("keywordA"), "foo");
+
+        assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(true));
+    }
+
+    @Test
+    public void prefixingShouldHandleFiltersAndReturnNothing() throws Exception {
+        final String prefixedQuery = prefixQueryWithFilters(viewWithQuery("keywordA:foo "), "", new SimpleSearchFilter("keywordA:bar"));
+
+        final Record shouldMatch = record(keyword("keywordA"), "foo");
+
+        assertThat(parsedQuery(prefixedQuery).matches(shouldMatch), is(false));
+    }
+
 
     private Model viewWithQuery(String query) {
         return ViewsRepository.viewModel(Sequences.<Keyword<?>>empty(), "viewName", "source", query, true, "");
